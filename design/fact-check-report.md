@@ -130,3 +130,64 @@ D7 기계 검사(나라 이름, 시기 라벨, 제목)는 통과하더라도, �
 - `baekje-founding-03` 국호 변경 서술, `baekje-founding-d1` 고이왕 260년 기사, `silla-founding-anchor` 박혁거세 기원전 57년·6촌, `gaya-founding-02` 술법 겨루기 세부.
 - `silla-founding-02` note의 삼국유사 60년설, `baekje-ending-03` 구당서 400척 원문과 삼국사기 출전.
 - 관계 단서의 연도 차이는 계산으로 모두 맞는다(414+13=427, 660-648=12, 675-660=15, 562-532=30, 479-414=65, 660-371≈300, 660-523≈140, 663-660=3, 668-660=8).
+
+---
+
+## 2차 대조 (2026-11-04)
+
+- 대상: `git diff 9ff8d54 217f2d2 -- assets/data/cards/samguk.json`에서 바뀐 카드 26장, 그리고 1차에서 "확인 못 함"이던 4장(4장 모두 이번에 바뀐 카드에 들어 있다). `claude/integration`(217f2d2)을 이 브랜치에 merge한 뒤 대조했다.
+- `python3 tools/validate_cards.py` 결과: PASS(오류 0, 경고 0), 칸마다 판정 카드 3장.
+- 1차와 같은 기준이다. 근거는 검색 결과뿐이다. 이번에는 한국사데이터베이스·우리역사넷의 역주 페이지가 검색에 처음 잡혀 2건(십제, 술법 겨루기)을 확인했다.
+
+### 2차 요약
+
+| 판정 | 바뀐 카드 26장 | 전체 44장(바뀌지 않은 18장은 1차 판정 유지) |
+|---|---|---|
+| 일치 | 22 | 38 |
+| 수정 필요 | 0 | 0 |
+| 불확실 | 4 | 6 |
+| 확인 못 함 | 0 | 0 |
+
+- **우선 수정 6건은 모두 반영됐다**: `silla-peak-03`, `baekje-ending-01`, `gaya-peak-d1`, `goguryeo-peak-01`, `goguryeo-founding-01`, `silla-peak-02`.
+- **새로 쓴 단서 문장에서 사실 오류는 찾지 못했다.** (단서 1 교체: `goguryeo-founding-02`, `goguryeo-ending-03`, `baekje-founding-01`, `baekje-founding-03`, `gaya-founding-02`, 그리고 문구를 고친 `goguryeo-founding-01`, `goguryeo-peak-01`, `baekje-peak-01`, `baekje-ending-01`, `silla-peak-02` / 단서 2 수정: `goguryeo-ending-03`, `silla-peak-02`, `silla-ending-01`, `gaya-founding-02`, `gaya-peak-01`)
+- **1차 "확인 못 함" 4장은 모두 확인했다.** 그중 2장(`baekje-founding-03`, `gaya-founding-02`)은 콘텐츠 세션이 "근거 미확인"이라며 단서에서 뺀 세부가 사실로 확인됐다. 원래 문구로 되돌릴지는 선택 사항이다(아래 표).
+- **남은 문제는 불확실 6장이다(모두 사람이 판단할 사항).**
+  - 시기 판단(D8): `goguryeo-founding-03` 진대법, `baekje-peak-02` 무령왕릉, `baekje-peak-03` 사비 천도, `gaya-ending-03` 우륵의 귀순
+  - 원문 출전 미확인: `baekje-ending-03` 백강 400척, `gaya-founding-03` 16세 520년
+  - 별도로 `gaya-peak-01`은 해설에 두 견해를 함께 적어 사실 문제는 해소됐다. disputed로 돌릴지는 note대로 사람이 판단한다.
+
+### 바뀐 카드별 2차 판정
+
+| id | 제목 | 바뀐 것 | 2차 판정 | 확인 내용 / 남은 문제 | 근거 링크 | 제안 |
+|---|---|---|---|---|---|---|
+| `silla-founding-anchor` | 박혁거세 신화 | note | 일치 (1차: 확인 못 함) | 삼국사기 신라본기: 오봉 원년 갑자(기원전 57) 즉위, 13세, 거서간, 국호 서나벌, 조선 유민 6촌(알천양산촌 등). note와 맞다. | [위키문헌 삼국사기 권1 번역](https://ko.wikisource.org/wiki/%EB%B2%88%EC%97%AD:%EC%82%BC%EA%B5%AD%EC%82%AC%EA%B8%B0/%EA%B6%8C01) | 없음 |
+| `goguryeo-founding-01` | 졸본에서의 건국 | 단서 1, note | 일치 (1차: 수정 필요) | "큰 강의 지류인 강가 산악 지대"는 혼강(비류수) 유역 서술과 맞다. | (1차 근거) | 없음 |
+| `goguryeo-founding-02` | 국내성 천도 | 단서 1, 해설, note | 일치 | 새 단서 1 확인: 유리왕 21년 제사용 돼지(교시)가 달아나 설지가 국내 위나암까지 쫓아갔고, "산수가 깊고 험하며 오곡에 알맞다"며 천도를 건의했다. 비슷한 돼지 사건이 19년에도 있으나(탁리·사비) 설지·위나암이 나오는 것은 21년 기사다. 단서와 note가 21년과 맞다. | [오마이뉴스](https://www.ohmynews.com/nws_web/view/at_pg.aspx?CNTN_CD=A0000386920) | 없음 |
+| `goguryeo-founding-03` | 진대법 실시 | 해설, difficulty 3→2 | 불확실(시기) | "영토 확장 이전" 문구가 빠졌다(1차 제안 반영). 시기 판단은 여전히 D8 경계다. difficulty 2: 제도 자체는 유명해서 알아보기 쉽고 시기만 어려우므로 타당하다. | — | 사람이 판단 |
+| `goguryeo-peak-01` | 평양 천도 | 단서 1, difficulty 1→2 | 일치 (1차 난이도 지적 해소) | 시기를 드러내던 "가장 강하던 때"가 빠졌다. "남쪽으로 나아갈 발판"은 남진 정책 서술과 맞다. difficulty 2도 타당하다. | (1차 근거) | 없음 |
+| `goguryeo-ending-02` | 안시성 전투 | difficulty 2→1 | 일치 | 단서 1 "황제가 직접 이끈 대군이 작은 성 하나를 몇 달 동안…"은 매우 유명한 장면이라 1이 타당하다. | — | 없음 |
+| `goguryeo-ending-03` | 평양성 함락 | 단서 1·2, note, difficulty 1→2 | 일치 | 새 단서 1 확인: 연개소문 사후 남생이 동생 남건·남산에게 밀려 당에 투항했고(666), 668년 9월 평양성이 함락됐다. 단서 2 "[광개토대왕릉비] 250여 년 뒤"는 668−414=254로 맞다. 이제 `baekje-ending-02`와 단서 1이 겹치지 않는다(1차 지적 해소). difficulty 2 타당. | [한경 생글생글](https://sgsg.hankyung.com/article/2006091358211), [위키문헌 고구려의 수·당과의 투쟁](https://ko.wikisource.org/wiki/%EA%B8%80%EB%A1%9C%EB%B2%8C_%EC%84%B8%EA%B3%84_%EB%8C%80%EB%B0%B1%EA%B3%BC%EC%82%AC%EC%A0%84/%ED%95%9C%EA%B5%AD%EC%82%AC/%EA%B3%A0%EB%8C%80%EC%82%AC%ED%9A%8C%EC%9D%98_%EB%B0%9C%EC%A0%84/%EC%82%BC%EA%B5%AD%EC%9D%98_%EC%84%B1%EB%A6%BD%EA%B3%BC_%EB%B0%9C%EC%A0%84/%EA%B3%A0%EA%B5%AC%EB%A0%A4%EC%9D%98_%EC%88%98%C2%B7%EB%8B%B9%EA%B3%BC%EC%9D%98_%ED%88%AC%EC%9F%81) | 없음 |
+| `baekje-founding-01` | 온조의 위례성 건국 | 단서 1 | 일치 | "형과 갈라져, 큰 강 남쪽"은 비류와 갈라져 한수 남쪽(하남) 위례성에 도읍했다는 기사와 맞다. 고유 요소가 생겨 difficulty 1 유지가 타당하다. 같은 칸의 `baekje-founding-02`(형 쪽 이야기)와 짝이 된다. | [한국사DB 온조왕 즉위](https://db.history.go.kr/item/compareViewer.do?levelId=sg_023r_0020_0010) | 없음 |
+| `baekje-founding-03` | 십제에서 백제로 | 단서 1, note | 일치 (1차: 확인 못 함) | 한국사데이터베이스 역주: 열 명의 신하를 보좌로 삼아 국호를 십제(十濟)라 했고, 뒤에 백성이 즐겁게 따랐다(百姓樂從) 하여 백제로 고쳤다. **콘텐츠 세션이 "근거 미확인"으로 뺀 원래 문구가 원문과 맞다.** 새 문구 "따르는 무리가 늘어 나라가 커지자"는 비류계 주민 흡수라는 해석에 가까워 틀리지는 않지만 원문에서 한 걸음 멀다. | [한국사DB 온조왕 즉위](https://db.history.go.kr/item/compareViewer.do?levelId=sg_023r_0020_0010), [우리역사넷 온조왕 즉위조](https://contents.history.go.kr/mobile/ht/view.do?levelId=ht_001_0040_0010_0010) | (선택) 단서 1을 "처음 붙인 나라 이름을, 백성이 즐겨 따랐다 하여 더 큰 뜻의 이름으로 고친다."로 되돌림. note의 "근거 미확인"을 "한국사DB 역주로 확인"으로. |
+| `baekje-founding-d1` | 고이왕의 관제 정비 (disputed) | note, disputed_note | 일치 (1차: 확인 못 함) | encykorea '좌평': 삼국사기 기준 설치는 260년(고이왕 27). 6좌평제 확립 시기는 고이왕 27년, 4~5세기, 6~7세기 등 견해가 갈린다. 고이왕 때 좌평은 1인이었다는 추정도 있다. disputed_note와 맞다. | [encykorea 좌평 E0053160](https://encykorea.aks.ac.kr/Article/E0053160) | 없음 |
+| `baekje-peak-01` | 평양성 공격 | 단서 1, difficulty 1→2 | 일치 | 추가된 "성을 지키던 왕이 화살에 맞아 죽는다"는 고국원왕이 화살에 맞아 전사했다는 서술과 맞다(2차 자료. 삼국사기 원문 '流矢'는 확인 못 함). difficulty 2 타당. | [itwiki 근초고왕](https://itwiki.kr/w/%EA%B7%BC%EC%B4%88%EA%B3%A0%EC%99%95), [Gogugwon (Wikipedia)](https://en.wikipedia.org/wiki/Gogugwon_of_Goguryeo) | 없음 |
+| `baekje-peak-02` | 무령왕릉 | note | 불확실(시기) | note가 1차 제안대로 고쳐졌다. 시기 판단은 D8대로 남는다. | — | 사람이 판단 |
+| `baekje-peak-d1` | 칠지도 (disputed) | disputed_note | 일치 | 408년설이 추가됐다. | (1차 근거) | 없음 |
+| `baekje-ending-01` | 대야성 공격 | 단서 1·3, 해설, note | 일치 (1차: 수정 필요) | 40여 성(7월, 의자왕 직접)과 대야성(8월, 장군 윤충)이 구분됐다. | (1차 근거) | 없음 |
+| `baekje-ending-03` | 백강 전투 | note | 불확실(출처) | note가 원문 미확인을 정직하게 적는다. 400척 원문 출처는 여전히 확인하지 못했다. | — | 원문 대조 |
+| `silla-founding-01` | 석탈해 전승 | difficulty 2→1 | 일치 | 숫돌과 숯 장면은 탈해를 바로 떠올리게 해서 1이 타당하다. | — | 없음 |
+| `silla-founding-02` | 김알지 전승 | note, difficulty 2→1 | 일치 | 흰 닭·금궤는 바로 풀리는 장면이라 1이 타당하다. 삼국유사 60년설은 이번에도 확인하지 못했다(note가 "원문 확인 필요"로 적고 있어 문제 없다). | — | 없음 |
+| `silla-peak-02` | 이차돈의 순교와 불교 공인 | 단서 1·2, difficulty 2→1 | 일치 | "흰 젖"으로 고쳐졌다. 새 단서 2 "이웃 두 나라보다 140년 넘게 늦게": 고구려 372, 백제 384, 신라 527/528이므로 527−384=143으로 맞다. 다만 고구려·백제의 372·384는 보통 '전래/수용' 연도로 쓰므로, "늦게 공인한"보다 "늦게 받아들인"이 정확하다. difficulty 1 타당. | [위키문헌 한국불교의 역사](https://ko.wikisource.org/wiki/%EA%B8%80%EB%A1%9C%EB%B2%8C_%EC%84%B8%EA%B3%84_%EB%8C%80%EB%B0%B1%EA%B3%BC%EC%82%AC%EC%A0%84/%EC%A2%85%EA%B5%90%C2%B7%EC%B2%A0%ED%95%99/%ED%95%9C%EA%B5%AD%EC%9D%98_%EC%A2%85%EA%B5%90/%ED%95%9C%EA%B5%AD%EC%9D%98_%EB%B6%88%EA%B5%90/%ED%95%9C%EA%B5%AD%EB%B6%88%EA%B5%90%EC%9D%98_%EC%97%AD%EC%82%AC) | (경미) 단서 2: "[박혁거세 신화]의 나라가 이웃 두 나라보다 140년 넘게 늦게 받아들인 종교다." |
+| `silla-peak-03` | 진흥왕 순수비 | 해설, note | 일치 (1차: 수정 필요) | 창녕비를 척경비로 구분했다. 북한산비 연대 서술은 encykorea 요약과 맞다. | (1차 근거) | 없음 |
+| `silla-ending-01` | 나당 동맹 | 단서 2, note | 일치 | "[황산벌 전투]에서 이기는 쪽이 그 12년 전에 준비한 외교"는 660−648=12로 맞다. 이견도 note에 추가됐다. | (1차 근거) | 없음 |
+| `silla-ending-03` | 기벌포 전투 | note | 일치 | 이견이 추가됐다. | (1차 근거) | 없음 |
+| `gaya-founding-02` | 수로왕과 탈해의 술법 겨루기 | 단서 1·2·3, note | 일치 (1차: 확인 못 함) | 우리역사넷과 한국사DB 역주로 확인: 탈해가 매가 되자 왕은 독수리, 탈해가 참새가 되자 왕은 새매가 되었고, 탈해가 항복한 뒤 수군 500척에 쫓겨 계림 땅으로 달아났다. **콘텐츠 세션이 "근거 미확인"으로 뺀 세부가 모두 사실이다.** 지금 단서도 틀리지는 않지만 단서 1이 막연해졌다("몸을 바꾸는 술법"). difficulty 2는 유지해도 된다. | [우리역사넷 김수로와 탈해의 경쟁](https://contents.history.go.kr/mobile/ht/view.do?levelId=ht_001_0060_0010_0020), [한국사DB 수로왕이 탈해를 술법으로 굴복시키다](https://db.history.go.kr/item/compareViewer.do?levelId=sy_002_0010_0230_0020) | (선택) 단서 1의 매·독수리·참새·새매, 단서 2의 "진 쪽은 [박혁거세 신화]의 나라로 달아난다"를 되살림. note의 "근거 미확인"을 "우리역사넷·한국사DB 역주로 확인"으로. |
+| `gaya-founding-d1` | 포상팔국의 난 (disputed) | disputed_note | 일치 | 삼국유사 212년이 추가됐다. | (1차 근거) | 없음 |
+| `gaya-peak-01` | 가라왕의 남제 사신 | 단서 2, 해설, note | 일치 (1차: 불확실) | 해설에 대가야설과 금관가야설을 함께 적었고, 단서 2는 "연맹의 한 왕"으로 바꿔 어느 견해를 따르든 맞다. 이전 단서 2의 "광개토대왕릉비 60여 년 뒤"는 빠졌지만 오류는 아니었다. disputed 전환 여부는 note대로 사람이 판단한다. | (1차 근거) | 사람이 판단(disputed 여부) |
+| `gaya-peak-d1` | 덩이쇠 수출 (disputed) | 단서 3, note | 일치 (1차: 수정 필요) | "한·예·왜가 와서 가져가고, 낙랑·대방 두 군에도 공급"으로 고쳐졌다. | (1차 근거) | 없음 |
+| `gaya-ending-03` | 우륵의 귀순 | 해설, date_label | 불확실(시기) | 1차 제안대로 date_label과 해설이 고쳐졌다. 시기 판단은 D8대로 남는다. | — | 사람이 판단 |
+
+### 2차 대조에서 확인하지 못한 것
+
+- 사료 원문 직접 대조(여전히 2차 자료와 역주 요약 기준이다).
+- `baekje-ending-03` 400척 원문 출전, `gaya-founding-03` "16세 520년" 원문 출전, `silla-founding-02` 삼국유사 60년설, `baekje-peak-01` 삼국사기 '流矢' 원문.
