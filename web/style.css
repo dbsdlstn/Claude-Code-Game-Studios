@@ -203,7 +203,7 @@ button { font: inherit; color: inherit; }
 }
 .entry.collected { border-color: var(--celadon); }
 .entry.revealed { border-style: dashed; color: var(--ink-soft); }
-.entry.unknown { color: var(--line); letter-spacing: .2em; }
+.entry.unknown:not(.disputed) { color: var(--line); letter-spacing: .2em; }
 .entry.anchor { background: var(--paper-3); font-family: var(--serif); font-weight: 700; }
 .entry.disputed { border-color: var(--gold); border-style: dotted; }
 .entry.active { box-shadow: 0 0 0 2px var(--seal); }

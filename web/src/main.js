@@ -293,7 +293,7 @@ function showEndModal(status) {
     el('dt', {}, '놓지 못한 카드'), el('dd', {}, `${s.deck - s.total}장`));
   const dogamBtn = el('button', { type: 'button', class: 'btn', id: 'modal-dogam', onclick: () => { closeModal(); openDogam(); } }, '도감 보기');
   if (status === 'cleared') {
-    openModal('도감 완성', [el('p', {}, '이번 라운드의 카드를 모두 놓았습니다. 정답으로 놓은 카드는 도감에 수집되었습니다.'), stats],
+    openModal('라운드 클리어', [el('p', {}, '이번 라운드의 카드를 모두 놓았습니다. 정답으로 놓은 카드는 도감에 수집되었습니다.'), stats],
       [dogamBtn, el('button', { type: 'button', class: 'btn btn-primary', id: 'modal-retry', onclick: startNewRound }, '새 라운드')], 'cleared');
   } else {
     openModal('먹물이 바닥났습니다', [el('p', {}, '이번 라운드는 실패입니다. 지금까지 수집한 카드는 도감에 남습니다.'), stats],
@@ -381,14 +381,15 @@ function renderDogamDetail() {
   if (st === 'anchor') badges.push(el('span', { class: 'badge' }, '기준 카드'));
   if (card.disputed) badges.push(el('span', { class: 'badge badge-warn' }, '견해가 나뉨 · 판정 제외'));
   if (!card.verified) badges.push(el('span', { class: 'badge badge-warn' }, '사실 확인 전'));
-  box.replaceChildren(
+  box.replaceChildren(...[
     el('h3', { id: 'dogam-detail-title' }, card.title),
     el('p', { class: 'meta' }, where, ' · ', TYPE_LABEL[card.type] ?? card.type),
     el('div', {}, badges),
     el('p', {}, card.explanation || ''),
     card.disputed && card.disputed_note ? el('p', { class: 'meta' }, '견해: ', card.disputed_note) : null,
     card.source ? el('div', { class: 'src' }, '근거: ', card.source.name, card.source.note ? ` (${card.source.note})` : '') : null,
-  );
+
+  ].filter(Boolean));
 }
 
 /* ------------------------------------------------------------------ 시작 */
