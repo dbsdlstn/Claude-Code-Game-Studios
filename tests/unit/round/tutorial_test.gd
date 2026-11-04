@@ -53,3 +53,38 @@ func test_data_rejects_title_already_in_deck() -> void:
 func test_data_rejects_unknown_anchor() -> void:
 	var text := JSON.stringify({"anchor_id": "nope", "cards": [Fx.card("practice-01", "goguryeo", "peak")]})
 	assert_bool(TutorialData.parse(text, _deck(), _config()).is_valid()).is_false()
+
+
+func test_release_mode_skips_unverified_practice_card() -> void:
+	# 리뷰 2 N2: 출시 모드는 본 덱처럼 verified && !disputed 연습 카드만 쓴다.
+	var c := Fx.card("practice-01", "goguryeo", "peak")
+	c["verified"] = false
+	c["verified_by"] = null
+	var text := JSON.stringify({"anchor_id": Fx.ANCHOR_ID, "cards": [c]})
+	assert_bool(TutorialData.parse(text, _deck(), _config(), true).is_valid()).is_false()
+	assert_bool(TutorialData.parse(text, _deck(), _config(), false).is_valid()).is_true()
+
+
+func test_release_mode_accepts_verified_practice_card() -> void:
+	var t := TutorialData.parse(_tutorial_text("practice-01"), _deck(), _config(), true)
+	assert_bool(t.is_valid()).is_true()
+
+
+func test_board_anchors_include_main_anchor() -> void:
+	var t := TutorialData.parse(_tutorial_text("practice-01"), _deck(), _config())
+	assert_int(t.board_anchors.size()).is_equal(1)
+	assert_str(t.board_anchors[0].id).is_equal(Fx.ANCHOR_ID)
+
+
+func test_disputed_anchor_id_is_rejected() -> void:
+	var cards := Fx.valid_set()
+	var extra := Fx.anchor("anchor-disputed", "silla", "peak")
+	extra["disputed"] = true
+	extra["disputed_note"] = "견해가 나뉜다."
+	# disputed 기준 카드는 검증 규칙 6에서 걸리므로 CardSet을 직접 만든다.
+	var deck := CardSet.new()
+	for raw: Dictionary in cards:
+		deck.add(CardData.from_dict(raw))
+	deck.add(CardData.from_dict(extra))
+	var text := JSON.stringify({"anchor_id": "anchor-disputed", "cards": [Fx.card("practice-01", "silla", "peak", "anchor-disputed")]})
+	assert_bool(TutorialData.parse(text, deck, _config()).is_valid()).is_false()

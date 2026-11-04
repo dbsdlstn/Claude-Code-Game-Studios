@@ -8,6 +8,8 @@ extends RefCounted
 ##   3) path.tmp 를 path 로 옮긴다. 실패하면 path.bak 을 되돌린다.
 ##   4) path.bak 을 지운다.
 ## 읽기는 path → path.tmp → path.bak 순서로, 처음 읽히는 온전한 파일을 쓴다.
+## 이 코드보다 새 형식(version > ProgressData.SAVE_VERSION)이면 그 파일을
+## progress.v<N>.json 으로 복사해 두고 새로 시작한다(모르는 필드를 덮어써 지우지 않게, 리뷰 2 L2).
 ## (2와 3 사이에 끊기면 path가 없고 tmp가 완성본이다. 1에서 끊기면 path가 그대로 있다.)
 ##
 ## 사용 예:
@@ -78,12 +80,23 @@ func load_progress() -> ProgressData:
 		found_any = true
 		var data: Variant = _read_dict(candidate)
 		if data is Dictionary:
+			var version := ProgressData.version_of(data)
+			if version > ProgressData.SAVE_VERSION:
+				var keep := future_backup_path(version)
+				DirAccess.copy_absolute(candidate, keep)
+				last_error = "저장 형식 v%d을 이 버전이 읽지 못해 %s 에 보관하고 새로 시작한다" % [version, keep.get_file()]
+				return ProgressData.new()
 			if candidate != path:
 				last_error = "저장 파일을 %s 에서 복구했다" % candidate.get_file()
 			return ProgressData.from_dict(data)
 	if found_any:
 		last_error = "저장 파일이 깨져 새로 시작한다: %s" % path
 	return ProgressData.new()
+
+
+## 새 형식 저장을 보관하는 경로. 예: user://progress.v3.json
+func future_backup_path(version: int) -> String:
+	return "%s.v%d.%s" % [path.get_basename(), version, path.get_extension()]
 
 
 ## 저장 파일을 모두 지운다(테스트와 "진행 초기화"용).

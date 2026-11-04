@@ -11,8 +11,11 @@ extends PanelContainer
 
 ## 카드가 이 칸에 놓였다.
 signal card_dropped(nation: String, era: String)
-## 이 칸을 눌렀다(카드를 고른 뒤 누르는 방식).
-signal cell_clicked(nation: String, era: String)
+## 이 칸을 눌렀다(카드를 고른 뒤 누르는 방식). by_keyboard: Enter/Space(ui_accept)로 눌렀으면 true.
+signal cell_clicked(nation: String, era: String, by_keyboard: bool)
+
+## 칸에 보일 카드 이름 줄 수. 넘으면 최근 줄만 보이고 "외 n장"으로 줄인다(리뷰 2 L6, 보드 넘침 방지).
+const MAX_VISIBLE_LINES := 2
 
 var nation: String = ""
 var era: String = ""
@@ -67,16 +70,27 @@ func setup(cell_nation: String, cell_era: String, anchor_titles: PackedStringArr
 func show_empty() -> void:
 	_lines = PackedStringArray()
 	_content_label.text = ""
+	tooltip_text = ""
 	var bg: Color = HanjiTheme.ANCHOR if _anchor_label.visible else HanjiTheme.CELL
 	_set_base(HanjiTheme.box(bg, HanjiTheme.BORDER, 1))
 
 
 ## 카드를 한 장 더한다. correct가 false면 오답으로 공개된 카드다. 칸 색은 마지막 카드를 따른다.
 func show_placed(title: String, correct: bool) -> void:
-	_lines.append(title if correct else "%s (오답 공개)" % title)
-	_content_label.text = "\n".join(_lines)
+	_lines.append(title if correct else "%s (오답)" % title)
+	_content_label.text = visible_text(_lines, MAX_VISIBLE_LINES)
+	tooltip_text = "\n".join(_lines)
 	var bg: Color = HanjiTheme.CORRECT if correct else HanjiTheme.WRONG
 	_set_base(HanjiTheme.box(bg, HanjiTheme.BORDER, 2))
+
+
+## 칸에 보일 글: 최근 max_lines줄, 그보다 많으면 맨 위에 "외 n장".
+## 사용 예: BoardCell.visible_text(PackedStringArray(["가", "나", "다"]), 2) → "외 1장\n나\n다"
+static func visible_text(lines: PackedStringArray, max_lines: int) -> String:
+	if lines.size() <= max_lines:
+		return "\n".join(lines)
+	var shown := lines.slice(lines.size() - max_lines)
+	return "외 %d장\n%s" % [lines.size() - max_lines, "\n".join(shown)]
 
 
 ## 오답으로 고른 칸을 잠깐 붉게 표시한다.
@@ -107,10 +121,13 @@ func _drop_data(_at_position: Vector2, _data: Variant) -> void:
 func _gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
 	if mb != null and mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed:
-		cell_clicked.emit(nation, era)
+		# 마우스로 누른 칸에는 키보드 초점 테두리를 남기지 않는다(리뷰 2 L4).
+		if has_focus():
+			release_focus()
+		cell_clicked.emit(nation, era, false)
 		accept_event()
 	elif event.is_action_pressed("ui_accept"):
-		cell_clicked.emit(nation, era)
+		cell_clicked.emit(nation, era, true)
 		accept_event()
 
 

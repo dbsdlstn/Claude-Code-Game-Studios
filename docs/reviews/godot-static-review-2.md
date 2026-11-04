@@ -252,3 +252,23 @@ python3 tools/gd_card_validator_port.py tests/fixtures/cards_fixture.json  # 0 e
 3. v1 형식 `progress.json`(`{"version":1,"collected":[...],"rounds_played":2}`)을 넣고 실행했을 때 타이틀·도감 플레이 기록(L1)
 4. 마우스로 카드를 누른 뒤 고구려·건국기 칸에 붉은 테두리가 생기는지(L4)
 5. 한 칸에 3장이 쌓인 1280×720 화면(L6)
+
+## 처리 결과 (Godot MVP 세션, 2026-11-04)
+
+Godot는 실행하지 않았다. gdparse·gdlint 통과, 튜토리얼과 검증기는 `tools/gd_card_validator_port.py`로 대조했다. 결정 기록 D34.
+
+| 항목 | 처리 | 내용 |
+|---|---|---|
+| N1 공용 튜토리얼 파일 | 확인(Godot 영향 없음) | 형식(`{anchor_id, cards}`)은 그대로라 `TutorialData.parse`가 그대로 읽는다. 수정된 [낙랑군 축출]을 이식 도구로 검사: 개발 모드 오류 0, 본 덱과 id·제목 겹침 없음. 추가로 Python T2(anchor는 disputed 아님)·T5(relation은 본 덱의 아무 기준 카드)에 맞췄다 |
+| N2 출시 모드의 확인 전 연습 카드 | 고침 | `parse(..., release_mode)`가 `filter_for_mode`를 적용, 남는 카드가 없으면 튜토리얼 건너뜀 + 안내. 지금 파일은 출시 모드에서 0장(의도대로 건너뜀). 테스트 2개. 참고: Python `--tutorial --release`는 verified를 보지 않아 PASS(도구 쪽 차이) |
+| N3 이어하기 뒤 new_ids | 고침 | `RoundSession.new_ids`로 옮겨 `to_dict`·`summary`에 포함. 테스트: 저장 → 되살리기 → 남은 카드 → `round_log[0].new_ids`에 앞 카드 |
+| L1 v1 라운드 수와 기록 | 고침 | 라운드 수는 `rounds_played`, 정답률·단서는 기록 있는 라운드만, v1은 "세부 없음" 문구. 테스트 2개 |
+| L2 저장 version | 고침 | 새 형식이면 `progress.v<N>.json`에 보관하고 새로 시작. 통합 테스트 1개 |
+| L3 글꼴 판정 오탐 | 고침 | 한글 목록만으로 판정, "sans-serif"는 테마에만. 안내 문구를 완화. 실제 표시는 체크리스트 |
+| L4 마우스 선택 시 초점 테두리 | 고침 | `selection_changed(is_selected, by_keyboard)`. 마우스로 누르면 초점을 놓는다. 고름/초점 모양 분리 |
+| L5 키보드 흐름 | 고침 | 모든 화면 `focus_default()`, 튜토리얼에 선택 → 첫 칸 초점 연결, 키보드로 놓은 뒤 카드로 초점. 게임패드는 미확인 |
+| L6 칸 넘침 | 고침 | 최근 2줄 + "외 n장", 전체는 툴팁. `BoardCell.visible_text` 단위 테스트 3개. 1280×720 확인은 체크리스트 |
+| L7 기본 경고 | 고침 | `size` → `font_size`, `exp` → `explanation_text` |
+| L8 시작하기 확인 | 고침 | 진행 중 라운드가 있으면 `ConfirmationDialog` |
+| L9 되살린 라운드 정합성 | 고침 | 개수·먹물·순서·보드 위치 검사, 틀리면 새 라운드. 테스트 4개 |
+| 지시 5 하드코딩 | 확인 | 튜토리얼 통합 테스트는 파일에서 id·anchor를 읽는다. 단위 테스트는 공장 데이터(`Fx`)만 쓴다. 체크리스트의 카드 이름은 "지금은"으로 표시 |

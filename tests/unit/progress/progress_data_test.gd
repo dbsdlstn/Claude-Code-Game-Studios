@@ -103,3 +103,23 @@ func test_v1_save_loads_with_defaults() -> void:
 	assert_bool(r.tutorial_done).is_false()
 	assert_int(r.round_log.size()).is_equal(0)
 	assert_bool(r.has_current_round()).is_false()
+
+
+func test_v1_rounds_count_in_stats_without_details() -> void:
+	# 리뷰 2 L1: 라운드 수는 rounds_played 하나에서 나온다. v1 라운드는 세부 기록이 없다.
+	var r := ProgressData.from_dict({"version": 1, "rounds_played": 2, "rounds_cleared": 1, "rounds_failed": 1})
+	var st := r.stats()
+	assert_int(st["rounds"]).is_equal(2)
+	assert_int(st["logged_rounds"]).is_equal(0)
+	assert_float(st["accuracy"]).is_equal(-1.0)
+
+
+func test_rounds_played_is_never_below_logged_rounds() -> void:
+	var r := ProgressData.from_dict({"version": 2, "rounds_played": 0, "round_log": [
+		{"cleared": true, "correct": 1, "clue_levels": [1]}]})
+	assert_int(r.stats()["rounds"]).is_equal(1)
+
+
+func test_version_of_reads_number_or_defaults_to_one() -> void:
+	assert_int(ProgressData.version_of({"version": 3.0})).is_equal(3)
+	assert_int(ProgressData.version_of({})).is_equal(1)

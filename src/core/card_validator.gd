@@ -159,13 +159,13 @@ static func _check_schema(card: Dictionary, cid: String, era_labels: Dictionary,
 	if not _is_int_like(diff) or int(diff) < 1 or int(diff) > 3:
 		errors.append(_err(RULE_SCHEMA, cid, "difficulty가 1~3 정수가 아니다"))
 	if not _is_true(card.get("anchor")):
-		var exp: Variant = card.get("explanation")
-		if not _is_nonempty_str(exp):
+		var explanation_text: Variant = card.get("explanation")
+		if not _is_nonempty_str(explanation_text):
 			errors.append(_err(RULE_SCHEMA, cid, "일반 카드에 explanation이 없다"))
 		else:
 			var answer: Variant = card.get("answer")
 			var era: Variant = answer.get("era") if answer is Dictionary else null
-			if era is String and era_labels.has(era) and (exp as String).find(era_labels[era]) == -1:
+			if era is String and era_labels.has(era) and (explanation_text as String).find(era_labels[era]) == -1:
 				errors.append(_err(RULE_SCHEMA, cid, "해설에 시기 라벨 '%s'가 없다" % era_labels[era]))
 
 

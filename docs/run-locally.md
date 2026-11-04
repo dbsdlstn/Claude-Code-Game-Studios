@@ -65,20 +65,22 @@ godot --headless -s -d --remote-debug tcp://127.0.0.1:0 res://addons/gdUnit4/bin
 | `tests/unit/cards/card_validator_test.gd` | 검증 규칙 0~9, Python 검증기와 맞춘 라벨·참조 규칙, 경고 |
 | `tests/unit/cards/card_loader_test.gd` | JSON 파싱, 규칙 9(출시/개발 모드 필터), 판정 제외(규칙 6), 경로 선택 |
 | `tests/unit/config/game_config_test.gd` | 설정 읽기, 시기 정의, 라벨 맵, 출시 빌드 강제 |
-| `tests/unit/round/round_session_test.gd` | 단서 공개, 판정, 오답 공개·소모, **채워진 칸도 받음, 한 칸 여러 장**(D22), 클리어/실패, 요약, 진행 중 라운드 저장·복원 |
+| `tests/unit/round/round_session_test.gd` | 단서 공개, 판정, 오답 공개·소모, 채워진 칸도 받음, 한 칸 여러 장(D22), 클리어/실패, 요약, 진행 중 라운드 저장·복원, **이어하기 뒤 새로 모은 카드 유지**, **되살린 값 정합성 검사** |
 | `tests/unit/round/round_builder_test.gd` | **칸과 무관하게 12장, 미수집 우선, 부족하면 수집 카드로**, 같은 시드 같은 순서 |
 | `tests/unit/round/ink_meter_test.gd` | 먹물 규칙 |
-| `tests/unit/round/tutorial_test.gd` | 연습 카드 판정(먹물 없음), 튜토리얼 데이터가 본 덱과 겹치지 않음 |
-| `tests/unit/progress/progress_data_test.gd` | 도감 수집, 도감 완성, 플레이 기록(정답률·평균 단서 단계), 저장 v1/v2 |
+| `tests/unit/round/tutorial_test.gd` | 연습 카드 판정(먹물 없음), 본 덱과 겹침 거부, **출시 모드에서 확인 전 연습 카드 거부**, disputed 기준 카드 거부, 보드 기준 카드 |
+| `tests/unit/ui/board_cell_text_test.gd` | 한 칸에 많이 쌓일 때 "외 n장" 축약(노드 없이 정적 함수) |
+| `tests/unit/progress/progress_data_test.gd` | 도감 수집, 도감 완성, 플레이 기록(정답률·평균 단서 단계), 저장 v1/v2, **v1 라운드 수와 기록 정합**, version 읽기 |
 | `tests/integration/cards/card_file_loading_test.gd` | 설정, 픽스처, samguk.json(44장, 칸당 3장, 출시 모드는 규칙 8만), 라운드 12장, tutorial.json |
 | `tests/integration/cards/validator_parity_test.gd` | Python 검증기와 같은 39개 케이스 |
-| `tests/integration/save/save_store_test.gd` | user:// 저장/불러오기, 덮어쓰기, 깨진 파일, **교체 중 끊김 복구**, 임시·백업 파일 정리 |
+| `tests/integration/save/save_store_test.gd` | user:// 저장/불러오기, 덮어쓰기, 깨진 파일, 교체 중 끊김 복구, 임시·백업 파일 정리, **모르는 새 형식 보관 후 새로 시작** |
 
 ### Python 쪽 확인(Godot 없이)
 
 ```bash
 python3 tools/validate_cards.py                                   # samguk.json: PASS
 python3 tools/validator_parity.py                                 # 39/39 cases match
+python3 tools/validate_cards.py --tutorial assets/data/cards/tutorial.json   # TUTORIAL RESULT: PASS
 python3 tools/gd_card_validator_port.py --parity                  # GDScript 검증기 이식: 39/39
 python3 tools/gd_card_validator_port.py assets/data/cards/samguk.json   # 0 errors, anchors 4, playable 36, disputed 4
 ```
@@ -89,10 +91,14 @@ python3 tools/gd_card_validator_port.py assets/data/cards/samguk.json   # 0 erro
 - [ ] import·에디터 열기에서 파서 오류 0개, gdUnit4 전체 통과
 - [ ] 첫 실행: 튜토리얼이 바로 열린다. 저장이 있으면 타이틀이 열린다
 - [ ] 타이틀: 시작하기 / 이어하기(진행 중 라운드가 있을 때만 켜짐) / 도감 / 하는 방법, 아래에 "도감 m / 36"
+- [ ] 진행 중 라운드가 있을 때 "시작하기" → "진행 중인 라운드를 버리고 새로 시작할까요?" 확인 창(한글이 보이는지, 취소하면 그대로)
+- [ ] 키보드만으로: 타이틀·결과·도감·하는 방법이 열리면 첫 버튼에 초점이 있고 Enter로 누를 수 있다
 - [ ] 하는 방법: 규칙과 시기 정의 3줄, 돌아가기
 
 **튜토리얼**
-- [ ] 보드에 기준 카드 [광개토대왕릉비] 하나만 보인다. 연습 카드는 [낙랑군 축출](본 덱에 없는 카드)
+- [ ] 보드에 `tutorial.json`의 `anchor_id` 기준 카드(지금은 [광개토대왕릉비])와 연습 카드가 relation으로 가리키는 기준 카드만 보인다. 연습 카드(지금은 [낙랑군 축출])는 본 덱에 없는 카드다
+- [ ] 튜토리얼도 키보드로: "다음"에 초점, 카드 Enter → 보드 첫 칸 → 방향키 → Enter
+- [ ] 출시 모드(`release_mode: true`)에서는 `verified: false` 연습 카드를 쓰지 않는다: 튜토리얼이 열리지 않고 상단에 "튜토리얼 데이터 오류로 튜토리얼을 건너뜀"
 - [ ] 다음 → 단서 1 → 단서 2(관계)로 넘어가고, 놓기 단계에서 카드를 끌어 놓을 수 있다
 - [ ] 오답: 고른 칸이 붉게, 3단계까지 열림, 먹물 표시 없음, 다시 놓을 수 있다
 - [ ] 정답: 해설과 "본게임 시작". 건너뛰기는 언제든 타이틀로. 둘 다 다음 실행부터 튜토리얼이 자동으로 안 열린다
@@ -107,10 +113,12 @@ python3 tools/gd_card_validator_port.py assets/data/cards/samguk.json   # 0 erro
 - [ ] 카드를 눌러(붉은 테두리) 고른 뒤 칸 누르기로도 놓인다
 - [ ] 키보드: Tab으로 카드에 초점 → Enter로 고르기(초점이 보드 첫 칸으로) → 방향키로 칸 이동 → Enter로 놓기
 - [ ] 정답: 칸 초록, 이름 공개, 해설, 먹물 그대로. 오답: 고른 칸 잠깐 붉게, 정답 칸에 "(오답 공개)", 먹물 -1
-- [ ] **이미 카드가 있는 칸에도 놓을 수 있고 판정된다**(D22). 한 칸에 이름이 여러 줄로 쌓인다
+- [ ] **이미 카드가 있는 칸에도 놓을 수 있고 판정된다**(D22). 한 칸에 이름이 쌓이고, 3장 이상이면 최근 2장과 "외 n장"만 보인다(마우스를 올리면 전체 목록 툴팁). **한 칸에 3장, 그중 오답 2장**인 1280×720 화면에서 보드가 넘치지 않는다
+- [ ] 마우스로 카드를 눌러 고르면 카드가 노란 바탕 + 붉은 테두리, 보드 칸에는 초점 테두리가 생기지 않는다. 키보드로 고를 때만 첫 칸에 붉은 초점 테두리
 - [ ] 한 라운드에 같은 칸 카드가 여러 장 나올 수 있다(빈 칸이 정답을 알려 주지 않는다)
 - [ ] 해설이 길어도 옆 패널이 스크롤된다(L5)
-- [ ] 라운드 도중 "타이틀" → "이어하기"로 같은 카드·먹물·보드에서 계속. 게임을 껐다 켜도 이어하기가 된다
+- [ ] 라운드 도중 "타이틀" → "이어하기"로 같은 카드·먹물·단서 단계·보드에서 계속. 게임을 껐다 켜도 이어하기가 된다
+- [ ] 이어하기 전에 모은 카드도 결과 화면의 "새로 모은 카드"와 도감 플레이 기록에 들어간다
 
 **결과·도감**
 - [ ] 라운드 끝: 결과 화면(라운드 클리어 또는 실패, 정답 수, 남은 먹물, 새로 모은 카드 수와 목록, 단서 단계 분포, 틀린 카드 해설), 새 라운드/도감/타이틀
@@ -118,9 +126,11 @@ python3 tools/gd_card_validator_port.py assets/data/cards/samguk.json   # 0 erro
 - [ ] 도감: 맞힌 카드만 이름이 열리고 누르면 해설·근거·사실 확인 상태. 기준 카드와 "견해가 나뉘는 기록" **4장**은 항상 보임. 플레이 기록 한 줄(라운드 수, 클리어·실패, 정답률, 평균 단서 단계)
 - [ ] 36장을 다 모으면 "[도감 완성]"(라운드 도중이면 메시지, 마지막 카드면 결과 화면에), 도감 제목 "도감 완성 36 / 36". 빨리 보려면 `progress.json`의 `collected`에 35개 id를 넣고 시작
 - [ ] 다시 켜도 도감·플레이 기록이 남는다
+- [ ] v1 형식 `progress.json`(`{"version":1,"collected":[...],"rounds_played":2}`)을 넣으면 도감 플레이 기록이 "라운드 2 … 이전 버전 기록이라 세부가 없습니다"
+- [ ] `{"version":99,...}`를 넣으면 `progress.v99.json`으로 보관되고 새로 시작한다는 안내가 뜬다
 
 **화면·글꼴**
-- [ ] 한글이 네모(□)로 깨지지 않는다. 시스템 한글 글꼴이 없으면 상단 안내가 뜨고, `assets/fonts/ui_font_kr.ttf`에 한글 TTF를 넣으면 그 글꼴로 바뀐다
+- [ ] 한글이 네모(□)로 깨지지 않는다. 목록의 한글 글꼴이 없으면 상단에 "목록의 한글 글꼴을 찾지 못함: 글자가 네모로 보이면 …" 안내가 뜬다. **한글 글꼴이 없는 리눅스에서 안내와 실제 표시가 맞는지**(OS 대체 글꼴로 한글이 보이는데 안내가 뜨면 기록). `assets/fonts/ui_font_kr.ttf`에 한글 TTF를 넣으면 그 글꼴로 바뀐다
 - [ ] `--resolution 1280x720`, `1920x1080`, `2560x1440`, `1280x800`에서 글자가 잘리거나 칸이 넘치지 않고, 2560×1440에서 흐리지 않다
 
 ## 6. 설정 바꾸기

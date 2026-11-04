@@ -13,6 +13,8 @@ func before_test() -> void:
 
 func after_test() -> void:
 	_store.clear()
+	if FileAccess.file_exists(_store.future_backup_path(99)):
+		DirAccess.remove_absolute(_store.future_backup_path(99))
 
 
 func test_missing_file_loads_empty_progress() -> void:
@@ -95,3 +97,12 @@ func test_partial_temp_file_does_not_replace_good_save() -> void:
 	var p := _store.load_progress()
 	assert_bool(p.is_collected("good")).is_true()
 	assert_str(_store.last_error).is_empty()
+
+
+func test_unknown_future_version_is_backed_up_and_not_read() -> void:
+	# 리뷰 2 L2: 모르는 새 형식은 덮어쓰지 않도록 보관하고 새로 시작한다.
+	_write(TEST_PATH, JSON.stringify({"version": 99, "collected": ["x"]}))
+	var p := _store.load_progress()
+	assert_bool(p.is_collected("x")).is_false()
+	assert_bool(FileAccess.file_exists(_store.future_backup_path(99))).is_true()
+	assert_str(_store.last_error).is_not_empty()

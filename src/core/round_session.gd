@@ -33,6 +33,9 @@ var wrong_count: int = 0
 var hints_used: int = 0
 ## 카드별 기록 [{ "card_id", "correct", "clues_seen" }] — 결과 화면과 플레이 기록용.
 var history: Array[Dictionary] = []
+## 이번 라운드에 새로 도감에 들어간 카드 id. 수집 판단은 ProgressData가 하고,
+## 화면이 note_new_collected()로 알려 준다. 이어하기에도 남도록 to_dict()에 들어간다(리뷰 2 N3).
+var new_ids: Array[String] = []
 
 var _queue: Array[CardData] = []
 var _index: int = 0
@@ -151,9 +154,15 @@ func is_over() -> bool:
 	return status != Status.PLAYING
 
 
+## 이번 라운드에 새로 모은 카드를 기록한다(같은 id는 한 번만).
+func note_new_collected(card_id: String) -> void:
+	if not card_id.is_empty() and not new_ids.has(card_id):
+		new_ids.append(card_id)
+
+
 ## 결과 화면·플레이 기록용 요약.
 ## { "cleared", "correct", "wrong", "total", "placed", "ink_left", "hints",
-##   "clue_levels": [놓을 때 본 단서 단계...], "correct_ids": [...], "wrong_ids": [...] }
+##   "clue_levels": [놓을 때 본 단서 단계...], "correct_ids": [...], "wrong_ids": [...], "new_ids": [...] }
 func summary() -> Dictionary:
 	var levels: Array = []
 	var correct_ids: Array = []
@@ -175,6 +184,7 @@ func summary() -> Dictionary:
 		"clue_levels": levels,
 		"correct_ids": correct_ids,
 		"wrong_ids": wrong_ids,
+		"new_ids": Array(new_ids),
 	}
 
 
@@ -195,10 +205,13 @@ func to_dict() -> Dictionary:
 		"hints": hints_used,
 		"placed": _placed.duplicate(true),
 		"history": history.duplicate(true),
+		"new_ids": Array(new_ids),
 	}
 
 
-## 저장된 진행 중 라운드를 되살린다. 카드가 지금 판정 카드 묶음에 없거나 값이 맞지 않으면 null
+## 저장된 진행 중 라운드를 되살린다. 카드가 지금 판정 카드 묶음에 없거나, 값의 범위가 틀리거나,
+## 값끼리 맞지 않으면(정답+오답 ≠ 놓은 수, 기록 수 ≠ 놓은 수, 먹물 ≠ 시작 − 오답,
+## 보드의 카드가 앞서 놓은 카드와 다름) null
 ## (그 라운드는 버리고 새로 시작한다. 도감 기록은 ProgressData에 따로 있어 잃지 않는다).
 static func from_dict(d: Dictionary, cards: CardSet, nation_ids: PackedStringArray, era_ids: PackedStringArray) -> RoundSession:
 	if _num(d.get("version"), -1) != SAVE_VERSION:
@@ -243,7 +256,40 @@ static func from_dict(d: Dictionary, cards: CardSet, nation_ids: PackedStringArr
 		for h: Variant in hist:
 			if h is Dictionary and h.get("card_id") is String and typeof(h.get("correct")) == TYPE_BOOL:
 				s.history.append({"card_id": h["card_id"], "correct": h["correct"], "clues_seen": _num(h.get("clues_seen"), 1)})
+	var saved_new: Variant = d.get("new_ids")
+	if saved_new is Array:
+		for id: Variant in saved_new:
+			if id is String:
+				s.note_new_collected(id)
+	if not s._is_consistent():
+		return null
 	return s
+
+
+## 되살린 값끼리 맞는지(리뷰 2 L9).
+func _is_consistent() -> bool:
+	if correct_count + wrong_count != _index or history.size() != _index:
+		return false
+	if ink.current != ink.max_ink - wrong_count:
+		return false
+	var wrong_in_history := 0
+	var placed_ids: Dictionary = {}
+	for i in history.size():
+		if history[i]["card_id"] != _queue[i].id:
+			return false
+		if not history[i]["correct"]:
+			wrong_in_history += 1
+		placed_ids[_queue[i].id] = _queue[i].cell_key()
+	if wrong_in_history != wrong_count:
+		return false
+	var on_board := 0
+	for key: Variant in _placed:
+		for e: Dictionary in _placed[key]:
+			# 보드의 카드는 앞서 놓은 카드여야 하고, 그 카드의 정답 칸에 있어야 한다.
+			if not placed_ids.has(e["card_id"]) or placed_ids[e["card_id"]] != key:
+				return false
+			on_board += 1
+	return on_board == _index
 
 
 func _begin_card() -> void:

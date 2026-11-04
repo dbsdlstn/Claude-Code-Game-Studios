@@ -5,8 +5,8 @@ extends PanelContainer
 
 ## "단서 더 보기"를 눌렀다.
 signal more_clues_requested
-## 카드를 눌러 고르거나 고르기를 풀었다.
-signal selection_changed(is_selected: bool)
+## 카드를 눌러 고르거나 고르기를 풀었다. by_keyboard: Enter/Space로 골랐으면 true.
+signal selection_changed(is_selected: bool, by_keyboard: bool)
 
 ## 드래그 데이터의 종류 표시. BoardCell이 확인한다.
 const DRAG_KIND := "hanyang_card"
@@ -113,13 +113,18 @@ func _gui_input(event: InputEvent) -> void:
 	if mb == null and event.is_action_pressed("ui_accept"):
 		toggle = true
 	if toggle and not _card_id.is_empty():
+		if mb != null and has_focus():
+			release_focus()  # 마우스로 고를 때는 초점 테두리를 남기지 않는다(리뷰 2 L4)
 		set_selected(not selected)
-		selection_changed.emit(selected)
+		selection_changed.emit(selected, mb == null)
 		accept_event()
 
 
 func _apply_style() -> void:
-	if selected or has_focus():
-		add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.CARD, HanjiTheme.ACCENT, 3, 12.0))
+	# 고른 상태(노란 바탕 + 굵은 붉은 테두리)와 키보드 초점(붉은 테두리만)을 구분한다.
+	if selected:
+		add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.HOVER, HanjiTheme.ACCENT, 3, 12.0))
+	elif has_focus():
+		add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.CARD, HanjiTheme.ACCENT, 2, 12.0))
 	else:
 		add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.CARD, HanjiTheme.BORDER, 2, 12.0))

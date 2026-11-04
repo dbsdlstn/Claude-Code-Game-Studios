@@ -85,8 +85,10 @@ func record_round_result(summary: Dictionary, new_ids: Array = []) -> void:
 	current_round = {}
 
 
-## 플레이 기록 집계. accuracy: 놓은 카드 중 정답 비율(0~1), avg_clue_level: 놓을 때 본 단서 단계 평균.
-## 기록이 없으면 accuracy와 avg_clue_level은 -1.0.
+## 플레이 기록 집계.
+## rounds/cleared/failed: 끝낸 라운드 수(v1 저장에서 넘어온 라운드 포함, rounds_played 기준).
+## logged_rounds: 세부 기록(round_log)이 있는 라운드 수. v1에서 넘어온 라운드는 세부가 없다.
+## accuracy(0~1)와 avg_clue_level은 logged_rounds만으로 계산한다. 세부 기록이 없으면 -1.0.
 func stats() -> Dictionary:
 	var placed := 0
 	var correct := 0
@@ -98,7 +100,8 @@ func stats() -> Dictionary:
 		for lv: Variant in levels:
 			level_sum += int(lv)
 	return {
-		"rounds": round_log.size(),
+		"rounds": rounds_played,
+		"logged_rounds": round_log.size(),
 		"cleared": rounds_cleared,
 		"failed": rounds_failed,
 		"accuracy": (float(correct) / placed) if placed > 0 else -1.0,
@@ -127,6 +130,14 @@ func to_dict() -> Dictionary:
 	}
 
 
+## 저장 딕셔너리의 version. 없거나 숫자가 아니면 1(최초 형식에는 version이 있었지만 안전하게).
+static func version_of(d: Dictionary) -> int:
+	var v: Variant = d.get("version")
+	if typeof(v) == TYPE_INT or typeof(v) == TYPE_FLOAT:
+		return int(v)
+	return 1
+
+
 ## 저장 딕셔너리에서 만든다. 잘못된 값은 무시하고 기본값을 쓴다.
 ## 지금 카드 묶음에 없는 id도 지우지 않는다(출시 모드에서 잠시 빠진 카드일 수 있다).
 static func from_dict(d: Dictionary) -> ProgressData:
@@ -139,6 +150,8 @@ static func from_dict(d: Dictionary) -> ProgressData:
 	p.rounds_played = _count(d.get("rounds_played"))
 	p.rounds_cleared = _count(d.get("rounds_cleared"))
 	p.rounds_failed = _count(d.get("rounds_failed"))
+	# 카운터가 손상돼도 끝낸 라운드 수는 클리어+실패와 세부 기록 수보다 작을 수 없다.
+	p.rounds_played = maxi(p.rounds_played, p.rounds_cleared + p.rounds_failed)
 	var td: Variant = d.get("tutorial_done")
 	p.tutorial_done = typeof(td) == TYPE_BOOL and td
 	var log_raw: Variant = d.get("round_log")
@@ -168,6 +181,7 @@ static func from_dict(d: Dictionary) -> ProgressData:
 	var cur: Variant = d.get("current_round")
 	if cur is Dictionary:
 		p.current_round = cur
+	p.rounds_played = maxi(p.rounds_played, p.round_log.size())
 	return p
 
 

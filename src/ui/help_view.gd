@@ -4,6 +4,8 @@ extends PanelContainer
 
 signal closed
 
+var _back: Button
+
 
 ## 내용을 만든다.
 func setup(config: GameConfig) -> void:
@@ -33,7 +35,12 @@ func setup(config: GameConfig) -> void:
 	body.custom_minimum_size = Vector2(600, 0)
 	body.text = "\n".join(lines)
 	box.add_child(body)
-	var back := Button.new()
-	back.text = "돌아가기"
-	back.pressed.connect(func() -> void: closed.emit())
-	box.add_child(back)
+	_back = Button.new()
+	_back.text = "돌아가기"
+	_back.pressed.connect(func() -> void: closed.emit())
+	box.add_child(_back)
+
+
+## 키보드 초점을 "돌아가기"에 둔다.
+func focus_default() -> void:
+	_back.grab_focus()
