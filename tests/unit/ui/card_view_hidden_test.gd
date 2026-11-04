@@ -29,13 +29,16 @@ func test_shown_card_texts_do_not_depend_on_type() -> void:
 		assert_array(Array(_shown_texts(_card(t)))).is_equal(Array(expected))
 
 
-func test_shown_card_has_no_type_word_except_shared_heading() -> void:
+func test_shown_card_has_no_type_word() -> void:
+	# 숨김 제목도 예외 없이 검사한다(바이블 §7 "? 이름 숨김": 유형을 암시하는 말 금지).
 	for t: String in TYPES:
 		for s: String in _shown_texts(_card(t)):
-			if s == CardView.HIDDEN_HEADING:
-				continue  # "? 사건 카드"는 모든 카드에 같은 제목(바이블 §7)
 			for label: String in HanjiTheme.TYPE_LABELS.values():
 				assert_str(s).not_contains(label)
+
+
+func test_hidden_heading_follows_art_bible() -> void:
+	assert_str(CardView.HIDDEN_HEADING).is_equal("? 이름 숨김")
 
 
 func test_shown_card_has_no_title_nation_or_era() -> void:

@@ -21,8 +21,8 @@ signal anchor_ref_pressed(anchor_id: String, sticky: bool)
 ## 드래그 데이터의 종류 표시. BoardCell이 확인한다.
 const DRAG_KIND := "hanyang_card"
 const KIND_LABELS := {"description": "장면", "relation": "관계", "direct": "직접"}
-## 숨김 상태 제목(모든 카드에 같다, 바이블 §7).
-const HIDDEN_HEADING := "? 사건 카드"
+## 숨김 상태 제목(모든 카드에 같다, 바이블 §7). "사건 카드"처럼 유형을 암시하는 말은 쓰지 않는다(D37).
+const HIDDEN_HEADING := "? 이름 숨김"
 
 ## 눌러서 골랐는지.
 var selected: bool = false
