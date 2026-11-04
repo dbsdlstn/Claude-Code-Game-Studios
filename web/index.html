@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>한양 도감 — 삼국시대</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1 class="brand">한양 도감 <span class="brand-sub">삼국시대</span></h1>
+  <div class="status">
+    <div id="ink" class="ink" role="img" aria-label="먹물"></div>
+    <div id="progress" class="progress"></div>
+  </div>
+  <nav class="actions">
+    <button id="btn-dogam" type="button" class="btn">도감</button>
+    <button id="btn-new" type="button" class="btn btn-quiet">새 라운드</button>
+  </nav>
+</header>
+
+<main class="play" id="play">
+  <aside class="hand">
+    <div id="card" class="card" tabindex="0" aria-describedby="hand-help"></div>
+    <p id="hand-help" class="help">카드를 끌어 칸에 놓거나, 카드를 눌러 고른 뒤 칸을 누르세요.</p>
+    <section id="feedback" class="feedback" aria-live="polite"></section>
+  </aside>
+  <section class="board-wrap" aria-label="나라와 시기 보드">
+    <div id="board" class="board"></div>
+  </section>
+</main>
+
+<div id="dogam" class="overlay" hidden>
+  <div class="sheet dogam-sheet" role="dialog" aria-modal="true" aria-labelledby="dogam-title">
+    <header class="sheet-head">
+      <h2 id="dogam-title">도감</h2>
+      <span id="dogam-count" class="dogam-count"></span>
+      <button id="btn-dogam-close" type="button" class="btn">닫기</button>
+    </header>
+    <div class="dogam-body">
+      <div id="dogam-grid" class="board dogam-grid"></div>
+      <article id="dogam-detail" class="dogam-detail"></article>
+    </div>
+  </div>
+</div>
+
+<div id="modal" class="overlay" hidden>
+  <div class="sheet modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h2 id="modal-title"></h2>
+    <div id="modal-body"></div>
+    <div id="modal-actions" class="modal-actions"></div>
+  </div>
+</div>
+
+<footer class="foot">
+  <span id="data-info"></span>
+  <span id="data-warn" class="warn"></span>
+</footer>
+
+<div id="drag-ghost" class="drag-ghost" hidden></div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
