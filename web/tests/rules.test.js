@@ -9,7 +9,7 @@ import {
   roundStatus, currentCardId, revealNextClue, placeCard, boardCells, roundStats,
   recordInCollection, serializeRound, restoreRound, restoreCollection,
   buildRoundOrder, isDogamComplete, dogamProgress, releaseFilter,
-  summarizeRound, historyStats, restoreHistory, dataFingerprint, parseTutorial, fnv1a,
+  summarizeRound, historyStats, restoreHistory, dataFingerprint, parseTutorial, fnv1a, TUTORIAL_RELEASE_EMPTY,
 } from '../src/rules.js';
 import { createStore } from '../src/storage.js';
 import { loadCards, resolveDataUrls } from '../src/data.js';
@@ -483,6 +483,48 @@ describe('공용 튜토리얼 파일(assets/data/cards/tutorial.json, D31)', () 
     assert.ok(rulesOf({ anchor_id: 'goguryeo-peak-anchor', cards: [otherRef] }).includes('R4'));
     assert.ok(rulesOf([fresh]).includes('TUTORIAL'));
     assert.ok(rulesOf({ anchor_id: 'goguryeo-peak-anchor', cards: [{ ...fresh, disputed: true, disputed_note: 'x' }] }).includes('TUTORIAL'));
+  });
+});
+
+describe('튜토리얼 출시 모드(D35·D40)', () => {
+  const deck = () => loadSample();
+  const practice = () => ({ ...structuredClone(loadSample().find((c) => c.id === 'goguryeo-founding-01')), id: 'tutorial-x', title: '연습 카드' });
+
+  test('출시 모드: verified가 아닌 연습 카드는 걸러지고, 남는 게 없으면 TUTORIAL_RELEASE_EMPTY', () => {
+    const t = parseTutorial({ anchor_id: 'goguryeo-peak-anchor', cards: [practice()] }, deck(), { release: true });
+    assert.deepEqual(t.errors.map((e) => e.rule), [TUTORIAL_RELEASE_EMPTY]);
+    assert.equal(t.card, null);
+  });
+
+  test('출시 모드: disputed 연습 카드도 걸러진다', () => {
+    const p = { ...practice(), verified: true, verified_by: '테스트', disputed: true, disputed_note: 'x' };
+    assert.deepEqual(parseTutorial({ anchor_id: 'goguryeo-peak-anchor', cards: [p] }, deck(), { release: true }).errors.map((e) => e.rule), [TUTORIAL_RELEASE_EMPTY]);
+  });
+
+  test('출시 모드: 미확인 카드 뒤의 확인된 카드가 연습 카드가 된다', () => {
+    const ok = { ...practice(), id: 'tutorial-ok', title: '확인된 연습', verified: true, verified_by: '테스트' };
+    const t = parseTutorial({ anchor_id: 'goguryeo-peak-anchor', cards: [practice(), ok] }, deck(), { release: true });
+    assert.deepEqual(t.errors, []);
+    assert.equal(t.card.id, 'tutorial-ok');
+  });
+
+  test('개발 모드는 미확인 카드도 쓴다', () => {
+    const t = parseTutorial({ anchor_id: 'goguryeo-peak-anchor', cards: [practice()] }, deck());
+    assert.deepEqual(t.errors, []);
+    assert.equal(t.card.id, 'tutorial-x');
+  });
+
+  test('relation은 본 덱 아무 기준 카드나 가리킬 수 있고, 보드 기준 카드에 함께 들어간다', () => {
+    const p = practice();
+    p.clues[1] = { ...p.clues[1], refs: ['silla-founding-anchor'], text: '[박혁거세 신화]와 비슷한 때의 이야기.' };
+    const t = parseTutorial({ anchor_id: 'goguryeo-peak-anchor', cards: [p] }, deck());
+    assert.deepEqual(t.errors, []);
+    assert.deepEqual(t.boardAnchors.map((a) => a.id), ['goguryeo-peak-anchor', 'silla-founding-anchor']);
+  });
+
+  test('disputed 기준 카드는 anchor_id가 될 수 없다', () => {
+    const d = deck().map((c) => (c.id === 'goguryeo-peak-anchor' ? { ...c, disputed: true, disputed_note: 'x' } : c));
+    assert.ok(parseTutorial({ anchor_id: 'goguryeo-peak-anchor', cards: [practice()] }, d).errors.some((e) => e.rule === 'TUTORIAL'));
   });
 });
 

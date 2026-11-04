@@ -74,3 +74,21 @@ test('규칙 위반 묶음: 두 검증기의 (규칙, 대상) 오류 목록이 �
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('튜토리얼 파일: JS parseTutorial과 validate_cards.py --tutorial의 통과·실패가 같다(개발·출시 모드)', { skip: !existsSync(SAMGUK) && 'samguk.json 없음' }, async () => {
+  const { parseTutorial, TUTORIAL_RELEASE_EMPTY } = await import('../src/rules.js');
+  const TUT = path.join(ROOT, 'assets', 'data', 'cards', 'tutorial.json');
+  const deck = JSON.parse(readFileSync(SAMGUK, 'utf8'));
+  const data = JSON.parse(readFileSync(TUT, 'utf8'));
+  const py = (release) => {
+    let out;
+    try { out = execFileSync('python3', [PY, '--tutorial', TUT, ...(release ? ['--release'] : [])], { encoding: 'utf8' }); } catch (e) { out = e.stdout; }
+    return { pass: /TUTORIAL RESULT: PASS/.test(out), t6: /\[T6\]/.test(out) };
+  };
+  for (const release of [false, true]) {
+    const js = parseTutorial(data, deck, { release });
+    const p = py(release);
+    assert.equal(js.errors.length === 0, p.pass, `release=${release}`);
+    assert.equal(js.errors.some((e) => e.rule === TUTORIAL_RELEASE_EMPTY), p.t6, `release=${release} T6`);
+  }
+});

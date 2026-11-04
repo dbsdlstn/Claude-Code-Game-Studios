@@ -10,11 +10,14 @@ import { wireRefHighlight } from './refs.js';
 const STEPS = ['eras', 'clue1', 'relation', 'explain'];
 
 /**
- * @param {{anchor: object, card: object}} pair
+ * @param {{anchor: object, card: object, boardAnchors?: Array<object>}} pair
  * @param {{onFinish: (skipped: boolean) => void}} hooks
  */
 export function createTutorial(pair, hooks) {
-  const { anchor, card } = pair;
+  const { card } = pair;
+  const boardAnchors = pair.boardAnchors?.length ? pair.boardAnchors : [pair.anchor];
+  // 관계 단서가 가리키는 기준 카드(없으면 anchor_id 카드). 단계 설명과 칸 강조에 쓴다.
+  const anchor = boardAnchors.find((a) => card.clues?.[1]?.refs?.includes(a.id)) ?? pair.anchor;
   const where = (a) => `${nationLabel(a.nation)} ${eraLabel(a.era)}`;
   const t = { step: 0, shown: 1, selected: false, placed: null, wrongTries: 0 };
   let wired = false;
@@ -80,7 +83,7 @@ export function createTutorial(pair, hooks) {
       el('div', { class: 'card-head' }, el('span', { class: 'card-title' }, '？ 이름 숨김')),
       el('ol', { class: 'clues' }, card.clues.slice(0, t.shown).map((cl, i) => el('li', {
         class: 'clue' + (i === t.shown - 1 && i > 0 ? ' clue-new' : ''), dataset: { kind: cl.kind },
-      }, el('span', { class: 'clue-level' }, LEVEL_LABEL[cl.level]), clueText(cl.text, (title) => (title === anchor.title ? { id: anchor.id, label: where(anchor.answer) } : null))))),
+      }, el('span', { class: 'clue-level' }, LEVEL_LABEL[cl.level]), clueText(cl.text, (title) => { const a = boardAnchors.find((x) => x.title === title); return a ? { id: a.id, label: where(a.answer) } : null; })))),
       el('div', { class: 'card-foot' },
         el('span', { class: 'clue-count' }, `단서 ${t.shown} / 3`),
         el('button', {
@@ -103,7 +106,8 @@ export function createTutorial(pair, hooks) {
         el('span', { class: 'seal', 'aria-hidden': 'true' }, NATION_SEAL[n.id] ?? n.label[0]),
         el('span', { class: 'nation-name' }, n.label)));
       for (const e of ERAS) {
-        const isAnchor = anchor.answer.nation === n.id && anchor.answer.era === e.id;
+        const here = boardAnchors.filter((a) => a.answer.nation === n.id && a.answer.era === e.id);
+        const isAnchor = here.includes(anchor);
         const isAnswer = t.placed?.correct && card.answer.nation === n.id && card.answer.era === e.id;
         const wrongHere = t.placed && !t.placed.correct && t.placed.nation === n.id && t.placed.era === e.id;
         nodes.push(el('button', {
@@ -114,7 +118,7 @@ export function createTutorial(pair, hooks) {
           onclick: () => { if (t.selected) place(n.id, e.id); },
           onkeydown: (ev) => onCellKey(ev, n.id, e.id),
         },
-        isAnchor ? el('span', { class: 'chip chip-anchor', dataset: { id: anchor.id } }, anchor.title) : null,
+        here.map((a) => el('span', { class: 'chip chip-anchor', dataset: { id: a.id } }, a.title)),
         isAnswer ? el('span', { class: 'chip chip-ok chip-new' }, card.title) : null,
         isAnswer ? el('span', { class: 'stamp', 'aria-hidden': 'true' }, '正') : null,
         wrongHere ? el('span', { class: 'blot', 'aria-hidden': 'true' }) : null));

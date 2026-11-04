@@ -379,3 +379,37 @@ describe('데이터가 바뀌면 진행 중 라운드를 버린다', () => {
     assert.equal(await page.getAttribute('#dogam-progress', 'data-collected'), '1');
   });
 });
+
+describe('출시 모드의 튜토리얼(D35·D40)', () => {
+  /** config.js를 출시 모드로 바꾸고, 샘플 본 덱을 전부 verified로 만든다. tutorialVerified로 연습 카드 확인 여부를 정한다. */
+  async function releaseMode(tutorialVerified) {
+    await page.route('**/src/config.js', async (route) => {
+      const body = (await (await route.fetch()).text()).replace('onlyVerified: false', 'onlyVerified: true');
+      await route.fulfill({ contentType: 'text/javascript', body });
+    });
+    const verifiedDeck = SAMPLE.filter((c) => !c.disputed).map((c) => ({ ...c, verified: true, verified_by: 'E2E' }));
+    await page.route('**/data/sample-cards.json', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify(verifiedDeck) }));
+    const tut = structuredClone(TUTORIAL_FILE);
+    if (tutorialVerified) tut.cards = tut.cards.map((c) => ({ ...c, verified: true, verified_by: 'E2E' }));
+    await page.route('**/assets/data/cards/tutorial.json', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify(tut) }));
+  }
+
+  test('연습 카드가 사실 확인 전이면 튜토리얼을 건너뛰고 안내한다', async () => {
+    await releaseMode(false);
+    await openGame(page, server.base, { title: true });
+    assert.equal(await page.isVisible('#title-notice'), true);
+    assert.match(await page.innerText('#title-notice'), /튜토리얼을 건너뜁니다/);
+    await page.click('#title-start');
+    assert.equal(await page.isHidden('#tutorial'), true);
+    assert.ok(await page.getAttribute('#card', 'data-card-id'), '본게임으로 바로');
+    assert.match(await page.innerText('#hand-help'), /튜토리얼을 건너뜁니다/);
+  });
+
+  test('연습 카드가 사실 확인되었으면 출시 모드에서도 튜토리얼이 열린다', async () => {
+    await releaseMode(true);
+    await openGame(page, server.base, { title: true });
+    assert.equal(await page.isHidden('#title-notice'), true);
+    await page.click('#title-start');
+    await page.waitForSelector('#tutorial:not([hidden])');
+  });
+});

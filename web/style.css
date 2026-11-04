@@ -438,3 +438,5 @@ button { font: inherit; color: inherit; }
 .cell.ref-target { box-shadow: inset 0 0 0 3px var(--indigo); background: #e3ecf2 !important; }
 .cell.ref-target .chip-anchor { outline: 2px solid var(--indigo); }
 .complete-seal, .title-seal { border-color: var(--seal); }
+.title-notice { font-size: 14px; color: var(--wrong); background: var(--paper-2); border: 1px dashed var(--line); border-radius: 4px; padding: 6px 10px; display: inline-block; }
+.title-notice[hidden] { display: none; }

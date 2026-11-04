@@ -42,3 +42,6 @@
 - 17:08 UTC Godot(5d20546) 통합(5ad26ad, 436dd94): 리뷰 13건 처리 표, D22 구현, 타이틀·튜토리얼(`assets/data/cards/tutorial.json`)·결과·플레이 기록·이어하기·키보드, 렌더러 Compatibility. Godot D24·D25→D29·D30 재부여(참조 3곳 갱신). gdUnit 122개는 미실행. 통합 상태 validate PASS, parity 39/39, 웹 77개 통과.
 - 17:10 UTC D31: 튜토리얼 데이터를 `assets/data/cards/tutorial.json` 하나로 통일(01ebfd8). 지시: 웹(공용 튜토리얼 파일, 데이터 변경 시 저장 무효화), 사실 검증(튜토리얼 카드·마무리 수정 3차 대조, "바다 건너 왕조" 표현 확인), 리뷰(Godot 2차 정적 리뷰).
 - 메모: 추적 참조 갱신에 `--depth=1`을 쓰면 로컬 이력이 얕아져 다음 merge가 실패한다. `--depth=400` 사용.
+- 17:12~17:24 UTC 사실 검증 3차(b405ff7), 웹 튜토리얼 통일(467347e), 콘텐츠 튜토리얼 수정·validate --tutorial(4e0c2ee), 연습 카드 [엄리대수 건너기] 교체(d4faab8), Godot 리뷰 2(743bef9), Godot 리뷰 2 반영(ca97219, 816585d) 순서로 통합. 결정 번호 재부여: Godot D34→D35, 설계 D26→D36.
+- 17:26 UTC 점검 4회차. 설계(716defe: v2.1 플레이테스트 계획·결과 양식, 웹 아트 검수) 통합. 아트 검수가 찾은 누출(숨김 카드의 유형 배지로 14장 시기 노출)을 D37로 즉시 수정 결정. 웹·Godot에 D37과 아트 제안 2~5 반영 지시, 콘텐츠에 validate --tutorial --release 정합과 단서 문장 누출 점검 지시.
+- 17:30 UTC 아침 보고서 `docs/morning-report.md` 작성(초기 버전 완성 기준 충족: 웹 D22 검증, Godot D22·리뷰 반영 통합).
