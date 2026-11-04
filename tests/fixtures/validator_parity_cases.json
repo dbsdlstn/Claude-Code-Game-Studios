@@ -1,0 +1,635 @@
+{
+ "base": "res://tests/fixtures/cards_fixture.json",
+ "note": "tools/validator_parity.py 와 tests/integration/cards/validator_parity_test.gd 가 같은 케이스를 돌린다. expect: 규칙 번호(0=FIELD), null=통과.",
+ "cases": [
+  {
+   "name": "base fixture passes",
+   "expect": null,
+   "ops": []
+  },
+  {
+   "name": "duplicate id",
+   "expect": 1,
+   "ops": [
+    {
+     "op": "copy_card",
+     "card": "fx-silla-peak-01",
+     "as": "fx-silla-peak-01"
+    }
+   ]
+  },
+  {
+   "name": "missing title",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "delete",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "title"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "bad type",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "type"
+     ],
+     "value": "place"
+    }
+   ]
+  },
+  {
+   "name": "difficulty 4",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "difficulty"
+     ],
+     "value": 4
+    }
+   ]
+  },
+  {
+   "name": "difficulty as string",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "difficulty"
+     ],
+     "value": "2"
+    }
+   ]
+  },
+  {
+   "name": "tags not strings",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "tags"
+     ],
+     "value": [
+      1
+     ]
+    }
+   ]
+  },
+  {
+   "name": "source.url missing",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "delete",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "source",
+      "url"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "source.url not http",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "source",
+      "url"
+     ],
+     "value": "ftp://x"
+    }
+   ]
+  },
+  {
+   "name": "source.url https ok",
+   "expect": null,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "source",
+      "url"
+     ],
+     "value": "https://example.org"
+    }
+   ]
+  },
+  {
+   "name": "source.note missing",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "delete",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "source",
+      "note"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "date_label number",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "date_label"
+     ],
+     "value": 555
+    }
+   ]
+  },
+  {
+   "name": "explanation empty",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "explanation"
+     ],
+     "value": ""
+    }
+   ]
+  },
+  {
+   "name": "explanation without era label",
+   "expect": 0,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "explanation"
+     ],
+     "value": "진흥왕 때 한강 유역을 차지했다."
+    }
+   ]
+  },
+  {
+   "name": "unknown nation",
+   "expect": 2,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "answer",
+      "nation"
+     ],
+     "value": "goryeo"
+    }
+   ]
+  },
+  {
+   "name": "unknown era",
+   "expect": 2,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "answer",
+      "era"
+     ],
+     "value": "late"
+    }
+   ]
+  },
+  {
+   "name": "two clues",
+   "expect": 3,
+   "ops": [
+    {
+     "op": "pop",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "level order wrong",
+   "expect": 3,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      0,
+      "level"
+     ],
+     "value": 2
+    },
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      1,
+      "level"
+     ],
+     "value": 1
+    }
+   ]
+  },
+  {
+   "name": "kind wrong",
+   "expect": 3,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      2,
+      "kind"
+     ],
+     "value": "description"
+    }
+   ]
+  },
+  {
+   "name": "anchor with clues",
+   "expect": 3,
+   "ops": [
+    {
+     "op": "set",
+     "card": "silla-founding-anchor",
+     "path": [
+      "clues"
+     ],
+     "value": [
+      {
+       "level": 1,
+       "kind": "description",
+       "text": "x",
+       "refs": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ref missing",
+   "expect": 4,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      1,
+      "refs"
+     ],
+     "value": [
+      "nope"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ref non-anchor",
+   "expect": 4,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      1,
+      "refs"
+     ],
+     "value": [
+      "fx-silla-founding-01"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "relation refs empty",
+   "expect": 4,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      1,
+      "refs"
+     ],
+     "value": []
+    }
+   ]
+  },
+  {
+   "name": "relation text without [title]",
+   "expect": 4,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      1,
+      "text"
+     ],
+     "value": "기준 카드의 나라가 한강까지 나아간 때다."
+    }
+   ]
+  },
+  {
+   "name": "description with refs",
+   "expect": 4,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      0,
+      "refs"
+     ],
+     "value": [
+      "silla-founding-anchor"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "refs not list",
+   "expect": 4,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      2,
+      "refs"
+     ],
+     "value": null
+    }
+   ]
+  },
+  {
+   "name": "title in level 1",
+   "expect": 5,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      0,
+      "text"
+     ],
+     "value": "진흥왕 순수비를 세운다."
+    }
+   ]
+  },
+  {
+   "name": "nation label in level 1",
+   "expect": 5,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      0,
+      "text"
+     ],
+     "value": "신라가 새 땅에 비석을 세운다."
+    }
+   ]
+  },
+  {
+   "name": "era label in level 1",
+   "expect": 5,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      0,
+      "text"
+     ],
+     "value": "전성기의 왕이 비석을 세운다."
+    }
+   ]
+  },
+  {
+   "name": "title in level 3 ok",
+   "expect": null,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "clues",
+      2,
+      "text"
+     ],
+     "value": "진흥왕 순수비, 6세기 중반."
+    }
+   ]
+  },
+  {
+   "name": "disputed without note",
+   "expect": 6,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-gaya-peak-disputed",
+     "path": [
+      "disputed_note"
+     ],
+     "value": null
+    }
+   ]
+  },
+  {
+   "name": "note on non-disputed",
+   "expect": 6,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "disputed_note"
+     ],
+     "value": "메모"
+    }
+   ]
+  },
+  {
+   "name": "disputed anchor",
+   "expect": 6,
+   "ops": [
+    {
+     "op": "set",
+     "card": "silla-founding-anchor",
+     "path": [
+      "disputed"
+     ],
+     "value": true
+    },
+    {
+     "op": "set",
+     "card": "silla-founding-anchor",
+     "path": [
+      "disputed_note"
+     ],
+     "value": "x"
+    }
+   ]
+  },
+  {
+   "name": "image without license",
+   "expect": 7,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "image"
+     ],
+     "value": "assets/art/cards/a.png"
+    },
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "image_source"
+     ],
+     "value": "박물관"
+    }
+   ]
+  },
+  {
+   "name": "image with credits ok",
+   "expect": null,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "image"
+     ],
+     "value": "assets/art/cards/a.png"
+    },
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "image_source"
+     ],
+     "value": "박물관"
+    },
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "image_license"
+     ],
+     "value": "CC0"
+    }
+   ]
+  },
+  {
+   "name": "empty cell",
+   "expect": 8,
+   "ops": [
+    {
+     "op": "remove_card",
+     "card": "fx-gaya-ending-01"
+    }
+   ]
+  },
+  {
+   "name": "cell only disputed",
+   "expect": 8,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-gaya-ending-01",
+     "path": [
+      "disputed"
+     ],
+     "value": true
+    },
+    {
+     "op": "set",
+     "card": "fx-gaya-ending-01",
+     "path": [
+      "disputed_note"
+     ],
+     "value": "x"
+    }
+   ]
+  },
+  {
+   "name": "verified without verified_by",
+   "expect": 9,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "verified"
+     ],
+     "value": true
+    }
+   ]
+  },
+  {
+   "name": "verified with verified_by ok",
+   "expect": null,
+   "ops": [
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "verified"
+     ],
+     "value": true
+    },
+    {
+     "op": "set",
+     "card": "fx-silla-peak-01",
+     "path": [
+      "verified_by"
+     ],
+     "value": "검토자 2026-11-04"
+    }
+   ]
+  }
+ ]
+}

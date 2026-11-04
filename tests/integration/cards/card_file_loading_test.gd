@@ -14,7 +14,7 @@ func test_game_config_file_is_valid() -> void:
 
 func test_fixture_file_passes_validation_in_dev_mode() -> void:
 	var cfg := GameConfig.load_file(CONFIG_PATH)
-	var cs := CardLoader.load_file(FIXTURE_PATH, cfg.nation_ids(), cfg.era_ids(), false)
+	var cs := CardLoader.load_with_config(FIXTURE_PATH, cfg, false)
 	assert_array(cs.errors).is_empty()
 	assert_int(cs.anchors.size()).is_equal(3)
 	assert_int(cs.playable.size()).is_equal(12)
@@ -34,11 +34,44 @@ func test_missing_file_reports_error() -> void:
 	assert_bool(cs.is_valid()).is_false()
 
 
-func test_content_file_passes_validation_in_dev_mode_when_present() -> void:
-	# 콘텐츠 세션이 samguk.json을 만드는 중이다. 파일이 생기면 이 테스트가 그 파일을 검증한다.
+## 실제 콘텐츠: 기준 4, disputed 4, 판정 36(칸당 3). tools/validate_cards.py 도 PASS다.
+func test_samguk_json_passes_validation_in_dev_mode() -> void:
 	var cfg := GameConfig.load_file(CONFIG_PATH)
-	if not FileAccess.file_exists(cfg.cards_path):
-		push_warning("samguk.json이 아직 없다: %s" % cfg.cards_path)
-		return
-	var cs := CardLoader.load_file(cfg.cards_path, cfg.nation_ids(), cfg.era_ids(), false)
+	var cs := CardLoader.load_with_config(cfg.cards_path, cfg, false)
 	assert_array(cs.errors).is_empty()
+	assert_int(cs.all_cards.size()).is_equal(44)
+	assert_int(cs.anchors.size()).is_equal(4)
+	assert_int(cs.disputed.size()).is_equal(4)
+	assert_int(cs.playable.size()).is_equal(36)
+	assert_array(cs.warnings).is_empty()
+
+
+func test_samguk_json_has_three_judged_cards_per_cell() -> void:
+	var cfg := GameConfig.load_file(CONFIG_PATH)
+	var cs := CardLoader.load_with_config(cfg.cards_path, cfg, false)
+	for n in cfg.nation_ids():
+		for e in cfg.era_ids():
+			assert_int(cs.playable_for_cell(n, e).size()).is_equal(3)
+			assert_int(cs.anchors_for_cell(n, e).size()).is_less_equal(1)
+
+
+func test_samguk_json_release_mode_reports_only_coverage() -> void:
+	# 아직 사실 확인된 카드가 없으면 출시 모드에서는 칸이 비어 규칙 8만 나온다.
+	# 카드가 확인되기 시작하면 이 테스트는 "오류가 있으면 규칙 8뿐"을 확인한다.
+	var cfg := GameConfig.load_file(CONFIG_PATH)
+	var cs := CardLoader.load_with_config(cfg.cards_path, cfg, true)
+	for rule in CardValidator.rules_of(cs.errors):
+		assert_int(rule).is_equal(CardValidator.RULE_CELL_COVERAGE)
+
+
+func test_samguk_json_round_has_twelve_cards_one_per_cell() -> void:
+	var cfg := GameConfig.load_file(CONFIG_PATH)
+	var cs := CardLoader.load_with_config(cfg.cards_path, cfg, false)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	var queue := RoundBuilder.build_queue(cs, cfg.nation_ids(), cfg.era_ids(), rng)
+	var keys := {}
+	for c: CardData in queue:
+		keys[c.cell_key()] = true
+	assert_int(queue.size()).is_equal(12)
+	assert_int(keys.size()).is_equal(12)

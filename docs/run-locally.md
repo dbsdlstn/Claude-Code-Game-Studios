@@ -59,9 +59,18 @@ godot --headless -s -d --remote-debug tcp://127.0.0.1:0 res://addons/gdUnit4/bin
 | `tests/unit/round/round_session_test.gd` | 단서 공개, 배치 판정, 오답 시 정답 공개·소모, 거부 규칙, 클리어/실패 |
 | `tests/unit/round/ink_meter_test.gd` | 먹물 규칙 |
 | `tests/unit/round/round_builder_test.gd` | 칸당 1장, 같은 시드 같은 순서, 미수집 우선 |
-| `tests/unit/progress/progress_data_test.gd` | 도감 수집, 저장 딕셔너리 변환 |
-| `tests/integration/cards/card_file_loading_test.gd` | 설정 파일, 픽스처 파일, samguk.json(있을 때) 검증 |
+| `tests/unit/progress/progress_data_test.gd` | 도감 수집, 도감 완성 판정, 저장 딕셔너리 변환 |
+| `tests/integration/cards/card_file_loading_test.gd` | 설정 파일, 픽스처, **samguk.json**(44장, 칸당 3장, 출시 모드는 규칙 8만), 라운드 12장 |
+| `tests/integration/cards/validator_parity_test.gd` | Python 검증기와 같은 39개 케이스 |
 | `tests/integration/save/save_store_test.gd` | user:// 저장/불러오기, 덮어쓰기, 깨진 파일 |
+
+### Python 검증기와의 동등성
+
+```bash
+python3 tools/validate_cards.py        # samguk.json: PASS여야 한다
+python3 tools/validator_parity.py      # 39/39 cases match
+```
+Godot 쪽은 `validator_parity_test.gd`가 같은 케이스를 돌린다. 둘 다 통과하면 두 검증기의 결과가 같다.
 
 ## 5. 확인 체크리스트
 
@@ -80,7 +89,10 @@ godot --headless -s -d --remote-debug tcp://127.0.0.1:0 res://addons/gdUnit4/bin
 - [ ] 12장을 다 놓으면 클리어 메시지와 요약(정답 수, 단서 사용 수, 남은 먹물)
 - [ ] "도감": 맞힌 카드만 이름이 열리고, 누르면 해설·근거·사실 확인 상태가 보인다. 기준 카드와 "견해가 나뉘는 기록"(덩이쇠 수출)은 항상 보인다
 - [ ] 게임을 껐다 켜도 도감 수집이 남아 있다(저장: `user://progress.json`. 위치는 에디터의 프로젝트 → 사용자 데이터 폴더 열기)
-- [ ] 1280×720에서 글자가 잘리거나 칸이 넘치지 않는다
+- [ ] 상단에 "카드 n / 12"와 "도감 m / 36"이 보인다. 라운드가 끝나면 "[라운드 클리어]" 또는 "[실패]"
+- [ ] 36장을 모두 모으면 "[도감 완성]"이 뜨고 도감 화면이 "도감 완성 36 / 36"으로 열린다(빨리 보려면 `user://progress.json`의 `collected`에 35개 id를 넣고 시작)
+- [ ] 한글 글꼴: 시스템에 한글 글꼴이 없으면 상단 안내가 뜬다. `assets/fonts/ui_font_kr.ttf`에 한글 TTF를 넣으면 그 글꼴로 바뀐다
+- [ ] 해상도: `--resolution 1280x720`, `1920x1080`, `2560x1440`, `1280x800`에서 글자가 잘리거나 칸이 넘치지 않고, 2560×1440에서 글자가 흐리지 않다
 
 ## 6. 설정 바꾸기
 

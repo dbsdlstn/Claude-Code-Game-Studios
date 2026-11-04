@@ -5,6 +5,8 @@ extends RefCounted
 const NATIONS := ["goguryeo", "baekje", "silla", "gaya"]
 const ERAS := ["founding", "peak", "ending"]
 const ANCHOR_ID := "anchor-goguryeo-peak"
+const NATION_LABELS := {"goguryeo": "고구려", "baekje": "백제", "silla": "신라", "gaya": "가야"}
+const ERA_LABELS := {"founding": "건국기", "peak": "전성기", "ending": "결말기"}
 
 
 static func nation_ids() -> PackedStringArray:
@@ -13,6 +15,21 @@ static func nation_ids() -> PackedStringArray:
 
 static func era_ids() -> PackedStringArray:
 	return PackedStringArray(ERAS)
+
+
+## { 나라 id: 라벨 }
+static func nation_labels() -> Dictionary:
+	return NATION_LABELS.duplicate()
+
+
+## { 시기 id: 라벨 }
+static func era_labels() -> Dictionary:
+	return ERA_LABELS.duplicate()
+
+
+## 기준 카드 제목(relation 본문의 [제목]과 맞춘다).
+static func anchor_title(id: String) -> String:
+	return "기준 " + id
 
 
 ## 설정 딕셔너리(game_config.json 형식).
@@ -38,10 +55,10 @@ static func config_dict(start_ink: int = 5) -> Dictionary:
 ## 기준 카드 하나.
 static func anchor(id: String = ANCHOR_ID, nation: String = "goguryeo", era: String = "peak") -> Dictionary:
 	return {
-		"id": id, "type": "artifact", "title": "기준 " + id, "anchor": true,
+		"id": id, "type": "artifact", "title": anchor_title(id), "anchor": true,
 		"answer": {"nation": nation, "era": era}, "clues": [],
 		"explanation": "", "source": {"name": "테스트", "url": null, "note": ""},
-		"verified": true, "verified_by": null, "disputed": false, "disputed_note": null,
+		"verified": true, "verified_by": "test", "disputed": false, "disputed_note": null,
 		"difficulty": 1, "image": null, "image_source": null, "image_license": null, "tags": [],
 	}
 
@@ -53,10 +70,10 @@ static func card(id: String, nation: String, era: String, ref_id: String = ANCHO
 		"answer": {"nation": nation, "era": era},
 		"clues": [
 			{"level": 1, "kind": "description", "text": "장면 설명 " + nation + era, "refs": []},
-			{"level": 2, "kind": "relation", "text": "[기준]과의 관계", "refs": [ref_id]},
+			{"level": 2, "kind": "relation", "text": "[%s]과의 관계" % anchor_title(ref_id), "refs": [ref_id]},
 			{"level": 3, "kind": "direct", "text": "직접 힌트", "refs": []},
 		],
-		"explanation": "해설. 사건 성격으로 이 시기다.",
+		"explanation": "해설. 사건 성격으로 %s다." % ERA_LABELS.get(era, era),
 		"source": {"name": "테스트", "url": null, "note": ""},
 		"verified": true, "verified_by": "test", "disputed": false, "disputed_note": null,
 		"difficulty": 1, "image": null, "image_source": null, "image_license": null, "tags": [],

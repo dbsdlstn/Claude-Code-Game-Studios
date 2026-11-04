@@ -38,3 +38,15 @@ func test_release_mode_setting_applies_in_debug_build() -> void:
 	var d := Fx.config_dict()
 	d["release_mode"] = true
 	assert_bool(GameConfig.from_dict(d).effective_release_mode(true)).is_true()
+
+
+func test_label_maps_follow_config() -> void:
+	var cfg := GameConfig.from_dict(Fx.config_dict())
+	assert_str(cfg.nation_label_map()["silla"]).is_equal("신라")
+	assert_str(cfg.era_label_map()["peak"]).is_equal("전성기")
+
+
+func test_ui_font_path_is_optional() -> void:
+	var cfg := GameConfig.from_dict(Fx.config_dict())
+	assert_bool(cfg.is_valid()).is_true()
+	assert_str(cfg.ui_font_path).is_empty()

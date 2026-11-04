@@ -25,6 +25,20 @@ func is_collected(card_id: String) -> bool:
 	return collected.has(card_id)
 
 
+## card_ids 중 도감에 있는 수. 사용 예: progress.count_in(ids) → "도감 m / 36".
+func count_in(card_ids: PackedStringArray) -> int:
+	var n := 0
+	for id in card_ids:
+		if collected.has(id):
+			n += 1
+	return n
+
+
+## 게임 클리어(도감 완성): card_ids가 비어 있지 않고 모두 모았는지(decision-log D16).
+func is_complete(card_ids: PackedStringArray) -> bool:
+	return not card_ids.is_empty() and count_in(card_ids) == card_ids.size()
+
+
 ## 끝난 라운드를 기록한다. cleared: 클리어면 true, 실패면 false.
 func record_round(cleared: bool) -> void:
 	rounds_played += 1

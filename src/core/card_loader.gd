@@ -21,11 +21,13 @@ static func filter_for_mode(raw: Array, release_mode: bool) -> Array:
 
 
 ## 이미 파싱된 배열에서 CardSet을 만든다.
-static func build(raw: Array, nation_ids: PackedStringArray, era_ids: PackedStringArray, release_mode: bool) -> CardSet:
+## nation_labels / era_labels: { id: 표시 이름 } — 라벨 검사용(CardValidator.validate 참고).
+static func build(raw: Array, nation_ids: PackedStringArray, era_ids: PackedStringArray, release_mode: bool, nation_labels: Dictionary = {}, era_labels: Dictionary = {}) -> CardSet:
 	var result := CardSet.new()
 	result.release_mode = release_mode
 	var filtered := filter_for_mode(raw, release_mode)
-	result.errors = CardValidator.validate(filtered, nation_ids, era_ids)
+	result.errors = CardValidator.validate(filtered, nation_ids, era_ids, nation_labels, era_labels)
+	result.warnings = CardValidator.warnings(filtered, nation_ids, era_ids)
 	if not result.errors.is_empty():
 		return result
 	for item: Variant in filtered:
@@ -34,20 +36,20 @@ static func build(raw: Array, nation_ids: PackedStringArray, era_ids: PackedStri
 
 
 ## JSON 문자열에서 CardSet을 만든다. 최상위는 카드 배열이어야 한다.
-static func parse_text(text: String, nation_ids: PackedStringArray, era_ids: PackedStringArray, release_mode: bool) -> CardSet:
+static func parse_text(text: String, nation_ids: PackedStringArray, era_ids: PackedStringArray, release_mode: bool, nation_labels: Dictionary = {}, era_labels: Dictionary = {}) -> CardSet:
 	var json := JSON.new()
 	if json.parse(text) != OK:
 		return _failed("JSON 파싱 실패 %d행: %s" % [json.get_error_line(), json.get_error_message()], release_mode)
 	if not (json.data is Array):
 		return _failed("카드 파일의 최상위가 배열이 아니다", release_mode)
-	return build(json.data, nation_ids, era_ids, release_mode)
+	return build(json.data, nation_ids, era_ids, release_mode, nation_labels, era_labels)
 
 
 ## 파일에서 CardSet을 만든다.
-static func load_file(path: String, nation_ids: PackedStringArray, era_ids: PackedStringArray, release_mode: bool) -> CardSet:
+static func load_file(path: String, nation_ids: PackedStringArray, era_ids: PackedStringArray, release_mode: bool, nation_labels: Dictionary = {}, era_labels: Dictionary = {}) -> CardSet:
 	if not FileAccess.file_exists(path):
 		return _failed("카드 파일이 없다: %s" % path, release_mode)
-	return parse_text(FileAccess.get_file_as_string(path), nation_ids, era_ids, release_mode)
+	return parse_text(FileAccess.get_file_as_string(path), nation_ids, era_ids, release_mode, nation_labels, era_labels)
 
 
 ## 설정에 따라 카드 경로를 고른다. 개발 모드이고 cards_path가 없으면 픽스처 경로를 쓴다.
@@ -61,6 +63,11 @@ static func resolve_path(config: GameConfig, release_mode: bool, file_exists: Ca
 	if not release_mode and not config.dev_fallback_cards_path.is_empty() and exists.call(config.dev_fallback_cards_path):
 		return config.dev_fallback_cards_path
 	return config.cards_path
+
+
+## 설정에서 id·라벨을 모두 넘겨 파일을 읽는다(게임과 통합 테스트가 쓰는 경로).
+static func load_with_config(path: String, config: GameConfig, release_mode: bool) -> CardSet:
+	return load_file(path, config.nation_ids(), config.era_ids(), release_mode, config.nation_label_map(), config.era_label_map())
 
 
 static func _failed(message: String, release_mode: bool) -> CardSet:
