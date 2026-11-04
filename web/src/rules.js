@@ -433,3 +433,57 @@ export function restoreHistory(saved) {
   return saved.filter((h) => h && typeof h === 'object' && Number.isInteger(h.placed) && Number.isInteger(h.right)
     && Array.isArray(h.levels) && h.levels.length === 3 && ['cleared', 'failed'].includes(h.status));
 }
+
+/** FNV-1a 32비트 해시(16진 8자리). 보안용이 아니라 데이터 묶음 식별용. */
+export function fnv1a(text) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
+}
+
+/**
+ * 카드 데이터 식별자: 경로 + 카드 수 + id 목록 해시. 저장한 라운드가 지금 덱과 같은 데이터에서 나왔는지 본다.
+ * @param {string} url 읽은 데이터 경로
+ * @param {Array<object>} cards
+ */
+export function dataFingerprint(url, cards) {
+  const ids = cards.map((c) => c.id).sort();
+  return `${url}|${cards.length}|${fnv1a(ids.join('\n'))}`;
+}
+
+/**
+ * 공용 튜토리얼 파일(D31)을 해석한다. Godot `TutorialData.parse`와 같은 규칙:
+ *   형식 { anchor_id: <본 덱 기준 카드 id>, cards: [스키마 v1 카드...] }, 연습 카드는 cards[0].
+ *   - anchor_id가 본 덱의 기준 카드여야 한다.
+ *   - [기준 카드, ...cards]를 카드 검증 규칙으로 검사하되 12칸 규칙(R8)은 뺀다(R4로 relation → 기준 카드 확인).
+ *   - 연습 카드 id·제목이 본 덱과 겹치지 않고, 기준 카드가 아니며, 판정 카드(disputed 아님)여야 한다.
+ * @param {unknown} data JSON.parse 결과
+ * @param {Array<object>} mainCards 검증을 통과한 본 덱
+ * @returns {{anchor: object|null, card: object|null, errors: Array<{id: string, rule: string, message: string}>}}
+ */
+export function parseTutorial(data, mainCards) {
+  const out = { anchor: null, card: null, errors: [] };
+  const fail = (message) => out.errors.push({ id: '(tutorial)', rule: 'TUTORIAL', message });
+  if (!data || typeof data !== 'object' || Array.isArray(data)) { fail('튜토리얼 파일이 객체가 아니다.'); return out; }
+  const byId = new Map(mainCards.map((c) => [c.id, c]));
+  const anchor = typeof data.anchor_id === 'string' ? byId.get(data.anchor_id) : null;
+  if (!anchor || anchor.anchor !== true) { fail(`anchor_id가 본 덱의 기준 카드가 아니다: ${data.anchor_id}`); return out; }
+  if (!Array.isArray(data.cards) || data.cards.length === 0) { fail('튜토리얼 카드가 없다.'); return out; }
+  for (const e of validateCards([anchor, ...data.cards]).errors) if (e.rule !== 'R8') out.errors.push(e);
+  const titles = new Set(mainCards.map((c) => c.title));
+  for (const c of data.cards) {
+    if (!c || typeof c !== 'object') continue;
+    if (byId.has(c.id)) fail(`연습 카드 id가 본 덱과 겹친다: ${c.id}`);
+    if (titles.has(c.title)) fail(`연습 카드 제목이 본 덱과 겹친다: ${c.title}`);
+    if (c.anchor === true) fail('연습 카드는 기준 카드일 수 없다.');
+  }
+  if (out.errors.length) return out;
+  const card = data.cards[0];
+  if (card.disputed === true) { fail('연습 카드는 판정 카드여야 한다(disputed 아님).'); return out; }
+  out.anchor = anchor;
+  out.card = card;
+  return out;
+}

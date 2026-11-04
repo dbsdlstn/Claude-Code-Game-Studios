@@ -9,23 +9,6 @@ import { makeDraggable } from './drag.js';
 const STEPS = ['eras', 'clue1', 'relation', 'explain'];
 
 /**
- * 튜토리얼 카드 묶음에서 한 쌍을 고른다: 기준 카드를 relation으로 가리키는 첫 연습 카드와 그 기준 카드.
- * excludeIds(본 덱 id)와 겹치는 카드는 쓰지 않는다.
- * @returns {{anchor: object, card: object} | null}
- */
-export function pickTutorialCards(cards, excludeIds = new Set()) {
-  const usable = cards.filter((c) => c && !excludeIds.has(c.id));
-  const byId = new Map(usable.map((c) => [c.id, c]));
-  for (const card of usable) {
-    if (card.anchor || card.disputed) continue;
-    const ref = card.clues?.[1]?.refs?.[0];
-    const anchor = ref && byId.get(ref);
-    if (anchor?.anchor) return { anchor, card };
-  }
-  return null;
-}
-
-/**
  * @param {{anchor: object, card: object}} pair
  * @param {{onFinish: (skipped: boolean) => void}} hooks
  */

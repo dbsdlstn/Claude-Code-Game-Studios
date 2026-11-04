@@ -13,9 +13,10 @@ export const CONFIG = Object.freeze({
   /** true면 verified: true 카드만 판정 대상으로 쓴다(출시 빌드 규칙 9). 플레이테스트 빌드는 false. */
   onlyVerified: false,
   /**
-   * 튜토리얼 전용 카드(기준 1장 + 연습 1장, 스키마 v1). 본 덱과 겹치지 않는다. 읽지 못하면 튜토리얼 없이 진행한다.
+   * 공용 튜토리얼 파일(D31): { anchor_id: 본 덱 기준 카드 id, cards: [연습 카드] }. Godot과 같은 파일.
+   * 읽지 못하거나 검증에 걸리면 튜토리얼 없이 진행한다. tools/build_web.py가 dist에서는 data/tutorial.json으로 바꾼다.
    */
-  tutorialDataUrl: 'data/tutorial.json',
+  tutorialDataUrl: '../assets/data/cards/tutorial.json',
   /** localStorage 키. 저장 형식을 바꾸면 버전을 올린다. */
   storageKey: 'hanyang-dogam:save:v1',
 });

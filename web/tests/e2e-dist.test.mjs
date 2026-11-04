@@ -29,7 +29,9 @@ after(async () => {
 test('빌드 결과: 카드 JSON 포함, 경로가 data/로 바뀜, 테스트 파일 제외', { skip: !SAMGUK && 'samguk.json 없음' }, () => {
   assert.ok(existsSync(path.join(DIST, 'index.html')));
   assert.deepEqual(JSON.parse(readFileSync(path.join(DIST, 'data', 'samguk.json'), 'utf8')), SAMGUK);
-  assert.ok(existsSync(path.join(DIST, 'data', 'tutorial.json')));
+  assert.deepEqual(JSON.parse(readFileSync(path.join(DIST, 'data', 'tutorial.json'), 'utf8')),
+    JSON.parse(readFileSync(path.join(REPO_ROOT, 'assets', 'data', 'cards', 'tutorial.json'), 'utf8')));
+  assert.equal(existsSync(path.join(REPO_ROOT, 'web', 'data', 'tutorial.json')), false, '웹 전용 튜토리얼 파일은 없어야 한다(D31)');
   const config = readFileSync(path.join(DIST, 'src', 'config.js'), 'utf8');
   assert.match(config, /'data\/samguk\.json'/);
   assert.doesNotMatch(config, /\.\.\/assets/);
@@ -48,6 +50,10 @@ test('배포본만으로 실제 카드 로드 → 타이틀 → 튜토리얼 →
   assert.match(await page.innerText('#data-info'), /samguk\.json · 판정 카드 36장/);
   await page.click('#title-start');
   await page.waitForSelector('#tutorial:not([hidden])');
+  await page.click('#tut-next');
+  await page.click('#tut-more');
+  const tut = JSON.parse(readFileSync(path.join(DIST, 'data', 'tutorial.json'), 'utf8'));
+  assert.ok((await page.innerText('#tut-card')).includes(tut.cards[0].clues[1].text.replace(/\[|\]/g, '').slice(0, 6)));
   await page.click('#tut-skip');
   const c1 = await currentCard(page, SAMGUK_BY_ID);
   assert.ok(c1, '실제 데이터의 카드여야 한다');
