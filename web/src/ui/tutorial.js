@@ -9,15 +9,14 @@ import { makeDraggable } from './drag.js';
 const STEPS = ['eras', 'clue1', 'relation', 'explain'];
 
 /**
- * 튜토리얼에 쓸 카드 한 쌍을 고른다. 설정의 id가 있으면 그것, 없으면 기준 카드를 relation으로 가리키는 첫 카드.
+ * 튜토리얼 카드 묶음에서 한 쌍을 고른다: 기준 카드를 relation으로 가리키는 첫 연습 카드와 그 기준 카드.
+ * excludeIds(본 덱 id)와 겹치는 카드는 쓰지 않는다.
  * @returns {{anchor: object, card: object} | null}
  */
-export function pickTutorialCards(cards, preferred) {
-  const byId = new Map(cards.map((c) => [c.id, c]));
-  const a = byId.get(preferred.anchorId);
-  const c = byId.get(preferred.cardId);
-  if (a?.anchor && c && !c.anchor && !c.disputed && c.clues?.[1]?.refs?.includes(a.id)) return { anchor: a, card: c };
-  for (const card of cards) {
+export function pickTutorialCards(cards, excludeIds = new Set()) {
+  const usable = cards.filter((c) => c && !excludeIds.has(c.id));
+  const byId = new Map(usable.map((c) => [c.id, c]));
+  for (const card of usable) {
     if (card.anchor || card.disputed) continue;
     const ref = card.clues?.[1]?.refs?.[0];
     const anchor = ref && byId.get(ref);
@@ -72,7 +71,7 @@ export function createTutorial(pair, hooks) {
       el('ul', { class: 'rule-list' },
         el('li', {}, '틀리면 먹물 1 소모, 정답 칸이 공개되고 카드는 소모됩니다.'),
         el('li', {}, '먹물 5개가 모두 떨어지면 라운드 실패, 다시 도전합니다.'),
-        el('li', {}, '한 라운드는 칸마다 1장씩 12장. 아직 모으지 않은 카드가 먼저 나옵니다.'),
+        el('li', {}, '한 라운드는 12장. 아직 모으지 않은 카드가 먼저 나오고, 같은 칸의 카드가 여러 장 나올 수도 있습니다.'),
         el('li', {}, '판정 카드 36장을 모두 모으면 도감 완성입니다.')),
     ];
   }

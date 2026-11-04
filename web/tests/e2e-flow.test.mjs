@@ -2,10 +2,12 @@
 import { test, before, after, beforeEach, afterEach, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { NATIONS, ERAS } from '../src/rules.js';
 import { chromium, startServer, openGame, currentCard, wrongCell, cellSel, dragTo, clickPlace, inkOf, SAMPLE, SAMPLE_BY_ID, SAMGUK } from './helpers.mjs';
 
-const TUT_CARD = SAMPLE_BY_ID.get('goguryeo-founding-01');
-const TUT_ANCHOR = SAMPLE_BY_ID.get('goguryeo-peak-anchor');
+const TUTORIAL = JSON.parse(readFileSync(new URL('../data/tutorial.json', import.meta.url), 'utf8'));
+const TUT_CARD = TUTORIAL.find((c) => !c.anchor);
+const TUT_ANCHOR = TUTORIAL.find((c) => c.anchor);
 
 let server;
 let browser;
@@ -107,6 +109,20 @@ describe('타이틀과 튜토리얼', () => {
     assert.equal(await page.isVisible('#card'), true);
   });
 
+  test('튜토리얼 카드는 본 덱에 없다(샘플·실제 데이터 모두)', async () => {
+    const deckIds = new Set([...SAMPLE, ...(SAMGUK ?? [])].map((c) => c.id));
+    const deckTitles = new Set([...SAMPLE, ...(SAMGUK ?? [])].map((c) => c.title));
+    for (const c of TUTORIAL) {
+      assert.ok(!deckIds.has(c.id), c.id);
+      assert.ok(!deckTitles.has(c.title), c.title);
+    }
+    await openGame(page, server.base, { title: true, data: null });
+    await page.click('#title-start');
+    await page.click('#tut-next');
+    await page.click('#tut-more');
+    assert.ok((await page.innerText('#tut-board')).includes(TUT_ANCHOR.title));
+  });
+
   test('튜토리얼 건너뛰기: 어느 단계에서든 바로 본게임, 이후 다시 나오지 않는다', async () => {
     await openGame(page, server.base, { title: true });
     await page.click('#title-start');
@@ -153,8 +169,12 @@ describe('타이틀과 튜토리얼', () => {
     await page.click('#tut-more');
     await page.focus('#tut-card');
     await page.keyboard.press('Enter');
-    // 첫 칸(고구려 건국기)에서 시작
+    // 첫 칸(고구려 건국기)에서 시작해 방향키로 정답 칸까지
     assert.equal(await page.evaluate(() => document.activeElement?.closest('#tut-board') !== null), true);
+    const ni = NATIONS.findIndex((n) => n.id === TUT_CARD.answer.nation);
+    const ei = ERAS.findIndex((e) => e.id === TUT_CARD.answer.era);
+    for (let k = 0; k < ni; k++) await page.keyboard.press('ArrowDown');
+    for (let k = 0; k < ei; k++) await page.keyboard.press('ArrowRight');
     await page.keyboard.press('Enter');
     await page.waitForSelector('#tut-fb[data-result="correct"]');
   });
@@ -250,8 +270,64 @@ describe('라운드 결과와 플레이 기록', () => {
     assert.deepEqual(log.history[0].levels, [9, 3, 0]);
     assert.equal(log.history[0].placements.length, 12);
     assert.equal(log.stats.rounds, 2);
-    // 샘플은 칸마다 1장이라 매 라운드 같은 12장: 라운드1 정답 11장 + 버린 라운드에서 맞힌 1장(이미 수집했을 수도 있음)
+    // 샘플은 판정 카드가 12장뿐이라 매 라운드 같은 12장: 라운드1 정답 11장 + 버린 라운드에서 맞힌 1장(이미 수집했을 수도 있음)
     assert.equal(log.collection.collected.length, Number(await page.getAttribute('#dogam-count', 'data-collected')));
     assert.ok([11, 12].includes(log.collection.collected.length));
+  });
+});
+
+describe('진행 초기화와 낭독 알림', () => {
+  test('진행 초기화는 두 번 확인 후 도감·기록·튜토리얼 표시를 지우고 처음 화면으로', async () => {
+    await openGame(page, server.base);
+    await playRound((i) => ({ correct: i !== 0, level: 1 }));
+    await page.click('#modal-dogam');
+    assert.equal(await page.getAttribute('#play-record', 'data-rounds'), '1');
+    await page.click('#btn-reset');
+    assert.equal(await page.getAttribute('#modal', 'data-kind'), 'reset1');
+    await page.click('#reset-cancel');
+    assert.equal(await page.getAttribute('#dogam-count', 'data-collected'), '11', '취소하면 그대로');
+    await page.click('#btn-reset');
+    await page.click('#reset-next');
+    assert.equal(await page.getAttribute('#modal', 'data-kind'), 'reset2');
+    assert.equal(await page.evaluate(() => document.activeElement?.id), 'reset-cancel', '기본 포커스는 취소');
+    await page.click('#reset-confirm');
+    assert.equal(await page.isVisible('#title-screen'), true);
+    assert.equal(await page.locator('#title-continue').count(), 0);
+    await page.reload();
+    await page.waitForSelector('body[data-ready="true"]');
+    assert.equal(await page.getAttribute('#dogam-progress', 'data-collected'), '0');
+    await page.click('#btn-dogam');
+    assert.equal(await page.getAttribute('#play-record', 'data-rounds'), '0');
+  });
+
+  test('화면 낭독용 알림: 정답·오답과 남은 먹물을 role=status 영역에 알린다', async () => {
+    await openGame(page, server.base);
+    assert.equal(await page.getAttribute('#announcer', 'role'), 'status');
+    const c1 = await currentCard(page);
+    await clickPlace(page, c1.answer);
+    await page.waitForFunction(() => document.getElementById('announcer').textContent.length > 0);
+    const t1 = await page.innerText('#announcer');
+    assert.match(t1, /^정답\./);
+    assert.ok(t1.includes(c1.title));
+    assert.match(t1, /먹물 5개 남음/);
+    const c2 = await currentCard(page);
+    await clickPlace(page, wrongCell(c2));
+    await page.waitForFunction(() => document.getElementById('announcer').textContent.startsWith('오답'));
+    assert.match(await page.innerText('#announcer'), /먹물 1개 소모, 4개 남음/);
+  });
+
+  test('정답·오답은 색 말고도 기호와 글자로 구분된다', async () => {
+    await openGame(page, server.base);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const c1 = await currentCard(page);
+    await clickPlace(page, c1.answer);
+    const c2 = await currentCard(page);
+    await clickPlace(page, wrongCell(c2));
+    const ok = await page.locator(`.chip-ok[data-id="${c1.id}"]`).evaluate((n) => [getComputedStyle(n, '::before').content, n.innerText]);
+    const bad = await page.locator(`.chip-bad[data-id="${c2.id}"]`).evaluate((n) => [getComputedStyle(n, '::before').content, n.textContent]);
+    assert.match(ok[0], /○/);
+    assert.match(bad[0], /✕/);
+    assert.match(bad[1], /오답 공개/);
+    assert.match(await page.innerText('#fb .fb-head'), /오답/);
   });
 });

@@ -237,19 +237,28 @@ describe('실제 데이터(assets/data/cards/samguk.json)', { skip: !SAMGUK && '
   }
 
   async function openReal(p) {
+    // beforeEach가 샘플 데이터로 연 저장을 지운다(샘플 id가 samguk에도 있어 샘플 라운드가 복원될 수 있다).
+    await p.evaluate(() => localStorage.clear());
     await openGame(p, server.base, { seed: 7, data: null });
     assert.match(await p.innerText('#data-info'), /samguk\.json/);
   }
 
-  test('기본 경로로 samguk.json을 읽고, 라운드는 칸마다 1장씩 12장', async () => {
+  test('기본 경로로 samguk.json을 읽고, 라운드는 칸과 무관한 12장(시드 7: 한 칸에 2장, 빈 칸 2개)', async () => {
     await openReal(page);
     assert.match(await page.innerText('#progress'), /카드 1 \/ 12/);
     assert.match(await page.innerText('#dogam-progress'), new RegExp(`도감 0 / ${JUDGED.length}`));
     const ids = await playRound(page);
     assert.equal(ids.length, 12);
-    const cells = new Set(ids.map((id) => { const c = SAMGUK_BY_ID.get(id); return `${c.answer.nation}:${c.answer.era}`; }));
-    assert.equal(cells.size, 12);
+    assert.equal(new Set(ids).size, 12);
     assert.ok(ids.every((id) => JUDGED.some((c) => c.id === id)), 'disputed·기준 카드는 나오지 않는다');
+    const perCell = new Map();
+    for (const id of ids) { const c = SAMGUK_BY_ID.get(id); const k = `${c.answer.nation}:${c.answer.era}`; perCell.set(k, (perCell.get(k) ?? 0) + 1); }
+    assert.equal(perCell.size, 10);
+    assert.equal(Math.max(...perCell.values()), 2);
+    // 같은 칸에 정답 카드 두 장이 함께 놓인다
+    const [dupCell] = [...perCell].find(([, n]) => n === 2);
+    const [nation, era] = dupCell.split(':');
+    assert.equal(await page.locator(`${cellSel({ nation, era })} .chip-ok`).count(), 2);
     await page.waitForSelector('#modal[data-kind="cleared"]:not([hidden])');
   });
 

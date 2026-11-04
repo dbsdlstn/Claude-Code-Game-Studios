@@ -25,7 +25,7 @@
   <aside class="hand">
     <div id="card" class="card" tabindex="0" aria-describedby="hand-help"></div>
     <p id="hand-help" class="help" aria-live="polite">카드를 끌어 칸에 놓거나, 카드를 눌러 고른 뒤 칸을 누르세요.</p>
-    <section id="feedback" class="feedback" aria-live="polite"></section>
+    <section id="feedback" class="feedback"></section>
   </aside>
   <section class="board-wrap" aria-label="나라와 시기 보드">
     <div id="board" class="board"></div>
@@ -99,6 +99,7 @@
 </footer>
 
 <div id="drag-ghost" class="drag-ghost" hidden></div>
+<div id="announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 <script type="module" src="src/main.js"></script>
 </body>
 </html>
