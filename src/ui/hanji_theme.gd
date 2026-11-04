@@ -15,8 +15,17 @@ const WRONG := Color(0.953, 0.769, 0.753)     # 오답 #f3c4c0
 const HOVER := Color(1.0, 0.914, 0.659)       # 끌어 놓기 대상 #ffe9a8
 const ACCENT := Color(0.753, 0.224, 0.169)    # 선택 표시 #c0392b
 
-## 한글이 있는 시스템 글꼴을 우선 찾는다. 없으면 엔진 기본 글꼴의 시스템 대체 글꼴을 쓴다.
-const FONT_NAMES := ["Noto Sans CJK KR", "Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", "NanumGothic", "sans-serif"]
+## 한글이 있는 시스템 글꼴 이름(우선순위 순).
+const FONT_NAMES := [
+	"Noto Sans CJK KR", "Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo",
+	"NanumGothic", "NanumBarunGothic", "UnDotum", "sans-serif",
+]
+## 글꼴이 한글을 그릴 수 있는지 볼 때 쓰는 글자('한', U+D55C).
+const HANGUL_PROBE := 0xD55C
+## pick_font()가 고른 글꼴의 출처.
+const FONT_SOURCE_BUNDLED := "bundled"
+const FONT_SOURCE_SYSTEM := "system"
+const FONT_SOURCE_MISSING := "missing"
 
 
 ## 색과 테두리로 StyleBoxFlat을 만든다.
@@ -30,11 +39,34 @@ static func box(bg: Color, border: Color = BORDER, border_width: int = 1, margin
 	return sb
 
 
-## 게임 전체 테마.
-static func build() -> Theme:
+## 한글 글꼴을 고른다. 순서: 1) bundled_path의 번들 글꼴 2) 시스템 한글 글꼴
+## 3) 둘 다 없으면 시스템 글꼴을 그대로 쓰되 출처를 "missing"으로 알린다(화면에 안내).
+## 돌려주는 값: { "font": Font, "source": FONT_SOURCE_* }
+## 사용 예: var pick := HanjiTheme.pick_font(cfg.ui_font_path); theme = HanjiTheme.build(pick["font"])
+static func pick_font(bundled_path: String) -> Dictionary:
+	var system := SystemFont.new()
+	system.font_names = PackedStringArray(FONT_NAMES)
+	if not bundled_path.is_empty() and ResourceLoader.exists(bundled_path):
+		var bundled := load(bundled_path) as Font
+		if bundled != null and bundled.has_char(HANGUL_PROBE):
+			# 번들 글꼴에 없는 글자(한자 등)는 시스템 글꼴로 보충한다.
+			var with_fallback := bundled.duplicate() as Font
+			if with_fallback != null:
+				var chain: Array[Font] = [system]
+				with_fallback.fallbacks = chain
+				return {"font": with_fallback, "source": FONT_SOURCE_BUNDLED}
+			return {"font": bundled, "source": FONT_SOURCE_BUNDLED}
+	if system.has_char(HANGUL_PROBE):
+		return {"font": system, "source": FONT_SOURCE_SYSTEM}
+	push_warning("한글 글꼴을 찾지 못했다. 한글 TTF를 %s 에 두면 그 글꼴을 쓴다." % bundled_path)
+	return {"font": system, "source": FONT_SOURCE_MISSING}
+
+
+## 게임 전체 테마. font가 null이면 시스템 한글 글꼴을 쓴다.
+static func build(font: Font = null) -> Theme:
 	var t := Theme.new()
-	var font := SystemFont.new()
-	font.font_names = PackedStringArray(FONT_NAMES)
+	if font == null:
+		font = pick_font("")["font"]
 	t.default_font = font
 	t.default_font_size = 16
 

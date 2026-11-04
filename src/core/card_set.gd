@@ -13,6 +13,8 @@ var playable: Array[CardData] = []
 var disputed: Array[CardData] = []
 ## CardValidator 오류 형식의 목록.
 var errors: Array[Dictionary] = []
+## 오류는 아닌 알림(칸당 목표 3장 미달 등).
+var warnings: Array[String] = []
 ## 출시 모드로 걸러졌는지.
 var release_mode: bool = false
 var _by_id: Dictionary = {}

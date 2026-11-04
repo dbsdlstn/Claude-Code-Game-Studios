@@ -13,6 +13,7 @@ var _cells: Dictionary = {}
 
 var _ink_label: Label
 var _count_label: Label
+var _dogam_count_label: Label
 var _notice_label: Label
 var _message_label: Label
 var _card_view: CardView
@@ -21,7 +22,6 @@ var _dogam_view: DogamView
 
 
 func _ready() -> void:
-	theme = HanjiTheme.build()
 	var bg := ColorRect.new()
 	bg.color = HanjiTheme.PAPER
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -29,12 +29,14 @@ func _ready() -> void:
 	add_child(bg)
 
 	_config = GameConfig.load_file()
+	var font_pick := HanjiTheme.pick_font(_config.ui_font_path)
+	theme = HanjiTheme.build(font_pick["font"])
 	if not _config.is_valid():
 		_show_fatal("설정 파일 오류", _config.errors)
 		return
 	var release_mode := _config.effective_release_mode(OS.is_debug_build())
 	var cards_path := CardLoader.resolve_path(_config, release_mode)
-	_cards = CardLoader.load_file(cards_path, _config.nation_ids(), _config.era_ids(), release_mode)
+	_cards = CardLoader.load_with_config(cards_path, _config, release_mode)
 	if not _cards.is_valid():
 		var lines: Array[String] = []
 		for e: Dictionary in _cards.errors:
@@ -53,6 +55,8 @@ func _ready() -> void:
 		notices.append("콘텐츠 파일이 없어 테스트 픽스처 사용 (%s)" % cards_path)
 	if not _store.last_error.is_empty():
 		notices.append(_store.last_error)
+	if font_pick["source"] == HanjiTheme.FONT_SOURCE_MISSING:
+		notices.append("한글 글꼴을 찾지 못함: 한글 TTF를 %s 에 두세요" % _config.ui_font_path)
 	_build_ui(" · ".join(notices))
 	_start_round()
 
@@ -82,6 +86,8 @@ func _build_ui(notice: String) -> void:
 	top.add_child(_ink_label)
 	_count_label = Label.new()
 	top.add_child(_count_label)
+	_dogam_count_label = Label.new()
+	top.add_child(_dogam_count_label)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(spacer)
@@ -191,6 +197,8 @@ func _refresh() -> void:
 	var left := _session.ink.current
 	_ink_label.text = "먹물 " + "●".repeat(left) + "○".repeat(maxi(_session.ink.max_ink - left, 0))
 	_count_label.text = "카드 %d / %d" % [mini(_session.placed_count() + 1, _session.total_cards()), _session.total_cards()]
+	var ids := _playable_ids()
+	_dogam_count_label.text = "도감 %d / %d" % [_progress.count_in(ids), ids.size()]
 	var card := _session.current_card()
 	if card == null:
 		if _session.status == RoundSession.Status.FAILED:
@@ -221,8 +229,11 @@ func _on_cell_target(nation: String, era: String) -> void:
 	var answer_cell: BoardCell = _cells.get(card.cell_key())
 	if answer_cell != null:
 		answer_cell.show_placed(card.title, r["correct"])
+	var completed_now := false
 	if r["correct"]:
+		var was_complete := _progress.is_complete(_playable_ids())
 		_progress.collect(card.id)
+		completed_now = not was_complete and _progress.is_complete(_playable_ids())
 		_message_label.text = "정답! [%s]\n%s" % [card.title, card.explanation]
 	else:
 		var chosen: BoardCell = _cells.get(CardData.make_cell_key(nation, era))
@@ -236,9 +247,22 @@ func _on_cell_target(nation: String, era: String) -> void:
 		_progress.record_round(cleared)
 		var summary := "정답 %d / %d, 단서 더 보기 %d회, 남은 먹물 %d" % [
 			_session.correct_count, _session.total_cards(), _session.hints_used, _session.ink.current]
-		_message_label.text += "\n\n%s %s" % ["[도감 완성]" if cleared else "[실패]", summary]
+		_message_label.text += "\n\n%s %s" % ["[라운드 클리어]" if cleared else "[실패]", summary]
+	if completed_now:
+		# 게임 클리어(decision-log D16): 판정 카드를 모두 모았다.
+		_message_label.text += "\n\n[도감 완성] 판정 카드 %d장을 모두 모았습니다!" % _playable_ids().size()
 	_save()
 	_refresh()
+	if completed_now:
+		_open_dogam()
+
+
+## 판정 카드 id 목록(도감 완성 기준).
+func _playable_ids() -> PackedStringArray:
+	var ids := PackedStringArray()
+	for c: CardData in _cards.playable:
+		ids.append(c.id)
+	return ids
 
 
 func _save() -> void:

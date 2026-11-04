@@ -103,6 +103,19 @@
   - 한 칸에 카드가 여러 장 쌓일 수 있다(도감 화면에서 칸당 3장 표시).
 - **이유**: 한 라운드 길이가 짧아 재도전 부담이 적고, 도감 수집이 라운드를 반복하는 동기가 된다.
 
+## 2026-11-04 D17. GDScript 검증기를 tools/validate_cards.py와 맞춤 (Godot MVP)
+- `CardValidator`가 Python 검증기의 규칙을 같은 술어로 구현한다. 추가된 것: 1단계 단서의 나라·시기 라벨 금지, 일반 카드 해설의 시기 라벨 필수, relation 본문의 `[제목]` 필수, relation이 아닌 단서의 `refs`는 비어 있어야 함, disputed 카드 참조 금지, disputed 기준 카드 금지, disputed가 아니면 `disputed_note`는 null, `source.url` 키 필수·http(s), `source.note` 문자열, 선택 문자열 필드·`tags` 타입, `verified: true`면 `verified_by` 필수(규칙 9번 오류로 보고).
+- 라벨은 설정(`game_config.json`)에서 가져온다(`CardLoader.load_with_config`). 라벨을 넘기지 않으면 라벨 검사를 건너뛴다.
+- 일부러 남긴 차이: Godot JSON은 숫자를 모두 float으로 읽으므로 `difficulty`·`level`은 정수값 float(2.0)도 정수로 본다. Python은 int만 받는다. 둘 다 JSON 파일에서는 같은 결과다.
+- 칸당 3장 미만은 오류가 아니라 경고(`CardSet.warnings`)로 둔다(Python과 같음).
+- 동등성 확인: `tests/fixtures/validator_parity_cases.json`(39개 패치 케이스)을 Python(`tools/validator_parity.py`, 39/39)과 Godot(`tests/integration/cards/validator_parity_test.gd`, 미실행)이 같이 돌린다. GDScript 로직을 Python으로 옮긴 임시 미러로도 39/39와 samguk.json PASS를 확인했다(Godot 실행은 아님).
+- 픽스처의 disputed 카드 해설에 시기 라벨이 없어 Python 검증기에서 실패했으므로 고쳤다.
+
+## 2026-11-04 D18. D16 반영과 한글 글꼴·해상도 (Godot MVP)
+- **D16 반영**: 상단에 "카드 n / 12"와 "도감 m / 36". 라운드 끝 표시를 "[라운드 클리어]"로 고쳤다(전에는 "[도감 완성]"으로 잘못 표시). 판정 카드를 모두 모은 순간 "[도감 완성]" 메시지를 띄우고 도감 화면(제목 "도감 완성")을 연다. 도감은 칸마다 모든 판정 카드(칸당 3장)를 나열한다.
+- **글꼴 대체 경로**: 1) `ui_font_path`(기본 `res://assets/fonts/ui_font_kr.ttf`)에 한글 글꼴이 있으면 그 글꼴, 없는 글자는 시스템 글꼴로 보충 2) 시스템 한글 글꼴(목록은 `HanjiTheme.FONT_NAMES`) 3) 둘 다 '한'을 못 그리면 화면 위에 안내를 띄운다. 글꼴 파일은 넣지 않았다(라이선스 파일과 함께 사용자가 넣는 것이 보수적).
+- **해상도**: 기준 1280×720, `stretch/mode=canvas_items`, `aspect=expand`. 2560×1440은 2배로 확대되고 16:10·21:9는 남는 폭이 오른쪽 카드 영역으로 간다. 실제 화면은 확인하지 못했다.
+
 ## 남은 문제
 - 카드 44장 전부 `verified: false`. 사람의 사실 확인 전에는 출시 빌드에 넣을 카드가 없다(`validate_cards.py --release` 실패가 정상).
 - 같은 사료(삼국사기 전승)에 기댄 건국기 카드가 많다. 플레이에서 건국기 칸이 단서 3단계 의존으로 쏠리는지 볼 것.

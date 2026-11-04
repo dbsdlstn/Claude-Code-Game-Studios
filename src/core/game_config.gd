@@ -15,6 +15,8 @@ var cards_path: String = ""
 var dev_fallback_cards_path: String = ""
 ## 진행 저장 경로(user://).
 var save_path: String = ""
+## 한글 UI 글꼴(번들). 없으면 시스템 글꼴을 쓴다(HanjiTheme.pick_font). 비워 둘 수 있다.
+var ui_font_path: String = ""
 ## [{ "id": String, "label": String }]
 var nations: Array[Dictionary] = []
 ## [{ "id": String, "label": String, "definition": String }]
@@ -37,6 +39,7 @@ static func from_dict(d: Dictionary) -> GameConfig:
 	if cfg.cards_path.is_empty():
 		cfg.errors.append("cards_path가 없다")
 	cfg.dev_fallback_cards_path = _str(d.get("dev_fallback_cards_path"))
+	cfg.ui_font_path = _str(d.get("ui_font_path"))
 	cfg.save_path = _str(d.get("save_path"))
 	if cfg.save_path.is_empty():
 		cfg.errors.append("save_path가 없다")
@@ -83,6 +86,16 @@ func era_ids() -> PackedStringArray:
 	return _ids(eras)
 
 
+## { 나라 id: 라벨 } — 카드 검증의 라벨 검사용.
+func nation_label_map() -> Dictionary:
+	return _label_map(nations)
+
+
+## { 시기 id: 라벨 } — 카드 검증의 라벨 검사용.
+func era_label_map() -> Dictionary:
+	return _label_map(eras)
+
+
 ## 나라 표시 이름. 없으면 id를 그대로 쓴다.
 func nation_label(id: String) -> String:
 	return _field(nations, id, "label", id)
@@ -126,6 +139,13 @@ static func _ids(list: Array[Dictionary]) -> PackedStringArray:
 	var out := PackedStringArray()
 	for e: Dictionary in list:
 		out.append(e["id"])
+	return out
+
+
+static func _label_map(list: Array[Dictionary]) -> Dictionary:
+	var out: Dictionary = {}
+	for e: Dictionary in list:
+		out[e["id"]] = e["label"]
 	return out
 
 

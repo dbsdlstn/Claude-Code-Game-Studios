@@ -5,14 +5,15 @@ const Fx = preload("res://tests/fixtures/card_fixtures.gd")
 
 
 func _validate(cards: Array) -> Array[int]:
-	return CardValidator.rules_of(CardValidator.validate(cards, Fx.nation_ids(), Fx.era_ids()))
+	return CardValidator.rules_of(CardValidator.validate(
+		cards, Fx.nation_ids(), Fx.era_ids(), Fx.nation_labels(), Fx.era_labels()))
 
 
 func test_valid_set_has_no_errors() -> void:
 	# Arrange
 	var cards := Fx.valid_set()
 	# Act
-	var errors := CardValidator.validate(cards, Fx.nation_ids(), Fx.era_ids())
+	var errors := CardValidator.validate(cards, Fx.nation_ids(), Fx.era_ids(), Fx.nation_labels(), Fx.era_labels())
 	# Assert
 	assert_array(errors).is_empty()
 
@@ -174,3 +175,84 @@ func test_rule8_anchor_does_not_count_for_its_cell() -> void:
 	var cards := Fx.valid_set()
 	cards.erase(Fx.find(cards, "goguryeo-peak"))
 	assert_array(_validate(cards)).contains([CardValidator.RULE_CELL_COVERAGE])
+
+
+# --- tools/validate_cards.py 와 맞춘 추가 규칙 (decision-log D7) ----------------
+
+func test_rule0_explanation_without_era_label_reports_error() -> void:
+	var cards := Fx.valid_set()
+	Fx.find(cards, "silla-peak")["explanation"] = "해설만 있고 시기 이름이 없다."
+	assert_array(_validate(cards)).contains([CardValidator.RULE_SCHEMA])
+
+
+func test_rule0_explanation_label_check_skipped_without_labels() -> void:
+	var cards := Fx.valid_set()
+	Fx.find(cards, "silla-peak")["explanation"] = "해설만 있고 시기 이름이 없다."
+	assert_array(CardValidator.validate(cards, Fx.nation_ids(), Fx.era_ids())).is_empty()
+
+
+func test_rule0_source_url_must_be_http() -> void:
+	var cards := Fx.valid_set()
+	Fx.find(cards, "silla-peak")["source"]["url"] = "ftp://example.org"
+	assert_array(_validate(cards)).contains([CardValidator.RULE_SCHEMA])
+
+
+func test_rule0_source_url_key_required() -> void:
+	var cards := Fx.valid_set()
+	(Fx.find(cards, "silla-peak")["source"] as Dictionary).erase("url")
+	assert_array(_validate(cards)).contains([CardValidator.RULE_SCHEMA])
+
+
+func test_rule0_tags_must_be_strings() -> void:
+	var cards := Fx.valid_set()
+	Fx.find(cards, "silla-peak")["tags"] = [1]
+	assert_array(_validate(cards)).contains([CardValidator.RULE_SCHEMA])
+
+
+func test_rule4_relation_text_without_title_reports_error() -> void:
+	var cards := Fx.valid_set()
+	Fx.find(cards, "silla-peak")["clues"][1]["text"] = "기준 카드와의 관계"
+	assert_array(_validate(cards)).contains([CardValidator.RULE_RELATION_REFS])
+
+
+func test_rule4_refs_on_non_relation_clue_reports_error() -> void:
+	var cards := Fx.valid_set()
+	Fx.find(cards, "silla-peak")["clues"][0]["refs"] = [Fx.ANCHOR_ID]
+	assert_array(_validate(cards)).contains([CardValidator.RULE_RELATION_REFS])
+
+
+func test_rule5_nation_label_in_first_clue_reports_error() -> void:
+	var cards := Fx.valid_set()
+	Fx.find(cards, "silla-peak")["clues"][0]["text"] = "신라의 왕이 비석을 세운다."
+	assert_array(_validate(cards)).contains([CardValidator.RULE_TITLE_IN_FIRST_CLUE])
+
+
+func test_rule5_era_label_in_first_clue_reports_error() -> void:
+	var cards := Fx.valid_set()
+	Fx.find(cards, "silla-peak")["clues"][0]["text"] = "결말기의 싸움이다."
+	assert_array(_validate(cards)).contains([CardValidator.RULE_TITLE_IN_FIRST_CLUE])
+
+
+func test_rule6_disputed_anchor_reports_error() -> void:
+	var cards := Fx.valid_set()
+	var a := Fx.find(cards, Fx.ANCHOR_ID)
+	a["disputed"] = true
+	a["disputed_note"] = "견해가 나뉜다."
+	assert_array(_validate(cards)).contains([CardValidator.RULE_DISPUTED_NOTE])
+
+
+func test_rule6_note_on_undisputed_card_reports_error() -> void:
+	var cards := Fx.valid_set()
+	Fx.find(cards, "silla-peak")["disputed_note"] = "메모"
+	assert_array(_validate(cards)).contains([CardValidator.RULE_DISPUTED_NOTE])
+
+
+func test_rule9_verified_without_verified_by_reports_error() -> void:
+	var cards := Fx.valid_set()
+	Fx.find(cards, "silla-peak")["verified_by"] = null
+	assert_array(_validate(cards)).contains([CardValidator.RULE_RELEASE])
+
+
+func test_warnings_report_cells_below_target() -> void:
+	var cards := Fx.valid_set()
+	assert_int(CardValidator.warnings(cards, Fx.nation_ids(), Fx.era_ids()).size()).is_equal(12)
