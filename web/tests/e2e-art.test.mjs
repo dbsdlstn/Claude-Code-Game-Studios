@@ -106,6 +106,11 @@ describe('일러스트 영역과 대체 문양', () => {
     assert.match(await fig.locator('img').getAttribute('src'), new RegExp(`assets/art/placeholders/placeholder-${card.type}\\.svg$`));
     await page.waitForFunction(() => document.querySelector('#fb .illust img').naturalWidth > 0);
     assert.match(await fig.innerText(), /그림 준비 중/);
+    // 캡션은 문양 아래: 그림 영역과 겹치지 않는다(2차 아트 검수 §2)
+    const imgBox = await fig.locator('img').boundingBox();
+    const capBox = await fig.locator('figcaption').boundingBox();
+    assert.ok(capBox.y >= imgBox.y + imgBox.height - 1.5, `캡션 top ${capBox.y} < 그림 bottom ${imgBox.y + imgBox.height}`);
+    assert.ok(Math.abs(imgBox.width / imgBox.height - 4 / 3) < 0.02, '그림은 4:3');
     await page.click('#btn-dogam');
     await page.click(`#dogam [data-entry="${card.id}"]`);
     await page.waitForFunction(() => document.querySelector('#dogam-detail .illust img')?.naturalWidth > 0);
