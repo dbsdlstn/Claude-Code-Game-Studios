@@ -295,15 +295,17 @@ export function revealNextClue(state, maxClues = 3) {
 /**
  * 현재 카드를 (nation, era) 칸에 놓고 판정한다.
  * 오답이면 먹물 -1, 카드는 정답 칸에 공개된 채 소모된다.
+ * collection을 주면 이번 배치로 새로 수집했는지(isNew)를 배치 기록에 남긴다(라운드 결과 화면용).
  * @returns {{state: object, result: null | {id: string, correct: boolean, placed: {nation: string, era: string}, answer: {nation: string, era: string}, hints: number}}}
  */
-export function placeCard(state, cardsById, nation, era) {
+export function placeCard(state, cardsById, nation, era, collection = {}) {
   const id = currentCardId(state);
   if (!id || !NATION_IDS.includes(nation) || !ERA_IDS.includes(era)) return { state, result: null };
   const card = cardsById.get(id);
   const correct = card.answer.nation === nation && card.answer.era === era;
   const hints = state.shown - 1;
-  const placement = Object.freeze({ id, nation: card.answer.nation, era: card.answer.era, correct, hints, placedNation: nation, placedEra: era });
+  const isNew = correct && collection[id] !== 'collected';
+  const placement = Object.freeze({ id, nation: card.answer.nation, era: card.answer.era, correct, hints, isNew, placedNation: nation, placedEra: era });
   const next = Object.freeze({
     ...state,
     ink: correct ? state.ink : state.ink - 1,
@@ -313,7 +315,7 @@ export function placeCard(state, cardsById, nation, era) {
   });
   return {
     state: next,
-    result: { id, correct, placed: { nation, era }, answer: { ...card.answer }, hints },
+    result: { id, correct, placed: { nation, era }, answer: { ...card.answer }, hints, isNew },
   };
 }
 
@@ -388,4 +390,56 @@ export function restoreCollection(saved, cards) {
   const out = {};
   for (const [id, v] of Object.entries(saved)) if (ids.has(id) && (v === 'collected' || v === 'revealed')) out[id] = v;
   return Object.freeze(out);
+}
+
+/**
+ * 끝난 라운드를 플레이 기록 한 줄로 요약한다(플레이테스트 지표).
+ * level = 배치할 때까지 본 단서 단계(1~3). levels[k] = k+1단계에서 놓은 카드 수.
+ * @param {object} state 끝난 라운드
+ * @param {{at?: string, dataFile?: string}} [meta]
+ */
+export function summarizeRound(state, meta = {}) {
+  const levels = [0, 0, 0];
+  for (const p of state.placements) levels[Math.min(Math.max(p.hints, 0), 2)] += 1;
+  const right = state.placements.filter((p) => p.correct).length;
+  return {
+    at: meta.at ?? null,
+    dataFile: meta.dataFile ?? null,
+    seed: state.seed,
+    status: roundStatus(state),
+    deck: state.order.length,
+    placed: state.placements.length,
+    right,
+    wrong: state.placements.length - right,
+    newlyCollected: state.placements.filter((p) => p.isNew).length,
+    inkLeft: Math.max(state.ink, 0),
+    levels,
+    placements: state.placements.map((p) => ({ id: p.id, correct: p.correct, level: p.hints + 1 })),
+  };
+}
+
+/**
+ * 누적 플레이 기록 통계.
+ * @param {Array<ReturnType<typeof summarizeRound>>} history
+ */
+export function historyStats(history) {
+  const rounds = history.length;
+  const cleared = history.filter((h) => h.status === 'cleared').length;
+  const placed = history.reduce((s, h) => s + h.placed, 0);
+  const right = history.reduce((s, h) => s + h.right, 0);
+  const levels = [0, 1, 2].map((k) => history.reduce((s, h) => s + (h.levels?.[k] ?? 0), 0));
+  const levelSum = levels[0] + 2 * levels[1] + 3 * levels[2];
+  return {
+    rounds, cleared, failed: rounds - cleared, placed, right,
+    rate: placed ? Math.round((100 * right) / placed) : 0,
+    avgLevel: placed ? Math.round((levelSum / placed) * 100) / 100 : 0,
+    levels,
+  };
+}
+
+/** 저장된 플레이 기록에서 형식이 맞는 줄만 남긴다. */
+export function restoreHistory(saved) {
+  if (!Array.isArray(saved)) return [];
+  return saved.filter((h) => h && typeof h === 'object' && Number.isInteger(h.placed) && Number.isInteger(h.right)
+    && Array.isArray(h.levels) && h.levels.length === 3 && ['cleared', 'failed'].includes(h.status));
 }

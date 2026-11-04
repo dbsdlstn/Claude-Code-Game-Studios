@@ -42,10 +42,12 @@ export async function startServer() {
 
 /**
  * 고정 시드로 게임을 연다. data를 주면 그 데이터로 고정, null이면 기본 경로(samguk.json 우선).
+ * title: false(기본)면 `?notitle=1`로 타이틀·튜토리얼을 건너뛰고 본게임으로 바로 들어간다.
  */
-export async function openGame(page, base, { seed = 42, data = 'data/sample-cards.json' } = {}) {
+export async function openGame(page, base, { seed = 42, data = 'data/sample-cards.json', title = false } = {}) {
   const q = new URLSearchParams({ seed: String(seed) });
   if (data) q.set('data', data);
+  if (!title) q.set('notitle', '1');
   await page.goto(`${base}/web/index.html?${q}`);
   await page.waitForSelector('body[data-ready="true"]');
 }

@@ -1,6 +1,6 @@
 /**
- * 화면 연결. 규칙은 rules.js, 저장은 storage.js, 로딩은 data.js에 있고 여기서는 DOM만 다룬다.
- * 텍스트는 전부 textContent로 넣는다(카드 데이터를 HTML로 해석하지 않는다).
+ * 화면 연결. 규칙은 rules.js, 저장은 storage.js, 로딩은 data.js, 공용 DOM은 ui/에 있다.
+ * 흐름: 타이틀 → (첫 실행이면) 튜토리얼 → 본게임 → 라운드 결과 → 도감.
  */
 import { CONFIG } from './config.js';
 import { loadCards, resolveDataUrls } from './data.js';
@@ -9,39 +9,24 @@ import {
   NATIONS, ERAS, nationLabel, eraLabel, validateCards, anchorCards, playableCards, releaseFilter,
   createRound, roundStatus, currentCardId, revealNextClue, placeCard, boardCells, roundStats,
   recordInCollection, serializeRound, restoreRound, restoreCollection, isDogamComplete, dogamProgress,
+  summarizeRound, historyStats, restoreHistory,
 } from './rules.js';
+import { $, el, clueText, TYPE_LABEL, LEVEL_LABEL, inkDrops } from './ui/dom.js';
+import { makeDraggable } from './ui/drag.js';
+import { createTutorial, pickTutorialCards } from './ui/tutorial.js';
 
-const TYPE_LABEL = { event: '사건', artifact: '유물', person: '인물', myth: '전승' };
-const LEVEL_LABEL = ['', '1단계 · 장면', '2단계 · 관계', '3단계 · 직접 힌트'];
-const $ = (id) => document.getElementById(id);
-
-/** 작은 DOM 생성 도우미. 문자열 자식은 텍스트 노드가 되고 null·false는 버린다. */
-function el(tag, attrs = {}, ...children) {
-  const node = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) {
-    if (v === null || v === undefined || v === false) continue;
-    if (k === 'class') node.className = v;
-    else if (k === 'dataset') Object.assign(node.dataset, v);
-    else if (k.startsWith('on')) node.addEventListener(k.slice(2), v);
-    else node.setAttribute(k, v === true ? '' : String(v));
-  }
-  for (const c of children.flat()) if (c !== null && c !== undefined && c !== false) node.append(c instanceof Node ? c : String(c));
-  return node;
-}
-
-/** "[제목]" 표기를 강조 span으로 바꾼다. */
-function clueText(text) {
-  return text.split(/(\[[^\]]+\])/g).filter(Boolean)
-    .map((part) => (/^\[.+\]$/.test(part) ? el('span', { class: 'ref' }, part) : part));
-}
+const HELP_IDLE = '카드를 끌어 칸에 놓거나, 카드를 눌러 고른 뒤 칸을 누르세요.';
+const HELP_ARMED = '칸을 누르거나 방향키로 칸을 고르고 Enter로 놓으세요. Esc로 취소.';
 
 const app = {
   store: createStore(CONFIG.storageKey),
-  cards: [], cardsById: new Map(), anchors: [], playable: [],
-  round: null, collection: Object.freeze({}),
+  cards: [], cardsById: new Map(), anchors: [], playable: [], dataFile: '',
+  round: null, collection: Object.freeze({}), meta: {}, history: [],
   selected: false, lastResult: null, lostInk: false, dogamActive: null,
-  seedParam: null, focusCell: null,
+  seedParam: null, focusCell: null, tutorial: null,
 };
+
+const where = (a) => `${nationLabel(a.nation)} ${eraLabel(a.era)}`;
 
 function newSeed() {
   if (app.seedParam !== null) return (app.seedParam + (app.round ? app.round.seed + 1 : 0)) >>> 0;
@@ -49,30 +34,19 @@ function newSeed() {
 }
 
 function persist() {
-  app.store.save(serializeRound(app.round), app.collection);
+  app.store.save({ round: serializeRound(app.round), collection: app.collection, meta: app.meta, history: app.history });
 }
 
 function newRoundState() {
   return createRound(app.playable, { seed: newSeed(), startInk: CONFIG.startInk, collection: app.collection });
 }
 
-/* ------------------------------------------------------------------ 렌더 */
+/* ------------------------------------------------------------------ 본게임 렌더 */
 
 function renderTop() {
-  const ink = $('ink');
   const { ink: n, startInk } = app.round;
-  ink.replaceChildren(el('span', { class: 'ink-label' }, '먹물'));
-  for (let i = 0; i < startInk; i++) {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 16 20');
-    svg.setAttribute('aria-hidden', 'true');
-    const lost = app.lostInk && i === n;
-    svg.setAttribute('class', 'drop' + (i < n ? '' : ' empty') + (lost ? ' drop-lost' : ''));
-    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    p.setAttribute('d', 'M8 1 C8 1 2 9 2 13 a6 6 0 0 0 12 0 C14 9 8 1 8 1 Z');
-    svg.append(p);
-    ink.append(svg);
-  }
+  const ink = $('ink');
+  ink.replaceChildren(el('span', { class: 'ink-label' }, '먹물'), ...inkDrops(n, startInk, app.lostInk ? n : -1));
   ink.dataset.ink = String(n);
   ink.setAttribute('aria-label', `먹물 ${Math.max(n, 0)}/${startInk}`);
   const total = app.round.order.length;
@@ -96,14 +70,6 @@ function renderCard() {
   }
   box.className = 'card' + (app.selected ? ' selected' : '') + (app.lastResult ? ' card-enter' : '');
   const card = app.cardsById.get(id);
-  const shown = card.clues.slice(0, app.round.shown);
-  const more = el('button', {
-    id: 'more-clue', type: 'button', class: 'btn',
-    disabled: app.round.shown >= card.clues.length,
-    onclick: (e) => { e.stopPropagation(); onMoreClue(); },
-    onpointerdown: (e) => e.stopPropagation(),
-    onkeydown: (e) => e.stopPropagation(),
-  }, '단서 더 보기');
   box.dataset.cardId = id; // E2E가 정답을 데이터에서 찾을 때 쓴다(화면에는 보이지 않음).
   box.setAttribute('aria-label', `이름이 숨겨진 ${TYPE_LABEL[card.type] ?? ''} 카드. Enter로 고른 뒤 방향키로 칸을 고르고 Enter로 놓습니다.`);
   box.replaceChildren(
@@ -111,17 +77,21 @@ function renderCard() {
       el('span', { class: 'card-title' }, '？ 이름 숨김'),
       el('span', { class: 'card-type' }, TYPE_LABEL[card.type] ?? card.type)),
     el('ol', { class: 'clues', id: 'clues' },
-      shown.map((cl, i) => el('li', { class: 'clue' + (i === app.round.shown - 1 && i > 0 ? ' clue-new' : ''), dataset: { kind: cl.kind, level: String(cl.level) } },
-        el('span', { class: 'clue-level' }, LEVEL_LABEL[cl.level] ?? ''),
-        clueText(cl.text)))),
+      card.clues.slice(0, app.round.shown).map((cl, i) => el('li', {
+        class: 'clue' + (i === app.round.shown - 1 && i > 0 ? ' clue-new' : ''), dataset: { kind: cl.kind, level: String(cl.level) },
+      }, el('span', { class: 'clue-level' }, LEVEL_LABEL[cl.level] ?? ''), clueText(cl.text)))),
     el('div', { class: 'card-foot' },
       el('span', { class: 'clue-count' }, `단서 ${app.round.shown} / ${card.clues.length}`),
-      more),
+      el('button', {
+        id: 'more-clue', type: 'button', class: 'btn',
+        disabled: app.round.shown >= card.clues.length,
+        onclick: (e) => { e.stopPropagation(); onMoreClue(); },
+        onkeydown: (e) => e.stopPropagation(),
+      }, '단서 더 보기')),
   );
 }
 
 function renderBoard() {
-  const board = $('board');
   const cells = boardCells(app.round, app.anchors);
   const r = app.lastResult;
   const nodes = [el('div', { class: 'corner' })];
@@ -133,11 +103,10 @@ function renderBoard() {
     nodes.push(el('div', { class: 'nation-head' }, n.label));
     for (const e of ERAS) {
       const c = cells[`${n.id}:${e.id}`];
-      let flash = '';
-      if (r && r.answer.nation === n.id && r.answer.era === e.id) flash = ' flash-ok';
-      if (r && !r.correct && r.placed.nation === n.id && r.placed.era === e.id) flash = ' flash-bad';
+      const isAnswer = r && r.answer.nation === n.id && r.answer.era === e.id;
+      const isWrongPlace = r && !r.correct && r.placed.nation === n.id && r.placed.era === e.id;
       nodes.push(el('button', {
-        type: 'button', class: 'cell' + flash,
+        type: 'button', class: 'cell' + (isAnswer ? ' flash-ok' : '') + (isWrongPlace ? ' flash-bad' : ''),
         dataset: { nation: n.id, era: e.id },
         'aria-label': `${n.label} ${e.label} 칸, 카드 ${c.anchors.length + c.placed.length}장`,
         onclick: () => onCellClick(n.id, e.id),
@@ -147,11 +116,13 @@ function renderBoard() {
       c.placed.map((p) => el('span', {
         class: 'chip ' + (p.correct ? 'chip-ok' : 'chip-bad') + (r && r.id === p.id ? ' chip-new' : ''),
         dataset: { id: p.id },
-      }, el('span', { class: 'sr-only' }, p.correct ? '정답: ' : '오답 공개: '), app.cardsById.get(p.id).title))));
+      }, el('span', { class: 'sr-only' }, p.correct ? '정답: ' : '오답 공개: '), app.cardsById.get(p.id).title)),
+      isAnswer && r.correct ? el('span', { class: 'stamp', 'aria-hidden': 'true' }, '正') : null,
+      isWrongPlace ? el('span', { class: 'blot', 'aria-hidden': 'true' }) : null));
     }
   }
-  board.replaceChildren(...nodes);
-  board.classList.toggle('armed', app.selected);
+  $('board').replaceChildren(...nodes);
+  $('board').classList.toggle('armed', app.selected);
 }
 
 function renderFeedback() {
@@ -159,11 +130,10 @@ function renderFeedback() {
   const r = app.lastResult;
   if (!r) { box.replaceChildren(); return; }
   const card = app.cardsById.get(r.id);
-  const where = (a) => `${nationLabel(a.nation)} ${eraLabel(a.era)}`;
   box.replaceChildren(el('div', { class: 'fb fb-enter ' + (r.correct ? 'fb-ok' : 'fb-bad'), id: 'fb', dataset: { result: r.correct ? 'correct' : 'wrong' } },
     el('div', { class: 'fb-head' },
       el('span', { class: 'fb-mark', 'aria-hidden': 'true' }, r.correct ? '○' : '✕'),
-      r.correct ? '정답 · 도감에 수집' : '오답 · 먹물 1 소모'),
+      r.correct ? (r.isNew ? '정답 · 도감에 수집' : '정답 · 이미 수집한 카드') : '오답 · 먹물 1 소모'),
     el('div', { class: 'fb-title' }, card.title),
     el('div', { class: 'fb-meta' },
       r.correct ? where(r.answer) : el('span', {}, '놓은 칸 ', el('s', {}, where(r.placed)), ' → 정답 칸 ', el('b', {}, where(r.answer))),
@@ -178,7 +148,7 @@ function render() {
   renderFeedback();
 }
 
-/* ------------------------------------------------------------------ 동작 */
+/* ------------------------------------------------------------------ 본게임 동작 */
 
 function onMoreClue() {
   app.round = revealNextClue(app.round);
@@ -192,9 +162,7 @@ function setSelected(v, { focusBoard = false } = {}) {
   app.selected = v && !!currentCardId(app.round);
   $('card').classList.toggle('selected', app.selected);
   $('board').classList.toggle('armed', app.selected);
-  $('hand-help').textContent = app.selected
-    ? '칸을 누르거나 방향키로 칸을 고르고 Enter로 놓으세요. Esc로 취소.'
-    : '카드를 끌어 칸에 놓거나, 카드를 눌러 고른 뒤 칸을 누르세요.';
+  $('hand-help').textContent = app.selected ? HELP_ARMED : HELP_IDLE;
   if (app.selected && focusBoard) focusCellAt(app.focusCell ?? { nation: NATIONS[0].id, era: ERAS[0].id });
 }
 
@@ -219,9 +187,10 @@ function onCellKey(ev, nation, era) {
   if (moves[ev.key]) {
     ev.preventDefault();
     const [dn, de] = moves[ev.key];
-    const n2 = Math.min(Math.max(ni + dn, 0), NATIONS.length - 1);
-    const e2 = Math.min(Math.max(ei + de, 0), ERAS.length - 1);
-    focusCellAt({ nation: NATIONS[n2].id, era: ERAS[e2].id });
+    focusCellAt({
+      nation: NATIONS[Math.min(Math.max(ni + dn, 0), NATIONS.length - 1)].id,
+      era: ERAS[Math.min(Math.max(ei + de, 0), ERAS.length - 1)].id,
+    });
   } else if (ev.key === 'Escape' && app.selected) {
     ev.stopPropagation();
     setSelected(false);
@@ -231,19 +200,22 @@ function onCellKey(ev, nation, era) {
 
 function place(nation, era) {
   const before = isDogamComplete(app.playable, app.collection);
-  const { state, result } = placeCard(app.round, app.cardsById, nation, era);
+  const { state, result } = placeCard(app.round, app.cardsById, nation, era, app.collection);
   if (!result) return;
   app.round = state;
   app.collection = recordInCollection(app.collection, result);
   app.lastResult = result;
   app.lostInk = !result.correct;
-  app.selected = false;
   app.focusCell = { nation, era };
+  const status = roundStatus(app.round);
+  if (status !== 'playing') {
+    // 끝난 라운드는 한 번만 기록한다(D12: 도중에 새 라운드를 시작하면 기록하지 않음).
+    app.history = [...app.history, summarizeRound(app.round, { at: new Date().toISOString(), dataFile: app.dataFile })];
+  }
   persist();
   render();
   setSelected(false);
   app.lostInk = false;
-  const status = roundStatus(app.round);
   const completedNow = !before && isDogamComplete(app.playable, app.collection);
   if (completedNow) showCompleteModal(status);
   else if (status !== 'playing') showEndModal(status);
@@ -260,79 +232,14 @@ function startNewRound() {
   $('card').focus();
 }
 
-/* ------------------------------------------------------------------ 드래그 */
-
-function setupDrag() {
-  const card = $('card');
-  const ghost = $('drag-ghost');
-  let start = null;
-  let dragging = false;
-  let overCell = null;
-
-  const cellAt = (x, y) => document.elementFromPoint(x, y)?.closest?.('#board .cell') ?? null;
-  const setOver = (c) => {
-    if (overCell === c) return;
-    overCell?.classList.remove('over');
-    overCell = c;
-    overCell?.classList.add('over');
-    ghost.dataset.target = c ? `${nationLabel(c.dataset.nation)} ${eraLabel(c.dataset.era)}` : '';
-    ghost.querySelector('.ghost-target').textContent = c ? `→ ${ghost.dataset.target}` : '';
-  };
-
-  card.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 || !currentCardId(app.round)) return;
-    start = { x: e.clientX, y: e.clientY, id: e.pointerId };
-    dragging = false;
-    card.setPointerCapture(e.pointerId);
-  });
-  card.addEventListener('pointermove', (e) => {
-    if (!start || e.pointerId !== start.id) return;
-    if (!dragging && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 6) {
-      dragging = true;
-      card.classList.add('dragging');
-      ghost.replaceChildren(el('span', {}, '？ 이름 숨김 카드'), el('span', { class: 'ghost-target' }));
-      ghost.hidden = false;
-      $('board').classList.add('armed', 'dragging');
-    }
-    if (dragging) {
-      ghost.style.left = e.clientX + 'px';
-      ghost.style.top = e.clientY + 'px';
-      setOver(cellAt(e.clientX, e.clientY));
-    }
-  });
-  const end = (e, cancelled) => {
-    if (!start || e.pointerId !== start.id) return;
-    const wasDragging = dragging;
-    const target = cancelled || !wasDragging ? null : cellAt(e.clientX, e.clientY);
-    start = null;
-    dragging = false;
-    card.classList.remove('dragging');
-    ghost.hidden = true;
-    setOver(null);
-    $('board').classList.remove('dragging');
-    if (wasDragging) {
-      if (target) place(target.dataset.nation, target.dataset.era);
-      else setSelected(app.selected);
-    } else if (!cancelled) {
-      setSelected(!app.selected);
-    }
-  };
-  card.addEventListener('pointerup', (e) => end(e, false));
-  card.addEventListener('pointercancel', (e) => end(e, true));
-  card.addEventListener('keydown', (e) => {
-    if (e.target !== card) return;
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(!app.selected, { focusBoard: true }); }
-    if (e.key === 'Escape') setSelected(false);
-  });
-}
-
 /* ------------------------------------------------------------------ 모달 */
 
-function openModal(title, body, actions, kind) {
+function openModal(title, body, actions, kind, { wide = false } = {}) {
   $('modal-title').textContent = title;
   $('modal-body').replaceChildren(...body);
   $('modal-actions').replaceChildren(...actions);
   $('modal').dataset.kind = kind;
+  $('modal').querySelector('.modal-sheet').classList.toggle('wide', wide);
   $('modal').hidden = false;
   actions[actions.length - 1]?.focus();
 }
@@ -342,15 +249,36 @@ function closeModal() {
   delete $('modal').dataset.kind;
 }
 
-function statsList() {
+/** 라운드 결과: 정답 수, 단서 단계 분포, 새로 수집한 카드, 오답 해설 다시 보기. */
+function roundResult() {
   const s = roundStats(app.round);
-  const dp = dogamProgress(app.playable, app.collection);
-  return el('dl', { class: 'stats' },
-    el('dt', {}, '정답'), el('dd', {}, `${s.right} / ${s.total}장 (${s.rate}%)`),
-    el('dt', {}, '남은 먹물'), el('dd', {}, `${Math.max(s.ink, 0)} / ${app.round.startInk}`),
-    el('dt', {}, '단서 더 보기'), el('dd', {}, `${s.hints}회 (${s.cardsWithHints}장에서 사용)`),
-    el('dt', {}, '놓지 못한 카드'), el('dd', {}, `${s.deck - s.total}장`),
-    el('dt', {}, '도감'), el('dd', {}, `${dp.collected} / ${dp.total}장 수집`));
+  const h = summarizeRound(app.round);
+  const max = Math.max(1, ...h.levels);
+  const fresh = app.round.placements.filter((p) => p.isNew);
+  const wrong = app.round.placements.filter((p) => !p.correct);
+  return el('div', { class: 'result', id: 'round-result' },
+    el('div', { class: 'result-head' },
+      el('div', { class: 'result-big' }, el('b', { id: 'result-right' }, String(s.right)), ` / ${s.deck}`, el('span', {}, '정답')),
+      el('div', { class: 'result-big' }, el('b', {}, String(Math.max(s.ink, 0))), ` / ${app.round.startInk}`, el('span', {}, '남은 먹물')),
+      el('div', { class: 'result-big' }, el('b', {}, String(fresh.length)), el('span', {}, '새로 수집'))),
+    s.deck > s.total ? el('p', { class: 'meta' }, `놓지 못한 카드 ${s.deck - s.total}장`) : null,
+    el('h4', {}, '몇 단계 단서에서 놓았나'),
+    el('div', { class: 'levels', id: 'result-levels' }, h.levels.map((n, k) => el('div', { class: 'level-row', dataset: { level: String(k + 1), count: String(n) } },
+      el('span', { class: 'level-name' }, LEVEL_LABEL[k + 1]),
+      el('span', { class: 'level-bar' }, el('span', { class: 'level-fill', style: `width:${Math.round((100 * n) / max)}%` })),
+      el('span', { class: 'level-n' }, `${n}장`)))),
+    el('h4', {}, `새로 수집한 카드 ${fresh.length}장`),
+    fresh.length
+      ? el('div', { class: 'chips', id: 'result-new' }, fresh.map((p) => el('span', { class: 'chip chip-ok', dataset: { id: p.id } }, app.cardsById.get(p.id).title)))
+      : el('p', { class: 'meta', id: 'result-new' }, '이번 라운드에 새로 모은 카드가 없습니다.'),
+    wrong.length ? el('h4', {}, `오답 다시 보기 ${wrong.length}장`) : null,
+    wrong.length ? el('div', { class: 'wrong-list', id: 'result-wrong' }, wrong.map((p) => {
+      const c = app.cardsById.get(p.id);
+      return el('details', { class: 'wrong-item', dataset: { id: p.id } },
+        el('summary', {}, el('b', {}, c.title), ` — 놓은 칸 ${where({ nation: p.placedNation, era: p.placedEra })} → 정답 ${where(p)}`),
+        el('p', {}, c.explanation),
+        c.date_label ? el('p', { class: 'meta' }, c.date_label) : null);
+    })) : null);
 }
 
 function dogamButton() {
@@ -358,12 +286,13 @@ function dogamButton() {
 }
 
 function showEndModal(status) {
+  const retry = el('button', { type: 'button', class: 'btn btn-primary', id: 'modal-retry', onclick: startNewRound }, status === 'cleared' ? '새 라운드' : '재도전');
   if (status === 'cleared') {
-    openModal('라운드 클리어', [el('p', {}, '먹물이 남은 채 이번 라운드의 12장을 모두 놓았습니다. 새 라운드는 아직 모으지 않은 카드부터 나옵니다.'), statsList()],
-      [dogamButton(), el('button', { type: 'button', class: 'btn btn-primary', id: 'modal-retry', onclick: startNewRound }, '새 라운드')], 'cleared');
+    openModal('라운드 클리어', [el('p', {}, '먹물이 남은 채 이번 라운드의 12장을 모두 놓았습니다. 새 라운드는 아직 모으지 않은 카드부터 나옵니다.'), roundResult()],
+      [dogamButton(), retry], 'cleared', { wide: true });
   } else {
-    openModal('먹물이 바닥났습니다', [el('p', {}, '이번 라운드는 실패입니다. 지금까지 수집한 카드는 도감에 남습니다.'), statsList()],
-      [dogamButton(), el('button', { type: 'button', class: 'btn btn-primary', id: 'modal-retry', onclick: startNewRound }, '재도전')], 'failed');
+    openModal('먹물이 바닥났습니다', [el('p', {}, '이번 라운드는 실패입니다. 지금까지 수집한 카드는 도감에 남습니다.'), roundResult()],
+      [dogamButton(), retry], 'failed', { wide: true });
   }
 }
 
@@ -375,15 +304,93 @@ function showCompleteModal(status) {
   openModal('도감 완성', [
     el('p', { class: 'complete-seal', 'aria-hidden': 'true' }, '完'),
     el('p', {}, `삼국시대 판정 카드 ${dp.total}장을 모두 수집했습니다. 도감에서 해설을 다시 읽을 수 있습니다.`),
-    statsList(),
-  ], [dogamButton(), next], 'complete');
+    status === 'playing' ? null : roundResult(),
+  ], [dogamButton(), next], 'complete', { wide: status !== 'playing' });
 }
 
 function confirmNewRound() {
   if (roundStatus(app.round) !== 'playing' || app.round.index === 0) { startNewRound(); return; }
-  openModal('새 라운드를 시작할까요?', [el('p', {}, '지금 라운드의 보드와 먹물이 초기화됩니다. 도감 수집 기록은 남습니다.')],
+  openModal('새 라운드를 시작할까요?', [el('p', {}, '지금 라운드의 보드와 먹물이 초기화됩니다. 끝나지 않은 라운드라 플레이 기록에는 남지 않습니다. 도감 수집 기록은 남습니다.')],
     [el('button', { type: 'button', class: 'btn', onclick: closeModal }, '취소'),
       el('button', { type: 'button', class: 'btn btn-primary', id: 'modal-confirm', onclick: startNewRound }, '새 라운드')], 'confirm');
+}
+
+function showHowTo() {
+  openModal('하는 방법', [
+    el('ul', { class: 'rule-list' },
+      el('li', {}, '이름이 숨겨진 카드의 단서를 읽고, 나라 × 시기 보드의 칸에 놓습니다.'),
+      el('li', {}, '시기는 사건의 성격으로 나눕니다: ', ERAS.map((e, i) => [i ? ' · ' : '', el('b', {}, e.label), `(${e.definition})`])),
+      el('li', {}, '단서는 3단계입니다. 1 장면 → 2 기준 카드와의 관계 → 3 직접 힌트. "단서 더 보기"로 엽니다.'),
+      el('li', {}, '맞히면 도감에 수집, 틀리면 먹물 1 소모와 정답 공개. 먹물 5가 다 떨어지면 라운드 실패.'),
+      el('li', {}, '한 라운드는 12장(칸마다 1장). 36장을 모두 모으면 도감 완성.'),
+      el('li', {}, '조작: 끌어서 놓기, 또는 카드를 누르고 칸 누르기. 키보드는 카드에서 Enter → 방향키 → Enter.')),
+  ], [
+    el('button', { type: 'button', class: 'btn', id: 'howto-tutorial', onclick: () => { closeModal(); hideTitle(); openTutorial(); } }, '튜토리얼 다시 하기'),
+    el('button', { type: 'button', class: 'btn btn-primary', id: 'howto-close', onclick: () => { closeModal(); if (!$('title-screen').hidden) $('title-actions').querySelector('button')?.focus(); } }, '닫기'),
+  ], 'howto');
+}
+
+/* ------------------------------------------------------------------ 타이틀·튜토리얼 */
+
+function hasProgress() {
+  return (roundStatus(app.round) === 'playing' && app.round.index > 0) || Object.keys(app.collection).length > 0 || app.history.length > 0;
+}
+
+function showTitle() {
+  closeModal();
+  const dp = dogamProgress(app.playable, app.collection);
+  const hs = historyStats(app.history);
+  $('title-progress').textContent = hasProgress()
+    ? `도감 ${dp.collected} / ${dp.total}장 · 끝낸 라운드 ${hs.rounds}회`
+    : `카드 ${dp.total}장 · 한 라운드 12장 · 먹물 ${CONFIG.startInk}`;
+  const resumable = roundStatus(app.round) === 'playing' && app.round.index > 0;
+  const actions = [];
+  if (resumable) {
+    actions.push(el('button', { type: 'button', class: 'btn btn-primary btn-big', id: 'title-continue', onclick: () => enterGame(false) }, `이어하기 (카드 ${app.round.index + 1} / ${app.round.order.length})`));
+    actions.push(el('button', { type: 'button', class: 'btn btn-big', id: 'title-start', onclick: () => enterGame(true) }, '새 라운드'));
+  } else {
+    actions.push(el('button', { type: 'button', class: 'btn btn-primary btn-big', id: 'title-start', onclick: () => enterGame(roundStatus(app.round) !== 'playing') }, hasProgress() ? '라운드 시작' : '시작하기'));
+  }
+  actions.push(el('button', { type: 'button', class: 'btn', id: 'title-dogam', onclick: openDogam }, '도감'));
+  actions.push(el('button', { type: 'button', class: 'btn', id: 'title-howto', onclick: showHowTo }, '하는 방법'));
+  $('title-actions').replaceChildren(...actions);
+  $('title-screen').hidden = false;
+  actions[0].focus();
+}
+
+function hideTitle() {
+  $('title-screen').hidden = true;
+}
+
+/** 타이틀에서 본게임으로. 튜토리얼을 아직 안 했으면 먼저 튜토리얼. */
+function enterGame(fresh) {
+  const hadProgress = hasProgress();
+  hideTitle();
+  if (fresh) {
+    app.round = newRoundState();
+    app.lastResult = null;
+    persist();
+  }
+  render();
+  // 첫 실행(튜토리얼 미완료이고 진행 기록도 없음)에만 튜토리얼을 자동으로 연다. 이미 플레이한 사람은 "하는 방법"에서 다시 볼 수 있다.
+  if (!app.meta.tutorialDone && !hadProgress && app.tutorial) { openTutorial(); return; }
+  const status = roundStatus(app.round);
+  if (status !== 'playing') showEndModal(status);
+  else $('card').focus();
+}
+
+function openTutorial() {
+  if (!app.tutorial) { $('card').focus(); return; }
+  app.tutorial.open();
+}
+
+function onTutorialFinish(skipped) {
+  app.meta = { ...app.meta, tutorialDone: true, tutorialSkipped: skipped };
+  persist();
+  render();
+  const status = roundStatus(app.round);
+  if (status !== 'playing') showEndModal(status);
+  else $('card').focus();
 }
 
 /* ------------------------------------------------------------------ 도감 */
@@ -401,13 +408,31 @@ function openDogam() {
 
 function closeDogam() {
   $('dogam').hidden = true;
+  if (!$('title-screen').hidden) { $('title-actions').querySelector('button')?.focus(); return; }
   const status = roundStatus(app.round);
   if (status !== 'playing') showEndModal(status);
   else $('btn-dogam').focus();
 }
 
+function selectEntry(id) {
+  app.dogamActive = id;
+  renderDogam();
+  document.querySelector(`#dogam [data-entry="${CSS.escape(id)}"]`)?.focus();
+}
+
+function entryButton(c, extraClass = '') {
+  const st = dogamState(c);
+  const known = st !== 'unknown' || c.disputed;
+  return el('button', {
+    type: 'button',
+    class: `entry ${st}${c.disputed ? ' disputed' : ''}${app.dogamActive === c.id ? ' active' : ''}${extraClass}`,
+    dataset: { id: c.id, state: c.disputed ? 'disputed' : st, entry: c.id },
+    'aria-label': known ? `${c.title} (${c.disputed ? '견해가 나뉨' : ({ anchor: '기준 카드', collected: '수집', revealed: '오답으로 공개' })[st]})` : '미수집 카드',
+    onclick: () => selectEntry(c.id),
+  }, known ? c.title : '？？？');
+}
+
 function renderDogam() {
-  const grid = $('dogam-grid');
   const nodes = [el('div', { class: 'corner' })];
   for (const e of ERAS) {
     nodes.push(el('div', { class: 'era-head' }, el('span', { class: 'era-name' }, e.label), el('span', { class: 'era-def' }, e.definition)));
@@ -415,27 +440,25 @@ function renderDogam() {
   for (const n of NATIONS) {
     nodes.push(el('div', { class: 'nation-head' }, n.label));
     for (const e of ERAS) {
-      const inCell = app.cards.filter((c) => c.answer.nation === n.id && c.answer.era === e.id);
-      const judged = inCell.filter((c) => !c.anchor && !c.disputed);
+      // 판정 칸에는 기준 카드와 판정 카드만. disputed 카드는 아래 "견해가 나뉘는 기록"으로 분리(D12).
+      const inCell = app.cards.filter((c) => c.answer.nation === n.id && c.answer.era === e.id && !c.disputed)
+        .sort((a, b) => Number(b.anchor) - Number(a.anchor));
+      const judged = inCell.filter((c) => !c.anchor);
       const got = judged.filter((c) => app.collection[c.id] === 'collected').length;
-      const order = (c) => (c.anchor ? 0 : c.disputed ? 2 : 1);
       nodes.push(el('div', { class: 'cell dogam-cell' + (judged.length && got === judged.length ? ' cell-done' : ''), dataset: { nation: n.id, era: e.id } },
         el('span', { class: 'cell-count' }, `${got} / ${judged.length}`),
-        inCell.slice().sort((a, b) => order(a) - order(b)).map((c) => {
-          const st = dogamState(c);
-          const known = st !== 'unknown' || c.disputed;
-          return el('button', {
-            type: 'button',
-            class: `entry ${st}${c.disputed ? ' disputed' : ''}${app.dogamActive === c.id ? ' active' : ''}`,
-            dataset: { id: c.id, state: st },
-            'aria-label': known ? `${c.title} (${({ anchor: '기준 카드', collected: '수집', revealed: '오답으로 공개', unknown: '판정 제외' })[st]})` : '미수집 카드',
-            onclick: () => { app.dogamActive = c.id; renderDogam(); document.querySelector(`#dogam .entry[data-id="${CSS.escape(c.id)}"]`)?.focus(); },
-          }, known ? c.title : '？？？');
-        })));
+        inCell.map((c) => entryButton(c))));
     }
   }
-  grid.replaceChildren(...nodes);
+  $('dogam-grid').replaceChildren(...nodes);
 
+  const disputed = app.cards.filter((c) => c.disputed);
+  $('dogam-disputed').replaceChildren(...(disputed.length ? disputed.map((c) => el('div', { class: 'disputed-card', dataset: { id: c.id } },
+    el('div', { class: 'disputed-top' }, entryButton(c), el('span', { class: 'badge badge-warn' }, '견해가 나뉨')),
+    el('p', { class: 'meta' }, `자료상 분류 ${where(c.answer)} · 판정 제외`),
+    el('p', { class: 'disputed-note' }, c.disputed_note || ''))) : [el('p', { class: 'meta' }, '없음')]));
+
+  renderPlayRecord();
   const dp = dogamProgress(app.playable, app.collection);
   const revealed = app.playable.filter((c) => app.collection[c.id] === 'revealed').length;
   $('dogam-count').textContent = `수집 ${dp.collected} / ${dp.total}장 · 오답으로 공개 ${revealed}장`;
@@ -443,40 +466,78 @@ function renderDogam() {
   renderDogamDetail();
 }
 
+function renderPlayRecord() {
+  const hs = historyStats(app.history);
+  const box = $('play-record');
+  box.dataset.rounds = String(hs.rounds);
+  box.replaceChildren(
+    el('dl', { class: 'stats record-stats' },
+      el('dt', {}, '끝낸 라운드'), el('dd', { id: 'rec-rounds' }, `${hs.rounds}회 (클리어 ${hs.cleared} · 실패 ${hs.failed})`),
+      el('dt', {}, '정답률'), el('dd', { id: 'rec-rate' }, hs.placed ? `${hs.rate}% (${hs.right} / ${hs.placed}장)` : '—'),
+      el('dt', {}, '평균 단서 단계'), el('dd', { id: 'rec-level' }, hs.placed ? `${hs.avgLevel.toFixed(2)} (1단계 ${hs.levels[0]} · 2단계 ${hs.levels[1]} · 3단계 ${hs.levels[2]})` : '—')),
+    el('button', { type: 'button', class: 'btn', id: 'btn-export', onclick: exportPlayLog }, '기록 내보내기 (JSON)'));
+}
+
+/** 플레이테스트 데이터 수집용 JSON 내보내기. 카드 본문 대신 id만 담는다. */
+function exportPlayLog() {
+  const now = new Date();
+  const payload = {
+    format: 'hanyang-dogam-playlog',
+    version: 1,
+    exportedAt: now.toISOString(),
+    dataFile: app.dataFile,
+    cardsJudged: app.playable.length,
+    tutorial: { done: !!app.meta.tutorialDone, skipped: !!app.meta.tutorialSkipped },
+    collection: {
+      collected: Object.keys(app.collection).filter((id) => app.collection[id] === 'collected'),
+      revealed: Object.keys(app.collection).filter((id) => app.collection[id] === 'revealed'),
+    },
+    stats: historyStats(app.history),
+    history: app.history,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const pad = (x) => String(x).padStart(2, '0');
+  const a = el('a', { href: url, download: `hanyang-playlog-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}.json` });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function renderDogamDetail() {
   const box = $('dogam-detail');
   const card = app.dogamActive ? app.cardsById.get(app.dogamActive) : null;
   if (!card) {
-    box.replaceChildren(el('p', { class: 'meta' }, '칸 안의 카드를 누르면 해설과 출처를 볼 수 있습니다.'),
+    box.replaceChildren(el('p', { class: 'meta' }, '카드를 누르면 해설과 출처를 볼 수 있습니다.'),
       el('ul', { class: 'legend' },
         el('li', {}, el('span', { class: 'entry collected' }, '이름'), ' 정답으로 수집'),
         el('li', {}, el('span', { class: 'entry revealed' }, '이름'), ' 오답으로 공개(수집 아님)'),
         el('li', {}, el('span', { class: 'entry unknown' }, '？？？'), ' 아직 만나지 못한 카드'),
-        el('li', {}, el('span', { class: 'entry disputed' }, '이름'), ' 견해가 나뉨 · 판정 제외'),
         el('li', {}, el('span', { class: 'entry anchor' }, '이름'), ' 기준 카드')));
     return;
   }
   const st = dogamState(card);
-  const where = `${nationLabel(card.answer.nation)} · ${eraLabel(card.answer.era)}${card.date_label ? ' · ' + card.date_label : ''}`;
+  const loc = `${nationLabel(card.answer.nation)} · ${eraLabel(card.answer.era)}${card.date_label ? ' · ' + card.date_label : ''}`;
   if (st === 'unknown' && !card.disputed) {
-    box.replaceChildren(el('h3', { id: 'dogam-detail-title' }, '？？？'), el('p', { class: 'meta' }, where),
+    box.replaceChildren(el('h3', { id: 'dogam-detail-title' }, '？？？'), el('p', { class: 'meta' }, loc),
       el('p', {}, '아직 수집하지 않은 카드입니다. 라운드에서 정답으로 놓으면 해설이 열립니다.'));
     return;
   }
   const badges = [];
-  if (st === 'collected') badges.push(el('span', { class: 'badge badge-ok' }, '수집'));
-  if (st === 'revealed') badges.push(el('span', { class: 'badge badge-bad' }, '오답으로 공개'));
-  if (st === 'anchor') badges.push(el('span', { class: 'badge' }, '기준 카드'));
   if (card.disputed) badges.push(el('span', { class: 'badge badge-warn' }, '견해가 나뉨 · 판정 제외'));
+  else if (st === 'collected') badges.push(el('span', { class: 'badge badge-ok' }, '수집'));
+  else if (st === 'revealed') badges.push(el('span', { class: 'badge badge-bad' }, '오답으로 공개'));
+  else if (st === 'anchor') badges.push(el('span', { class: 'badge' }, '기준 카드'));
   if (!card.verified) badges.push(el('span', { class: 'badge badge-warn' }, '사실 확인 전'));
   const src = card.source ?? {};
   const url = typeof src.url === 'string' && /^https?:\/\//.test(src.url) ? src.url : null;
   box.replaceChildren(...[
     el('h3', { id: 'dogam-detail-title' }, card.title),
-    el('p', { class: 'meta' }, where, ' · ', TYPE_LABEL[card.type] ?? card.type),
+    el('p', { class: 'meta' }, card.disputed ? `자료상 분류 ${loc}` : loc, ' · ', TYPE_LABEL[card.type] ?? card.type),
     el('div', { class: 'badges' }, badges),
     card.explanation ? el('p', { class: 'exp' }, card.explanation) : null,
-    card.disputed && card.disputed_note ? el('p', { class: 'note' }, el('b', {}, '견해 '), card.disputed_note) : null,
+    card.disputed && card.disputed_note ? el('p', { class: 'note', id: 'dogam-disputed-note' }, el('b', {}, '견해 '), card.disputed_note) : null,
     el('div', { class: 'src', id: 'dogam-source' },
       el('b', {}, '출처 '), src.name || '미상',
       src.note ? el('div', { class: 'src-note' }, src.note) : null,
@@ -496,10 +557,39 @@ function showLoadError(title, lines) {
   document.body.dataset.ready = 'error';
 }
 
+function wireGame() {
+  const card = $('card');
+  makeDraggable(card, {
+    board: $('board'),
+    ghost: $('drag-ghost'),
+    label: (c) => `${nationLabel(c.dataset.nation)} ${eraLabel(c.dataset.era)}`,
+    canDrag: () => !!currentCardId(app.round),
+    onDrop: (n, e) => place(n, e),
+    onClick: () => setSelected(!app.selected),
+    onCancel: () => setSelected(app.selected),
+  });
+  card.addEventListener('keydown', (e) => {
+    if (e.target !== card) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(!app.selected, { focusBoard: true }); }
+    if (e.key === 'Escape') setSelected(false);
+  });
+  $('btn-dogam').addEventListener('click', openDogam);
+  $('btn-dogam-close').addEventListener('click', closeDogam);
+  $('btn-new').addEventListener('click', confirmNewRound);
+  $('btn-home').addEventListener('click', showTitle);
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!$('dogam').hidden) closeDogam();
+    else if (['confirm', 'howto'].includes($('modal').dataset.kind)) closeModal();
+    else if ($('modal').dataset.kind === 'complete' && roundStatus(app.round) === 'playing') closeModal();
+  });
+}
+
 async function init() {
   const params = new URLSearchParams(location.search);
   const seed = Number.parseInt(params.get('seed') ?? '', 10);
   app.seedParam = Number.isFinite(seed) ? seed >>> 0 : null;
+  const skipTitle = params.get('notitle') === '1'; // 테스트·개발용: 타이틀과 튜토리얼을 건너뛴다.
 
   let loaded;
   try {
@@ -511,11 +601,11 @@ async function init() {
   // D11: 모드로 거르기(규칙 9) → 남은 카드 전체 검증 → 오류가 하나라도 있으면 시작하지 않는다.
   const cards = CONFIG.onlyVerified ? releaseFilter(loaded.cards) : loaded.cards;
   const { errors, warnings } = validateCards(cards, { release: CONFIG.onlyVerified });
-  const file = loaded.url.split('/').pop();
+  app.dataFile = loaded.url.split('/').pop();
   if (warnings.length) console.warn('[한양 도감] 카드 데이터 경고', warnings);
   if (errors.length) {
     console.error('[한양 도감] 카드 데이터 검증 오류', errors);
-    $('data-info').textContent = `데이터: ${file}`;
+    $('data-info').textContent = `데이터: ${app.dataFile}`;
     showLoadError(`카드 데이터 검증 오류 ${errors.length}건 — 게임을 시작하지 않습니다.`, errors.map((x) => `[${x.rule}] ${x.id}: ${x.message}`));
     return;
   }
@@ -524,27 +614,28 @@ async function init() {
   app.anchors = anchorCards(cards);
   app.playable = playableCards(cards);
 
-  $('data-info').textContent = `데이터: ${file} · 판정 카드 ${app.playable.length}장 · 기준 카드 ${app.anchors.length}장`
+  $('data-info').textContent = `데이터: ${app.dataFile} · 판정 카드 ${app.playable.length}장 · 기준 카드 ${app.anchors.length}장`
     + (app.playable.some((c) => !c.verified) ? ' · 플레이테스트 빌드(사실 확인 전 카드 포함)' : '');
   if (warnings.length) $('data-warn').textContent = `데이터 경고 ${warnings.length}건(콘솔 참고)`;
 
   const saved = app.store.load();
   app.collection = restoreCollection(saved?.collection, app.cards);
+  app.meta = saved?.meta && typeof saved.meta === 'object' ? { ...saved.meta } : {};
+  app.history = restoreHistory(saved?.history);
   app.round = restoreRound(saved?.round, app.playable) ?? newRoundState();
   persist();
 
-  setupDrag();
-  $('btn-dogam').addEventListener('click', openDogam);
-  $('btn-dogam-close').addEventListener('click', closeDogam);
-  $('btn-new').addEventListener('click', confirmNewRound);
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    if (!$('dogam').hidden) closeDogam();
-    else if (['confirm', 'complete'].includes($('modal').dataset.kind) && roundStatus(app.round) === 'playing') closeModal();
-  });
+  const pair = pickTutorialCards(app.cards, CONFIG.tutorial);
+  app.tutorial = pair ? createTutorial(pair, { onFinish: onTutorialFinish }) : null;
+
+  wireGame();
   render();
-  const status = roundStatus(app.round);
-  if (status !== 'playing') showEndModal(status);
+  if (skipTitle) {
+    const status = roundStatus(app.round);
+    if (status !== 'playing') showEndModal(status);
+  } else {
+    showTitle();
+  }
   document.body.dataset.ready = 'true';
 }
 
