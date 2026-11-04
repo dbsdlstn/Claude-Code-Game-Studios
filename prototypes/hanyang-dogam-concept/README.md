@@ -21,7 +21,7 @@
 - 질문은 하나만: "무엇이 헷갈렸나요?"
 
 ## 상태
-in-progress (빌드 완료, 플레이 전)
+concluded: v1 PIVOT, v2 PROCEED (조건부). 상세는 REPORT.md
 
 ## Findings
 (플레이 후 기록)

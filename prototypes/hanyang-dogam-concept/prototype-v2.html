@@ -1,0 +1,198 @@
+<!-- PROTOTYPE - NOT FOR PRODUCTION -->
+<!-- Question: 카드 이름을 숨기고 기준 카드와의 관계를 단서로 주면 추리처럼 느껴지는가? -->
+<!-- Date: 2026-11-04 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>한양 도감 v2 (프로토타입)</title>
+<style>
+  body { font-family: sans-serif; background:#efe6d2; color:#2b2118; margin:0; padding:12px; }
+  h1 { font-size:18px; margin:0 0 8px; }
+  #top { display:flex; gap:16px; align-items:center; margin:6px 0; flex-wrap:wrap; }
+  #ink { font-weight:bold; }
+  #card { background:#fffaf0; border:2px solid #8a6d3b; border-radius:6px; padding:10px; max-width:600px; cursor:grab; user-select:none; }
+  #card.selected { outline:3px solid #c0392b; }
+  #card .title { font-weight:bold; margin-bottom:4px; }
+  #card ul { margin:4px 0 6px 18px; padding:0; }
+  button { font-size:13px; }
+  table { border-collapse:collapse; margin-top:10px; }
+  th, td { border:1px solid #8a6d3b; padding:6px; text-align:center; }
+  td { width:130px; height:64px; background:#f7f0de; font-size:12px; vertical-align:top; }
+  td.anchor { background:#e3d6b4; font-weight:bold; }
+  td.over { background:#ffe9a8; }
+  td.ok { background:#cfe8c4; }
+  td.bad { background:#f3c4c0; }
+  #msg { margin-top:10px; min-height:44px; max-width:680px; }
+  #log { margin-top:12px; font-size:12px; white-space:pre-wrap; background:#fffaf0; border:1px solid #8a6d3b; padding:8px; max-width:680px; }
+  .small { font-size:12px; color:#5b4a35; }
+</style>
+</head>
+<body>
+<h1>한양 도감 v2 — 삼국시대 (프로토타입)</h1>
+<div class="small">카드 이름은 숨겨져 있습니다. 단서를 읽고 보드의 기준 카드(진한 칸)와의 관계를 따져 칸을 고르세요. 카드를 끌어 놓거나, 카드를 클릭한 뒤 칸을 클릭하세요. 시기: 초기=건국기 / 전성기=3~6세기 / 후기=6세기 말~7세기.</div>
+<div id="top">
+  <div id="ink"></div>
+  <div id="progress"></div>
+</div>
+<div id="card" draggable="true"></div>
+<table id="board"></table>
+<div id="msg"></div>
+<div id="log"></div>
+
+<script>
+// PROTOTYPE - NOT FOR PRODUCTION: 값과 카드는 전부 하드코딩
+const NATIONS = ["고구려", "백제", "신라", "가야"];
+const ERAS = ["초기", "전성기", "후기"];
+const START_INK = 5;
+
+// anchor: true -> 보드에 미리 놓임. answer: [나라 index, 시기 index]
+// 연도는 통설 기준, 건국 연대는 삼국사기 전승. 가야 전성기 시기 구분은 확인 필요.
+const CARDS = [
+  { name: "광개토대왕릉비", anchor: true, answer: [0, 1] },
+  { name: "황산벌 전투", anchor: true, answer: [1, 2] },
+  { name: "박혁거세 신화", anchor: true, answer: [2, 0] },
+
+  { name: "졸본에서의 건국", answer: [0, 0],
+    clues: ["압록강 중류 산악 지대에서 활 잘 쏘는 인물이 새 나라를 세운다는 이야기.",
+            "[광개토대왕릉비]를 세우게 되는 나라의 맨 처음이다.",
+            "건국 전승 연대는 기원전 37년."],
+    explain: "고구려 건국 전승(주몽). 고구려 초기." },
+  { name: "살수대첩", answer: [0, 2],
+    clues: ["중국 통일 왕조의 대군이 쳐들어오지만 한 장군의 유인 작전에 무너진다.",
+            "[광개토대왕릉비]를 세운 나라가 약 200년 뒤 겪은 큰 시험이다.",
+            "612년, 수나라, 을지문덕."],
+    explain: "612년 수의 침공을 막아 낸 싸움. 고구려 후기." },
+  { name: "온조의 위례성 건국", answer: [1, 0],
+    clues: ["한강 유역에 북쪽에서 내려온 집단이 작은 나라를 세운다.",
+            "[황산벌 전투]에서 마지막을 맞는 나라의 첫 장면이다.",
+            "건국 전승 연대는 기원전 18년."],
+    explain: "백제 건국 전승. 백제 초기." },
+  { name: "평양성 공격", answer: [1, 1],
+    clues: ["마한 지역을 아우른 왕이 북쪽으로 군대를 올린다.",
+            "[황산벌 전투]보다 약 300년 앞선, 이 나라의 가장 강했던 때다.",
+            "371년, 상대 나라의 왕이 전사한다."],
+    explain: "근초고왕 때(4세기 후반) 평양성 공격. 백제 전성기." },
+  { name: "진흥왕 순수비", answer: [2, 1],
+    clues: ["새로 차지한 땅을 둘러보고 기념 비석을 세운다.",
+            "[박혁거세 신화]의 나라가 한강 유역까지 진출한 때다.",
+            "6세기 중반."],
+    explain: "진흥왕 때(6세기 중반) 신라가 한강 유역을 차지. 신라 전성기." },
+  { name: "기벌포 전투", answer: [2, 2],
+    clues: ["예전에 손잡았던 대군을 서해안에서 몰아낸다.",
+            "[황산벌 전투]로부터 십여 년 뒤, 이긴 쪽이 전쟁을 마무리 짓는다.",
+            "676년, 당군."],
+    explain: "676년 신라가 당군을 몰아냄. 신라 후기." },
+  { name: "수로왕의 건국 전승", answer: [3, 0],
+    clues: ["하늘에서 내려온 상자 속 알들에서 여섯 왕이 나왔다는 이야기.",
+            "[박혁거세 신화]와 같은 알 이야기 구조이지만 낙동강 하류의 나라다.",
+            "금관가야."],
+    explain: "금관가야 건국 전승. 가야 초기." },
+  { name: "덩이쇠 수출", answer: [3, 1],
+    clues: ["철을 일정한 모양으로 만들어 화폐처럼 쓰고 바다 건너로 내다 판다.",
+            "[수로왕의 건국 전승] 이후 낙동강 하류의 나라가 번성하던 때다.",
+            "낙랑과 왜에 수출. (가야 전성기 시기 구분은 확인 필요)"],
+    explain: "철 생산과 수출로 번성한 가야 연맹. 가야 전성기." },
+  { name: "대가야의 멸망", answer: [3, 2],
+    clues: ["하나로 묶여 있던 작은 나라들의 마지막 중심이 이웃에 흡수된다.",
+            "[진흥왕 순수비]가 세워지던 시기, 신라가 남쪽까지 정리한 일이다.",
+            "562년."],
+    explain: "금관가야(532)에 이어 대가야(562)가 신라에 흡수. 가야 후기." }
+];
+
+let ink, idx, queue, anchors, selected = false, current, shown, hintsUsed, logLines, stats;
+const $ = id => document.getElementById(id);
+const cell = (r, c) => document.querySelector(`td[data-r="${r}"][data-c="${c}"]`);
+
+function shuffle(a) { return a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]); }
+
+function buildBoard() {
+  let h = "<tr><th></th>" + ERAS.map(e => `<th>${e}</th>`).join("") + "</tr>";
+  NATIONS.forEach((n, r) => {
+    h += `<tr><th>${n}</th>` + ERAS.map((e, c) => `<td data-r="${r}" data-c="${c}"></td>`).join("") + "</tr>";
+  });
+  $("board").innerHTML = h;
+  document.querySelectorAll("td").forEach(td => {
+    td.addEventListener("dragover", e => { e.preventDefault(); td.classList.add("over"); });
+    td.addEventListener("dragleave", () => td.classList.remove("over"));
+    td.addEventListener("drop", e => { e.preventDefault(); td.classList.remove("over"); place(+td.dataset.r, +td.dataset.c); });
+    td.addEventListener("click", () => { if (selected) place(+td.dataset.r, +td.dataset.c); });
+  });
+  anchors.forEach(a => { const td = cell(a.answer[0], a.answer[1]); td.classList.add("anchor"); td.textContent = a.name; });
+}
+
+function renderCard() {
+  if (!current) { $("card").style.display = "none"; return; }
+  $("card").style.display = "";
+  const clues = current.clues.slice(0, shown).map(c => `<li>${c}</li>`).join("");
+  const more = shown < current.clues.length ? `<button id="more">단서 더 보기</button>` : "";
+  $("card").innerHTML = `<div class="title">? 사건 카드</div><ul>${clues}</ul>${more}`;
+  const b = $("more");
+  if (b) b.onclick = e => { e.stopPropagation(); shown++; hintsUsed++; stats.hints++; renderCard(); };
+}
+
+function renderTop() {
+  $("ink").textContent = "먹물: " + "●".repeat(Math.max(ink, 0)) + "○".repeat(START_INK - Math.max(ink, 0));
+  $("progress").textContent = `카드 ${Math.min(idx + 1, queue.length)}/${queue.length}`;
+}
+
+function next() {
+  idx++;
+  if (ink <= 0 || idx >= queue.length) { finish(); return; }
+  current = queue[idx]; shown = 1; hintsUsed = 0; selected = false;
+  $("card").classList.remove("selected");
+  renderCard(); renderTop();
+}
+
+function place(r, c) {
+  if (!current) return;
+  const td = cell(r, c);
+  if (td.classList.contains("anchor") || td.classList.contains("ok")) { $("msg").textContent = "이미 카드가 놓인 칸입니다."; return; }
+  const ok = current.answer[0] === r && current.answer[1] === c;
+  const [ar, ac] = current.answer;
+  if (ok) {
+    stats.right++;
+    td.classList.add("ok"); td.textContent = current.name;
+    $("msg").textContent = `정답! [${current.name}] ` + current.explain;
+  } else {
+    stats.wrong++; ink--;
+    td.classList.add("bad"); setTimeout(() => td.classList.remove("bad"), 900);
+    const at = cell(ar, ac); at.classList.add("ok"); at.textContent = current.name;
+    $("msg").textContent = `오답 (먹물 -1). [${current.name}]의 자리는 ${NATIONS[ar]} ${ERAS[ac]}. ` + current.explain;
+  }
+  logLines.push(`${idx + 1}. ${current.name}: ${ok ? "정답" : "오답"}, 단서 추가 ${hintsUsed}회`);
+  $("log").textContent = logLines.join("\n");
+  next();
+  renderTop();
+}
+
+function finish() {
+  current = null; renderCard(); renderTop();
+  const total = stats.right + stats.wrong;
+  const rate = total ? Math.round(100 * stats.right / total) : 0;
+  const usedHints = logLines.filter(l => !l.endsWith("0회")).length;
+  const result = ink <= 0 ? "먹물이 바닥나 실패" : "도감 완성";
+  $("log").textContent = logLines.join("\n") +
+    `\n\n[${result}] 정답률 ${rate}% (${stats.right}/${total}), 단서 추가 총 ${stats.hints}회, ` +
+    `단서를 더 본 카드 ${usedHints}/${total}장, 남은 먹물 ${ink}\n` +
+    `목표: 정답률 40~70%, 절반 이상의 카드에서 단서 더 보기 사용`;
+  window.__result = { rate, right: stats.right, wrong: stats.wrong, hints: stats.hints, cardsWithHints: usedHints, ink };
+}
+
+function start() {
+  ink = START_INK; idx = -1;
+  anchors = CARDS.filter(c => c.anchor);
+  queue = shuffle(CARDS.filter(c => !c.anchor));
+  logLines = []; stats = { right: 0, wrong: 0, hints: 0 };
+  buildBoard();
+  $("msg").textContent = ""; $("log").textContent = "";
+  next();
+}
+
+$("card").addEventListener("click", () => { selected = !selected; $("card").classList.toggle("selected", selected); });
+$("card").addEventListener("dragstart", e => { e.dataTransfer.setData("text/plain", "card"); });
+start();
+</script>
+</body>
+</html>

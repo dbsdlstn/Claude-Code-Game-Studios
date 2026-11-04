@@ -91,3 +91,15 @@
 
 > *Prototype code location: `prototypes/hanyang-dogam-concept/`*
 > *This code is throwaway. Never refactor into production.*
+
+---
+
+## v2 결과 (2026-11-04)
+
+- **빌드**: `prototype-v2.html` (카드 이름 숨김, 기준 카드 3장 선배치, 단서 3단계, 12장)
+- **가설**: 관계 단서로 추리하게 된다 → **CONFIRMED** (플레이어 1명, 내부)
+- **가장 좋았던 순간**: 기준 카드와의 관계로 칸을 좁혔을 때
+- **가장 아쉬웠던 점**: 초기·전성기·후기 구분의 개념이 모호함
+- **수치**: 정답률과 단서 사용 수는 전달되지 않음 (`NOT REPORTED`)
+- **판정: PROCEED (조건부)**. 시기 축을 사건의 성격으로 재정의하고(건국기/전성기/결말기) v2.1로 재확인한다. 근거와 한계는 `docs/decision-log.md` D1, D2.
+- **다음**: 설계 기록은 `design/game-brief.md`, 카드 데이터는 `design/card-data-schema.md`.
