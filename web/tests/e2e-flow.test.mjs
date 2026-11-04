@@ -65,6 +65,7 @@ describe('타이틀과 튜토리얼', () => {
     const text = await page.innerText('#tut-step');
     for (const label of ['건국기', '전성기', '결말기']) assert.match(text, new RegExp(label));
     assert.match(text, /사건의 성격/);
+    for (const e of ERAS) assert.ok(text.includes(e.definition), `튜토리얼에 ${e.label} 정의(rules.js)`);
     await page.click('#tut-next');
 
     // 2. 단서 1 — "단서 더 보기"를 눌러야 넘어간다
@@ -161,6 +162,8 @@ describe('타이틀과 튜토리얼', () => {
     assert.equal(await page.isVisible('#title-screen'), true);
     await page.click('#title-howto');
     assert.match(await page.innerText('#modal-body'), /사건의 성격/);
+    const howto = await page.innerText('#modal-body');
+    for (const e of ERAS) assert.ok(howto.includes(e.definition), `하는 방법에 ${e.label} 정의(rules.js)`);
     await page.click('#howto-tutorial');
     await page.waitForSelector('#tutorial:not([hidden])');
     assert.equal(await stepOf(), 'eras');
