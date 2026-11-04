@@ -3,10 +3,15 @@
 
 Usage:
     python3 tools/validate_cards.py [path ...] [--release]
+    python3 tools/validate_cards.py --tutorial TUTORIAL [--deck DECK] [--release]
 
-    path       card JSON file(s). Default: assets/data/cards/samguk.json
-    --release  also apply rule 9 as a gate: the release set
-               (verified: true and disputed: false) must itself satisfy rule 8.
+    path        card JSON file(s). Default: assets/data/cards/samguk.json
+    --release   also apply rule 9 as a gate: the release set
+                (verified: true and disputed: false) must itself satisfy rule 8.
+    --tutorial  also validate a tutorial file (format below) against the deck.
+    --deck      deck file(s) for --tutorial. Default: the paths, else samguk.json.
+                The deck itself is validated and reported exactly as without
+                --tutorial; the tutorial report follows it.
 
 Exit code 0 = all checks passed, 1 = rule violations, 2 = file/JSON error.
 Standard library only.
@@ -41,6 +46,16 @@ schema doc "검증 규칙"). A Godot test should implement the same predicates:
       a bool; verified: true requires a non-empty verified_by. The count of
       release-loadable cards is reported; with --release, rule 8 must hold
       for the release set.
+
+  TUTORIAL FILE (decision-log D31; checked only with --tutorial):
+  T1  Top level is an object {"anchor_id": str, "cards": [card, ...]}.
+  T2  anchor_id is the id of a deck card with anchor: true and disputed: false.
+  T3  Every tutorial card passes the per-card rules above (FIELD, R2-R7,
+      R9 verified_by), validated together with the deck so R1 (id unique) and
+      R4 (refs resolve) see both files. R8 is not applied to tutorial cards.
+  T4  No tutorial card shares a `title` with a deck card.
+  T5  Every relation ref of a tutorial card is anchor_id or a deck anchor card
+      (a tutorial card never references another tutorial card).
 
   Field checks (schema "카드 객체" table): required fields present with the
   right types; type in {event, artifact, person, myth}; difficulty int 1..3;
@@ -241,15 +256,72 @@ def validate(cards, release=False):
     return errors, warnings, counts, len(release_set)
 
 
+def validate_tutorial(tutorial, deck):
+    """Return (errors, n_cards) for a tutorial object checked against deck cards."""
+    errors = []
+    if not isinstance(tutorial, dict) or not isinstance(tutorial.get("anchor_id"), str) \
+            or not isinstance(tutorial.get("cards"), list):
+        return ["[T1] tutorial: top level must be {\"anchor_id\": str, \"cards\": [...]}"], 0
+    anchor_id, tcards = tutorial["anchor_id"], tutorial["cards"]
+    deck_good = [c for c in deck if isinstance(c, dict)]
+    deck_anchors = {c.get("id") for c in deck_good if c.get("anchor") is True and c.get("disputed") is False}
+    if anchor_id not in deck_anchors:
+        errors.append(f"[T2] tutorial: anchor_id '{anchor_id}' is not a non-disputed deck anchor card")
+    tgood = [c for c in tcards if isinstance(c, dict)]
+    if len(tgood) != len(tcards):
+        errors.append("[T1] tutorial: every entry in cards must be an object")
+    tids = {c.get("id") for c in tgood} | {f"<index {i}>" for i in range(len(tcards))}
+    combined_errors, _, _, _ = validate(deck_good + tgood)
+    for e in combined_errors:
+        tag, rest = e[1:e.index("]")], e[e.index("]") + 2:]
+        cid = rest.split(": ", 1)[0]
+        if cid in tids and tag != "R8":
+            errors.append(e)
+    deck_titles = {c.get("title") for c in deck_good}
+    for c in tgood:
+        cid = c.get("id")
+        if c.get("title") in deck_titles:
+            errors.append(f"[T4] {cid}: title '{c.get('title')}' also used by a deck card")
+        for cl in c.get("clues") or []:
+            if isinstance(cl, dict) and cl.get("kind") == "relation":
+                for r in cl.get("refs") or []:
+                    if r != anchor_id and r not in deck_anchors:
+                        errors.append(f"[T5] {cid}: ref '{r}' is neither anchor_id nor a deck anchor")
+    return errors, len(tgood)
+
+
+def load_json(p):
+    try:
+        return json.loads(Path(p).read_text(encoding="utf-8")), None
+    except (OSError, json.JSONDecodeError) as e:
+        return None, f"ERROR reading {p}: {e}"
+
+
+def take_option(argv, name):
+    """Remove `name VALUE` pairs from argv; return the list of values."""
+    values, rest, i = [], [], 0
+    while i < len(argv):
+        if argv[i] == name and i + 1 < len(argv):
+            values.append(argv[i + 1])
+            i += 2
+        else:
+            rest.append(argv[i])
+            i += 1
+    argv[:] = rest
+    return values
+
+
 def main(argv):
+    argv = list(argv)
+    tutorial_paths = take_option(argv, "--tutorial")
+    deck_paths = take_option(argv, "--deck")
     release = "--release" in argv
-    paths = [Path(a) for a in argv if a != "--release"] or [DEFAULT_PATH]
+    paths = [Path(a) for a in deck_paths + [a for a in argv if a != "--release"]] or [DEFAULT_PATH]
     cards = []
     for p in paths:
-        try:
-            data = json.loads(p.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as e:
-            print(f"ERROR reading {p}: {e}")
+        data, problem = load_json(p)
+        if problem:
+            print(problem)
             return 2
         if not isinstance(data, list):
             print(f"ERROR {p}: top level must be a JSON array")
@@ -270,7 +342,20 @@ def main(argv):
     for e in errors:
         print("FAIL  " + e)
     print("RESULT: " + ("FAIL" if errors else "PASS") + f" ({len(errors)} error(s), {len(warnings)} warning(s))")
-    return 1 if errors else 0
+    status = 1 if errors else 0
+    for tp in tutorial_paths:
+        data, problem = load_json(tp)
+        if problem:
+            print(problem)
+            return 2
+        terrors, n = validate_tutorial(data, cards)
+        print(f"tutorial {tp}: {n} card(s), anchor_id {data.get('anchor_id') if isinstance(data, dict) else None}")
+        for e in terrors:
+            print("FAIL  " + e)
+        print("TUTORIAL RESULT: " + ("FAIL" if terrors else "PASS") + f" ({len(terrors)} error(s))")
+        if terrors:
+            status = 1
+    return status
 
 
 if __name__ == "__main__":
