@@ -1,7 +1,7 @@
 /**
  * 진행 저장. localStorage 접근은 전부 try/catch로 감싼다(사생활 보호 창 등에서 실패할 수 있다).
  * 저장 형식(v1, 필드 추가는 하위 호환):
- *   { version: 1, round: object|null, collection: {id: 'collected'|'revealed'},
+ *   { version: 1, dataId: string, round: object|null, collection: {id: 'collected'|'revealed'},
  *     meta: { tutorialDone: bool }, history: Array<라운드 요약> }
  */
 
@@ -27,14 +27,14 @@ export function createStore(key, storage) {
       }
     },
     /**
-     * @param {{round: object|null, collection: object, meta?: object, history?: Array<object>}} data
+     * @param {{dataId?: string, round: object|null, collection: object, meta?: object, history?: Array<object>}} data
      * @returns {boolean} 저장 성공 여부
      */
     save(data) {
       try {
         const b = backend();
         if (!b) return false;
-        b.setItem(key, JSON.stringify({ version: 1, round: data.round ?? null, collection: data.collection ?? {}, meta: data.meta ?? {}, history: data.history ?? [] }));
+        b.setItem(key, JSON.stringify({ version: 1, dataId: data.dataId ?? '', round: data.round ?? null, collection: data.collection ?? {}, meta: data.meta ?? {}, history: data.history ?? [] }));
         return true;
       } catch {
         return false;

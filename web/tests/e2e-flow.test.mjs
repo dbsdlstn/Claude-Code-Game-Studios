@@ -5,9 +5,11 @@ import { readFileSync } from 'node:fs';
 import { NATIONS, ERAS } from '../src/rules.js';
 import { chromium, startServer, openGame, currentCard, wrongCell, cellSel, dragTo, clickPlace, inkOf, SAMPLE, SAMPLE_BY_ID, SAMGUK } from './helpers.mjs';
 
-const TUTORIAL = JSON.parse(readFileSync(new URL('../data/tutorial.json', import.meta.url), 'utf8'));
-const TUT_CARD = TUTORIAL.find((c) => !c.anchor);
-const TUT_ANCHOR = TUTORIAL.find((c) => c.anchor);
+// 공용 튜토리얼 파일(D31): 연습 카드는 cards[0], 기준 카드는 본 덱에서 anchor_id로 찾는다(샘플·samguk 모두 같은 id).
+const TUTORIAL_FILE = JSON.parse(readFileSync(new URL('../../assets/data/cards/tutorial.json', import.meta.url), 'utf8'));
+const TUT_CARD = TUTORIAL_FILE.cards[0];
+const TUT_ANCHOR = SAMPLE_BY_ID.get(TUTORIAL_FILE.anchor_id);
+const TUTORIAL = TUTORIAL_FILE.cards;
 
 let server;
 let browser;
@@ -109,7 +111,9 @@ describe('타이틀과 튜토리얼', () => {
     assert.equal(await page.isVisible('#card'), true);
   });
 
-  test('튜토리얼 카드는 본 덱에 없다(샘플·실제 데이터 모두)', async () => {
+  test('튜토리얼 연습 카드는 본 덱에 없고, 기준 카드는 본 덱의 anchor_id 카드다(샘플·실제 데이터 모두)', async () => {
+    assert.ok(TUT_ANCHOR?.anchor, '샘플 덱에 anchor_id 기준 카드가 있어야 한다');
+    if (SAMGUK) assert.ok(SAMGUK.find((c) => c.id === TUTORIAL_FILE.anchor_id)?.anchor);
     const deckIds = new Set([...SAMPLE, ...(SAMGUK ?? [])].map((c) => c.id));
     const deckTitles = new Set([...SAMPLE, ...(SAMGUK ?? [])].map((c) => c.title));
     for (const c of TUTORIAL) {
@@ -329,5 +333,49 @@ describe('진행 초기화와 낭독 알림', () => {
     assert.match(bad[0], /✕/);
     assert.match(bad[1], /오답 공개/);
     assert.match(await page.innerText('#fb .fb-head'), /오답/);
+  });
+});
+
+describe('데이터가 바뀌면 진행 중 라운드를 버린다', () => {
+  test('샘플로 진행하다 samguk으로 바꾸면 라운드는 새로, 수집 기록은 samguk에 있는 id만 남는다', { skip: !SAMGUK && 'samguk.json 없음' }, async () => {
+    await openGame(page, server.base, { data: 'data/sample-cards.json' });
+    const placed = [];
+    for (let k = 0; k < 3; k++) { const c = await currentCard(page); placed.push(c.id); await clickPlace(page, c.answer); }
+    const sampleOrder = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-dogam:save:v1')).round.order);
+    const savedId = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-dogam:save:v1')).dataId);
+    assert.match(savedId, /sample-cards\.json\|16\|[0-9a-f]{8}$/);
+
+    await openGame(page, server.base, { data: null });
+    const save = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-dogam:save:v1')));
+    assert.match(save.dataId, /samguk\.json\|44\|/);
+    assert.equal(await page.getAttribute('#progress', 'data-index'), '0', '라운드는 처음부터');
+    assert.notDeepEqual(save.round.order, sampleOrder);
+    const samgukIds = new Set(SAMGUK.map((c) => c.id));
+    const kept = placed.filter((id) => samgukIds.has(id));
+    assert.deepEqual(Object.keys(save.collection).sort(), kept.sort(), '수집 기록은 지금 덱에 있는 id만');
+    assert.equal(await page.getAttribute('#dogam-progress', 'data-collected'), String(kept.filter((id) => !SAMGUK.find((c) => c.id === id).disputed).length));
+
+    // 같은 데이터로 다시 열면 라운드가 그대로 복원된다
+    const c = await currentCard(page, new Map(SAMGUK.map((x) => [x.id, x])));
+    await clickPlace(page, c.answer);
+    await page.reload();
+    await page.waitForSelector('body[data-ready="true"]');
+    assert.equal(await page.getAttribute('#progress', 'data-index'), '1');
+  });
+
+  test('식별자가 없는 옛 저장의 라운드는 버리고 수집 기록은 남긴다', async () => {
+    await openGame(page, server.base);
+    const c = await currentCard(page);
+    await clickPlace(page, c.answer);
+    await page.evaluate(() => {
+      const k = 'hanyang-dogam:save:v1';
+      const s = JSON.parse(localStorage.getItem(k));
+      delete s.dataId;
+      localStorage.setItem(k, JSON.stringify(s));
+    });
+    await page.reload();
+    await page.waitForSelector('body[data-ready="true"]');
+    assert.equal(await page.getAttribute('#progress', 'data-index'), '0');
+    assert.equal(await page.getAttribute('#dogam-progress', 'data-collected'), '1');
   });
 });

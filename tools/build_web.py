@@ -12,9 +12,10 @@ What it does (standard library only):
   1. Validates assets/data/cards/samguk.json with tools/validate_cards.py. Any
      error stops the build.
   2. Copies web/ into DIR, leaving out tests/, .gdignore and README.md.
-  3. Copies the card JSON to DIR/data/samguk.json.
-  4. Rewrites DIR/src/config.js so the card data path points at
-     data/samguk.json instead of ../assets/... (which only exists in the repo).
+  3. Copies the card JSON to DIR/data/samguk.json and the shared tutorial file
+     (assets/data/cards/tutorial.json, decision-log D31) to DIR/data/tutorial.json.
+  4. Rewrites DIR/src/config.js so both paths point at data/... instead of
+     ../assets/... (which only exists in the repo).
      The sample data stays as the fallback entry.
   5. Writes DIR/BUILD.txt with the source commit and card counts.
 
@@ -30,9 +31,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 WEB = ROOT / "web"
 CARDS = ROOT / "assets" / "data" / "cards" / "samguk.json"
+TUTORIAL = ROOT / "assets" / "data" / "cards" / "tutorial.json"
 VALIDATOR = ROOT / "tools" / "validate_cards.py"
 REPO_CARD_URL = "'../assets/data/cards/samguk.json'"
 DIST_CARD_URL = "'data/samguk.json'"
+REPO_TUTORIAL_URL = "'../assets/data/cards/tutorial.json'"
+DIST_TUTORIAL_URL = "'data/tutorial.json'"
 EXCLUDE = {"tests", ".gdignore", "README.md"}
 
 
@@ -74,12 +78,19 @@ def main(argv):
     cards = json.loads(CARDS.read_text(encoding="utf-8"))
     (out / "data").mkdir(exist_ok=True)
     shutil.copy2(CARDS, out / "data" / "samguk.json")
+    if TUTORIAL.exists():
+        shutil.copy2(TUTORIAL, out / "data" / "tutorial.json")
+    else:
+        print(f"WARN tutorial file not found, build has no tutorial: {TUTORIAL}")
 
     config = out / "src" / "config.js"
     text = config.read_text(encoding="utf-8")
     if REPO_CARD_URL not in text:
         fail(f"{REPO_CARD_URL} not found in config.js; update build_web.py")
     text = text.replace(REPO_CARD_URL, DIST_CARD_URL)
+    if REPO_TUTORIAL_URL not in text:
+        fail(f"{REPO_TUTORIAL_URL} not found in config.js; update build_web.py")
+    text = text.replace(REPO_TUTORIAL_URL, DIST_TUTORIAL_URL)
     if release:
         if "onlyVerified: false" not in text:
             fail("onlyVerified: false not found in config.js")
