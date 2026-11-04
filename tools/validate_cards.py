@@ -48,7 +48,8 @@ schema doc "검증 규칙"). A Godot test should implement the same predicates:
       for the release set.
 
   TUTORIAL FILE (decision-log D31; checked only with --tutorial):
-  T1  Top level is an object {"anchor_id": str, "cards": [card, ...]}.
+  T1  Top level is an object {"anchor_id": str, "cards": [card, ...]} and
+      cards is not empty.
   T2  anchor_id is the id of a deck card with anchor: true and disputed: false.
   T3  Every tutorial card passes the per-card rules above (FIELD, R2-R7,
       R9 verified_by), validated together with the deck so R1 (id unique) and
@@ -56,6 +57,12 @@ schema doc "검증 규칙"). A Godot test should implement the same predicates:
   T4  No tutorial card shares a `title` with a deck card.
   T5  Every relation ref of a tutorial card is anchor_id or a deck anchor card
       (a tutorial card never references another tutorial card).
+  T6  With --release (same as Godot TutorialData.parse with
+      CardLoader.filter_for_mode): both the deck and the tutorial cards are
+      first reduced to verified: true and disputed: false; T2-T5 then run on
+      the reduced sets. If no tutorial card survives, that is an error.
+  T7  No tutorial card is an anchor, and cards[0] (the practice card the
+      game uses) is not disputed.
 
   Field checks (schema "카드 객체" table): required fields present with the
   right types; type in {event, artifact, person, myth}; difficulty int 1..3;
@@ -256,13 +263,28 @@ def validate(cards, release=False):
     return errors, warnings, counts, len(release_set)
 
 
-def validate_tutorial(tutorial, deck):
-    """Return (errors, n_cards) for a tutorial object checked against deck cards."""
+def release_filter(cards):
+    """Rule 9 release set: verified is true and disputed is false."""
+    return [c for c in cards if isinstance(c, dict) and c.get("verified") is True and c.get("disputed") is False]
+
+
+def validate_tutorial(tutorial, deck, release=False):
+    """Return (errors, n_cards) for a tutorial object checked against deck cards.
+
+    n_cards counts the tutorial cards actually checked (after the release filter).
+    """
     errors = []
     if not isinstance(tutorial, dict) or not isinstance(tutorial.get("anchor_id"), str) \
             or not isinstance(tutorial.get("cards"), list):
         return ["[T1] tutorial: top level must be {\"anchor_id\": str, \"cards\": [...]}"], 0
     anchor_id, tcards = tutorial["anchor_id"], tutorial["cards"]
+    if not tcards:
+        return ["[T1] tutorial: cards is empty"], 0
+    if release:
+        deck = release_filter(deck)
+        tcards = release_filter(tcards)
+        if not tcards:
+            return ["[T6] tutorial: no verified, non-disputed practice card for release mode"], 0
     deck_good = [c for c in deck if isinstance(c, dict)]
     deck_anchors = {c.get("id") for c in deck_good if c.get("anchor") is True and c.get("disputed") is False}
     if anchor_id not in deck_anchors:
@@ -282,11 +304,15 @@ def validate_tutorial(tutorial, deck):
         cid = c.get("id")
         if c.get("title") in deck_titles:
             errors.append(f"[T4] {cid}: title '{c.get('title')}' also used by a deck card")
+        if c.get("anchor") is True:
+            errors.append(f"[T7] {cid}: a tutorial card cannot be an anchor")
         for cl in c.get("clues") or []:
             if isinstance(cl, dict) and cl.get("kind") == "relation":
                 for r in cl.get("refs") or []:
                     if r != anchor_id and r not in deck_anchors:
                         errors.append(f"[T5] {cid}: ref '{r}' is neither anchor_id nor a deck anchor")
+    if tgood and tgood[0].get("disputed") is True:
+        errors.append(f"[T7] {tgood[0].get('id')}: the practice card (cards[0]) must not be disputed")
     return errors, len(tgood)
 
 
@@ -348,8 +374,9 @@ def main(argv):
         if problem:
             print(problem)
             return 2
-        terrors, n = validate_tutorial(data, cards)
-        print(f"tutorial {tp}: {n} card(s), anchor_id {data.get('anchor_id') if isinstance(data, dict) else None}")
+        terrors, n = validate_tutorial(data, cards, release)
+        mode = " (release: verified, non-disputed only)" if release else ""
+        print(f"tutorial {tp}: {n} card(s){mode}, anchor_id {data.get('anchor_id') if isinstance(data, dict) else None}")
         for e in terrors:
             print("FAIL  " + e)
         print("TUTORIAL RESULT: " + ("FAIL" if terrors else "PASS") + f" ({len(terrors)} error(s))")
