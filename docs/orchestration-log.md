@@ -38,3 +38,7 @@
 - 17:03 UTC 2차 대조(7017f90) 통합: 바뀐 26장 수정 필요 0, 전체 44장 일치 38·불확실 6. 콘텐츠 세션에 마무리 지시(역주로 확인된 세부 2건 복원, 표현 1건).
 - 17:05 UTC 웹(ac0aac4, 4c56197) 통합(20b3dd9): D22 반영(칸과 무관하게 12장), 튜토리얼 전용 카드 `web/data/tutorial.json`, 진행 초기화, `tools/build_web.py`→`dist/web/`, 접근성(대비 AA, aria-live). 통합 상태 validate PASS, 웹 단위 41·일치 3·E2E 16·흐름 14·배포본 3 통과. 타이틀·결과 화면 직접 확인.
 - 메모: 얕은 클론에서 merge가 "unrelated histories"로 실패하면 관련 ref를 --depth=400으로 다시 fetch.
+- 17:06 UTC 콘텐츠 마무리(66fb1a2) 통합(cf8a1b6): 역주로 확인된 세부 2건 복원, 표현 1건.
+- 17:08 UTC Godot(5d20546) 통합(5ad26ad, 436dd94): 리뷰 13건 처리 표, D22 구현, 타이틀·튜토리얼(`assets/data/cards/tutorial.json`)·결과·플레이 기록·이어하기·키보드, 렌더러 Compatibility. Godot D24·D25→D29·D30 재부여(참조 3곳 갱신). gdUnit 122개는 미실행. 통합 상태 validate PASS, parity 39/39, 웹 77개 통과.
+- 17:10 UTC D31: 튜토리얼 데이터를 `assets/data/cards/tutorial.json` 하나로 통일(01ebfd8). 지시: 웹(공용 튜토리얼 파일, 데이터 변경 시 저장 무효화), 사실 검증(튜토리얼 카드·마무리 수정 3차 대조, "바다 건너 왕조" 표현 확인), 리뷰(Godot 2차 정적 리뷰).
+- 메모: 추적 참조 갱신에 `--depth=1`을 쓰면 로컬 이력이 얕아져 다음 merge가 실패한다. `--depth=400` 사용.
