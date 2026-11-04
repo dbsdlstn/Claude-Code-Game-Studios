@@ -26,3 +26,9 @@
 - 16:18 UTC 웹(전체 36장/라운드)과 Godot(12장/라운드) 규칙 차이 발견. D16으로 Godot 방식 통일(849c463).
 - 16:19 UTC 지시: 웹(integration merge, D16 반영, 실제 데이터 E2E, 폴리시), Godot(integration merge, D16, 검증기 일치, 실제 데이터 통합 테스트), 설계(카드 44장 이미지 프롬프트, placeholder SVG, 이미지 작업 절차). 새 세션: Godot 정적 코드 리뷰, 사실 검증 보조.
 - 16:20 UTC roadmap-doc(로드맵, 조사 보고서, 이 기록)을 integration에 merge.
+- 16:26 UTC Godot 보고(25aac52): D16 반영, GDScript 검증기와 validate_cards.py 일치(파이썬 미러로 39/39), 글꼴 대체·해상도 대응, D17·D18. 리뷰 보고서 대기.
+- 16:30 UTC 웹 보고(2f31888): D16 반영, JS 검증기 일치, 실제 데이터 E2E, 폴리시, 스크린샷 11장.
+- 16:33 UTC integration에 godot-mvp, web-build merge(5f6b5c2). 웹 D17→D19로 재부여. 통합 상태 validate PASS, validator_parity 39/39, 웹 단위 32·일치 3·E2E 15 통과.
+- 16:35 UTC 총괄 화면 검토에서 콘텐츠 버그 발견: `석탈해 전승`(신라 건국기) 1단계 단서가 가야 `수로왕과 탈해의 술법 겨루기`와 같은 장면(매·독수리, 참새·새매 둔갑 술법 대결). 정답이 둘로 갈림. 사실 검증 보고서와 함께 콘텐츠 세션에 수정 지시 예정.
+- 16:36 UTC 웹에 다음 작업 지시: 타이틀·튜토리얼, disputed 분리 표시, 라운드 결과·플레이 기록(내보내기), 정답/오답 효과.
+- 메모: `git push`와 `git fetch +refspec`을 한 명령에 묶으면 권한 검사에 막힌다(재현됨). 따로 실행한다.
