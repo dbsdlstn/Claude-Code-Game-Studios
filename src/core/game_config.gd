@@ -7,6 +7,10 @@ const DEFAULT_PATH := "res://assets/data/config/game_config.json"
 
 ## 라운드 시작 먹물 수.
 var start_ink: int = 0
+## 라운드 카드 수(decision-log D16·D22).
+var round_size: int = 0
+## 튜토리얼 전용 카드 파일. 비우면 튜토리얼을 건너뛴다.
+var tutorial_path: String = ""
 ## true면 출시 모드: verified && !disputed 카드만 로드한다.
 var release_mode: bool = false
 ## 카드 JSON 경로.
@@ -33,6 +37,12 @@ static func from_dict(d: Dictionary) -> GameConfig:
 		cfg.start_ink = int(ink)
 	else:
 		cfg.errors.append("start_ink는 1 이상의 정수여야 한다")
+	var rs: Variant = d.get("round_size")
+	if (typeof(rs) == TYPE_INT or typeof(rs) == TYPE_FLOAT) and int(rs) >= 1:
+		cfg.round_size = int(rs)
+	else:
+		cfg.errors.append("round_size는 1 이상의 정수여야 한다")
+	cfg.tutorial_path = _str(d.get("tutorial_path"))
 	var rm: Variant = d.get("release_mode", false)
 	cfg.release_mode = typeof(rm) == TYPE_BOOL and rm
 	cfg.cards_path = _str(d.get("cards_path"))

@@ -58,3 +58,48 @@ func test_is_complete_when_all_judged_cards_collected() -> void:
 
 func test_is_complete_false_for_empty_list() -> void:
 	assert_bool(ProgressData.new().is_complete(PackedStringArray())).is_false()
+
+
+func _summary(cleared: bool, correct: int, levels: Array) -> Dictionary:
+	return {"cleared": cleared, "correct": correct, "clue_levels": levels}
+
+
+func test_record_round_result_accumulates_play_log() -> void:
+	var p := ProgressData.new()
+	p.current_round = {"version": 1}
+	p.record_round_result(_summary(true, 3, [1, 2, 3, 1]), ["a"])
+	p.record_round_result(_summary(false, 1, [3, 3]), [])
+	var st := p.stats()
+	assert_int(st["rounds"]).is_equal(2)
+	assert_int(st["cleared"]).is_equal(1)
+	assert_int(st["failed"]).is_equal(1)
+	assert_float(st["accuracy"]).is_equal_approx(4.0 / 6.0, 0.0001)
+	assert_float(st["avg_clue_level"]).is_equal_approx(13.0 / 6.0, 0.0001)
+	assert_bool(p.has_current_round()).is_false()
+
+
+func test_stats_without_rounds_are_negative() -> void:
+	var st := ProgressData.new().stats()
+	assert_int(st["rounds"]).is_equal(0)
+	assert_float(st["accuracy"]).is_equal(-1.0)
+
+
+func test_v2_fields_round_trip_through_json() -> void:
+	var p := ProgressData.new()
+	p.tutorial_done = true
+	p.current_round = {"version": 1, "card_ids": ["a"]}
+	p.record_round_result(_summary(true, 1, [2]), ["a"])
+	p.current_round = {"version": 1, "card_ids": ["b"]}
+	var r := ProgressData.from_dict(JSON.parse_string(JSON.stringify(p.to_dict())))
+	assert_bool(r.tutorial_done).is_true()
+	assert_int(r.round_log.size()).is_equal(1)
+	assert_array(r.round_log[0]["new_ids"]).is_equal(["a"])
+	assert_array(r.current_round["card_ids"]).is_equal(["b"])
+
+
+func test_v1_save_loads_with_defaults() -> void:
+	var r := ProgressData.from_dict({"version": 1, "collected": ["a"], "rounds_played": 2})
+	assert_bool(r.is_collected("a")).is_true()
+	assert_bool(r.tutorial_done).is_false()
+	assert_int(r.round_log.size()).is_equal(0)
+	assert_bool(r.has_current_round()).is_false()

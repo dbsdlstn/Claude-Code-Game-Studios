@@ -1,0 +1,56 @@
+{
+  "anchor_id": "goguryeo-peak-anchor",
+  "cards": [
+    {
+      "id": "tutorial-goguryeo-peak-01",
+      "type": "event",
+      "title": "낙랑군 축출",
+      "anchor": false,
+      "answer": {
+        "nation": "goguryeo",
+        "era": "peak"
+      },
+      "clues": [
+        {
+          "level": 1,
+          "kind": "description",
+          "text": "오랫동안 한반도 서북부를 다스리던 바다 건너 왕조의 군현이 북쪽 나라의 공격에 밀려난다.",
+          "refs": []
+        },
+        {
+          "level": 2,
+          "kind": "relation",
+          "text": "[광개토대왕릉비]가 세워지기 약 100년 전, 같은 나라가 영토를 남쪽으로 넓힌 일이다.",
+          "refs": [
+            "goguryeo-peak-anchor"
+          ]
+        },
+        {
+          "level": 3,
+          "kind": "direct",
+          "text": "313년, 미천왕, 낙랑군.",
+          "refs": []
+        }
+      ],
+      "explanation": "미천왕이 낙랑군을 몰아내 대동강 유역을 차지했다. 영토가 커진 사건이므로 전성기.",
+      "date_label": "313년",
+      "source": {
+        "name": "삼국사기 고구려본기 미천왕 14년",
+        "url": null,
+        "note": "튜토리얼 전용 연습 카드. 본 덱에 넣지 않는다. 검증 전"
+      },
+      "verified": false,
+      "verified_by": null,
+      "disputed": false,
+      "disputed_note": null,
+      "difficulty": 1,
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "tags": [
+        "튜토리얼",
+        "고구려"
+      ]
+    }
+  ]
+}

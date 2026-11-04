@@ -26,6 +26,9 @@ func _init() -> void:
 	custom_minimum_size = Vector2(380, 0)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_DRAG
+	focus_mode = Control.FOCUS_ALL
+	focus_entered.connect(_apply_style)
+	focus_exited.connect(_apply_style)
 	var box := VBoxContainer.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_theme_constant_override("separation", 8)
@@ -46,7 +49,7 @@ func _init() -> void:
 	_more_button.pressed.connect(func() -> void: more_clues_requested.emit())
 	box.add_child(_more_button)
 
-	_help = HanjiTheme.small_label("카드를 끌어 칸에 놓거나, 카드를 누른 뒤 칸을 누르세요.")
+	_help = HanjiTheme.small_label("카드를 끌어 칸에 놓거나, 카드를 누른 뒤 칸을 누르세요. 키보드: 카드에서 Enter, 방향키로 칸 이동, Enter로 놓기.")
 	_help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_help)
 	_apply_style()
@@ -92,6 +95,8 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	if _card_id.is_empty():
 		return null
 	var preview := PanelContainer.new()
+	# 미리보기는 Main 아래가 아니라 드래그 레이어에 붙으므로 테마를 직접 준다(한글 글꼴).
+	preview.theme = HanjiTheme.current()
 	preview.add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.CARD, HanjiTheme.ACCENT, 2))
 	var l := Label.new()
 	l.text = "? 사건 카드"
@@ -104,14 +109,17 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 func _gui_input(event: InputEvent) -> void:
 	# 누른 뒤 끌지 않고 뗐을 때만 고르기를 바꾼다(끌어 놓으면 떼는 입력은 칸이 받는다).
 	var mb := event as InputEventMouseButton
-	if mb != null and mb.button_index == MOUSE_BUTTON_LEFT and not mb.pressed and not _card_id.is_empty():
+	var toggle := mb != null and mb.button_index == MOUSE_BUTTON_LEFT and not mb.pressed
+	if mb == null and event.is_action_pressed("ui_accept"):
+		toggle = true
+	if toggle and not _card_id.is_empty():
 		set_selected(not selected)
 		selection_changed.emit(selected)
 		accept_event()
 
 
 func _apply_style() -> void:
-	if selected:
+	if selected or has_focus():
 		add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.CARD, HanjiTheme.ACCENT, 3, 12.0))
 	else:
 		add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.CARD, HanjiTheme.BORDER, 2, 12.0))

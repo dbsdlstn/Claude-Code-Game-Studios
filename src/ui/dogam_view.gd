@@ -8,6 +8,7 @@ extends PanelContainer
 signal closed
 
 var _summary: Label
+var _stats: Label
 var _list: VBoxContainer
 var _detail: Label
 var _config: GameConfig
@@ -28,9 +29,12 @@ func _init() -> void:
 	_summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(_summary)
 	var close := Button.new()
-	close.text = "보드로"
+	close.text = "돌아가기"
 	close.pressed.connect(func() -> void: closed.emit())
 	header.add_child(close)
+
+	_stats = HanjiTheme.small_label("", 15)
+	root.add_child(_stats)
 
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -69,6 +73,7 @@ func show_dogam(config: GameConfig, cards: CardSet, progress: ProgressData) -> v
 	var complete := collected_count > 0 and collected_count == cards.playable.size()
 	_summary.text = "%s  %d / %d" % ["도감 완성" if complete else "도감", collected_count, cards.playable.size()]
 	_detail.text = "왼쪽에서 모은 카드를 누르면 해설이 열립니다."
+	_stats.text = format_stats(progress.stats())
 
 	for n in config.nation_ids():
 		var nation_title := Label.new()
@@ -90,6 +95,15 @@ func show_dogam(config: GameConfig, cards: CardSet, progress: ProgressData) -> v
 		_list.add_child(title)
 		for d: CardData in cards.disputed:
 			_add_entry(d.title, d, true)
+
+
+## 플레이 기록 한 줄. st: ProgressData.stats().
+static func format_stats(st: Dictionary) -> String:
+	if int(st["rounds"]) == 0:
+		return "플레이 기록: 아직 끝낸 라운드가 없습니다."
+	return "플레이 기록: 라운드 %d (클리어 %d · 실패 %d) · 정답률 %d%% · 평균 단서 단계 %.1f" % [
+		int(st["rounds"]), int(st["cleared"]), int(st["failed"]),
+		roundi(float(st["accuracy"]) * 100.0), float(st["avg_clue_level"])]
 
 
 ## 카드 해설 문장을 만든다(화면 밖에서도 쓸 수 있게 static).

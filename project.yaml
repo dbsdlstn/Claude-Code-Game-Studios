@@ -37,7 +37,7 @@ engine:
   name: "Godot"
   version: "4.7"
   language: "GDScript"
-  rendering: "Forward+"
+  rendering: "Compatibility"
   physics: "Godot Physics 2D"
 
 specialists:

@@ -22,7 +22,14 @@ static func filter_for_mode(raw: Array, release_mode: bool) -> Array:
 
 ## 이미 파싱된 배열에서 CardSet을 만든다.
 ## nation_labels / era_labels: { id: 표시 이름 } — 라벨 검사용(CardValidator.validate 참고).
-static func build(raw: Array, nation_ids: PackedStringArray, era_ids: PackedStringArray, release_mode: bool, nation_labels: Dictionary = {}, era_labels: Dictionary = {}) -> CardSet:
+static func build(
+	raw: Array,
+	nation_ids: PackedStringArray,
+	era_ids: PackedStringArray,
+	release_mode: bool,
+	nation_labels: Dictionary = {},
+	era_labels: Dictionary = {},
+) -> CardSet:
 	var result := CardSet.new()
 	result.release_mode = release_mode
 	var filtered := filter_for_mode(raw, release_mode)
@@ -36,7 +43,14 @@ static func build(raw: Array, nation_ids: PackedStringArray, era_ids: PackedStri
 
 
 ## JSON 문자열에서 CardSet을 만든다. 최상위는 카드 배열이어야 한다.
-static func parse_text(text: String, nation_ids: PackedStringArray, era_ids: PackedStringArray, release_mode: bool, nation_labels: Dictionary = {}, era_labels: Dictionary = {}) -> CardSet:
+static func parse_text(
+	text: String,
+	nation_ids: PackedStringArray,
+	era_ids: PackedStringArray,
+	release_mode: bool,
+	nation_labels: Dictionary = {},
+	era_labels: Dictionary = {},
+) -> CardSet:
 	var json := JSON.new()
 	if json.parse(text) != OK:
 		return _failed("JSON 파싱 실패 %d행: %s" % [json.get_error_line(), json.get_error_message()], release_mode)
@@ -46,7 +60,14 @@ static func parse_text(text: String, nation_ids: PackedStringArray, era_ids: Pac
 
 
 ## 파일에서 CardSet을 만든다.
-static func load_file(path: String, nation_ids: PackedStringArray, era_ids: PackedStringArray, release_mode: bool, nation_labels: Dictionary = {}, era_labels: Dictionary = {}) -> CardSet:
+static func load_file(
+	path: String,
+	nation_ids: PackedStringArray,
+	era_ids: PackedStringArray,
+	release_mode: bool,
+	nation_labels: Dictionary = {},
+	era_labels: Dictionary = {},
+) -> CardSet:
 	if not FileAccess.file_exists(path):
 		return _failed("카드 파일이 없다: %s" % path, release_mode)
 	return parse_text(FileAccess.get_file_as_string(path), nation_ids, era_ids, release_mode, nation_labels, era_labels)

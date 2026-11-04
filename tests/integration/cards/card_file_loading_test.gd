@@ -64,14 +64,26 @@ func test_samguk_json_release_mode_reports_only_coverage() -> void:
 		assert_int(rule).is_equal(CardValidator.RULE_CELL_COVERAGE)
 
 
-func test_samguk_json_round_has_twelve_cards_one_per_cell() -> void:
+func test_samguk_json_round_has_twelve_unique_cards() -> void:
 	var cfg := GameConfig.load_file(CONFIG_PATH)
 	var cs := CardLoader.load_with_config(cfg.cards_path, cfg, false)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
-	var queue := RoundBuilder.build_queue(cs, cfg.nation_ids(), cfg.era_ids(), rng)
-	var keys := {}
+	var queue := RoundBuilder.build_queue(cs, cfg.round_size, rng)
+	var ids := {}
 	for c: CardData in queue:
-		keys[c.cell_key()] = true
+		ids[c.id] = true
+		assert_bool(c.is_judgeable()).is_true()
 	assert_int(queue.size()).is_equal(12)
-	assert_int(keys.size()).is_equal(12)
+	assert_int(ids.size()).is_equal(12)
+
+
+func test_tutorial_file_is_valid_and_separate_from_deck() -> void:
+	# 튜토리얼 연습 카드는 본 덱과 겹치지 않아야 한다(decision-log D23).
+	var cfg := GameConfig.load_file(CONFIG_PATH)
+	var cs := CardLoader.load_with_config(cfg.cards_path, cfg, false)
+	var t := TutorialData.parse(FileAccess.get_file_as_string(cfg.tutorial_path), cs, cfg)
+	assert_array(t.errors).is_empty()
+	assert_bool(t.is_valid()).is_true()
+	assert_bool(cs.has_card(t.card.id)).is_false()
+	assert_bool(t.anchor.anchor).is_true()

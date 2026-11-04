@@ -1,19 +1,25 @@
 class_name RoundSession
 extends RefCounted
-## 한 라운드의 규칙: 현재 카드, 단서 공개, 배치 판정, 먹물, 클리어/실패.
+## 한 라운드의 규칙: 현재 카드, 단서 공개, 배치 판정, 먹물, 클리어/실패, 저장용 직렬화.
 ## 노드와 무관한 순수 로직이다. 화면은 이 객체를 읽고 place_current()를 부른다.
 ##
-## 규칙(design/game-brief.md):
+## 규칙(design/game-brief.md, decision-log D16·D22):
 ## - 카드는 한 장씩 나온다. 단서는 1단계부터 보이고 "단서 더 보기"로 3단계까지 연다.
-## - 정답 칸에 놓으면 정답. 다른 빈 칸에 놓으면 오답: 먹물 -1, 카드는 정답 칸에 공개되고 소모된다.
-## - 이미 채워진 칸이나 없는 칸에 놓으면 거부한다(먹물은 줄지 않는다).
-## - 먹물이 0이 되면 실패. 모든 카드를 놓았고 먹물이 남았으면 클리어.
+## - 카드는 어느 칸에나 놓을 수 있다. 이미 카드가 있는 칸도 받는다(채워진 칸 거부 없음).
+## - 정답 칸이면 정답. 아니면 오답: 먹물 -1, 카드는 정답 칸에 공개되고 소모된다.
+## - 없는 칸(설정에 없는 나라·시기)은 거부한다(먹물은 줄지 않는다).
+## - 먹물이 0이 되면 실패(마지막 카드여도 실패가 우선). 모든 카드를 놓고 먹물이 남으면 클리어.
+##
+## 사용 예:
+##   var s := RoundSession.new(queue, cfg.start_ink, cfg.nation_ids(), cfg.era_ids())
+##   s.reveal_more()
+##   var r := s.place_current("silla", "peak")
 
 enum Status { PLAYING, CLEARED, FAILED }
 
 const REJECT_ROUND_OVER := "round_over"
 const REJECT_INVALID_CELL := "invalid_cell"
-const REJECT_OCCUPIED := "occupied"
+const SAVE_VERSION := 1
 
 ## 현재 상태.
 var status: Status = Status.PLAYING
@@ -25,14 +31,14 @@ var revealed_clues: int = 0
 var correct_count: int = 0
 var wrong_count: int = 0
 var hints_used: int = 0
-## 카드별 기록 [{ "card_id", "correct", "clues_seen" }] — 플레이 로그 보정용.
+## 카드별 기록 [{ "card_id", "correct", "clues_seen" }] — 결과 화면과 플레이 기록용.
 var history: Array[Dictionary] = []
 
 var _queue: Array[CardData] = []
 var _index: int = 0
 var _nation_ids: PackedStringArray
 var _era_ids: PackedStringArray
-## cell_key -> { "card_id": String, "correct": bool }
+## cell_key -> [{ "card_id": String, "correct": bool }] (놓인 순서)
 var _placed: Dictionary = {}
 
 
@@ -93,13 +99,13 @@ func place_current(nation: String, era: String) -> Dictionary:
 	if not _nation_ids.has(nation) or not _era_ids.has(era):
 		result["reason"] = REJECT_INVALID_CELL
 		return result
-	if _placed.has(CardData.make_cell_key(nation, era)):
-		result["reason"] = REJECT_OCCUPIED
-		return result
 
 	var correct := card.matches(nation, era)
-	# 오답이어도 카드는 정답 칸에 공개되고 소모된다.
-	_placed[card.cell_key()] = {"card_id": card.id, "correct": correct}
+	# 오답이어도 카드는 정답 칸에 공개되고 소모된다. 한 칸에 여러 장이 쌓일 수 있다.
+	var key := card.cell_key()
+	if not _placed.has(key):
+		_placed[key] = []
+	(_placed[key] as Array).append({"card_id": card.id, "correct": correct})
 	history.append({"card_id": card.id, "correct": correct, "clues_seen": revealed_clues})
 	if correct:
 		correct_count += 1
@@ -125,9 +131,9 @@ func place_current(nation: String, era: String) -> Dictionary:
 	return result
 
 
-## 칸에 놓인 카드 정보. 비어 있으면 빈 딕셔너리.
-func cell_occupant(nation: String, era: String) -> Dictionary:
-	return _placed.get(CardData.make_cell_key(nation, era), {})
+## 칸에 놓인 카드들(놓인 순서). 비어 있으면 빈 배열.
+func cell_cards(nation: String, era: String) -> Array:
+	return _placed.get(CardData.make_cell_key(nation, era), [])
 
 
 ## 이번 라운드 카드 수.
@@ -145,6 +151,101 @@ func is_over() -> bool:
 	return status != Status.PLAYING
 
 
+## 결과 화면·플레이 기록용 요약.
+## { "cleared", "correct", "wrong", "total", "placed", "ink_left", "hints",
+##   "clue_levels": [놓을 때 본 단서 단계...], "correct_ids": [...], "wrong_ids": [...] }
+func summary() -> Dictionary:
+	var levels: Array = []
+	var correct_ids: Array = []
+	var wrong_ids: Array = []
+	for h: Dictionary in history:
+		levels.append(int(h["clues_seen"]))
+		if h["correct"]:
+			correct_ids.append(h["card_id"])
+		else:
+			wrong_ids.append(h["card_id"])
+	return {
+		"cleared": status == Status.CLEARED,
+		"correct": correct_count,
+		"wrong": wrong_count,
+		"total": _queue.size(),
+		"placed": _index,
+		"ink_left": ink.current,
+		"hints": hints_used,
+		"clue_levels": levels,
+		"correct_ids": correct_ids,
+		"wrong_ids": wrong_ids,
+	}
+
+
+## 진행 중 라운드를 저장용 딕셔너리로 만든다(카드는 id로만 참조).
+func to_dict() -> Dictionary:
+	var ids: Array = []
+	for c: CardData in _queue:
+		ids.append(c.id)
+	return {
+		"version": SAVE_VERSION,
+		"card_ids": ids,
+		"index": _index,
+		"ink": ink.current,
+		"max_ink": ink.max_ink,
+		"revealed": revealed_clues,
+		"correct": correct_count,
+		"wrong": wrong_count,
+		"hints": hints_used,
+		"placed": _placed.duplicate(true),
+		"history": history.duplicate(true),
+	}
+
+
+## 저장된 진행 중 라운드를 되살린다. 카드가 지금 판정 카드 묶음에 없거나 값이 맞지 않으면 null
+## (그 라운드는 버리고 새로 시작한다. 도감 기록은 ProgressData에 따로 있어 잃지 않는다).
+static func from_dict(d: Dictionary, cards: CardSet, nation_ids: PackedStringArray, era_ids: PackedStringArray) -> RoundSession:
+	if _num(d.get("version"), -1) != SAVE_VERSION:
+		return null
+	var raw_ids: Variant = d.get("card_ids")
+	if not (raw_ids is Array) or (raw_ids as Array).is_empty():
+		return null
+	var queue: Array[CardData] = []
+	for id: Variant in raw_ids:
+		if not (id is String):
+			return null
+		var card := cards.get_card(id)
+		if card == null or not card.is_judgeable():
+			return null
+		queue.append(card)
+	var max_ink := _num(d.get("max_ink"), 0)
+	var left := _num(d.get("ink"), -1)
+	var index := _num(d.get("index"), -1)
+	if max_ink < 1 or left < 1 or left > max_ink or index < 0 or index >= queue.size():
+		return null
+	var s := RoundSession.new(queue, max_ink, nation_ids, era_ids)
+	s.ink.current = left
+	s._index = index
+	s._begin_card()
+	s.revealed_clues = clampi(_num(d.get("revealed"), 1), 1, maxi(queue[index].clues.size(), 1))
+	s.correct_count = maxi(_num(d.get("correct"), 0), 0)
+	s.wrong_count = maxi(_num(d.get("wrong"), 0), 0)
+	s.hints_used = maxi(_num(d.get("hints"), 0), 0)
+	var placed: Variant = d.get("placed")
+	if placed is Dictionary:
+		for key: Variant in placed:
+			var entries: Variant = placed[key]
+			if not (key is String) or not (entries is Array):
+				continue
+			var clean: Array = []
+			for e: Variant in entries:
+				if e is Dictionary and e.get("card_id") is String and typeof(e.get("correct")) == TYPE_BOOL:
+					clean.append({"card_id": e["card_id"], "correct": e["correct"]})
+			s._placed[key] = clean
+	var hist: Variant = d.get("history")
+	if hist is Array:
+		for h: Variant in hist:
+			if h is Dictionary and h.get("card_id") is String and typeof(h.get("correct")) == TYPE_BOOL:
+				s.history.append({"card_id": h["card_id"], "correct": h["correct"], "clues_seen": _num(h.get("clues_seen"), 1)})
+	return s
+
+
 func _begin_card() -> void:
 	revealed_clues = 0
 	if _index >= _queue.size():
@@ -152,3 +253,9 @@ func _begin_card() -> void:
 		status = Status.CLEARED
 		return
 	revealed_clues = mini(1, _queue[_index].clues.size())
+
+
+static func _num(v: Variant, fallback: int) -> int:
+	if typeof(v) == TYPE_INT or typeof(v) == TYPE_FLOAT:
+		return int(v)
+	return fallback

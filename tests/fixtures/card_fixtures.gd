@@ -36,6 +36,7 @@ static func anchor_title(id: String) -> String:
 static func config_dict(start_ink: int = 5) -> Dictionary:
 	return {
 		"start_ink": start_ink,
+		"round_size": 12,
 		"release_mode": false,
 		"cards_path": "res://assets/data/cards/samguk.json",
 		"dev_fallback_cards_path": "res://tests/fixtures/cards_fixture.json",
@@ -91,6 +92,16 @@ static func valid_set() -> Array:
 	for n: String in NATIONS:
 		for e: String in ERAS:
 			cards.append(card(cell_card_id(n, e), n, e))
+	return cards
+
+
+## 기준 카드 1장 + 칸마다 per_cell장. id는 "<nation>-<era>-<k>" (k = 1..per_cell).
+static func multi_set(per_cell: int) -> Array:
+	var cards: Array = [anchor()]
+	for n: String in NATIONS:
+		for e: String in ERAS:
+			for k in range(1, per_cell + 1):
+				cards.append(card("%s-%d" % [cell_card_id(n, e), k], n, e))
 	return cards
 
 

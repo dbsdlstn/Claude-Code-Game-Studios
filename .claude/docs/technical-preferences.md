@@ -12,7 +12,7 @@
 
 - **Engine**: Godot 4.7
 - **Language**: GDScript
-- **Rendering**: Forward+
+- **Rendering**: Compatibility (2D UI 게임, decision-log D24)
 - **Physics**: Godot Physics 2D
 
 ## Input & Platform
