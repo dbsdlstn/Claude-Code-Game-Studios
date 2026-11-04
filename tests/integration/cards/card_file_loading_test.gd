@@ -35,14 +35,14 @@ func test_missing_file_reports_error() -> void:
 	assert_bool(cs.is_valid()).is_false()
 
 
-## 실제 콘텐츠: 기준 4, disputed 4, 판정 36(칸당 3). tools/validate_cards.py 도 PASS다.
+## 실제 콘텐츠: 기준 4, disputed 5, 판정 36(칸당 3). tools/validate_cards.py 도 PASS다.
 func test_samguk_json_passes_validation_in_dev_mode() -> void:
 	var cfg := GameConfig.load_file(CONFIG_PATH)
 	var cs := CardLoader.load_with_config(cfg.cards_path, cfg, false)
 	assert_array(cs.errors).is_empty()
-	assert_int(cs.all_cards.size()).is_equal(44)
+	assert_int(cs.all_cards.size()).is_equal(45)
 	assert_int(cs.anchors.size()).is_equal(4)
-	assert_int(cs.disputed.size()).is_equal(4)
+	assert_int(cs.disputed.size()).is_equal(5)
 	assert_int(cs.playable.size()).is_equal(36)
 	assert_array(cs.warnings).is_empty()
 
