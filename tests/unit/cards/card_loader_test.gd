@@ -108,6 +108,7 @@ func test_rule6_disputed_card_is_not_playable() -> void:
 func test_card_data_reads_json_float_numbers_as_int() -> void:
 	var raw := Fx.card("silla-peak", "silla", "peak")
 	raw["difficulty"] = 3.0
+	raw["clues"][2]["level"] = 3.0
 	var card := CardData.from_dict(raw)
 	assert_int(card.difficulty).is_equal(3)
 	assert_int(card.clues[2]["level"]).is_equal(3)
