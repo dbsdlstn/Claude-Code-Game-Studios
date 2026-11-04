@@ -1,8 +1,10 @@
 extends GdUnitTestSuite
-## 숨김 상태 카드는 유형을 보이지 않는다(decision-log D37, 아트 바이블 §3).
-## CardView의 정적 함수만 쓴다(노드를 만들지 않는다).
+## 숨김 상태 카드는 유형을 보이지 않는다(decision-log D37, 아트 바이블 §3, 리뷰 3 P1).
+## 실제 CardView 노드를 만들어 show_card 뒤 보이는 글(Label·Button·툴팁)을 모두 모아 비교한다.
+## 유형마다 새 노드를 만든다(queue_free로 지운 단서 줄이 같은 프레임에 남지 않게).
 
 const Fx = preload("res://tests/fixtures/card_fixtures.gd")
+const UiTexts = preload("res://tests/fixtures/ui_texts.gd")
 const TYPES := ["event", "artifact", "person", "myth"]
 
 
@@ -12,32 +14,49 @@ func _card(card_type: String) -> CardData:
 	return CardData.from_dict(raw)
 
 
-func test_hidden_texts_are_identical_for_every_type() -> void:
-	# Arrange: 유형만 다른 같은 카드
-	var base := _card("event")
-	var expected := CardView.hidden_texts(base, base.clues)
+func _shown_texts(c: CardData) -> PackedStringArray:
+	var view: CardView = auto_free(CardView.new())
+	view.set_ref_titles({Fx.ANCHOR_ID: Fx.anchor_title(Fx.ANCHOR_ID)})
+	view.show_card(c, c.clues, true)
+	return UiTexts.visible_texts(view)
+
+
+func test_shown_card_texts_do_not_depend_on_type() -> void:
+	# Arrange / Act
+	var expected := _shown_texts(_card("event"))
+	# Assert
 	for t: String in TYPES:
-		var c := _card(t)
-		# Act / Assert
-		assert_array(Array(CardView.hidden_texts(c, c.clues))).is_equal(Array(expected))
+		assert_array(Array(_shown_texts(_card(t)))).is_equal(Array(expected))
 
 
-func test_hidden_texts_contain_no_type_badge() -> void:
+func test_shown_card_has_no_type_word_except_shared_heading() -> void:
 	for t: String in TYPES:
-		var c := _card(t)
-		var joined := "\n".join(CardView.hidden_texts(c, c.clues))
-		for other: String in TYPES:
-			if other == "event":
-				continue  # 숨김 제목 "? 사건 카드"는 모든 카드에 같다(바이블 §7)
-			assert_str(joined).not_contains(HanjiTheme.type_label(other))
+		for s: String in _shown_texts(_card(t)):
+			if s == CardView.HIDDEN_HEADING:
+				continue  # "? 사건 카드"는 모든 카드에 같은 제목(바이블 §7)
+			for label: String in HanjiTheme.TYPE_LABELS.values():
+				assert_str(s).not_contains(label)
 
 
-func test_hidden_texts_do_not_show_title() -> void:
+func test_shown_card_has_no_title_nation_or_era() -> void:
 	var c := _card("myth")
-	assert_str("\n".join(CardView.hidden_texts(c, c.clues))).not_contains(c.title)
+	var joined := "\n".join(_shown_texts(c))
+	assert_str(joined).not_contains(c.title)
+	for word: String in ["신라", "전성기"]:
+		assert_str(joined).not_contains(word)
 
 
-func test_hidden_heading_is_shared_constant() -> void:
-	var c := _card("artifact")
-	var no_clues: Array[Dictionary] = []
-	assert_str(CardView.hidden_texts(c, no_clues)[0]).is_equal(CardView.HIDDEN_HEADING)
+func test_shown_card_includes_hidden_heading_question_mark_and_ref_button() -> void:
+	var texts := _shown_texts(_card("artifact"))
+	assert_array(Array(texts)).contains([CardView.HIDDEN_HEADING, "?", CardView.ref_button_text(Fx.anchor_title(Fx.ANCHOR_ID))])
+
+
+func test_texts_helper_sees_a_type_leak() -> void:
+	# 검사 도구 자체 확인: 유형 글자를 넣으면 실제로 잡힌다(테스트가 항상 통과하지 않음을 보인다).
+	var view: CardView = auto_free(CardView.new())
+	var c := _card("myth")
+	view.show_card(c, c.clues, true)
+	var leak := Label.new()
+	leak.text = HanjiTheme.type_label("myth")
+	view.add_child(leak)
+	assert_array(Array(UiTexts.visible_texts(view))).contains([HanjiTheme.type_label("myth")])

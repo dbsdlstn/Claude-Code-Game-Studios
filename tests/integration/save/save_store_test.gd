@@ -106,3 +106,15 @@ func test_unknown_future_version_is_backed_up_and_not_read() -> void:
 	assert_bool(p.is_collected("x")).is_false()
 	assert_bool(FileAccess.file_exists(_store.future_backup_path(99))).is_true()
 	assert_str(_store.last_error).is_not_empty()
+
+
+func test_failed_archive_copy_makes_store_read_only_and_keeps_original() -> void:
+	# 리뷰 3 H1: 새 형식을 보관하지 못하면 저장을 끄고 원본을 건드리지 않는다.
+	var original := JSON.stringify({"version": 99, "collected": ["x"]})
+	_write(TEST_PATH, original)
+	var failing := func(_from: String, _to: String) -> Error: return ERR_FILE_CANT_WRITE
+	var store := SaveStore.new(TEST_PATH, failing)
+	var p := store.load_progress()
+	assert_bool(store.read_only).is_true()
+	assert_int(store.save(p)).is_equal(ERR_UNAVAILABLE)
+	assert_str(FileAccess.get_file_as_string(TEST_PATH)).is_equal(original)

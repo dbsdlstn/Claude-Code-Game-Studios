@@ -78,7 +78,7 @@ func setup(config: GameConfig, data: TutorialData) -> void:
 	_card_view.more_clues_requested.connect(_on_more)
 	_card_view.selection_changed.connect(_on_selection_changed)
 	_card_view.set_ref_titles(GameScreen.ref_titles(data.board_anchors))
-	_card_view.anchor_ref_focused.connect(_board.highlight_anchor)
+	_board.wire_card(_card_view)
 	_reveal = RevealView.new()
 	side.add_child(_card_view)
 	side.add_child(_reveal)

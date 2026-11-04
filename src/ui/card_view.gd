@@ -1,6 +1,8 @@
 class_name CardView
 extends PanelContainer
-## 지금 놓을 카드(숨김 상태). 이름·유형·나라 표시 없이 "?" 일러스트 영역과 보이는 단서만 보여 준다
+## 지금 놓을 카드(숨김 상태). 숨김 화면에 유형이 없다는 것은 tests/unit/ui/card_view_hidden_test.gd가
+## 실제 노드를 만들어 보이는 글(Label·Button·툴팁)을 모아 확인한다(리뷰 3 P1).
+## 이름·유형·나라 표시 없이 "?" 일러스트 영역과 보이는 단서만 보여 준다
 ## (아트 바이블 §3·§7, decision-log D37: 유형 배지는 시기를 알려 주므로 공개 후에만).
 ## 끌어서 칸에 놓거나, 눌러서 고른 뒤 칸을 누른다.
 ## 관계 단서의 기준 카드 버튼을 누르거나 초점을 주면 anchor_ref_focused로 그 기준 카드 칸 강조를 요청한다.
@@ -9,8 +11,12 @@ extends PanelContainer
 signal more_clues_requested
 ## 카드를 눌러 고르거나 고르기를 풀었다. by_keyboard: Enter/Space로 골랐으면 true.
 signal selection_changed(is_selected: bool, by_keyboard: bool)
-## 관계 단서가 가리키는 기준 카드를 보고 싶다(누르거나 초점).
+## 관계 단서의 기준 카드 버튼에 초점이 왔다(강조 유지).
 signal anchor_ref_focused(anchor_id: String)
+## 그 버튼에서 초점이 떠났다(강조 끄기).
+signal anchor_ref_unfocused(anchor_id: String)
+## 그 버튼을 눌렀다. sticky: 버튼에 초점이 남아 있으면 true(유지), 아니면 false(2.5초).
+signal anchor_ref_pressed(anchor_id: String, sticky: bool)
 
 ## 드래그 데이터의 종류 표시. BoardCell이 확인한다.
 const DRAG_KIND := "hanyang_card"
@@ -82,17 +88,6 @@ static func ref_button_text(title: String) -> String:
 	return "  ▶ [%s] 칸 보기" % title
 
 
-## 숨김 상태에서 화면에 나오는 글 전부(제목, 단서 줄, 관계 단서 버튼). show_card와 같은 순서다.
-## 테스트가 유형 누출을 이것으로 확인한다. card는 받지만 단서 외의 필드는 쓰지 않는다.
-static func hidden_texts(_card: CardData, clues: Array[Dictionary], ref_titles: Dictionary = {}) -> PackedStringArray:
-	var out := PackedStringArray([HIDDEN_HEADING])
-	for clue: Dictionary in clues:
-		out.append(clue_line(clue))
-		for title in _ref_titles_of(clue, ref_titles):
-			out.append(ref_button_text(title))
-	return out
-
-
 ## 관계 단서가 가리키는 기준 카드 중 제목을 아는 것들: [[id, title], ...]
 static func _refs_of(clue: Dictionary, ref_titles: Dictionary) -> Array:
 	var out: Array = []
@@ -101,13 +96,6 @@ static func _refs_of(clue: Dictionary, ref_titles: Dictionary) -> Array:
 	for ref: String in clue["refs"]:
 		if ref_titles.has(ref):
 			out.append([ref, str(ref_titles[ref])])
-	return out
-
-
-static func _ref_titles_of(clue: Dictionary, ref_titles: Dictionary) -> PackedStringArray:
-	var out := PackedStringArray()
-	for pair: Array in _refs_of(clue, ref_titles):
-		out.append(pair[1])
 	return out
 
 
@@ -191,8 +179,9 @@ func _ref_button(anchor_id: String, title: String) -> Button:
 	b.add_theme_color_override("font_hover_color", HanjiTheme.INDIGO)
 	b.add_theme_color_override("font_focus_color", HanjiTheme.INDIGO)
 	b.tooltip_text = "보드에서 기준 카드 [%s]가 놓인 칸을 잠깐 강조합니다" % title
-	b.pressed.connect(func() -> void: anchor_ref_focused.emit(anchor_id))
+	b.pressed.connect(func() -> void: anchor_ref_pressed.emit(anchor_id, b.has_focus()))
 	b.focus_entered.connect(func() -> void: anchor_ref_focused.emit(anchor_id))
+	b.focus_exited.connect(func() -> void: anchor_ref_unfocused.emit(anchor_id))
 	return b
 
 

@@ -24,7 +24,8 @@ var _base_style: StyleBoxFlat
 var _focus_style: StyleBoxFlat
 var _hover_style: StyleBoxFlat
 var _highlight_style: StyleBoxFlat
-var _highlight_tween: Tween
+## 관계 단서 강조 중인지. 다른 입력(마우스 나감, 초점, 드래그 끝)이 와도 강조를 유지한다(리뷰 3 H5).
+var _ref_on: bool = false
 var _hovering: bool = false
 var _anchor_label: Label
 var _content_label: Label
@@ -105,14 +106,16 @@ static func visible_text(lines: PackedStringArray, max_lines: int) -> String:
 	return "외 %d장\n%s" % [lines.size() - max_lines, "\n".join(shown)]
 
 
-## 기준 카드 칸 강조: 청색 테두리와 옅은 청 바탕을 1.2초 보인 뒤 원래대로(관계 단서 → 기준 카드).
-func highlight() -> void:
-	if _highlight_tween != null and _highlight_tween.is_valid():
-		_highlight_tween.kill()
-	add_theme_stylebox_override("panel", _highlight_style)
-	_highlight_tween = create_tween()
-	_highlight_tween.tween_interval(1.2)
-	_highlight_tween.tween_callback(_restore_style)
+## 관계 단서 강조를 켜고 끈다(청 3px + 옅은 청 바탕, 웹 .cell.ref-target과 같은 값).
+## 시간 관리는 BoardView가 한다(초점 동안 유지, 클릭만 하면 2.5초).
+func set_ref_highlight(on: bool) -> void:
+	_ref_on = on
+	_restore_style()
+
+
+## 관계 단서 강조 중인지.
+func is_ref_highlighted() -> bool:
+	return _ref_on
 
 
 ## 오답으로 고른 칸을 잠깐 붉게 표시한다.
@@ -173,4 +176,7 @@ func _restore_style() -> void:
 	_hovering = false
 	if _base_style == null:
 		return
-	add_theme_stylebox_override("panel", _focus_style if has_focus() else _base_style)
+	if _ref_on:
+		add_theme_stylebox_override("panel", _highlight_style)
+	else:
+		add_theme_stylebox_override("panel", _focus_style if has_focus() else _base_style)

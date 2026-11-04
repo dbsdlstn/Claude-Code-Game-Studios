@@ -12,10 +12,14 @@ extends GridContainer
 ## by_drop: 드롭이면 true. by_keyboard: 키보드로 칸을 눌렀으면 true.
 signal cell_targeted(nation: String, era: String, by_drop: bool, by_keyboard: bool)
 
+## 클릭만 했을 때 강조를 지우는 시간(웹 refs.js와 같은 2.5초).
+const REF_CLICK_SECONDS := 2.5
+
 ## cell_key -> BoardCell
 var _cells: Dictionary = {}
 ## 기준 카드 id -> cell_key (관계 단서 강조용)
 var _anchor_cells: Dictionary = {}
+var _ref_tween: Tween
 
 
 ## 보드를 만든다. anchors: 보드에 보일 기준 카드.
@@ -83,17 +87,43 @@ static func anchor_cell_keys(anchors: Array[CardData]) -> Dictionary:
 	return out
 
 
-## 기준 카드가 놓인 칸을 잠깐 강조한다(관계 단서를 누르거나 초점을 줄 때). 모르는 id면 아무것도 안 한다.
-func highlight_anchor(anchor_id: String) -> void:
+## 기준 카드가 놓인 칸을 강조한다(웹 refs.js와 같은 동작). 한 번에 한 칸만.
+## sticky: true면 clear_ref()까지 유지(참조 버튼에 초점이 있는 동안), false면 2.5초 뒤 지운다(클릭만).
+## 모르는 id면 강조를 지우기만 한다.
+func show_ref(anchor_id: String, sticky: bool) -> void:
+	clear_ref()
 	if not _anchor_cells.has(anchor_id):
 		return
 	var c: BoardCell = _cells.get(_anchor_cells[anchor_id])
-	if c != null:
-		c.highlight()
+	if c == null:
+		return
+	c.set_ref_highlight(true)
+	if not sticky and is_inside_tree():
+		_ref_tween = create_tween()
+		_ref_tween.tween_interval(REF_CLICK_SECONDS)
+		_ref_tween.tween_callback(clear_ref)
+
+
+## CardView의 관계 단서 버튼을 이 보드의 강조에 잇는다(본게임과 튜토리얼이 같이 쓴다).
+func wire_card(view: CardView) -> void:
+	view.anchor_ref_focused.connect(func(id: String) -> void: show_ref(id, true))
+	view.anchor_ref_unfocused.connect(func(_id: String) -> void: clear_ref())
+	view.anchor_ref_pressed.connect(func(id: String, sticky: bool) -> void: show_ref(id, sticky))
+
+
+## 관계 단서 강조를 모두 지운다.
+func clear_ref() -> void:
+	if _ref_tween != null and _ref_tween.is_valid():
+		_ref_tween.kill()
+	_ref_tween = null
+	for bc: BoardCell in _cells.values():
+		if bc.is_ref_highlighted():
+			bc.set_ref_highlight(false)
 
 
 ## 모든 칸을 비운다.
 func reset() -> void:
+	clear_ref()
 	for cell: BoardCell in _cells.values():
 		cell.show_empty()
 

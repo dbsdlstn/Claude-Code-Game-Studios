@@ -21,10 +21,17 @@ extends RefCounted
 var path: String = ""
 ## 마지막 읽기/쓰기에서 생긴 문제나 복구 안내. 없으면 빈 문자열.
 var last_error: String = ""
+## true면 save()가 쓰지 않는다. 새 형식 저장을 보관하지 못했을 때 원본을 지키기 위해 켠다(리뷰 3 H1).
+var read_only: bool = false
+## 파일 복사(from, to) -> Error. 테스트에서 실패를 주입한다. 기본은 DirAccess.copy_absolute.
+var copy_file: Callable
 
 
-func _init(save_path: String) -> void:
+func _init(save_path: String, copy: Callable = Callable()) -> void:
 	path = save_path
+	copy_file = copy
+	if not copy_file.is_valid():
+		copy_file = func(from: String, to: String) -> Error: return DirAccess.copy_absolute(from, to)
 
 
 ## 임시 파일 경로.
@@ -39,6 +46,9 @@ func bak_path() -> String:
 
 ## 저장한다. 실패하면 이전 저장 파일을 남기고 오류 코드를 돌려준다.
 func save(progress: ProgressData) -> Error:
+	if read_only:
+		last_error = "새 형식 저장을 보관하지 못해 이번 실행에서는 저장하지 않는다(원본 %s 보존)" % path.get_file()
+		return ERR_UNAVAILABLE
 	last_error = ""
 	var f := FileAccess.open(tmp_path(), FileAccess.WRITE)
 	if f == null:
@@ -83,7 +93,12 @@ func load_progress() -> ProgressData:
 			var version := ProgressData.version_of(data)
 			if version > ProgressData.SAVE_VERSION:
 				var keep := future_backup_path(version)
-				DirAccess.copy_absolute(candidate, keep)
+				var copy_err: Error = copy_file.call(candidate, keep)
+				if copy_err != OK:
+					# 보관에 실패하면 원본을 덮어쓰지 않도록 저장을 끈다.
+					read_only = true
+					last_error = "저장 형식 v%d을 읽지 못했고 보관도 실패했다(%d). 원본을 지키려고 저장하지 않는다" % [version, copy_err]
+					return ProgressData.new()
 				last_error = "저장 형식 v%d을 이 버전이 읽지 못해 %s 에 보관하고 새로 시작한다" % [version, keep.get_file()]
 				return ProgressData.new()
 			if candidate != path:

@@ -290,6 +290,8 @@ func _save_round() -> void:
 
 
 func _save() -> void:
+	if _store.read_only:
+		return  # 시작할 때 안내했다(새 형식 저장을 지키려고 저장하지 않음)
 	if _store.save(_progress) != OK and _game != null:
 		_game.add_notice(_store.last_error)
 

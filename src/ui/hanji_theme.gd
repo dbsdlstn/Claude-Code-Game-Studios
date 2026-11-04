@@ -26,6 +26,7 @@ const FOCUS_BG := Color(0.9725, 0.9294, 0.8000)  # 키보드 초점 칸 바탕 #
 const SEAL_LIGHT_TEXT := Color(1, 1, 1)  # 인장 글자(어두운 나라색 바탕) #FFFFFF
 const CORRECT_TEXT := Color(0.1804, 0.3529, 0.1647)  # 정답 글자 #2E5A2A
 const WRONG_TEXT := Color(0.5412, 0.1647, 0.1333)  # 오답 글자 #8A2A22
+## 먹물 빈 칸(바이블 §4.3). 한지 대비 약 1.5라 장식(게이지 바탕)에만, 글자 ○에는 MUTED를 쓴다.
 const INK_EMPTY := Color(0.7882, 0.7373, 0.6078)  # 먹물 게이지 빈 칸 #C9BC9B
 ## 나라 색(아트 바이블 §4.2). 보드 행 머리글과 공개 후 카드에만 쓴다(숨김 카드에는 쓰지 않는다).
 const NATION_COLORS := {

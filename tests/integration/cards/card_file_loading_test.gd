@@ -3,6 +3,7 @@ extends GdUnitTestSuite
 
 const CONFIG_PATH := "res://assets/data/config/game_config.json"
 const FIXTURE_PATH := "res://tests/fixtures/cards_fixture.json"
+const UiTexts = preload("res://tests/fixtures/ui_texts.gd")
 
 
 func test_game_config_file_is_valid() -> void:
@@ -95,15 +96,22 @@ func test_placeholder_art_exists_for_every_card_type() -> void:
 		assert_bool(FileAccess.file_exists(CardArt.placeholder_path(t))).is_true()
 
 
-func test_samguk_hidden_texts_do_not_depend_on_card_type() -> void:
-	# D37: 숨김 상태의 글은 유형과 무관해야 한다. 실제 카드마다 유형을 바꿔도 글이 같아야 한다.
+func test_samguk_shown_cards_do_not_depend_on_card_type() -> void:
+	# D37·리뷰 3 P1: 실제 카드 36장 각각을 CardView에 띄워, 유형만 바꾼 같은 카드와 보이는 글이 같은지.
 	var cfg := GameConfig.load_file(CONFIG_PATH)
 	var cs := CardLoader.load_with_config(cfg.cards_path, cfg, false)
 	var refs := GameScreen.ref_titles(cs.anchors)
 	for c: CardData in cs.playable:
-		var before := CardView.hidden_texts(c, c.clues, refs)
+		var before := _shown_texts(c, refs)
 		var saved_type := c.type
 		c.type = "event" if saved_type != "event" else "myth"
-		var after := CardView.hidden_texts(c, c.clues, refs)
+		var after := _shown_texts(c, refs)
 		c.type = saved_type
 		assert_array(Array(after)).is_equal(Array(before))
+
+
+func _shown_texts(c: CardData, refs: Dictionary) -> PackedStringArray:
+	var view: CardView = auto_free(CardView.new())
+	view.set_ref_titles(refs)
+	view.show_card(c, c.clues, true)
+	return UiTexts.visible_texts(view)

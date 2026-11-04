@@ -52,7 +52,8 @@ func setup(config: GameConfig, cards: CardSet, notice: String) -> void:
 	ink_box.add_child(_ink_label)
 	_ink_empty_label = Label.new()
 	_ink_empty_label.add_theme_font_size_override("font_size", 20)
-	_ink_empty_label.add_theme_color_override("font_color", HanjiTheme.INK_EMPTY)
+	# 빈 칸 ○은 갈먹(대비 약 6.8). 바이블 INK_EMPTY(#C9BC9B)는 한지 대비 1.5라 글자에 쓰지 않는다(리뷰 3 H4).
+	_ink_empty_label.add_theme_color_override("font_color", HanjiTheme.MUTED)
 	ink_box.add_child(_ink_empty_label)
 	_count_label = Label.new()
 	top.add_child(_count_label)
@@ -95,7 +96,7 @@ func setup(config: GameConfig, cards: CardSet, notice: String) -> void:
 	scroll.add_child(side)
 	_card_view = CardView.new()
 	_card_view.set_ref_titles(ref_titles(cards.anchors))
-	_card_view.anchor_ref_focused.connect(_board.highlight_anchor)
+	_board.wire_card(_card_view)
 	_card_view.more_clues_requested.connect(func() -> void: more_clues_requested.emit())
 	_card_view.selection_changed.connect(_on_selection_changed)
 	side.add_child(_card_view)
@@ -105,6 +106,11 @@ func setup(config: GameConfig, cards: CardSet, notice: String) -> void:
 	_message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_message_label.custom_minimum_size = Vector2(360, 0)
 	side.add_child(_message_label)
+
+
+## 먹물 수 글. 예: ink_count_text(3, 5) → "3 / 5"
+static func ink_count_text(left: int, max_ink: int) -> String:
+	return "%d / %d" % [left, max_ink]
 
 
 ## 기준 카드 id → 제목(관계 단서 버튼용).
@@ -139,7 +145,7 @@ func restore_round(session: RoundSession, cards: CardSet) -> void:
 func refresh(session: RoundSession, dogam_text: String) -> void:
 	var left := session.ink.current
 	_ink_label.text = "먹물 " + "●".repeat(left)
-	_ink_empty_label.text = "○".repeat(maxi(session.ink.max_ink - left, 0))
+	_ink_empty_label.text = "○".repeat(maxi(session.ink.max_ink - left, 0)) + "  " + ink_count_text(left, session.ink.max_ink)
 	_count_label.text = "카드 %d / %d" % [mini(session.placed_count() + 1, session.total_cards()), session.total_cards()]
 	_dogam_label.text = dogam_text
 	var card := session.current_card()
@@ -187,7 +193,14 @@ func _on_cell_targeted(nation: String, era: String, by_drop: bool, by_keyboard: 
 		placement_requested.emit(nation, era)
 		if by_keyboard:
 			# 키보드로 놓았으면 다음 카드를 바로 고를 수 있게 초점을 카드로 돌려준다(리뷰 2 L5).
-			_card_view.grab_focus.call_deferred()
+			# 마지막 카드면 이 사이에 결과 화면이 열린다. 숨겨진 카드가 결과 화면의 초점을 빼앗지 않게
+			# 보일 때만 초점을 준다(리뷰 3 P3).
+			_focus_card_if_visible.call_deferred()
+
+
+func _focus_card_if_visible() -> void:
+	if _card_view.is_visible_in_tree():
+		_card_view.grab_focus()
 
 
 func _on_selection_changed(is_selected: bool, by_keyboard: bool) -> void:
