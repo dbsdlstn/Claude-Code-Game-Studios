@@ -22,8 +22,8 @@
 | `source` | object | 예 | `{ "name": string, "url": string\|null, "note": string }` 근거 자료. |
 | `verified` | bool | 예 | 사실 확인 완료 여부. 출시 빌드는 true만 포함한다. |
 | `verified_by` | string\|null | 아니오 | 확인한 사람/자료와 날짜. |
-| `disputed` | bool | 예 | true면 학설이 갈려 판정에서 제외한다. 보드에 올리지 않고 해설용으로만 쓴다. |
-| `disputed_note` | string\|null | disputed 시 예 | 갈리는 견해 요약. |
+| `disputed` | bool | 예 | true면 판정에서 제외한다. 두 경우다: (1) 사료나 학설이 갈리는 경우, (2) 사실은 확실하지만 이 게임의 시기 정의(D2·D45)를 적용할 때 칸이 갈리는 경우. 보드에 올리지 않고 해설용으로만 쓴다(D50). |
+| `disputed_note` | string\|null | disputed 시 예 | 갈리는 견해 요약. 플레이어에게 보이는 문장이므로 내부 결정 번호나 작업 메모는 넣지 않는다(그런 내용은 `source.note`). 위 (1)인지 (2)인지 분명히 적는다(D50). |
 | `difficulty` | int 1~3 | 예 | 1 쉬움(단서 1에서 풀림), 2 보통(관계 단서 필요), 3 어려움(직접 단서 필요). 플레이 로그로 보정한다. |
 | `image` | string\|null | 아니오 | `assets/art/cards/...` 상대 경로. |
 | `image_source` | string\|null | image 있으면 예 | 이미지 출처(기관/저자/URL). |
