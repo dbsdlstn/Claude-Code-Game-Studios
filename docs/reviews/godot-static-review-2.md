@@ -255,11 +255,11 @@ python3 tools/gd_card_validator_port.py tests/fixtures/cards_fixture.json  # 0 e
 
 ## 처리 결과 (Godot MVP 세션, 2026-11-04)
 
-Godot는 실행하지 않았다. gdparse·gdlint 통과, 튜토리얼과 검증기는 `tools/gd_card_validator_port.py`로 대조했다. 결정 기록 D35.
+Godot는 실행하지 않았다. gdparse·gdlint 통과, 튜토리얼과 검증기는 `tools/gd_card_validator_port.py`로 대조했다. 결정 기록 D35(콘텐츠 세션의 D34와 겹치지 않게).
 
 | 항목 | 처리 | 내용 |
 |---|---|---|
-| N1 공용 튜토리얼 파일 | 확인(Godot 영향 없음) | 형식(`{anchor_id, cards}`)은 그대로라 `TutorialData.parse`가 그대로 읽는다. 수정된 [낙랑군 축출]을 이식 도구로 검사: 개발 모드 오류 0, 본 덱과 id·제목 겹침 없음. 추가로 Python T2(anchor는 disputed 아님)·T5(relation은 본 덱의 아무 기준 카드)에 맞췄다 |
+| N1 공용 튜토리얼 파일 | 확인(Godot 영향 없음) | 형식(`{anchor_id, cards}`)은 그대로라 `TutorialData.parse`가 그대로 읽는다. 튜토리얼 파일(병합 후 연습 카드 [엄리대수 건너기], 콘텐츠 D34)을 이식 도구로 검사: 개발 모드 오류 0, 본 덱과 id·제목 겹침 없음. 추가로 Python T2(anchor는 disputed 아님)·T5(relation은 본 덱의 아무 기준 카드)에 맞췄다 |
 | N2 출시 모드의 확인 전 연습 카드 | 고침 | `parse(..., release_mode)`가 `filter_for_mode`를 적용, 남는 카드가 없으면 튜토리얼 건너뜀 + 안내. 지금 파일은 출시 모드에서 0장(의도대로 건너뜀). 테스트 2개. 참고: Python `--tutorial --release`는 verified를 보지 않아 PASS(도구 쪽 차이) |
 | N3 이어하기 뒤 new_ids | 고침 | `RoundSession.new_ids`로 옮겨 `to_dict`·`summary`에 포함. 테스트: 저장 → 되살리기 → 남은 카드 → `round_log[0].new_ids`에 앞 카드 |
 | L1 v1 라운드 수와 기록 | 고침 | 라운드 수는 `rounds_played`, 정답률·단서는 기록 있는 라운드만, v1은 "세부 없음" 문구. 테스트 2개 |
