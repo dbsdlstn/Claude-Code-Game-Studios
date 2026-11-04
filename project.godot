@@ -1,12 +1,18 @@
 ; Engine configuration file.
-; run/main_scene is intentionally unset: no scene exists yet.
-; /dev-story or the developer sets it once a scene exists.
 config_version=5
 
 [application]
 
 config/name="한양 도감"
+run/main_scene="res://src/main.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [rendering]
 
