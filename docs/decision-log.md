@@ -41,3 +41,13 @@
 - 가야 전성기·건국 전승 카드의 시기 정의는 사실 검증 전이다.
 - 클라우드 세션에서 Godot를 실행할 수 없어 `project.godot` 검증이 되어 있지 않다.
 - `docs/roadmap.md`는 읽지 않았다.
+
+## 2026-11-04 D6. 아트 방향과 카드 이미지 명세 (총괄 세션 요청)
+- **요청 경로와 실제 경로**: 총괄 세션은 `design/art-bible.md`, `design/asset-specs/cards.md`를 요청했으나, 프레임워크의 `/asset-spec`, `/art-bible` 스킬과 훅이 `design/art/art-bible.md`, `design/assets/specs/`를 기준 경로로 읽는다. 스킬이 경로를 찾지 못하는 문제를 피하려고 프레임워크 경로를 따랐다. 다른 세션은 이 경로를 참조해야 한다.
+  - 아트 바이블과 고증 가이드(부록 A): `design/art/art-bible.md`
+  - 카드 이미지 명세(공통 템플릿, 예시 3장): `design/assets/specs/cards-assets.md`
+- **미실행 단계**: art-director·technical-artist 위임과 art-director 서명(Phase 5)은 실행하지 않았다. 문서 머리말에 `NOT RUN`으로 표시했다. `/asset-spec`의 `design/assets/asset-manifest.md`도 만들지 않았다.
+- **고증 가이드의 근거**: 외부 자료를 읽어 확인하지 않았고 통설 기반이다. 각 항목에 확신도(확실/확인 필요)를 붙였고 불확실한 표현은 쓰지 않도록 했다.
+- **AI 생성 이미지**: 저작권 지위, 도구 약관의 상업 이용 조건, Steam의 AI 사용 공개 요건은 확인하지 못했다. 카드의 `image_license`에 "확인 필요"가 남아 있으면 출시 빌드에서 제외하는 규칙을 명세에 넣었다.
+- **카드별 프롬프트**: 콘텐츠 세션의 `assets/data/cards/samguk.json`(`claude/content-cards`)이 원격에 아직 없어서 템플릿과 예시 3장만 썼다. 예시의 id는 임시다.
+- **글꼴**: Noto Serif KR / Noto Sans KR을 후보로 적었고 라이선스는 번들 전에 직접 확인해야 한다.
