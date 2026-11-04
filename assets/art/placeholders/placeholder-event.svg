@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 768" width="1024" height="768" role="img" aria-label="사건 카드 대체 문양: 깃발과 산">
+  <title>사건 카드 대체 문양</title>
+  <rect width="1024" height="768" fill="#EFE6D2"/>
+  <rect x="40" y="40" width="944" height="688" fill="none" stroke="#8A6D3B" stroke-width="3"/>
+  <rect x="56" y="56" width="912" height="656" fill="none" stroke="#8A6D3B" stroke-width="1"/>
+  <path d="M120 600 Q260 470 400 600 Q520 500 640 600 Q760 440 904 600" fill="none" stroke="#2B2118" stroke-width="4" stroke-linecap="round"/>
+  <path d="M120 640 L904 640" fill="none" stroke="#8A6D3B" stroke-width="2" stroke-dasharray="14 10"/>
+  <line x1="512" y1="170" x2="512" y2="600" stroke="#2B2118" stroke-width="6" stroke-linecap="round"/>
+  <path d="M512 190 Q592 160 672 190 Q592 220 672 250 Q592 280 512 250 Z" fill="none" stroke="#2B2118" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="512" cy="162" r="10" fill="none" stroke="#C79A2E" stroke-width="4"/>
+</svg>
