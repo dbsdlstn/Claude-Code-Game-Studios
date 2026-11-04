@@ -17,6 +17,10 @@ export const CONFIG = Object.freeze({
    * 읽지 못하거나 검증에 걸리면 튜토리얼 없이 진행한다. tools/build_web.py가 dist에서는 data/tutorial.json으로 바꾼다.
    */
   tutorialDataUrl: '../assets/data/cards/tutorial.json',
+  /**
+   * 그림 파일(assets/art/...)의 기준 경로. 저장소에서는 '../', 배포본(build_web.py)에서는 ''.
+   */
+  assetRoot: '../',
   /** localStorage 키. 저장 형식을 바꾸면 버전을 올린다. */
   storageKey: 'hanyang-dogam:save:v1',
 });

@@ -36,6 +36,8 @@ test('빌드 결과: 카드 JSON 포함, 경로가 data/로 바뀜, 테스트 �
   assert.match(config, /'data\/samguk\.json'/);
   assert.doesNotMatch(config, /\.\.\/assets/);
   assert.equal(existsSync(path.join(DIST, 'tests')), false);
+  for (const t of ['event', 'artifact', 'person', 'myth']) assert.ok(existsSync(path.join(DIST, 'assets', 'art', 'placeholders', `placeholder-${t}.svg`)), t);
+  assert.match(config, /assetRoot: ''/);
   assert.match(readFileSync(path.join(DIST, 'BUILD.txt'), 'utf8'), /mode: playtest/);
 });
 
@@ -59,6 +61,7 @@ test('배포본만으로 실제 카드 로드 → 타이틀 → 튜토리얼 →
   assert.ok(c1, '실제 데이터의 카드여야 한다');
   await clickPlace(page, c1.answer);
   await page.waitForSelector('#fb[data-result="correct"]');
+  await page.waitForFunction(() => document.querySelector('#fb .illust img')?.naturalWidth > 0);
   const c2 = await currentCard(page, SAMGUK_BY_ID);
   await clickPlace(page, wrongCell(c2));
   await page.waitForSelector('#fb[data-result="wrong"]');

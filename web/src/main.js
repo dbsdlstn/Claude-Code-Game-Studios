@@ -11,8 +11,9 @@ import {
   recordInCollection, serializeRound, restoreRound, restoreCollection, isDogamComplete, dogamProgress,
   summarizeRound, historyStats, restoreHistory, dataFingerprint, parseTutorial,
 } from './rules.js';
-import { $, el, clueText, TYPE_LABEL, LEVEL_LABEL, inkDrops } from './ui/dom.js';
+import { $, el, clueText, TYPE_LABEL, LEVEL_LABEL, inkDrops, illustration, hiddenIllustration, NATION_SEAL } from './ui/dom.js';
 import { makeDraggable } from './ui/drag.js';
+import { wireRefHighlight } from './ui/refs.js';
 import { createTutorial } from './ui/tutorial.js';
 
 const HELP_IDLE = '카드를 끌어 칸에 놓거나, 카드를 눌러 고른 뒤 칸을 누르세요.';
@@ -43,6 +44,20 @@ function newRoundState() {
 
 /* ------------------------------------------------------------------ 본게임 렌더 */
 
+/** 행 머리글: 나라 인장(한 글자) + 나라 이름. 선택지 쪽 표시라 정답 누출이 아니다(D37). */
+function nationHead(n) {
+  return el('div', { class: `nation-head nation-${n.id}`, dataset: { nation: n.id } },
+    el('span', { class: 'seal', 'aria-hidden': 'true' }, NATION_SEAL[n.id] ?? n.label[0]),
+    el('span', { class: 'nation-name' }, n.label));
+}
+
+/** 관계 단서의 [제목] → 보드에 있는 기준 카드. */
+function resolveAnchorRef(title) {
+  const a = app.anchors.find((c) => c.title === title);
+  return a ? { id: a.id, label: where(a.answer) } : null;
+}
+
+
 function renderTop() {
   const { ink: n, startInk } = app.round;
   const ink = $('ink');
@@ -71,15 +86,16 @@ function renderCard() {
   box.className = 'card' + (app.selected ? ' selected' : '') + (app.lastResult ? ' card-enter' : '');
   const card = app.cardsById.get(id);
   box.dataset.cardId = id; // E2E가 정답을 데이터에서 찾을 때 쓴다(화면에는 보이지 않음).
-  box.setAttribute('aria-label', `이름이 숨겨진 ${TYPE_LABEL[card.type] ?? ''} 카드. Enter로 고른 뒤 방향키로 칸을 고르고 Enter로 놓습니다.`);
+  // 숨김 상태에는 유형·나라·시기를 짐작하게 하는 정보를 두지 않는다(D37). 접근성 이름도 마찬가지.
+  box.setAttribute('aria-label', '이름이 숨겨진 카드. Enter로 고른 뒤 방향키로 칸을 고르고 Enter로 놓습니다.');
   box.replaceChildren(
+    hiddenIllustration(),
     el('div', { class: 'card-head' },
-      el('span', { class: 'card-title' }, '？ 이름 숨김'),
-      el('span', { class: 'card-type' }, TYPE_LABEL[card.type] ?? card.type)),
+      el('span', { class: 'card-title' }, '？ 이름 숨김')),
     el('ol', { class: 'clues', id: 'clues' },
       card.clues.slice(0, app.round.shown).map((cl, i) => el('li', {
         class: 'clue' + (i === app.round.shown - 1 && i > 0 ? ' clue-new' : ''), dataset: { kind: cl.kind, level: String(cl.level) },
-      }, el('span', { class: 'clue-level' }, LEVEL_LABEL[cl.level] ?? ''), clueText(cl.text)))),
+      }, el('span', { class: 'clue-level' }, LEVEL_LABEL[cl.level] ?? ''), clueText(cl.text, resolveAnchorRef)))),
     el('div', { class: 'card-foot' },
       el('span', { class: 'clue-count' }, `단서 ${app.round.shown} / ${card.clues.length}`),
       el('button', {
@@ -100,7 +116,7 @@ function renderBoard() {
       el('span', { class: 'era-name' }, e.label), el('span', { class: 'era-def' }, e.definition)));
   }
   for (const n of NATIONS) {
-    nodes.push(el('div', { class: 'nation-head' }, n.label));
+    nodes.push(nationHead(n));
     for (const e of ERAS) {
       const c = cells[`${n.id}:${e.id}`];
       const isAnswer = r && r.answer.nation === n.id && r.answer.era === e.id;
@@ -131,11 +147,13 @@ function renderFeedback() {
   if (!r) { box.replaceChildren(); return; }
   const card = app.cardsById.get(r.id);
   box.replaceChildren(el('div', { class: 'fb fb-enter ' + (r.correct ? 'fb-ok' : 'fb-bad'), id: 'fb', dataset: { result: r.correct ? 'correct' : 'wrong' } },
+    illustration(card, CONFIG.assetRoot, 'illust-side'),
     el('div', { class: 'fb-head' },
       el('span', { class: 'fb-mark', 'aria-hidden': 'true' }, r.correct ? '○' : '✕'),
       r.correct ? (r.isNew ? '정답 · 도감에 수집' : '정답 · 이미 수집한 카드') : '오답 · 먹물 1 소모'),
     el('div', { class: 'fb-title' }, card.title),
     el('div', { class: 'fb-meta' },
+      `${TYPE_LABEL[card.type] ?? card.type} · `,
       r.correct ? where(r.answer) : el('span', {}, '놓은 칸 ', el('s', {}, where(r.placed)), ' → 정답 칸 ', el('b', {}, where(r.answer))),
       card.date_label ? ` · ${card.date_label}` : ''),
     el('p', { class: 'fb-exp' }, card.explanation)));
@@ -442,7 +460,7 @@ function renderDogam() {
     nodes.push(el('div', { class: 'era-head' }, el('span', { class: 'era-name' }, e.label), el('span', { class: 'era-def' }, e.definition)));
   }
   for (const n of NATIONS) {
-    nodes.push(el('div', { class: 'nation-head' }, n.label));
+    nodes.push(nationHead(n));
     for (const e of ERAS) {
       // 판정 칸에는 기준 카드와 판정 카드만. disputed 카드는 아래 "견해가 나뉘는 기록"으로 분리(D12).
       const inCell = app.cards.filter((c) => c.answer.nation === n.id && c.answer.era === e.id && !c.disputed)
@@ -559,7 +577,7 @@ function renderDogamDetail() {
   const st = dogamState(card);
   const loc = `${nationLabel(card.answer.nation)} · ${eraLabel(card.answer.era)}${card.date_label ? ' · ' + card.date_label : ''}`;
   if (st === 'unknown' && !card.disputed) {
-    box.replaceChildren(el('h3', { id: 'dogam-detail-title' }, '？？？'), el('p', { class: 'meta' }, loc),
+    box.replaceChildren(hiddenIllustration(), el('h3', { id: 'dogam-detail-title' }, '？？？'), el('p', { class: 'meta' }, loc),
       el('p', {}, '아직 수집하지 않은 카드입니다. 라운드에서 정답으로 놓으면 해설이 열립니다.'));
     return;
   }
@@ -572,6 +590,7 @@ function renderDogamDetail() {
   const src = card.source ?? {};
   const url = typeof src.url === 'string' && /^https?:\/\//.test(src.url) ? src.url : null;
   box.replaceChildren(...[
+    illustration(card, CONFIG.assetRoot, 'illust-detail'),
     el('h3', { id: 'dogam-detail-title' }, card.title),
     el('p', { class: 'meta' }, card.disputed ? `자료상 분류 ${loc}` : loc, ' · ', TYPE_LABEL[card.type] ?? card.type),
     el('div', { class: 'badges' }, badges),
@@ -594,7 +613,7 @@ async function loadTutorial() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const t = parseTutorial(await res.json(), app.cards);
     if (t.errors.length) { console.warn('[한양 도감] 튜토리얼 파일 오류', t.errors); return null; }
-    return createTutorial({ anchor: t.anchor, card: t.card }, { onFinish: onTutorialFinish });
+    return createTutorial({ anchor: t.anchor, card: t.card }, { onFinish: onTutorialFinish, assetRoot: CONFIG.assetRoot });
   } catch (e) {
     console.warn('[한양 도감] 튜토리얼 파일을 읽지 못했다', e);
     return null;
@@ -619,6 +638,7 @@ function showLoadError(title, lines) {
 
 function wireGame() {
   const card = $('card');
+  wireRefHighlight(card, () => $('board'));
   makeDraggable(card, {
     board: $('board'),
     ghost: $('drag-ghost'),

@@ -17,7 +17,9 @@ What it does (standard library only):
   4. Rewrites DIR/src/config.js so both paths point at data/... instead of
      ../assets/... (which only exists in the repo).
      The sample data stays as the fallback entry.
-  5. Writes DIR/BUILD.txt with the source commit and card counts.
+  5. Copies assets/art/placeholders/ and assets/art/cards/ (if present) to
+     DIR/assets/art/ and sets config assetRoot to '' so card images resolve.
+  6. Writes DIR/BUILD.txt with the source commit and card counts.
 
 The result can be uploaded as-is to any static host (itch.io HTML upload: zip
 the contents of DIR so index.html is at the zip root).
@@ -38,6 +40,9 @@ DIST_CARD_URL = "'data/samguk.json'"
 REPO_TUTORIAL_URL = "'../assets/data/cards/tutorial.json'"
 DIST_TUTORIAL_URL = "'data/tutorial.json'"
 EXCLUDE = {"tests", ".gdignore", "README.md"}
+ART_DIRS = ["placeholders", "cards"]  # assets/art/<dir> -> DIR/assets/art/<dir> (decision-log D37)
+REPO_ASSET_ROOT = "assetRoot: '../'"
+DIST_ASSET_ROOT = "assetRoot: ''"
 
 
 def fail(msg):
@@ -83,6 +88,13 @@ def main(argv):
     else:
         print(f"WARN tutorial file not found, build has no tutorial: {TUTORIAL}")
 
+    for d in ART_DIRS:
+        src = ROOT / "assets" / "art" / d
+        if src.is_dir():
+            shutil.copytree(src, out / "assets" / "art" / d)
+        elif d == "placeholders":
+            print(f"WARN {src} not found; cards without image will show no illustration")
+
     config = out / "src" / "config.js"
     text = config.read_text(encoding="utf-8")
     if REPO_CARD_URL not in text:
@@ -91,6 +103,9 @@ def main(argv):
     if REPO_TUTORIAL_URL not in text:
         fail(f"{REPO_TUTORIAL_URL} not found in config.js; update build_web.py")
     text = text.replace(REPO_TUTORIAL_URL, DIST_TUTORIAL_URL)
+    if REPO_ASSET_ROOT not in text:
+        fail(f"{REPO_ASSET_ROOT} not found in config.js; update build_web.py")
+    text = text.replace(REPO_ASSET_ROOT, DIST_ASSET_ROOT)
     if release:
         if "onlyVerified: false" not in text:
             fail("onlyVerified: false not found in config.js")
