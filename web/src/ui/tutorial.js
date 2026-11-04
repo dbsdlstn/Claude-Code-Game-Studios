@@ -3,8 +3,9 @@
  * 먹물·도감·저장에 영향을 주지 않는다. 언제든 건너뛸 수 있다.
  */
 import { NATIONS, ERAS, nationLabel, eraLabel } from '../rules.js';
-import { $, el, clueText, LEVEL_LABEL, TYPE_LABEL } from './dom.js';
+import { $, el, clueText, LEVEL_LABEL, TYPE_LABEL, illustration, hiddenIllustration, NATION_SEAL } from './dom.js';
 import { makeDraggable } from './drag.js';
+import { wireRefHighlight } from './refs.js';
 
 const STEPS = ['eras', 'clue1', 'relation', 'explain'];
 
@@ -66,6 +67,7 @@ export function createTutorial(pair, hooks) {
     if (t.placed?.correct) {
       box.className = 'card tut-card revealed';
       box.replaceChildren(
+        illustration(card, hooks.assetRoot ?? '../', 'illust-side'),
         el('div', { class: 'card-head' }, el('span', { class: 'card-title revealed-title' }, card.title), el('span', { class: 'card-type' }, TYPE_LABEL[card.type] ?? card.type)),
         el('p', { class: 'fb-meta' }, where(card.answer), card.date_label ? ` · ${card.date_label}` : ''),
         el('p', { class: 'fb-exp', id: 'tut-explanation' }, card.explanation));
@@ -74,10 +76,11 @@ export function createTutorial(pair, hooks) {
     box.className = 'card tut-card' + (t.selected ? ' selected' : '');
     const canMore = (STEPS[t.step] === 'clue1' && t.shown < 2) || (STEPS[t.step] === 'relation' && t.shown < 3 && t.wrongTries > 0);
     box.replaceChildren(
-      el('div', { class: 'card-head' }, el('span', { class: 'card-title' }, '？ 이름 숨김'), el('span', { class: 'card-type' }, TYPE_LABEL[card.type] ?? card.type)),
+      hiddenIllustration(),
+      el('div', { class: 'card-head' }, el('span', { class: 'card-title' }, '？ 이름 숨김')),
       el('ol', { class: 'clues' }, card.clues.slice(0, t.shown).map((cl, i) => el('li', {
         class: 'clue' + (i === t.shown - 1 && i > 0 ? ' clue-new' : ''), dataset: { kind: cl.kind },
-      }, el('span', { class: 'clue-level' }, LEVEL_LABEL[cl.level]), clueText(cl.text)))),
+      }, el('span', { class: 'clue-level' }, LEVEL_LABEL[cl.level]), clueText(cl.text, (title) => (title === anchor.title ? { id: anchor.id, label: where(anchor.answer) } : null))))),
       el('div', { class: 'card-foot' },
         el('span', { class: 'clue-count' }, `단서 ${t.shown} / 3`),
         el('button', {
@@ -96,7 +99,9 @@ export function createTutorial(pair, hooks) {
         el('span', { class: 'era-name' }, e.label), el('span', { class: 'era-def' }, e.definition)));
     }
     for (const n of NATIONS) {
-      nodes.push(el('div', { class: 'nation-head' }, n.label));
+      nodes.push(el('div', { class: `nation-head nation-${n.id}` },
+        el('span', { class: 'seal', 'aria-hidden': 'true' }, NATION_SEAL[n.id] ?? n.label[0]),
+        el('span', { class: 'nation-name' }, n.label)));
       for (const e of ERAS) {
         const isAnchor = anchor.answer.nation === n.id && anchor.answer.era === e.id;
         const isAnswer = t.placed?.correct && card.answer.nation === n.id && card.answer.era === e.id;
@@ -109,7 +114,7 @@ export function createTutorial(pair, hooks) {
           onclick: () => { if (t.selected) place(n.id, e.id); },
           onkeydown: (ev) => onCellKey(ev, n.id, e.id),
         },
-        isAnchor ? el('span', { class: 'chip chip-anchor' }, anchor.title) : null,
+        isAnchor ? el('span', { class: 'chip chip-anchor', dataset: { id: anchor.id } }, anchor.title) : null,
         isAnswer ? el('span', { class: 'chip chip-ok chip-new' }, card.title) : null,
         isAnswer ? el('span', { class: 'stamp', 'aria-hidden': 'true' }, '正') : null,
         wrongHere ? el('span', { class: 'blot', 'aria-hidden': 'true' }) : null));
@@ -176,6 +181,7 @@ export function createTutorial(pair, hooks) {
     if (wired) return;
     wired = true;
     const cardEl = $('tut-card');
+    wireRefHighlight(cardEl, () => $('tut-board'));
     makeDraggable(cardEl, {
       board: $('tut-board'),
       ghost: $('drag-ghost'),

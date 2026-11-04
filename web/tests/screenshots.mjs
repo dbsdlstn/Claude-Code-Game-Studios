@@ -60,6 +60,9 @@ try {
   await page.click('#more-clue');
   await page.click('#more-clue');
   await shot(page, '02-clues-expanded.png');
+  await page.locator('#card .ref-link').first().focus();
+  await shot(page, '02a-ref-highlight.png');
+  await page.focus('#card');
 
   let card = await cardNow(page);
   // 드래그 도중(칸 강조)
