@@ -44,7 +44,8 @@ func setup(cell_nation: String, cell_era: String, anchor_titles: PackedStringArr
 	focus_entered.connect(_restore_style)
 	focus_exited.connect(_restore_style)
 	_hover_style = HanjiTheme.box(HanjiTheme.HOVER, HanjiTheme.ACCENT, 2)
-	_highlight_style = HanjiTheme.box(HanjiTheme.ANCHOR, HanjiTheme.GOLD, 4)
+	# 관계 단서의 기준 카드 칸 강조: 청색 3px + 옅은 청 바탕(웹 .cell.ref-target과 같은 값).
+	_highlight_style = HanjiTheme.box(HanjiTheme.REF_TARGET_BG, HanjiTheme.INDIGO, 3)
 
 	var box := VBoxContainer.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -104,7 +105,7 @@ static func visible_text(lines: PackedStringArray, max_lines: int) -> String:
 	return "외 %d장\n%s" % [lines.size() - max_lines, "\n".join(shown)]
 
 
-## 기준 카드 칸 강조: 금색 굵은 테두리를 1.2초 보인 뒤 원래대로(관계 단서 → 기준 카드).
+## 기준 카드 칸 강조: 청색 테두리와 옅은 청 바탕을 1.2초 보인 뒤 원래대로(관계 단서 → 기준 카드).
 func highlight() -> void:
 	if _highlight_tween != null and _highlight_tween.is_valid():
 		_highlight_tween.kill()
@@ -159,9 +160,11 @@ func _notification(what: int) -> void:
 
 func _set_base(style: StyleBoxFlat) -> void:
 	_base_style = style
-	# 키보드 초점은 같은 바탕에 붉은 테두리로 보인다(PanelContainer는 focus 스타일을 그리지 않는다).
+	# 키보드 초점: 짙은 금 3px + 옅은 금 바탕(D42, 웹 .cell:focus-visible과 같은 값).
+	# PanelContainer는 focus 스타일을 그리지 않으므로 직접 바꾼다.
 	_focus_style = style.duplicate() as StyleBoxFlat
-	_focus_style.border_color = HanjiTheme.ACCENT
+	_focus_style.bg_color = HanjiTheme.FOCUS_BG
+	_focus_style.border_color = HanjiTheme.GOLD_DARK
 	_focus_style.set_border_width_all(3)
 	_restore_style()
 

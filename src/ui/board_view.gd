@@ -39,22 +39,28 @@ func setup(config: GameConfig, anchors: Array[CardData]) -> void:
 		header.add_child(def_label)
 		add_child(header)
 	for n in config.nation_ids():
-		# 행 머리글: 나라 인장 + 나라색 이름(바이블 §3·§4.2). 선택지라 정답 누출이 아니다(D37).
-		var row := HBoxContainer.new()
-		row.custom_minimum_size = Vector2(96, 0)
-		row.alignment = BoxContainer.ALIGNMENT_BEGIN
+		# 행 머리글: 왼쪽 5px 나라색 띠 + 인장 + 먹색 이름(바이블 §3·§4.2, 웹 .nation-head와 같은 구성).
+		# 나라색은 띠와 인장 바탕(장식)에만 쓰고 글자는 먹색이다(신라 금색 글자는 대비 부족, D42).
+		# 선택지라 정답 누출이 아니다(D37).
+		var head := PanelContainer.new()
+		var head_style := HanjiTheme.box(HanjiTheme.ANCHOR, HanjiTheme.ANCHOR, 0, 6.0)
+		head_style.border_width_left = 5
+		head_style.border_color = HanjiTheme.nation_color(n)
+		head.add_theme_stylebox_override("panel", head_style)
+		head.custom_minimum_size = Vector2(72, 0)
+		var row := VBoxContainer.new()
+		row.alignment = BoxContainer.ALIGNMENT_CENTER
 		row.add_theme_constant_override("separation", 6)
+		head.add_child(row)
 		var seal := HanjiTheme.seal(n, config.nation_label(n))
-		seal.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		seal.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		row.add_child(seal)
 		var row_label := Label.new()
 		row_label.text = config.nation_label(n)
-		row_label.add_theme_font_size_override("font_size", 18)
-		row_label.add_theme_color_override("font_color", HanjiTheme.nation_color(n))
-		row_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		row_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		row_label.add_theme_font_size_override("font_size", 16)
+		row_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		row.add_child(row_label)
-		add_child(row)
+		add_child(head)
 		for e in config.era_ids():
 			var titles := PackedStringArray()
 			for a: CardData in anchors:
