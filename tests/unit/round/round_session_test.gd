@@ -38,7 +38,7 @@ func test_correct_placement_keeps_ink_and_fills_cell() -> void:
 	assert_bool(r["accepted"]).is_true()
 	assert_bool(r["correct"]).is_true()
 	assert_int(s.ink.current).is_equal(5)
-	assert_str(s.cell_occupant("silla", "peak")["card_id"]).is_equal("silla-peak")
+	assert_str(s.cell_cards("silla", "peak")[0]["card_id"]).is_equal("silla-peak")
 	assert_str(s.current_card().id).is_equal("gaya-ending")
 
 
@@ -51,10 +51,10 @@ func test_wrong_placement_spends_ink_and_reveals_answer_cell() -> void:
 	# 정답 칸에 공개된다.
 	assert_str(r["answer_nation"]).is_equal("silla")
 	assert_str(r["answer_era"]).is_equal("peak")
-	assert_str(s.cell_occupant("silla", "peak")["card_id"]).is_equal("silla-peak")
-	assert_bool(s.cell_occupant("silla", "peak")["correct"]).is_false()
+	assert_str(s.cell_cards("silla", "peak")[0]["card_id"]).is_equal("silla-peak")
+	assert_bool(s.cell_cards("silla", "peak")[0]["correct"]).is_false()
 	# 고른 칸은 비어 있다.
-	assert_dict(s.cell_occupant("baekje", "founding")).is_empty()
+	assert_array(s.cell_cards("baekje", "founding")).is_empty()
 
 
 func test_wrong_placement_consumes_card() -> void:
@@ -72,14 +72,26 @@ func test_next_card_starts_from_first_clue_again() -> void:
 	assert_int(s.revealed_clues).is_equal(1)
 
 
-func test_occupied_cell_is_rejected_without_ink_loss() -> void:
+func test_occupied_cell_still_accepts_and_judges() -> void:
+	# D22: 채워진 칸도 카드를 받는다. 거부하면 빈 칸이 정답을 알려 준다(리뷰 M1).
 	var s := _session(["silla-peak", "gaya-ending"])
 	s.place_current("silla", "peak")
 	var r := s.place_current("silla", "peak")
-	assert_bool(r["accepted"]).is_false()
-	assert_str(r["reason"]).is_equal(RoundSession.REJECT_OCCUPIED)
-	assert_int(s.ink.current).is_equal(5)
-	assert_str(s.current_card().id).is_equal("gaya-ending")
+	assert_bool(r["accepted"]).is_true()
+	assert_bool(r["correct"]).is_false()
+	assert_int(s.ink.current).is_equal(4)
+	assert_int(s.cell_cards("gaya", "ending").size()).is_equal(1)
+
+
+func test_same_cell_can_hold_several_cards_in_one_round() -> void:
+	var cs := CardLoader.build(Fx.multi_set(2), Fx.nation_ids(), Fx.era_ids(), false)
+	var queue: Array[CardData] = [cs.get_card("silla-peak-1"), cs.get_card("silla-peak-2")]
+	var s := RoundSession.new(queue, 5, Fx.nation_ids(), Fx.era_ids())
+	s.place_current("silla", "peak")
+	s.place_current("silla", "peak")
+	assert_int(s.cell_cards("silla", "peak").size()).is_equal(2)
+	assert_int(s.correct_count).is_equal(2)
+	assert_int(s.status).is_equal(RoundSession.Status.CLEARED)
 
 
 func test_unknown_cell_is_rejected() -> void:
@@ -141,3 +153,42 @@ func test_history_records_clues_seen() -> void:
 	s.place_current("silla", "peak")
 	assert_int(s.history[0]["clues_seen"]).is_equal(2)
 	assert_bool(s.history[0]["correct"]).is_true()
+
+
+func test_summary_reports_counts_and_clue_levels() -> void:
+	var s := _session(["silla-peak", "gaya-ending"])
+	s.reveal_more()
+	s.place_current("silla", "peak")
+	s.place_current("goguryeo", "founding")
+	var sm := s.summary()
+	assert_bool(sm["cleared"]).is_true()
+	assert_int(sm["correct"]).is_equal(1)
+	assert_int(sm["placed"]).is_equal(2)
+	assert_array(sm["clue_levels"]).is_equal([2, 1])
+	assert_array(sm["wrong_ids"]).is_equal(["gaya-ending"])
+
+
+func test_to_dict_from_dict_restores_round_in_progress() -> void:
+	# Arrange
+	var cs := CardLoader.build(Fx.valid_set(), Fx.nation_ids(), Fx.era_ids(), false)
+	var queue: Array[CardData] = [cs.get_card("silla-peak"), cs.get_card("gaya-ending"), cs.get_card("baekje-peak")]
+	var s := RoundSession.new(queue, 5, Fx.nation_ids(), Fx.era_ids())
+	s.place_current("goguryeo", "founding")  # 오답
+	s.reveal_more()
+	# Act — JSON을 거쳐 숫자가 float이 되어도 되살아나야 한다.
+	var saved: Dictionary = JSON.parse_string(JSON.stringify(s.to_dict()))
+	var r := RoundSession.from_dict(saved, cs, Fx.nation_ids(), Fx.era_ids())
+	# Assert
+	assert_object(r).is_not_null()
+	assert_str(r.current_card().id).is_equal("gaya-ending")
+	assert_int(r.ink.current).is_equal(4)
+	assert_int(r.revealed_clues).is_equal(2)
+	assert_int(r.wrong_count).is_equal(1)
+	assert_int(r.cell_cards("silla", "peak").size()).is_equal(1)
+	assert_int(r.total_cards()).is_equal(3)
+
+
+func test_from_dict_with_unknown_card_returns_null() -> void:
+	var cs := CardLoader.build(Fx.valid_set(), Fx.nation_ids(), Fx.era_ids(), false)
+	var d := {"version": 1, "card_ids": ["no-such-card"], "index": 0, "ink": 5, "max_ink": 5}
+	assert_object(RoundSession.from_dict(d, cs, Fx.nation_ids(), Fx.era_ids())).is_null()

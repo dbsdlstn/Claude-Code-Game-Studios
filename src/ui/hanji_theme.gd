@@ -27,6 +27,9 @@ const FONT_SOURCE_BUNDLED := "bundled"
 const FONT_SOURCE_SYSTEM := "system"
 const FONT_SOURCE_MISSING := "missing"
 
+## 마지막으로 만든 테마. 노드 트리 밖(드래그 미리보기 등)에서 같은 테마를 쓰기 위해 둔다.
+static var _current: Theme = null
+
 
 ## 색과 테두리로 StyleBoxFlat을 만든다.
 static func box(bg: Color, border: Color = BORDER, border_width: int = 1, margin: float = 8.0) -> StyleBoxFlat:
@@ -84,7 +87,18 @@ static func build(font: Font = null) -> Theme:
 	t.set_color("font_pressed_color", "Button", INK)
 	t.set_color("font_focus_color", "Button", INK)
 	t.set_color("font_disabled_color", "Button", MUTED)
+	t.set_stylebox("panel", "ScrollContainer", box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 0.0))
+	_current = t
 	return t
+
+
+## 게임 테마. 아직 만들지 않았으면 시스템 글꼴로 만든다.
+## 사용 예: preview.theme = HanjiTheme.current()
+static func current() -> Theme:
+	if _current == null:
+		return build()
+	return _current
+
 
 
 ## 작은 보조 글자 라벨.

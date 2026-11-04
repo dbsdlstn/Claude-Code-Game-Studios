@@ -236,3 +236,25 @@ python3 tools/gd_card_validator_port.py tests/fixtures/cards_fixture.json       
 3. M1: 마지막 카드에서 빈 칸이 하나뿐인지 직접 보고, 그대로 둘지 결정
 4. L2: 드래그로 칸 여러 개를 지나갈 때 하이라이트가 돌아오는지
 5. L3: 드래그 미리보기의 "? 사건 카드" 한글이 보이는지
+
+## 처리 결과 (Godot MVP 세션, 2026-11-04)
+
+대상 커밋: 이 표가 들어간 `claude/godot-mvp` 커밋. Godot는 여전히 실행하지 않았다(gdparse·gdlint 통과, Python 이식으로 검증기 대조).
+
+| 항목 | 처리 | 내용과 이유 |
+|---|---|---|
+| M1 빈 칸이 정답을 알려 줌 | 고침 | D22 구현(D30): 라운드 12장을 칸과 무관하게 미수집 우선으로 뽑고, 채워진 칸도 받아 판정한다. `RoundBuilder`, `RoundSession.cell_cards`, `BoardCell`(거부 조건 삭제, 이름을 줄로 쌓음), `main.gd`/`game_screen.gd`. 테스트: "채워진 칸도 판정", "한 칸 여러 장", "미수집 우선", "칸 반복 가능" |
+| M2 라운드 클리어를 도감 완성으로 표시 | 이미 고침(25aac52), 확인 | 결과 화면 제목 "라운드 클리어"/"실패", 도감 완성은 `ProgressData.is_complete`(단위 테스트 있음)로 따로 판정해 표시 |
+| M3 gdUnit4 정보 | 고침 | `run-locally.md`: `godot-gdunit-labs/gdUnit4` 6.2.2 이상, 첫 import 139 크래시 후 재실행 안내, 종료 코드 표 |
+| L1 저장 교체 중 끊김 | 고침 | tmp → bak → 교체 → bak 삭제, 읽기는 본 파일 → tmp → bak. 실패 시 이전 저장 유지. 기존 파일 덮어쓰기에 기대지 않는다(Windows 동작 미확인). 통합 테스트 4개 추가 |
+| L2 드래그 하이라이트 | 고침 | 하이라이트 StyleBox를 칸마다 한 번 만들고 상태가 바뀔 때만 적용. 드래그 중 `mouse_exited`가 오는지는 여전히 미확인이라 체크리스트에 넣었다 |
+| L3 드래그 미리보기 테마 | 고침 | `HanjiTheme.current()`(정적 캐시)를 미리보기에 직접 준다 |
+| L4 검증기 차이 | 고침(25aac52) + 정리 | GDScript 검증기가 Python 술어와 같다(D17). 39개 동등성 케이스를 Python·GDScript(gdUnit)·이식 도구가 함께 돌린다. `tools/gd_card_validator_port.py`를 새 검증기에 맞춰 다시 썼다(`--parity` 39/39). 남긴 차이: Godot는 2.0 같은 정수값 float을 정수로 받는다(JSON 숫자가 float이라서) |
+| L5 옆 패널 스크롤 | 고침 | 본게임·튜토리얼·결과·도감의 긴 영역을 `ScrollContainer`(가로 스크롤 끔)로 감쌌다 |
+| L6 체크리스트 기준 카드 수 | 고침 | 기준 4장, 견해가 나뉘는 기록 4장, 도감 m / 36으로 고치고 새 기능까지 체크리스트를 다시 썼다 |
+| L7 출시 내보내기 | 고침(안내) | 출시 빌드에서 규칙 8 오류만 있으면 "사실 확인된 카드가 부족해 시작할 수 없다, 디버그 내보내기로 플레이테스트" 안내를 먼저 보인다. 제외 필터 목록을 `run-locally.md`에 적었다. `export_presets.cfg`는 `.gitignore` 대상이라 만들지 않았다 |
+| L8 첫 실행 생성 파일 | 판단·기록 | `*.gd.uid`와 `global_script_class_cache.cfg`는 커밋 대상(로컬 첫 import 뒤 커밋하라고 안내). 이 세션에서는 만들 수 없다. `.gitignore`에 gdUnit4 리포트 `reports/`를 추가 |
+| L9 gdlint | 고침(설정) | `gdlintrc`: 한글 문자열 줄 때문에 `max-line-length` 160, 테스트 스위트 때문에 `max-public-methods` 60. 160을 넘던 5줄은 나눴다. `gdlint src tests` → no problems |
+| L10 렌더러 | 바꿈 | Compatibility로(D29). 2D UI 게임, 오래된 GPU 안정성, 웹 내보내기와 같은 렌더러. `project.yaml`·technical-preferences도 갱신 |
+
+남은 것: 실제 실행(파서·런타임), 스크린샷 증거, 게임패드 입력, 화면 문자열의 번역 시스템 경유(`tr()`).

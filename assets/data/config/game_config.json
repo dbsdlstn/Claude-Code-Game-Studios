@@ -1,10 +1,12 @@
 {
   "schema_version": 1,
   "start_ink": 5,
+  "round_size": 12,
   "release_mode": false,
   "cards_path": "res://assets/data/cards/samguk.json",
   "dev_fallback_cards_path": "res://tests/fixtures/cards_fixture.json",
   "save_path": "user://progress.json",
+  "tutorial_path": "res://assets/data/cards/tutorial.json",
   "ui_font_path": "res://assets/fonts/ui_font_kr.ttf",
   "nations": [
     { "id": "goguryeo", "label": "고구려" },
