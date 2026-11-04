@@ -1,7 +1,7 @@
 // E2E·스크린샷 공용 도우미. 정적 서버(python3 -m http.server)와 사전 설치된 Playwright를 쓴다.
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import net from 'node:net';
@@ -13,6 +13,10 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..', '..');
 export const SAMPLE = JSON.parse(readFileSync(path.join(here, '..', 'data', 'sample-cards.json'), 'utf8'));
 export const SAMPLE_BY_ID = new Map(SAMPLE.map((c) => [c.id, c]));
+const SAMGUK_PATH = path.join(here, '..', '..', 'assets', 'data', 'cards', 'samguk.json');
+/** 실제 콘텐츠 데이터. 없으면 null(해당 E2E는 건너뛴다). */
+export const SAMGUK = existsSync(SAMGUK_PATH) ? JSON.parse(readFileSync(SAMGUK_PATH, 'utf8')) : null;
+export const SAMGUK_BY_ID = new Map((SAMGUK ?? []).map((c) => [c.id, c]));
 export const ERA_IDS = ['founding', 'peak', 'ending'];
 
 function freePort() {
@@ -36,15 +40,19 @@ export async function startServer() {
   throw new Error('정적 서버가 뜨지 않았다');
 }
 
-/** 샘플 데이터·고정 시드로 게임을 연다. */
-export async function openGame(page, base, { seed = 42 } = {}) {
-  await page.goto(`${base}/web/index.html?data=data/sample-cards.json&seed=${seed}`);
+/**
+ * 고정 시드로 게임을 연다. data를 주면 그 데이터로 고정, null이면 기본 경로(samguk.json 우선).
+ */
+export async function openGame(page, base, { seed = 42, data = 'data/sample-cards.json' } = {}) {
+  const q = new URLSearchParams({ seed: String(seed) });
+  if (data) q.set('data', data);
+  await page.goto(`${base}/web/index.html?${q}`);
   await page.waitForSelector('body[data-ready="true"]');
 }
 
-export async function currentCard(page) {
+export async function currentCard(page, byId = SAMPLE_BY_ID) {
   const id = await page.getAttribute('#card', 'data-card-id');
-  return id ? SAMPLE_BY_ID.get(id) : null;
+  return id ? byId.get(id) : null;
 }
 
 export function wrongCell(card) {

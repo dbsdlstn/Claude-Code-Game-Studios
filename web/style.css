@@ -120,10 +120,18 @@ button { font: inherit; color: inherit; }
 .fb { border: 1px solid var(--line-soft); border-radius: 6px; padding: 12px 14px; background: var(--paper-2); }
 .fb-ok { border-color: var(--celadon); background: var(--celadon-soft); }
 .fb-bad { border-color: var(--seal); background: var(--seal-soft); }
-.fb-head { font-weight: 700; margin-bottom: 4px; }
-.fb-title { font-family: var(--serif); font-size: 17px; }
-.fb p { margin: 4px 0 0; }
-.fb-meta { font-size: 13px; color: var(--ink-soft); }
+.fb-head { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.fb-ok .fb-head { color: var(--celadon); }
+.fb-bad .fb-head { color: var(--seal); }
+.fb-mark { font-size: 18px; line-height: 1; }
+.fb-title { font-family: var(--serif); font-size: 21px; font-weight: 700; margin: 6px 0 2px; }
+.fb-meta { font-size: 13.5px; color: var(--ink-soft); }
+.fb-meta s { color: var(--seal); }
+.fb-meta b { color: var(--ink); }
+.fb-exp {
+  margin: 10px 0 0; padding: 10px 12px; background: rgba(255,255,255,.55); border-radius: 4px;
+  font-size: 15.5px; line-height: 1.75; word-break: keep-all;
+}
 
 /* ---------- 보드 ---------- */
 .board {
@@ -155,11 +163,23 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
   transition: background .12s ease;
 }
-.board.armed .cell { background: rgba(255,255,255,.35); }
-.cell.over { background: #f5e6b8 !important; box-shadow: inset 0 0 0 2px var(--gold); }
+.board.armed .cell { background: rgba(255,255,255,.4); outline: 1px dashed var(--line); outline-offset: -5px; }
+.board.dragging .cell { cursor: copy; }
+.cell:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; background: #f8edcc; }
+.cell.over { background: #f5e6b8 !important; box-shadow: inset 0 0 0 3px var(--gold); outline: none !important; }
 .cell.flash-ok { animation: flash-ok 1.1s ease; }
-.cell.flash-bad { animation: flash-bad 1.1s ease; }
+.cell.flash-bad { animation: flash-bad 1.1s ease, shake .32s ease; }
 @keyframes flash-ok { 0%,40% { background: var(--celadon-soft); } 100% { background: transparent; } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@keyframes pop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes rise { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes drop-lost { 0% { transform: scale(1.4); } 100% { transform: scale(1); } }
+.chip-new { animation: pop .3s ease-out; }
+.fb-enter { animation: rise .25s ease-out; }
+.card-enter { animation: rise .25s ease-out; }
+.clue-new { animation: rise .2s ease-out; }
+.drop-lost { animation: drop-lost .35s ease-out; }
+.drop-lost path { stroke: var(--seal); }
 @keyframes flash-bad { 0%,40% { background: var(--seal-soft); } 100% { background: transparent; } }
 
 .chip {
@@ -229,5 +249,39 @@ button { font: inherit; color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .card, .cell { transition: none; }
-  .cell.flash-ok, .cell.flash-bad { animation: none; }
+  .cell.flash-ok, .cell.flash-bad, .chip-new, .fb-enter, .card-enter, .clue-new, .drop-lost { animation: none; }
 }
+
+/* ---------- 추가: 진행, 도감 칸, 오류, 접근성 ---------- */
+.dogam-progress { padding-left: 16px; border-left: 1px solid var(--line-soft); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.dogam-cell { position: relative; padding-top: 24px; }
+.cell-count { position: absolute; top: 4px; right: 8px; font-size: 11.5px; color: var(--ink-soft); }
+.cell-done { background: rgba(79,122,90,.08); }
+.cell-done .cell-count { color: var(--celadon); font-weight: 700; }
+.dogam-detail .exp { font-size: 15.5px; line-height: 1.75; word-break: keep-all; }
+.dogam-detail .note { font-size: 13.5px; background: #f7ecd0; padding: 8px 10px; border-radius: 4px; }
+.dogam-detail .badges { margin: 4px 0 8px; }
+.src-note { margin-top: 2px; }
+.src a { display: inline-block; margin-top: 4px; color: var(--indigo); }
+.legend { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; font-size: 13px; }
+.legend .entry { display: inline-block; width: auto; cursor: default; margin-right: 4px; }
+.card.error { place-items: start; text-align: left; color: var(--seal); }
+.err-list { font-size: 12.5px; padding-left: 18px; color: var(--ink); }
+.complete-seal {
+  float: right; margin: -6px 0 6px 12px; width: 64px; height: 64px; display: grid; place-items: center;
+  border: 3px solid var(--seal); color: var(--seal); border-radius: 6px; font-family: var(--serif); font-size: 34px;
+  transform: rotate(-6deg); animation: pop .4s ease-out;
+}
+.ghost-target { display: block; font-family: var(--sans); font-weight: 400; font-size: 12.5px; color: var(--seal); }
+
+/* 도감: 칸당 최대 5장(기준·판정 3·판정 제외)이 한 화면에 들어오게 압축하고, 넘치면 안에서 스크롤 */
+.dogam-sheet { max-height: calc(100vh - 48px); }
+.dogam-body { min-height: 0; }
+.dogam-grid .cell { min-height: 0; gap: 3px; padding: 22px 6px 6px; }
+.dogam-grid .era-head { padding: 5px 8px; }
+.dogam-grid .era-name { font-size: 16px; }
+.entry { font-size: 12.5px; padding: 2px 6px; line-height: 1.35; }
+.entry.collected::before { content: "○ "; color: var(--celadon); font-weight: 700; }
+.entry.revealed::before { content: "✕ "; color: var(--seal); }
+.legend .entry::before { content: none; }

@@ -8,6 +8,7 @@ import {
   NATIONS, ERAS, validateCards, anchorCards, playableCards, createRng, shuffle, createRound,
   roundStatus, currentCardId, revealNextClue, placeCard, boardCells, roundStats,
   recordInCollection, serializeRound, restoreRound, restoreCollection,
+  buildRoundOrder, isDogamComplete, dogamProgress, releaseFilter,
 } from '../src/rules.js';
 import { createStore } from '../src/storage.js';
 import { loadCards, resolveDataUrls } from '../src/data.js';
@@ -63,34 +64,55 @@ describe('카드 데이터 검증', () => {
     assert.deepEqual(errors, []);
   });
 
-  test('규칙 위반을 잡는다: id 중복, 잘못된 answer, 단서 순서, 1단계에 제목, 없는 ref, disputed_note, 이미지 라이선스', () => {
+  test('규칙 위반을 잡는다: 각 위반 카드에 해당 규칙 오류가 난다', () => {
     const base = loadSample();
-    const card = structuredClone(base.find((c) => c.id === 'goguryeo-peak-01'));
+    const card = base.find((c) => c.id === 'goguryeo-peak-01');
+    const variant = (id, patch) => ({ ...structuredClone(card), id, ...patch(structuredClone(card)) });
     const broken = [
-      { ...structuredClone(card), id: 'dup' },
-      { ...structuredClone(card), id: 'dup' },
-      { ...structuredClone(card), id: 'bad-answer', answer: { nation: 'balhae', era: 'peak' } },
-      { ...structuredClone(card), id: 'bad-order', clues: [card.clues[1], card.clues[0], card.clues[2]] },
-      { ...structuredClone(card), id: 'title-leak', clues: [{ ...card.clues[0], text: `${card.title}의 장면` }, card.clues[1], card.clues[2]] },
-      { ...structuredClone(card), id: 'bad-ref', clues: [card.clues[0], { ...card.clues[1], refs: ['nope'] }, card.clues[2]] },
-      { ...structuredClone(card), id: 'no-note', disputed: true, disputed_note: null },
-      { ...structuredClone(card), id: 'no-license', image: 'assets/art/cards/x.png' },
+      variant('dup', () => ({})),
+      variant('dup', () => ({})),
+      variant('bad-answer', () => ({ answer: { nation: 'balhae', era: 'peak' } })),
+      variant('bad-order', (c) => ({ clues: [c.clues[1], c.clues[0], c.clues[2]] })),
+      variant('title-leak', (c) => ({ clues: [{ ...c.clues[0], text: `${c.title}의 장면` }, c.clues[1], c.clues[2]] })),
+      variant('nation-leak', (c) => ({ clues: [{ ...c.clues[0], text: '고구려의 장면' }, c.clues[1], c.clues[2]] })),
+      variant('bad-ref', (c) => ({ clues: [c.clues[0], { ...c.clues[1], refs: ['nope'] }, c.clues[2]] })),
+      variant('non-anchor-ref', (c) => ({ clues: [c.clues[0], { ...c.clues[1], refs: ['goguryeo-founding-01'], text: '[졸본에서의 건국] 다음이다.' }, c.clues[2]] })),
+      variant('empty-ref', (c) => ({ clues: [c.clues[0], { ...c.clues[1], refs: [] }, c.clues[2]] })),
+      variant('no-note', () => ({ disputed: true, disputed_note: null })),
+      variant('stray-note', () => ({ disputed_note: '있으면 안 됨' })),
+      variant('no-license', () => ({ image: 'assets/art/cards/x.png' })),
+      variant('no-era-in-exp', () => ({ explanation: '수도를 옮겼다.' })),
+      variant('verified-no-by', () => ({ verified: true, verified_by: null })),
+      variant('bad-difficulty', () => ({ difficulty: 4 })),
     ];
     const { errors } = validateCards([...base, ...broken]);
     const rulesOf = (id) => errors.filter((e) => e.id === id).map((e) => e.rule);
-    assert.ok(rulesOf('dup').includes(1));
-    assert.ok(rulesOf('bad-answer').includes(2));
-    assert.ok(rulesOf('bad-order').includes(3));
-    assert.ok(rulesOf('title-leak').includes(5));
-    assert.ok(rulesOf('bad-ref').includes(4));
-    assert.ok(rulesOf('no-note').includes(6));
-    assert.ok(rulesOf('no-license').includes(7));
+    assert.ok(rulesOf('dup').includes('R1'));
+    assert.ok(rulesOf('bad-answer').includes('R2'));
+    assert.ok(rulesOf('bad-order').includes('R3'));
+    assert.ok(rulesOf('title-leak').includes('R5'));
+    assert.ok(rulesOf('nation-leak').includes('R5'));
+    assert.ok(rulesOf('bad-ref').includes('R4'));
+    assert.ok(rulesOf('non-anchor-ref').includes('R4'), 'relation ref가 기준 카드가 아니면 오류(D10)');
+    assert.ok(rulesOf('empty-ref').includes('R4'));
+    assert.ok(rulesOf('no-note').includes('R6'));
+    assert.ok(rulesOf('stray-note').includes('R6'));
+    assert.ok(rulesOf('no-license').includes('R7'));
+    assert.ok(rulesOf('no-era-in-exp').includes('FIELD'));
+    assert.ok(rulesOf('verified-no-by').includes('R9'));
+    assert.ok(rulesOf('bad-difficulty').includes('FIELD'));
+  });
+
+  test('출시 모드: verified 카드만으로 12칸이 차지 않으면 R9 오류', () => {
+    const cards = loadSample();
+    assert.ok(validateCards(cards, { release: true }).errors.some((e) => e.rule === 'R9'));
+    assert.equal(releaseFilter(cards).length, 0);
   });
 
   test('규칙 8: 빈 칸이 있으면 오류', () => {
     const cards = loadSample().filter((c) => !(c.answer.nation === 'gaya' && c.answer.era === 'ending'));
     const { errors } = validateCards(cards);
-    assert.ok(errors.some((e) => e.rule === 8));
+    assert.ok(errors.some((e) => e.rule === 'R8'));
   });
 
   test('onlyVerified면 verified: true 카드만 판정 대상', () => {
@@ -201,6 +223,79 @@ describe('라운드 진행', () => {
     assert.equal(st.total, playable.length);
     assert.equal(st.wrong, Math.ceil(playable.length / 4));
     assert.equal(st.ink, START_INK - st.wrong);
+  });
+});
+
+/** 칸마다 `perCell`장인 판정 카드 묶음(테스트 팩토리). id: `${nation}-${era}-${k}` */
+function makeDeck(perCell) {
+  const deck = [];
+  for (const n of NATIONS) for (const e of ERAS) for (let k = 1; k <= perCell; k++) {
+    deck.push({ id: `${n.id}-${e.id}-${k}`, anchor: false, disputed: false, answer: { nation: n.id, era: e.id } });
+  }
+  return deck;
+}
+
+describe('라운드 구성 (D16)', () => {
+  const CELLS = NATIONS.length * ERAS.length;
+
+  test('칸마다 1장씩 12장, 같은 칸에서 두 장이 나오지 않는다', () => {
+    const deck = makeDeck(3);
+    const order = buildRoundOrder(deck, createRng(SEED), {});
+    assert.equal(order.length, CELLS);
+    const cells = new Set(order.map((id) => id.split('-').slice(0, 2).join('-')));
+    assert.equal(cells.size, CELLS);
+  });
+
+  test('아직 수집하지 않은 카드를 먼저 고른다', () => {
+    const deck = makeDeck(3);
+    const collection = Object.fromEntries(deck.filter((c) => !c.id.endsWith('-3')).map((c) => [c.id, 'collected']));
+    const order = buildRoundOrder(deck, createRng(SEED), collection);
+    assert.ok(order.every((id) => id.endsWith('-3')));
+  });
+
+  test('오답으로 공개만 된 카드는 미수집으로 본다', () => {
+    const deck = makeDeck(2);
+    const collection = Object.fromEntries(deck.map((c) => [c.id, c.id.endsWith('-1') ? 'collected' : 'revealed']));
+    const order = buildRoundOrder(deck, createRng(SEED), collection);
+    assert.ok(order.every((id) => id.endsWith('-2')));
+  });
+
+  test('칸의 카드를 모두 모았으면 그 칸은 수집한 카드에서 다시 고른다', () => {
+    const deck = makeDeck(3);
+    const collection = Object.fromEntries(deck.map((c) => [c.id, 'collected']));
+    assert.equal(buildRoundOrder(deck, createRng(SEED), collection).length, CELLS);
+  });
+
+  test('완벽한 라운드 3번이면 칸당 3장 36장 도감 완성', () => {
+    const deck = makeDeck(3);
+    const byId = new Map(deck.map((c) => [c.id, c]));
+    let collection = {};
+    for (let round = 0; round < 3; round++) {
+      assert.equal(isDogamComplete(deck, collection), false);
+      let s = createRound(deck, { seed: SEED + round, startInk: START_INK, collection });
+      while (roundStatus(s) === 'playing') {
+        const r = placeCurrent(s, byId, true);
+        s = r.state;
+        collection = recordInCollection(collection, r.result);
+      }
+      assert.equal(roundStatus(s), 'cleared');
+      assert.equal(dogamProgress(deck, collection).collected, (round + 1) * CELLS);
+    }
+    assert.equal(isDogamComplete(deck, collection), true);
+  });
+
+  test('restoreRound: 같은 칸 카드 두 장이 든 저장은 버린다', () => {
+    const deck = makeDeck(3);
+    const s = serializeRound(createRound(deck, { seed: SEED, startInk: START_INK }));
+    const order = s.order.slice();
+    const first = order[0];
+    order[1] = first.replace(/-\d$/, first.endsWith('-1') ? '-2' : '-1');
+    assert.equal(restoreRound({ ...s, order }, deck), null);
+    assert.notEqual(restoreRound(s, deck), null);
+  });
+
+  test('isDogamComplete: 판정 카드가 없으면 false', () => {
+    assert.equal(isDogamComplete([], {}), false);
   });
 });
 

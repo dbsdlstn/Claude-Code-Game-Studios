@@ -11,7 +11,8 @@
   <h1 class="brand">한양 도감 <span class="brand-sub">삼국시대</span></h1>
   <div class="status">
     <div id="ink" class="ink" role="img" aria-label="먹물"></div>
-    <div id="progress" class="progress"></div>
+    <div id="progress" class="progress" aria-live="polite"></div>
+    <div id="dogam-progress" class="progress dogam-progress"></div>
   </div>
   <nav class="actions">
     <button id="btn-dogam" type="button" class="btn">도감</button>
@@ -22,7 +23,7 @@
 <main class="play" id="play">
   <aside class="hand">
     <div id="card" class="card" tabindex="0" aria-describedby="hand-help"></div>
-    <p id="hand-help" class="help">카드를 끌어 칸에 놓거나, 카드를 눌러 고른 뒤 칸을 누르세요.</p>
+    <p id="hand-help" class="help" aria-live="polite">카드를 끌어 칸에 놓거나, 카드를 눌러 고른 뒤 칸을 누르세요.</p>
     <section id="feedback" class="feedback" aria-live="polite"></section>
   </aside>
   <section class="board-wrap" aria-label="나라와 시기 보드">
