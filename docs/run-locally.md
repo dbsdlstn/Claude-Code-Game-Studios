@@ -27,7 +27,7 @@ godot --headless --path . --import
 godot --path . --windowed --resolution 1280x720
 ```
 
-- 메인 씬은 `res://src/main.tscn`이다. `assets/data/cards/samguk.json`(44장)을 읽는다. 이 파일이 없으면 개발 모드에서 `tests/fixtures/cards_fixture.json`을 대신 읽고 화면 위에 표시한다.
+- 메인 씬은 `res://src/main.tscn`이다. `assets/data/cards/samguk.json`(45장)을 읽는다. 이 파일이 없으면 개발 모드에서 `tests/fixtures/cards_fixture.json`을 대신 읽고 화면 위에 표시한다.
 - 첫 실행(저장 없음)이면 튜토리얼이 열린다. 다시 보려면 저장 파일을 지운다(에디터: 프로젝트 → 사용자 데이터 폴더 열기 → `progress.json` 삭제).
 - 저장: `user://progress.json`(도감, 플레이 기록, 튜토리얼 완료, 진행 중 라운드).
 
@@ -40,7 +40,7 @@ godot --path . --windowed --resolution 1280x720 --write-movie production/qa/evid
 `--write-movie`는 첫 화면(튜토리얼 또는 타이틀)만 찍는다. 보드·결과·도감은 에디터 실행 중 OS 캡처로 남긴다.
 
 ### 출시 내보내기에 대해 (L7)
-- 디버그가 아닌 빌드는 무조건 출시 모드다(D11). 카드 44장이 모두 `verified: false`인 지금은 **"출시 빌드는 사실 확인이 끝난 카드만 씁니다" 안내와 규칙 8 오류 목록이 뜨는 것이 정상**이다. 플레이테스트는 에디터 실행이나 **디버그 내보내기**로 한다.
+- 디버그가 아닌 빌드는 무조건 출시 모드다(D11). 카드 45장이 모두 `verified: false`인 지금은 **"출시 빌드는 사실 확인이 끝난 카드만 씁니다" 안내와 규칙 8 오류 목록이 뜨는 것이 정상**이다. 플레이테스트는 에디터 실행이나 **디버그 내보내기**로 한다.
 - 내보내기 프리셋을 만들 때 리소스 탭의 **제외 필터**에 `tests/*, addons/gdUnit4/*, prototypes/*, web/*, docs/*, tools/*, studio-tests/*, production/*`를 넣는다. `tests/`는 gdUnit4 없이는 로드되지 않는 스크립트를 담고 있다. (`export_presets.cfg`는 `.gitignore` 대상이라 저장소에 없다.)
 
 ## 4. 테스트 (gdUnit4)
@@ -75,7 +75,7 @@ godot --headless -s -d --remote-debug tcp://127.0.0.1:0 res://addons/gdUnit4/bin
 | `tests/unit/ui/board_view_test.gd` | 관계 단서 강조(유지·한 칸만·다른 입력에도 유지·리셋), 클릭 2.5초, 공개 그림에 "?" 없음, 먹물 수와 ○ 대비 |
 | `tests/unit/ui/art_and_theme_test.gd` | 일러스트 경로(이미지/대체 문양), 색 토큰이 아트 바이블 hex와 같음, 글자·초점 대비 4.5 이상(D42), 인장 글자와 글자색, ○/× 표기, 기준 카드 → 칸 매핑 |
 | `tests/unit/progress/progress_data_test.gd` | 도감 수집, 도감 완성, 플레이 기록(정답률·평균 단서 단계), 저장 v1/v2, **v1 라운드 수와 기록 정합**, version 읽기 |
-| `tests/integration/cards/card_file_loading_test.gd` | 설정, 픽스처, samguk.json(44장, 칸당 3장, 출시 모드는 규칙 8만), 라운드 12장, tutorial.json, 대체 문양 4종 존재, **실제 카드 36장의 숨김 글이 유형과 무관** |
+| `tests/integration/cards/card_file_loading_test.gd` | 설정, 픽스처, samguk.json(45장, 칸당 3장, 출시 모드는 규칙 8만), 라운드 12장, tutorial.json, 대체 문양 4종 존재, **실제 카드 36장의 숨김 글이 유형과 무관** |
 | `tests/integration/cards/validator_parity_test.gd` | Python 검증기와 같은 39개 케이스 |
 | `tests/integration/save/save_store_test.gd` | user:// 저장/불러오기, 덮어쓰기, 깨진 파일, 교체 중 끊김 복구, 임시·백업 파일 정리, **모르는 새 형식 보관 후 새로 시작** |
 
@@ -86,7 +86,7 @@ python3 tools/validate_cards.py                                   # samguk.json:
 python3 tools/validator_parity.py                                 # 39/39 cases match
 python3 tools/validate_cards.py --tutorial assets/data/cards/tutorial.json   # TUTORIAL RESULT: PASS
 python3 tools/gd_card_validator_port.py --parity                  # GDScript 검증기 이식: 39/39
-python3 tools/gd_card_validator_port.py assets/data/cards/samguk.json   # 0 errors, anchors 4, playable 36, disputed 4
+python3 tools/gd_card_validator_port.py assets/data/cards/samguk.json   # 0 errors, anchors 4, playable 36, disputed 5
 ```
 
 ## 5. 확인 체크리스트

@@ -350,7 +350,7 @@ describe('데이터가 바뀌면 진행 중 라운드를 버린다', () => {
 
     await openGame(page, server.base, { data: null });
     const save = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-dogam:save:v1')));
-    assert.match(save.dataId, /samguk\.json\|44\|/);
+    assert.match(save.dataId, /samguk\.json\|45\|/);
     assert.equal(await page.getAttribute('#progress', 'data-index'), '0', '라운드는 처음부터');
     assert.notDeepEqual(save.round.order, sampleOrder);
     const samgukIds = new Set(SAMGUK.map((c) => c.id));
