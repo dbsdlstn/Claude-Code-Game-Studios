@@ -48,7 +48,7 @@ static func config_dict(start_ink: int = 5) -> Dictionary:
 		"eras": [
 			{"id": "founding", "label": "건국기", "definition": "건국 전승과 초창기"},
 			{"id": "peak", "label": "전성기", "definition": "영토와 세력이 커지고 번영"},
-			{"id": "ending", "label": "결말기", "definition": "전쟁의 마무리·멸망·통일 완성"},
+			{"id": "ending", "label": "결말기", "definition": "멸망·통일로 이어지는 마지막 전쟁기"},
 		],
 	}
 

@@ -10,7 +10,7 @@
 ## Player goal & fail state — what "working" looks like
 - 판정 대상 카드를 모두 놓아 12칸 도감을 완성하면 클리어.
 - 먹물(5)이 0이 되면 해당 라운드 실패, 재도전.
-- 시기는 연도가 아니라 사건의 성격으로 판정한다. 건국기=건국 전승과 초창기, 전성기=확장과 번영, 결말기=전쟁의 마무리·멸망·통일 완성. 열 머리글에 항상 표시한다 (`docs/decision-log.md` D2).
+- 시기는 연도가 아니라 사건의 성격으로 판정한다. 건국기=건국 전승과 초창기, 전성기=확장과 번영, 결말기=멸망·통일로 이어지는 마지막 전쟁기(전쟁의 시작·진행·마무리 포함, D45). 열 머리글에 항상 표시한다 (`docs/decision-log.md` D2).
 
 ## MVP — what must exist to be the game
 1. 카드 데이터 (외부 JSON, `design/card-data-schema.md` 기준)

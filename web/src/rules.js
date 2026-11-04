@@ -16,7 +16,7 @@ export const NATIONS = Object.freeze([
 export const ERAS = Object.freeze([
   Object.freeze({ id: 'founding', label: '건국기', definition: '건국 전승과 초창기' }),
   Object.freeze({ id: 'peak', label: '전성기', definition: '영토와 세력이 커지고 번영' }),
-  Object.freeze({ id: 'ending', label: '결말기', definition: '전쟁의 마무리·멸망·통일 완성' }),
+  Object.freeze({ id: 'ending', label: '결말기', definition: '멸망·통일로 이어지는 마지막 전쟁기' }),
 ]);
 
 export const CARD_TYPES = Object.freeze(['event', 'artifact', 'person', 'myth']);

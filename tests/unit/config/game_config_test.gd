@@ -15,7 +15,7 @@ func test_from_dict_reads_axes_in_order() -> void:
 func test_era_definition_is_available_for_header() -> void:
 	var cfg := GameConfig.from_dict(Fx.config_dict())
 	assert_str(cfg.era_label("ending")).is_equal("결말기")
-	assert_str(cfg.era_definition("ending")).is_equal("전쟁의 마무리·멸망·통일 완성")
+	assert_str(cfg.era_definition("ending")).is_equal("멸망·통일로 이어지는 마지막 전쟁기")
 
 
 func test_missing_era_definition_reports_error() -> void:
