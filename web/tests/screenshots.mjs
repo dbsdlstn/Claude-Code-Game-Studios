@@ -48,7 +48,7 @@ try {
   await page.click('#tut-next');
   await page.click('#tut-more');
   await shot(page, '00b-tutorial-relation.png');
-  const tc = JSON.parse(readFileSync(new URL('../data/tutorial.json', import.meta.url), 'utf8')).find((c) => !c.anchor);
+  const tc = JSON.parse(readFileSync(new URL('../../assets/data/cards/tutorial.json', import.meta.url), 'utf8')).cards[0];
   await page.click('#tut-card .card-head');
   await page.click(`#tut-board .cell[data-nation="${tc.answer.nation}"][data-era="${tc.answer.era}"]`);
   await page.waitForTimeout(350);

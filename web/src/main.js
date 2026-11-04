@@ -9,18 +9,18 @@ import {
   NATIONS, ERAS, nationLabel, eraLabel, validateCards, anchorCards, playableCards, releaseFilter,
   createRound, roundStatus, currentCardId, revealNextClue, placeCard, boardCells, roundStats,
   recordInCollection, serializeRound, restoreRound, restoreCollection, isDogamComplete, dogamProgress,
-  summarizeRound, historyStats, restoreHistory,
+  summarizeRound, historyStats, restoreHistory, dataFingerprint, parseTutorial,
 } from './rules.js';
 import { $, el, clueText, TYPE_LABEL, LEVEL_LABEL, inkDrops } from './ui/dom.js';
 import { makeDraggable } from './ui/drag.js';
-import { createTutorial, pickTutorialCards } from './ui/tutorial.js';
+import { createTutorial } from './ui/tutorial.js';
 
 const HELP_IDLE = '카드를 끌어 칸에 놓거나, 카드를 눌러 고른 뒤 칸을 누르세요.';
 const HELP_ARMED = '칸을 누르거나 방향키로 칸을 고르고 Enter로 놓으세요. Esc로 취소.';
 
 const app = {
   store: createStore(CONFIG.storageKey),
-  cards: [], cardsById: new Map(), anchors: [], playable: [], dataFile: '',
+  cards: [], cardsById: new Map(), anchors: [], playable: [], dataFile: '', dataId: '',
   round: null, collection: Object.freeze({}), meta: {}, history: [],
   selected: false, lastResult: null, lostInk: false, dogamActive: null,
   seedParam: null, focusCell: null, tutorial: null,
@@ -34,7 +34,7 @@ function newSeed() {
 }
 
 function persist() {
-  app.store.save({ round: serializeRound(app.round), collection: app.collection, meta: app.meta, history: app.history });
+  app.store.save({ dataId: app.dataId, round: serializeRound(app.round), collection: app.collection, meta: app.meta, history: app.history });
 }
 
 function newRoundState() {
@@ -587,16 +587,16 @@ function renderDogamDetail() {
 
 /* ------------------------------------------------------------------ 시작 */
 
-/** 튜토리얼 전용 카드를 읽는다. 없거나 카드 단위 검증에 걸리면 튜토리얼 없이 진행한다(R8은 12칸 규칙이라 제외). */
+/** 공용 튜토리얼 파일(D31)을 읽는다. 없거나 검증에 걸리면 튜토리얼 없이 진행한다. */
 async function loadTutorial() {
   try {
-    const { cards } = await loadCards([CONFIG.tutorialDataUrl]);
-    const errs = validateCards(cards).errors.filter((e) => e.rule !== 'R8');
-    if (errs.length) { console.warn('[한양 도감] 튜토리얼 카드 오류', errs); return null; }
-    const pair = pickTutorialCards(cards, new Set(app.cards.map((c) => c.id)));
-    return pair ? createTutorial(pair, { onFinish: onTutorialFinish }) : null;
+    const res = await fetch(CONFIG.tutorialDataUrl, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const t = parseTutorial(await res.json(), app.cards);
+    if (t.errors.length) { console.warn('[한양 도감] 튜토리얼 파일 오류', t.errors); return null; }
+    return createTutorial({ anchor: t.anchor, card: t.card }, { onFinish: onTutorialFinish });
   } catch (e) {
-    console.warn('[한양 도감] 튜토리얼 카드를 읽지 못했다', e);
+    console.warn('[한양 도감] 튜토리얼 파일을 읽지 못했다', e);
     return null;
   }
 }
@@ -673,6 +673,7 @@ async function init() {
   app.cardsById = new Map(cards.map((c) => [c.id, c]));
   app.anchors = anchorCards(cards);
   app.playable = playableCards(cards);
+  app.dataId = dataFingerprint(loaded.url, cards);
 
   $('data-info').textContent = `데이터: ${app.dataFile} · 판정 카드 ${app.playable.length}장 · 기준 카드 ${app.anchors.length}장`
     + (app.playable.some((c) => !c.verified) ? ' · 플레이테스트 빌드(사실 확인 전 카드 포함)' : '');
@@ -682,7 +683,10 @@ async function init() {
   app.collection = restoreCollection(saved?.collection, app.cards);
   app.meta = saved?.meta && typeof saved.meta === 'object' ? { ...saved.meta } : {};
   app.history = restoreHistory(saved?.history);
-  app.round = restoreRound(saved?.round, app.playable) ?? newRoundState();
+  // 다른 데이터에서 저장한 라운드(식별자가 다르거나 없음)는 버린다. 수집 기록은 지금 덱에 있는 id만 남는다.
+  const sameData = saved?.dataId === app.dataId;
+  if (saved?.round && !sameData) console.info('[한양 도감] 카드 데이터가 바뀌어 진행 중 라운드를 버렸다', { saved: saved.dataId, now: app.dataId });
+  app.round = (sameData && restoreRound(saved.round, app.playable)) || newRoundState();
   persist();
 
   app.tutorial = await loadTutorial();

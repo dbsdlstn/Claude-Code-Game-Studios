@@ -9,7 +9,7 @@ import {
   roundStatus, currentCardId, revealNextClue, placeCard, boardCells, roundStats,
   recordInCollection, serializeRound, restoreRound, restoreCollection,
   buildRoundOrder, isDogamComplete, dogamProgress, releaseFilter,
-  summarizeRound, historyStats, restoreHistory,
+  summarizeRound, historyStats, restoreHistory, dataFingerprint, parseTutorial, fnv1a,
 } from '../src/rules.js';
 import { createStore } from '../src/storage.js';
 import { loadCards, resolveDataUrls } from '../src/data.js';
@@ -365,7 +365,7 @@ describe('저장과 복원', () => {
     const store = createStore('k', fake);
     assert.equal(store.load(), null);
     assert.equal(store.save({ round: { a: 1 }, collection: { x: 'collected' } }), true);
-    assert.deepEqual(store.load(), { version: 1, round: { a: 1 }, collection: { x: 'collected' }, meta: {}, history: [] });
+    assert.deepEqual(store.load(), { version: 1, dataId: '', round: { a: 1 }, collection: { x: 'collected' }, meta: {}, history: [] });
     store.save({ round: null, collection: {}, meta: { tutorialDone: true }, history: [{ placed: 1 }] });
     assert.deepEqual(store.load().meta, { tutorialDone: true });
     assert.deepEqual(store.load().history, [{ placed: 1 }]);
@@ -454,27 +454,47 @@ describe('라운드 결과와 플레이 기록', () => {
   });
 });
 
-describe('튜토리얼 카드(web/data/tutorial.json)', () => {
-  const TUT = JSON.parse(readFileSync(path.join(here, '..', 'data', 'tutorial.json'), 'utf8'));
+describe('공용 튜토리얼 파일(assets/data/cards/tutorial.json, D31)', () => {
+  const TUT_PATH = path.join(here, '..', '..', 'assets', 'data', 'cards', 'tutorial.json');
+  const TUT = existsSync(TUT_PATH) ? JSON.parse(readFileSync(TUT_PATH, 'utf8')) : null;
+  const decks = () => [['샘플', loadSample()], ...(existsSync(SAMGUK_PATH) ? [['samguk', JSON.parse(readFileSync(SAMGUK_PATH, 'utf8'))]] : [])];
 
-  test('카드 단위 검증 오류가 없다(12칸 규칙 R8 제외)', () => {
-    assert.deepEqual(validateCards(TUT).errors.filter((e) => e.rule !== 'R8'), []);
-  });
-
-  test('본 덱(샘플·samguk)과 id·제목이 겹치지 않고, 기준 1장 + 연습 1장', () => {
-    const decks = [loadSample(), existsSync(SAMGUK_PATH) ? JSON.parse(readFileSync(SAMGUK_PATH, 'utf8')) : []].flat();
-    for (const c of TUT) {
-      assert.ok(!decks.some((d) => d.id === c.id || d.title === c.title), c.title);
-      assert.equal(c.verified, false);
+  test('샘플·samguk 어느 덱으로 읽어도 오류 없이 기준 카드 + 연습 카드 한 쌍', { skip: !TUT && '튜토리얼 파일 없음' }, () => {
+    for (const [name, deck] of decks()) {
+      const t = parseTutorial(TUT, deck);
+      assert.deepEqual(t.errors, [], name);
+      assert.equal(t.anchor.id, TUT.anchor_id);
+      assert.equal(t.card.id, TUT.cards[0].id);
+      assert.ok(!deck.some((c) => c.id === t.card.id || c.title === t.card.title), `${name}와 겹치면 안 된다`);
     }
-    assert.equal(TUT.filter((c) => c.anchor).length, 1);
-    assert.equal(TUT.filter((c) => !c.anchor).length, 1);
   });
 
-  test('pickTutorialCards: 기준 카드를 가리키는 연습 카드 한 쌍, 본 덱 id는 제외', async () => {
-    const { pickTutorialCards } = await import('../src/ui/tutorial.js');
-    const pair = pickTutorialCards(TUT);
-    assert.equal(pair.card.clues[1].refs[0], pair.anchor.id);
-    assert.equal(pickTutorialCards(TUT, new Set(TUT.map((c) => c.id))), null);
+  test('규칙 위반을 잡는다: 기준 카드 아님, 카드 없음, 본 덱과 id·제목 중복, 기준 카드를 안 가리킴, 객체 아님', () => {
+    const deck = loadSample();
+    const practice = structuredClone(deck.find((c) => c.id === 'goguryeo-founding-01'));
+    const fresh = { ...practice, id: 'tutorial-x', title: '연습 카드' };
+    const rulesOf = (data) => parseTutorial(data, deck).errors.map((e) => `${e.rule}`);
+    assert.deepEqual(parseTutorial({ anchor_id: 'goguryeo-peak-anchor', cards: [fresh] }, deck).errors, []);
+    assert.ok(rulesOf({ anchor_id: 'goguryeo-founding-01', cards: [fresh] }).includes('TUTORIAL'));
+    assert.ok(rulesOf({ anchor_id: 'goguryeo-peak-anchor', cards: [] }).includes('TUTORIAL'));
+    assert.ok(rulesOf({ anchor_id: 'goguryeo-peak-anchor', cards: [practice] }).includes('TUTORIAL'), 'id 중복');
+    assert.ok(rulesOf({ anchor_id: 'goguryeo-peak-anchor', cards: [{ ...fresh, title: practice.title }] }).includes('TUTORIAL'), '제목 중복');
+    const otherRef = { ...fresh, clues: [fresh.clues[0], { ...fresh.clues[1], refs: ['goguryeo-founding-01'] }, fresh.clues[2]] };
+    assert.ok(rulesOf({ anchor_id: 'goguryeo-peak-anchor', cards: [otherRef] }).includes('R4'));
+    assert.ok(rulesOf([fresh]).includes('TUTORIAL'));
+    assert.ok(rulesOf({ anchor_id: 'goguryeo-peak-anchor', cards: [{ ...fresh, disputed: true, disputed_note: 'x' }] }).includes('TUTORIAL'));
+  });
+});
+
+describe('데이터 식별자', () => {
+  test('경로·카드 수·id 목록이 같으면 같고, 하나라도 다르면 다르다(카드 순서는 무관)', () => {
+    const deck = loadSample();
+    const a = dataFingerprint('x.json', deck);
+    assert.equal(a, dataFingerprint('x.json', [...deck].reverse()));
+    assert.notEqual(a, dataFingerprint('y.json', deck));
+    assert.notEqual(a, dataFingerprint('x.json', deck.slice(1)));
+    assert.notEqual(a, dataFingerprint('x.json', deck.map((c, i) => (i === 3 ? { ...c, id: 'other' } : c))));
+    assert.match(fnv1a('abc'), /^[0-9a-f]{8}$/);
+    assert.equal(fnv1a(''), '811c9dc5');
   });
 });
