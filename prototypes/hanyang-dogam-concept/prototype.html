@@ -1,0 +1,168 @@
+<!-- PROTOTYPE - NOT FOR PRODUCTION -->
+<!-- Question: 단서 카드를 나라×시기 칸에 놓는 것이 암기 퀴즈가 아니라 추리처럼 느껴지는가? -->
+<!-- Date: 2026-11-04 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>한양 도감 (프로토타입)</title>
+<style>
+  body { font-family: sans-serif; background:#efe6d2; color:#2b2118; margin:0; padding:12px; }
+  h1 { font-size:18px; margin:0 0 8px; }
+  #top { display:flex; gap:16px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+  #ink { font-weight:bold; }
+  #card { background:#fffaf0; border:2px solid #8a6d3b; border-radius:6px; padding:10px; max-width:560px; cursor:grab; user-select:none; }
+  #card.selected { outline:3px solid #c0392b; }
+  #card .title { font-weight:bold; margin-bottom:4px; }
+  #card ul { margin:4px 0 6px 18px; padding:0; }
+  button { font-size:13px; }
+  table { border-collapse:collapse; margin-top:10px; }
+  th, td { border:1px solid #8a6d3b; padding:6px; text-align:center; }
+  td { width:120px; height:64px; background:#f7f0de; font-size:12px; vertical-align:top; }
+  td.over { background:#ffe9a8; }
+  td.ok { background:#cfe8c4; }
+  td.bad { background:#f3c4c0; }
+  #msg { margin-top:10px; min-height:44px; max-width:640px; }
+  #log { margin-top:12px; font-size:12px; white-space:pre-wrap; background:#fffaf0; border:1px solid #8a6d3b; padding:8px; max-width:640px; }
+  .small { font-size:12px; color:#5b4a35; }
+</style>
+</head>
+<body>
+<h1>한양 도감 — 삼국시대 (프로토타입)</h1>
+<div class="small">카드를 끌어다 칸에 놓거나, 카드를 클릭한 뒤 칸을 클릭하세요. 시기: 초기=건국기 / 전성기=4~6세기 / 후기=7세기 통일전쟁기 이후.</div>
+<div id="top">
+  <div id="ink"></div>
+  <div id="progress"></div>
+</div>
+<div id="card" draggable="true"></div>
+<table id="board"></table>
+<div id="msg"></div>
+<div id="log"></div>
+
+<script>
+// PROTOTYPE - NOT FOR PRODUCTION: 값과 카드는 전부 하드코딩
+const NATIONS = ["고구려", "백제", "신라", "가야"];
+const ERAS = ["초기", "전성기", "후기"];
+const START_INK = 5;
+
+// answer: [나라 index, 시기 index]. 연대는 전승/통설 기준, 건국 연대는 삼국사기 전승.
+const CARDS = [
+  { title: "졸본에서의 건국", answer: [0, 0],
+    clues: ["주몽(동명성왕)이 압록강 중류 졸본 지역에서 나라를 세웠다고 전해진다.", "건국 전승 연대는 기원전 37년이다."],
+    explain: "고구려의 건국 전승. 나라를 세우던 시기이므로 고구려 초기." },
+  { title: "광개토대왕릉비", answer: [0, 1],
+    clues: ["비문에 영토 확장과 왜군 격퇴 기록이 새겨져 있다.", "장수왕이 414년에 세웠다."],
+    explain: "광개토대왕·장수왕 때(4~5세기)는 고구려 최대 영토기. 고구려 전성기." },
+  { title: "살수대첩", answer: [0, 2],
+    clues: ["을지문덕이 수의 대군을 물리쳤다.", "612년의 일이다."],
+    explain: "7세기 수·당과의 전쟁기. 고구려 후기." },
+  { title: "온조의 위례성 건국", answer: [1, 0],
+    clues: ["고구려 계통 유민 집단이 한강 유역에 나라를 세웠다고 전해진다.", "건국 전승 연대는 기원전 18년이다."],
+    explain: "백제 건국 전승. 백제 초기." },
+  { title: "평양성 공격과 고국원왕 전사", answer: [1, 1],
+    clues: ["백제군이 북진해 평양성까지 이르렀다.", "371년의 일이고 이때 왕은 근초고왕이다."],
+    explain: "근초고왕은 마한을 통합하고 북으로 진출한 백제 최전성기의 왕. 백제 전성기." },
+  { title: "황산벌 전투", answer: [1, 2],
+    clues: ["계백이 5천 결사대를 이끌었다.", "660년, 나당 연합군과 맞섰다."],
+    explain: "660년 백제 멸망 직전의 전투. 백제 후기." },
+  { title: "박혁거세 신화", answer: [2, 0],
+    clues: ["알에서 태어나 6부 사람들의 추대를 받았다.", "건국 전승 연대는 기원전 57년이다."],
+    explain: "신라 건국 전승. 신라 초기." },
+  { title: "북한산 순수비", answer: [2, 1],
+    clues: ["신라 왕이 한강 유역을 차지하고 영토를 둘러본 기념으로 세웠다.", "6세기 중반의 일이다."],
+    explain: "진흥왕 때(6세기 중반) 신라는 한강 유역과 가야 지역을 차지했다. 신라 전성기." },
+  { title: "수로왕의 건국 전승", answer: [3, 0],
+    clues: ["하늘에서 내려온 금빛 상자 속 알에서 여섯 왕이 나왔다.", "금관가야가 시작되었다고 전해진다."],
+    explain: "금관가야 건국 전승. 가야 초기." },
+  { title: "대가야의 멸망", answer: [3, 2],
+    clues: ["가야 연맹의 마지막 중심 세력이 무너졌다.", "562년, 신라의 공격을 받았다."],
+    explain: "금관가야(532)에 이어 대가야(562)가 신라에 흡수되며 가야는 사라졌다. 가야 후기." }
+];
+
+let ink, idx, cards, selected = false, current, hintsUsed, shown, logLines = [], stats = { right: 0, wrong: 0, hints: 0 };
+
+const $ = id => document.getElementById(id);
+
+function buildBoard() {
+  let h = "<tr><th></th>" + ERAS.map(e => `<th>${e}</th>`).join("") + "</tr>";
+  NATIONS.forEach((n, r) => {
+    h += `<tr><th>${n}</th>` + ERAS.map((e, c) => `<td data-r="${r}" data-c="${c}"></td>`).join("") + "</tr>";
+  });
+  $("board").innerHTML = h;
+  document.querySelectorAll("td").forEach(td => {
+    td.addEventListener("dragover", e => { e.preventDefault(); td.classList.add("over"); });
+    td.addEventListener("dragleave", () => td.classList.remove("over"));
+    td.addEventListener("drop", e => { e.preventDefault(); td.classList.remove("over"); place(+td.dataset.r, +td.dataset.c); });
+    td.addEventListener("click", () => { if (selected) place(+td.dataset.r, +td.dataset.c); });
+  });
+}
+
+function renderCard() {
+  if (!current) { $("card").style.display = "none"; return; }
+  $("card").style.display = "";
+  const clues = current.clues.slice(0, shown).map(c => `<li>${c}</li>`).join("");
+  const more = shown < current.clues.length ? `<button id="more">단서 더 보기</button>` : "";
+  $("card").innerHTML = `<div class="title">${current.title}</div><ul>${clues}</ul>${more}`;
+  const b = $("more");
+  if (b) b.onclick = e => { e.stopPropagation(); shown++; hintsUsed++; stats.hints++; renderCard(); };
+}
+
+function renderTop() {
+  $("ink").textContent = "먹물: " + "●".repeat(ink) + "○".repeat(START_INK - ink);
+  $("progress").textContent = `카드 ${Math.min(idx + 1, cards.length)}/${cards.length}`;
+}
+
+function next() {
+  idx++;
+  if (ink <= 0 || idx >= cards.length) { finish(); return; }
+  current = cards[idx]; shown = 1; hintsUsed = 0; selected = false;
+  $("card").classList.remove("selected");
+  renderCard(); renderTop();
+}
+
+function place(r, c) {
+  if (!current) return;
+  const td = document.querySelector(`td[data-r="${r}"][data-c="${c}"]`);
+  const ok = current.answer[0] === r && current.answer[1] === c;
+  if (ok) {
+    stats.right++;
+    td.classList.add("ok"); td.innerHTML += `<div>${current.title}</div>`;
+    $("msg").textContent = "정답! " + current.explain;
+  } else {
+    stats.wrong++; ink--;
+    const [ar, ac] = current.answer;
+    const at = document.querySelector(`td[data-r="${ar}"][data-c="${ac}"]`);
+    td.classList.add("bad"); setTimeout(() => td.classList.remove("bad"), 900);
+    at.classList.add("ok"); at.innerHTML += `<div>${current.title}</div>`;
+    $("msg").textContent = `오답 (먹물 -1). 정답은 ${NATIONS[ar]} ${ERAS[ac]}. ` + current.explain;
+  }
+  logLines.push(`${idx + 1}. ${current.title}: ${ok ? "정답" : "오답"}, 단서 추가 ${hintsUsed}회`);
+  $("log").textContent = logLines.join("\n");
+  next();
+  renderTop();
+}
+
+function finish() {
+  current = null; renderCard(); renderTop();
+  const total = stats.right + stats.wrong;
+  const rate = total ? Math.round(100 * stats.right / total) : 0;
+  const result = ink <= 0 ? "먹물이 바닥나 실패" : "도감 완성";
+  $("log").textContent = logLines.join("\n") +
+    `\n\n[${result}] 정답률 ${rate}% (${stats.right}/${total}), 단서 추가 총 ${stats.hints}회, 남은 먹물 ${ink}`;
+  window.__result = { rate, right: stats.right, wrong: stats.wrong, hints: stats.hints, ink };
+}
+
+function start() {
+  ink = START_INK; idx = -1; cards = CARDS.slice();
+  buildBoard(); logLines = []; stats = { right: 0, wrong: 0, hints: 0 };
+  $("msg").textContent = ""; $("log").textContent = "";
+  next();
+}
+
+$("card").addEventListener("click", () => { selected = !selected; $("card").classList.toggle("selected", selected); });
+$("card").addEventListener("dragstart", e => { e.dataTransfer.setData("text/plain", "card"); });
+start();
+</script>
+</body>
+</html>
