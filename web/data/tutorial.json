@@ -1,0 +1,25 @@
+[
+  {
+    "id": "tutorial-silla-ending-anchor", "type": "event", "title": "문무왕의 바다 장례", "anchor": true,
+    "answer": { "nation": "silla", "era": "ending" }, "clues": [],
+    "explanation": "삼국 통일 전쟁을 마무리한 문무왕이 죽어서 바다의 용이 되어 나라를 지키겠다며 동해에 장사 지내라고 유언했다. 통일 완성 직후의 일이므로 결말기.",
+    "date_label": "681년",
+    "source": { "name": "삼국사기 신라본기 문무왕 21년조", "url": null, "note": "튜토리얼 전용 카드(본 덱에 없음). 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 1, "image": null, "image_source": null, "image_license": null, "tags": ["튜토리얼", "신라"]
+  },
+  {
+    "id": "tutorial-silla-peak-01", "type": "event", "title": "황룡사 창건", "anchor": false,
+    "answer": { "nation": "silla", "era": "peak" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "왕이 새 궁궐을 지으려던 땅에 누런 용이 나타나자, 궁궐 대신 큰 절을 짓게 한다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[문무왕의 바다 장례]보다 약 130년 앞, 같은 나라가 한강 유역까지 영토를 넓히던 때다.", "refs": ["tutorial-silla-ending-anchor"] },
+      { "level": 3, "kind": "direct", "text": "553년, 진흥왕, 서라벌(경주).", "refs": [] }
+    ],
+    "explanation": "진흥왕 14년(553) 월성 동쪽에 새 궁궐을 짓다가 황룡이 나타나 절로 고쳐 지었다는 황룡사. 영토를 넓히고 불교로 왕권을 높이던 때이므로 전성기.",
+    "date_label": "553년",
+    "source": { "name": "삼국사기 신라본기 진흥왕 14년조", "url": null, "note": "튜토리얼 전용 카드(본 덱에 없음). 완공은 566년. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 1, "image": null, "image_source": null, "image_license": null, "tags": ["튜토리얼", "신라", "불교"]
+  }
+]

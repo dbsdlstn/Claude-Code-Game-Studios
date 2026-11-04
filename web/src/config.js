@@ -13,10 +13,9 @@ export const CONFIG = Object.freeze({
   /** true면 verified: true 카드만 판정 대상으로 쓴다(출시 빌드 규칙 9). 플레이테스트 빌드는 false. */
   onlyVerified: false,
   /**
-   * 튜토리얼에 쓸 기준 카드와 연습 카드 id. 데이터에 없으면 "기준 카드를 relation으로 가리키는 첫 카드"로 대신한다.
-   * 연습 카드는 본게임에도 나온다(튜토리얼에서 맞혀도 도감에는 넣지 않는다).
+   * 튜토리얼 전용 카드(기준 1장 + 연습 1장, 스키마 v1). 본 덱과 겹치지 않는다. 읽지 못하면 튜토리얼 없이 진행한다.
    */
-  tutorial: Object.freeze({ anchorId: 'goguryeo-peak-anchor', cardId: 'goguryeo-founding-01' }),
+  tutorialDataUrl: 'data/tutorial.json',
   /** localStorage 키. 저장 형식을 바꾸면 버전을 올린다. */
   storageKey: 'hanyang-dogam:save:v1',
 });

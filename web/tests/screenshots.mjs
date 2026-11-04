@@ -1,6 +1,6 @@
 // 화면별 스크린샷을 production/qa/evidence/web/에 남긴다: node web/tests/screenshots.mjs
 // 실제 데이터(assets/data/cards/samguk.json)가 있으면 그것으로, 없으면 샘플 데이터로 찍는다.
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   chromium, startServer, openGame, currentCard, wrongCell, dragTo, clickPlace, cellSel, REPO_ROOT,
@@ -48,7 +48,7 @@ try {
   await page.click('#tut-next');
   await page.click('#tut-more');
   await shot(page, '00b-tutorial-relation.png');
-  const tc = BY_ID.get('goguryeo-founding-01');
+  const tc = JSON.parse(readFileSync(new URL('../data/tutorial.json', import.meta.url), 'utf8')).find((c) => !c.anchor);
   await page.click('#tut-card .card-head');
   await page.click(`#tut-board .cell[data-nation="${tc.answer.nation}"][data-era="${tc.answer.era}"]`);
   await page.waitForTimeout(350);
@@ -99,6 +99,10 @@ try {
   await page.locator('#dogam-disputed .entry').first().click();
   await page.locator('#play-record').scrollIntoViewIfNeeded();
   await shot(page, '05a-dogam-disputed-record.png');
+  await page.click('#btn-reset');
+  await page.click('#reset-next');
+  await shot(page, '05b-reset-confirm.png');
+  await page.click('#reset-cancel');
   await ctx.close();
 
   ({ ctx, page } = await fresh());

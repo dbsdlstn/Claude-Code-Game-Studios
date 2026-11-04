@@ -216,6 +216,10 @@ function place(nation, era) {
   render();
   setSelected(false);
   app.lostInk = false;
+  const title = app.cardsById.get(result.id).title;
+  announce(result.correct
+    ? `정답. ${title}, ${where(result.answer)}. ${result.isNew ? '도감에 수집했습니다. ' : ''}먹물 ${app.round.ink}개 남음.`
+    : `오답. 먹물 1개 소모, ${Math.max(app.round.ink, 0)}개 남음. ${title}의 정답 칸은 ${where(result.answer)}.`);
   const completedNow = !before && isDogamComplete(app.playable, app.collection);
   if (completedNow) showCompleteModal(status);
   else if (status !== 'playing') showEndModal(status);
@@ -322,7 +326,7 @@ function showHowTo() {
       el('li', {}, '시기는 사건의 성격으로 나눕니다: ', ERAS.map((e, i) => [i ? ' · ' : '', el('b', {}, e.label), `(${e.definition})`])),
       el('li', {}, '단서는 3단계입니다. 1 장면 → 2 기준 카드와의 관계 → 3 직접 힌트. "단서 더 보기"로 엽니다.'),
       el('li', {}, '맞히면 도감에 수집, 틀리면 먹물 1 소모와 정답 공개. 먹물 5가 다 떨어지면 라운드 실패.'),
-      el('li', {}, '한 라운드는 12장(칸마다 1장). 36장을 모두 모으면 도감 완성.'),
+      el('li', {}, '한 라운드는 12장. 칸과 상관없이 뽑으므로 한 칸에 여러 장이 들어갈 수도, 빈 칸이 남을 수도 있습니다. 36장을 모두 모으면 도감 완성.'),
       el('li', {}, '조작: 끌어서 놓기, 또는 카드를 누르고 칸 누르기. 키보드는 카드에서 Enter → 방향키 → Enter.')),
   ], [
     el('button', { type: 'button', class: 'btn', id: 'howto-tutorial', onclick: () => { closeModal(); hideTitle(); openTutorial(); } }, '튜토리얼 다시 하기'),
@@ -475,7 +479,42 @@ function renderPlayRecord() {
       el('dt', {}, '끝낸 라운드'), el('dd', { id: 'rec-rounds' }, `${hs.rounds}회 (클리어 ${hs.cleared} · 실패 ${hs.failed})`),
       el('dt', {}, '정답률'), el('dd', { id: 'rec-rate' }, hs.placed ? `${hs.rate}% (${hs.right} / ${hs.placed}장)` : '—'),
       el('dt', {}, '평균 단서 단계'), el('dd', { id: 'rec-level' }, hs.placed ? `${hs.avgLevel.toFixed(2)} (1단계 ${hs.levels[0]} · 2단계 ${hs.levels[1]} · 3단계 ${hs.levels[2]})` : '—')),
-    el('button', { type: 'button', class: 'btn', id: 'btn-export', onclick: exportPlayLog }, '기록 내보내기 (JSON)'));
+    el('div', { class: 'record-actions' },
+      el('button', { type: 'button', class: 'btn', id: 'btn-export', onclick: exportPlayLog }, '기록 내보내기 (JSON)'),
+      el('button', { type: 'button', class: 'btn btn-danger', id: 'btn-reset', onclick: confirmReset1 }, '진행 초기화')));
+}
+
+/** 진행 초기화: 두 번 확인한다. 도감, 플레이 기록, 진행 중 라운드, 튜토리얼 완료 표시를 지운다. */
+function confirmReset1() {
+  openModal('진행을 초기화할까요?', [el('p', {}, '도감 수집, 플레이 기록, 진행 중인 라운드가 모두 지워집니다.')],
+    [el('button', { type: 'button', class: 'btn', id: 'reset-cancel', onclick: closeModal }, '취소'),
+      el('button', { type: 'button', class: 'btn', id: 'reset-next', onclick: confirmReset2 }, '계속')], 'reset1');
+  $('reset-cancel').focus();
+}
+
+function confirmReset2() {
+  const dp = dogamProgress(app.playable, app.collection);
+  openModal('정말 모두 지울까요?', [
+    el('p', {}, `도감 ${dp.collected}장, 플레이 기록 ${app.history.length}회가 지워지고 되돌릴 수 없습니다. 필요하면 먼저 "기록 내보내기"로 저장하세요.`),
+  ], [el('button', { type: 'button', class: 'btn', id: 'reset-cancel', onclick: closeModal }, '취소'),
+    el('button', { type: 'button', class: 'btn btn-danger', id: 'reset-confirm', onclick: doReset }, '모두 지우기')], 'reset2');
+  $('reset-cancel').focus();
+}
+
+function doReset() {
+  app.store.clear();
+  app.collection = Object.freeze({});
+  app.history = [];
+  app.meta = {};
+  app.dogamActive = null;
+  app.lastResult = null;
+  app.round = newRoundState();
+  persist();
+  closeModal();
+  $('dogam').hidden = true;
+  render();
+  announce('진행을 초기화했습니다.');
+  showTitle();
 }
 
 /** 플레이테스트 데이터 수집용 JSON 내보내기. 카드 본문 대신 id만 담는다. */
@@ -548,6 +587,27 @@ function renderDogamDetail() {
 
 /* ------------------------------------------------------------------ 시작 */
 
+/** 튜토리얼 전용 카드를 읽는다. 없거나 카드 단위 검증에 걸리면 튜토리얼 없이 진행한다(R8은 12칸 규칙이라 제외). */
+async function loadTutorial() {
+  try {
+    const { cards } = await loadCards([CONFIG.tutorialDataUrl]);
+    const errs = validateCards(cards).errors.filter((e) => e.rule !== 'R8');
+    if (errs.length) { console.warn('[한양 도감] 튜토리얼 카드 오류', errs); return null; }
+    const pair = pickTutorialCards(cards, new Set(app.cards.map((c) => c.id)));
+    return pair ? createTutorial(pair, { onFinish: onTutorialFinish }) : null;
+  } catch (e) {
+    console.warn('[한양 도감] 튜토리얼 카드를 읽지 못했다', e);
+    return null;
+  }
+}
+
+/** 화면 낭독기에 알린다(정답·오답·먹물). 같은 문장이 연달아 와도 읽히도록 비웠다가 넣는다. */
+function announce(text) {
+  const a = $('announcer');
+  a.textContent = '';
+  requestAnimationFrame(() => { a.textContent = text; });
+}
+
 function showLoadError(title, lines) {
   $('card').className = 'card empty error';
   $('card').replaceChildren(el('div', {},
@@ -579,8 +639,8 @@ function wireGame() {
   $('btn-home').addEventListener('click', showTitle);
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (!$('dogam').hidden) closeDogam();
-    else if (['confirm', 'howto'].includes($('modal').dataset.kind)) closeModal();
+    if (['confirm', 'howto', 'reset1', 'reset2'].includes($('modal').dataset.kind)) closeModal();
+    else if (!$('dogam').hidden) closeDogam();
     else if ($('modal').dataset.kind === 'complete' && roundStatus(app.round) === 'playing') closeModal();
   });
 }
@@ -625,8 +685,7 @@ async function init() {
   app.round = restoreRound(saved?.round, app.playable) ?? newRoundState();
   persist();
 
-  const pair = pickTutorialCards(app.cards, CONFIG.tutorial);
-  app.tutorial = pair ? createTutorial(pair, { onFinish: onTutorialFinish }) : null;
+  app.tutorial = await loadTutorial();
 
   wireGame();
   render();

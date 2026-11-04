@@ -27,13 +27,16 @@ function freePort() {
   });
 }
 
-/** 저장소 루트에서 정적 서버를 띄운다. */
-export async function startServer() {
+/**
+ * 정적 서버를 띄운다. 기본은 저장소 루트(게임은 /web/index.html). root를 주면 그 폴더(배포본 확인용).
+ * @param {{root?: string, probe?: string}} [opts]
+ */
+export async function startServer({ root = REPO_ROOT, probe = '/web/index.html' } = {}) {
   const port = await freePort();
-  const proc = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', REPO_ROOT], { stdio: 'ignore' });
+  const proc = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', root], { stdio: 'ignore' });
   const base = `http://127.0.0.1:${port}`;
   for (let i = 0; i < 100; i++) {
-    try { const r = await fetch(base + '/web/index.html'); if (r.ok) return { base, stop: () => proc.kill() }; } catch { /* 대기 */ }
+    try { const r = await fetch(base + probe); if (r.ok) return { base, stop: () => proc.kill() }; } catch { /* 대기 */ }
     await new Promise((r) => setTimeout(r, 100));
   }
   proc.kill();

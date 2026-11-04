@@ -236,38 +236,59 @@ function makeDeck(perCell) {
   return deck;
 }
 
-describe('라운드 구성 (D16)', () => {
-  const CELLS = NATIONS.length * ERAS.length;
+describe('라운드 구성 (D22: 칸과 무관하게 뽑기)', () => {
+  const cellOf = (id) => id.split('-').slice(0, 2).join('-');
 
-  test('칸마다 1장씩 12장, 같은 칸에서 두 장이 나오지 않는다', () => {
+  test('판정 카드에서 서로 다른 12장', () => {
     const deck = makeDeck(3);
     const order = buildRoundOrder(deck, createRng(SEED), {});
-    assert.equal(order.length, CELLS);
-    const cells = new Set(order.map((id) => id.split('-').slice(0, 2).join('-')));
-    assert.equal(cells.size, CELLS);
+    assert.equal(order.length, 12);
+    assert.equal(new Set(order).size, 12);
+    assert.ok(order.every((id) => deck.some((c) => c.id === id)));
   });
 
-  test('아직 수집하지 않은 카드를 먼저 고른다', () => {
+  test('같은 칸 카드가 여러 장 나올 수 있고, 빈 칸도 생긴다(시드 고정)', () => {
     const deck = makeDeck(3);
-    const collection = Object.fromEntries(deck.filter((c) => !c.id.endsWith('-3')).map((c) => [c.id, 'collected']));
-    const order = buildRoundOrder(deck, createRng(SEED), collection);
-    assert.ok(order.every((id) => id.endsWith('-3')));
+    const order = buildRoundOrder(deck, createRng(SEED), {});
+    const perCell = new Map();
+    for (const id of order) perCell.set(cellOf(id), (perCell.get(cellOf(id)) ?? 0) + 1);
+    assert.ok(Math.max(...perCell.values()) >= 2, `칸별 장수 ${JSON.stringify([...perCell])}`);
+    assert.ok(perCell.size < 12, '12칸이 모두 한 장씩이면 빈 칸이 정답을 알려 준다');
   });
 
-  test('오답으로 공개만 된 카드는 미수집으로 본다', () => {
-    const deck = makeDeck(2);
-    const collection = Object.fromEntries(deck.map((c) => [c.id, c.id.endsWith('-1') ? 'collected' : 'revealed']));
-    const order = buildRoundOrder(deck, createRng(SEED), collection);
-    assert.ok(order.every((id) => id.endsWith('-2')));
-  });
-
-  test('칸의 카드를 모두 모았으면 그 칸은 수집한 카드에서 다시 고른다', () => {
+  test('여러 시드에서 칸마다 1장씩 구성이 강제되지 않는다', () => {
     const deck = makeDeck(3);
-    const collection = Object.fromEntries(deck.map((c) => [c.id, 'collected']));
-    assert.equal(buildRoundOrder(deck, createRng(SEED), collection).length, CELLS);
+    let oneEach = 0;
+    for (let seed = 1; seed <= 50; seed++) {
+      const cells = new Set(buildRoundOrder(deck, createRng(seed), {}).map(cellOf));
+      if (cells.size === 12) oneEach++;
+    }
+    assert.ok(oneEach < 5, `50번 중 ${oneEach}번이 칸마다 1장`);
   });
 
-  test('완벽한 라운드 3번이면 칸당 3장 36장 도감 완성', () => {
+  test('아직 수집하지 않은 카드를 먼저, 오답으로 공개만 된 카드도 미수집으로 본다', () => {
+    const deck = makeDeck(3);
+    const fresh = new Set(deck.slice(0, 12).map((c) => c.id));
+    const collection = Object.fromEntries(deck.map((c) => [c.id, fresh.has(c.id) ? (c.id.endsWith('-1') ? 'revealed' : undefined) : 'collected']).filter(([, v]) => v));
+    const order = buildRoundOrder(deck, createRng(SEED), collection);
+    assert.deepEqual([...order].sort(), [...fresh].sort());
+  });
+
+  test('미수집 카드가 12장보다 적으면 수집한 카드로 채운다', () => {
+    const deck = makeDeck(3);
+    const fresh = new Set(deck.slice(0, 5).map((c) => c.id));
+    const collection = Object.fromEntries(deck.filter((c) => !fresh.has(c.id)).map((c) => [c.id, 'collected']));
+    const order = buildRoundOrder(deck, createRng(SEED), collection);
+    assert.equal(order.length, 12);
+    assert.ok([...fresh].every((id) => order.includes(id)), '미수집 5장은 모두 들어간다');
+  });
+
+  test('판정 카드가 12장보다 적으면 있는 만큼', () => {
+    const deck = makeDeck(3).slice(0, 7);
+    assert.equal(buildRoundOrder(deck, createRng(SEED), {}).length, 7);
+  });
+
+  test('완벽한 라운드 3번이면 36장 도감 완성', () => {
     const deck = makeDeck(3);
     const byId = new Map(deck.map((c) => [c.id, c]));
     let collection = {};
@@ -280,19 +301,18 @@ describe('라운드 구성 (D16)', () => {
         collection = recordInCollection(collection, r.result);
       }
       assert.equal(roundStatus(s), 'cleared');
-      assert.equal(dogamProgress(deck, collection).collected, (round + 1) * CELLS);
+      assert.equal(dogamProgress(deck, collection).collected, (round + 1) * 12);
     }
     assert.equal(isDogamComplete(deck, collection), true);
   });
 
-  test('restoreRound: 같은 칸 카드 두 장이 든 저장은 버린다', () => {
+  test('restoreRound: 중복 id, 없는 id, 길이가 다른 저장은 버린다', () => {
     const deck = makeDeck(3);
     const s = serializeRound(createRound(deck, { seed: SEED, startInk: START_INK }));
-    const order = s.order.slice();
-    const first = order[0];
-    order[1] = first.replace(/-\d$/, first.endsWith('-1') ? '-2' : '-1');
-    assert.equal(restoreRound({ ...s, order }, deck), null);
     assert.notEqual(restoreRound(s, deck), null);
+    assert.equal(restoreRound({ ...s, order: [s.order[0], ...s.order.slice(0, 11)] }, deck), null);
+    assert.equal(restoreRound({ ...s, order: ['ghost', ...s.order.slice(1)] }, deck), null);
+    assert.equal(restoreRound({ ...s, order: s.order.slice(0, 11) }, deck), null);
   });
 
   test('isDogamComplete: 판정 카드가 없으면 false', () => {
@@ -431,5 +451,30 @@ describe('라운드 결과와 플레이 기록', () => {
     const ok = { status: 'failed', placed: 5, right: 0, levels: [5, 0, 0] };
     assert.deepEqual(restoreHistory([ok, null, { placed: 'x' }, { ...ok, status: 'playing' }]), [ok]);
     assert.deepEqual(restoreHistory('nope'), []);
+  });
+});
+
+describe('튜토리얼 카드(web/data/tutorial.json)', () => {
+  const TUT = JSON.parse(readFileSync(path.join(here, '..', 'data', 'tutorial.json'), 'utf8'));
+
+  test('카드 단위 검증 오류가 없다(12칸 규칙 R8 제외)', () => {
+    assert.deepEqual(validateCards(TUT).errors.filter((e) => e.rule !== 'R8'), []);
+  });
+
+  test('본 덱(샘플·samguk)과 id·제목이 겹치지 않고, 기준 1장 + 연습 1장', () => {
+    const decks = [loadSample(), existsSync(SAMGUK_PATH) ? JSON.parse(readFileSync(SAMGUK_PATH, 'utf8')) : []].flat();
+    for (const c of TUT) {
+      assert.ok(!decks.some((d) => d.id === c.id || d.title === c.title), c.title);
+      assert.equal(c.verified, false);
+    }
+    assert.equal(TUT.filter((c) => c.anchor).length, 1);
+    assert.equal(TUT.filter((c) => !c.anchor).length, 1);
+  });
+
+  test('pickTutorialCards: 기준 카드를 가리키는 연습 카드 한 쌍, 본 덱 id는 제외', async () => {
+    const { pickTutorialCards } = await import('../src/ui/tutorial.js');
+    const pair = pickTutorialCards(TUT);
+    assert.equal(pair.card.clues[1].refs[0], pair.anchor.id);
+    assert.equal(pickTutorialCards(TUT, new Set(TUT.map((c) => c.id))), null);
   });
 });

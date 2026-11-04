@@ -232,35 +232,33 @@ export function shuffle(items, rng) {
   return a;
 }
 
+/** 한 라운드 카드 수(D16, D22). */
+export const ROUND_SIZE = 12;
+
 /**
- * 라운드에 낼 카드 id를 고른다(D16): 칸마다 판정 카드 1장, 아직 수집하지 않은 카드를 먼저, 그다음 섞는다.
- * Godot `RoundBuilder.build_queue`와 같은 절차다(난수 소비 순서까지 같지는 않다).
+ * 라운드에 낼 카드 id를 고른다(D22): 칸 구성과 무관하게 판정 카드에서 뽑는다.
+ * 아직 수집하지 않은 카드(오답으로 공개만 된 카드 포함)를 먼저 섞어 뽑고, 모자라면 수집한 카드로 채운다.
+ * 그래서 어떤 칸은 0장, 어떤 칸은 여러 장일 수 있다(빈 칸이 정답을 알려 주지 않게).
  * @param {Array<object>} playable
  * @param {() => number} rng
  * @param {Record<string, string>} [collection] {id: 'collected'|'revealed'}
+ * @param {number} [size]
  * @returns {string[]}
  */
-export function buildRoundOrder(playable, rng, collection = {}) {
-  const picks = [];
-  for (const n of NATION_IDS) {
-    for (const e of ERA_IDS) {
-      const candidates = playable.filter((c) => c.answer.nation === n && c.answer.era === e);
-      if (!candidates.length) continue;
-      const fresh = candidates.filter((c) => collection[c.id] !== 'collected');
-      const pool = fresh.length ? fresh : candidates;
-      picks.push(pool[Math.floor(rng() * pool.length)].id);
-    }
-  }
+export function buildRoundOrder(playable, rng, collection = {}, size = ROUND_SIZE) {
+  const fresh = shuffle(playable.filter((c) => collection[c.id] !== 'collected').map((c) => c.id), rng);
+  const old = shuffle(playable.filter((c) => collection[c.id] === 'collected').map((c) => c.id), rng);
+  const picks = [...fresh, ...old].slice(0, Math.min(size, playable.length));
   return shuffle(picks, rng);
 }
 
 /**
  * 새 라운드를 만든다.
  * @param {Array<object>} playable playableCards()의 결과
- * @param {{seed: number, startInk: number, collection?: Record<string, string>}} opts
+ * @param {{seed: number, startInk: number, collection?: Record<string, string>, size?: number}} opts
  */
-export function createRound(playable, { seed, startInk, collection = {} }) {
-  const order = buildRoundOrder(playable, createRng(seed), collection);
+export function createRound(playable, { seed, startInk, collection = {}, size = ROUND_SIZE }) {
+  const order = buildRoundOrder(playable, createRng(seed), collection, size);
   return Object.freeze({ seed, startInk, ink: startInk, order: Object.freeze(order), index: 0, shown: 1, placements: Object.freeze([]) });
 }
 
@@ -354,23 +352,15 @@ export function serializeRound(state) {
 }
 
 /**
- * 저장된 라운드를 복원한다. 카드 데이터와 맞지 않으면(카드가 바뀌었으면) null.
+ * 저장된 라운드를 복원한다. 카드 데이터와 맞지 않으면(카드가 바뀌었거나 라운드 구성이 다르면) null.
  * @param {object} saved
  * @param {Array<object>} playable
  */
-export function restoreRound(saved, playable) {
+export function restoreRound(saved, playable, size = ROUND_SIZE) {
   if (!saved || !Array.isArray(saved.order) || !Array.isArray(saved.placements)) return null;
-  const byId = new Map(playable.map((c) => [c.id, c]));
-  const cellsWithCards = new Set(playable.map((c) => `${c.answer.nation}:${c.answer.era}`));
-  const cells = new Set();
-  for (const id of saved.order) {
-    const c = byId.get(id);
-    if (!c) return null;
-    const key = `${c.answer.nation}:${c.answer.era}`;
-    if (cells.has(key)) return null;
-    cells.add(key);
-  }
-  if (cells.size !== cellsWithCards.size) return null;
+  const ids = new Set(playable.map((c) => c.id));
+  if (saved.order.length !== Math.min(size, playable.length)) return null;
+  if (new Set(saved.order).size !== saved.order.length || !saved.order.every((id) => ids.has(id))) return null;
   const n = saved.order.length;
   if (!Number.isInteger(saved.index) || saved.index < 0 || saved.index > n) return null;
   if (saved.placements.length !== saved.index) return null;
