@@ -1,0 +1,213 @@
+[
+  {
+    "id": "goguryeo-peak-anchor", "type": "artifact", "title": "광개토대왕릉비", "anchor": true,
+    "answer": { "nation": "goguryeo", "era": "peak" }, "clues": [],
+    "explanation": "장수왕이 아버지 광개토대왕의 정복을 기록해 세운 비석. 영토 확장의 상징이므로 전성기.",
+    "date_label": "414년",
+    "source": { "name": "광개토대왕릉비문", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 1, "image": null, "image_source": null, "image_license": null, "tags": ["기준", "고구려"]
+  },
+  {
+    "id": "baekje-ending-anchor", "type": "event", "title": "황산벌 전투", "anchor": true,
+    "answer": { "nation": "baekje", "era": "ending" }, "clues": [],
+    "explanation": "계백의 결사대가 신라군에 패하고 곧 사비성이 함락된다. 백제 멸망 직전의 싸움이므로 결말기.",
+    "date_label": "660년",
+    "source": { "name": "삼국사기 백제본기", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 1, "image": null, "image_source": null, "image_license": null, "tags": ["기준", "백제"]
+  },
+  {
+    "id": "silla-founding-anchor", "type": "myth", "title": "박혁거세 신화", "anchor": true,
+    "answer": { "nation": "silla", "era": "founding" }, "clues": [],
+    "explanation": "알에서 태어난 박혁거세가 서라벌의 첫 임금이 된다는 건국 전승이므로 건국기.",
+    "date_label": "전승 기원전 57년",
+    "source": { "name": "삼국사기 신라본기", "url": null, "note": "웹 빌드 샘플 데이터. 전승 연대. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 1, "image": null, "image_source": null, "image_license": null, "tags": ["기준", "신라"]
+  },
+
+  {
+    "id": "goguryeo-founding-01", "type": "myth", "title": "졸본에서의 건국", "anchor": false,
+    "answer": { "nation": "goguryeo", "era": "founding" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "압록강 중류 산악 지대에서 활 잘 쏘는 인물이 새 나라를 세운다는 이야기.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[광개토대왕릉비]를 세우게 되는 나라의 맨 처음이다.", "refs": ["goguryeo-peak-anchor"] },
+      { "level": 3, "kind": "direct", "text": "건국 전승 연대는 기원전 37년.", "refs": [] }
+    ],
+    "explanation": "고구려 건국 전승(주몽). 나라가 시작되는 사건이므로 건국기.",
+    "date_label": "전승 기원전 37년",
+    "source": { "name": "삼국사기 고구려본기", "url": null, "note": "웹 빌드 샘플 데이터. 전승 연대. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 1, "image": null, "image_source": null, "image_license": null, "tags": ["건국", "고구려"]
+  },
+  {
+    "id": "goguryeo-peak-01", "type": "event", "title": "평양 천도", "anchor": false,
+    "answer": { "nation": "goguryeo", "era": "peak" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "북쪽 산성 도읍을 떠나 넓은 강가 평야로 수도를 옮기고 남쪽을 바라본다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[광개토대왕릉비]를 세운 바로 그 왕이 한 일이다.", "refs": ["goguryeo-peak-anchor"] },
+      { "level": 3, "kind": "direct", "text": "427년, 장수왕.", "refs": [] }
+    ],
+    "explanation": "장수왕이 수도를 국내성에서 평양으로 옮기고 남진을 본격화했다. 세력이 커지던 때이므로 전성기.",
+    "date_label": "427년",
+    "source": { "name": "삼국사기 고구려본기", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 2, "image": null, "image_source": null, "image_license": null, "tags": ["천도", "고구려"]
+  },
+  {
+    "id": "goguryeo-ending-01", "type": "event", "title": "살수대첩", "anchor": false,
+    "answer": { "nation": "goguryeo", "era": "ending" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "중국 통일 왕조의 대군이 쳐들어오지만 한 장군의 유인 작전에 무너진다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[광개토대왕릉비]를 세운 나라가 약 200년 뒤 겪은 큰 시험이다.", "refs": ["goguryeo-peak-anchor"] },
+      { "level": 3, "kind": "direct", "text": "612년, 수나라, 을지문덕.", "refs": [] }
+    ],
+    "explanation": "612년 수의 침공을 막아 낸 싸움. 나라의 마지막을 향한 대외 전쟁의 시작이므로 결말기.",
+    "date_label": "612년",
+    "source": { "name": "삼국사기 고구려본기", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 2, "image": null, "image_source": null, "image_license": null, "tags": ["전쟁", "고구려"]
+  },
+  {
+    "id": "baekje-founding-01", "type": "myth", "title": "온조의 위례성 건국", "anchor": false,
+    "answer": { "nation": "baekje", "era": "founding" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "한강 유역에 북쪽에서 내려온 집단이 작은 나라를 세운다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[황산벌 전투]에서 마지막을 맞는 나라의 첫 장면이다.", "refs": ["baekje-ending-anchor"] },
+      { "level": 3, "kind": "direct", "text": "건국 전승 연대는 기원전 18년.", "refs": [] }
+    ],
+    "explanation": "백제 건국 전승(온조). 나라가 시작되는 이야기이므로 건국기.",
+    "date_label": "전승 기원전 18년",
+    "source": { "name": "삼국사기 백제본기", "url": null, "note": "웹 빌드 샘플 데이터. 전승 연대. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 1, "image": null, "image_source": null, "image_license": null, "tags": ["건국", "백제"]
+  },
+  {
+    "id": "baekje-peak-01", "type": "event", "title": "평양성 공격", "anchor": false,
+    "answer": { "nation": "baekje", "era": "peak" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "마한 지역을 아우른 왕이 북쪽으로 군대를 올린다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[황산벌 전투]보다 약 300년 앞선, 이 나라의 가장 강했던 때다.", "refs": ["baekje-ending-anchor"] },
+      { "level": 3, "kind": "direct", "text": "371년, 상대 나라의 왕이 전사한다.", "refs": [] }
+    ],
+    "explanation": "근초고왕 때(4세기 후반) 평양성 공격. 영토를 넓히던 때이므로 전성기.",
+    "date_label": "371년",
+    "source": { "name": "삼국사기 백제본기", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 2, "image": null, "image_source": null, "image_license": null, "tags": ["확장", "백제"]
+  },
+  {
+    "id": "baekje-ending-01", "type": "event", "title": "백강 전투", "anchor": false,
+    "answer": { "nation": "baekje", "era": "ending" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "나라를 되살리려는 사람들과 바다 건너 온 지원군이 강 하구에서 크게 패한다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[황산벌 전투] 3년 뒤, 그 나라를 다시 세우려던 마지막 싸움이다.", "refs": ["baekje-ending-anchor"] },
+      { "level": 3, "kind": "direct", "text": "663년, 부흥군과 왜의 수군.", "refs": [] }
+    ],
+    "explanation": "백제 부흥 운동이 백강에서 무너졌다. 나라 이야기의 마무리이므로 결말기.",
+    "date_label": "663년",
+    "source": { "name": "삼국사기 신라본기·일본서기", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 2, "image": null, "image_source": null, "image_license": null, "tags": ["전쟁", "백제"]
+  },
+  {
+    "id": "silla-founding-01", "type": "myth", "title": "계림의 금궤 전승", "anchor": false,
+    "answer": { "nation": "silla", "era": "founding" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "숲속 나뭇가지에 걸린 금빛 궤짝에서 아이가 나오고, 흰 닭이 그 아래에서 운다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[박혁거세 신화]의 나라에서, 훗날 왕위를 잇는 또 다른 성씨의 시조 이야기다.", "refs": ["silla-founding-anchor"] },
+      { "level": 3, "kind": "direct", "text": "김씨의 시조 김알지.", "refs": [] }
+    ],
+    "explanation": "신라 김씨 시조 김알지 전승. 나라 초창기의 전승이므로 건국기.",
+    "date_label": "전승 65년",
+    "source": { "name": "삼국사기 신라본기", "url": null, "note": "웹 빌드 샘플 데이터. 전승 연대. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 2, "image": null, "image_source": null, "image_license": null, "tags": ["건국", "신라"]
+  },
+  {
+    "id": "silla-peak-01", "type": "artifact", "title": "진흥왕 순수비", "anchor": false,
+    "answer": { "nation": "silla", "era": "peak" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "새로 차지한 땅을 둘러보고 기념 비석을 세운다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[박혁거세 신화]의 나라가 한강 유역까지 진출한 때다.", "refs": ["silla-founding-anchor"] },
+      { "level": 3, "kind": "direct", "text": "6세기 중반.", "refs": [] }
+    ],
+    "explanation": "진흥왕 때(6세기 중반) 신라가 한강 유역을 차지했다. 영토 확장이므로 전성기.",
+    "date_label": "555~568년경",
+    "source": { "name": "진흥왕 순수비문", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 2, "image": null, "image_source": null, "image_license": null, "tags": ["확장", "신라"]
+  },
+  {
+    "id": "silla-ending-01", "type": "event", "title": "기벌포 전투", "anchor": false,
+    "answer": { "nation": "silla", "era": "ending" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "예전에 손잡았던 대군을 서해안에서 몰아낸다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[황산벌 전투]로부터 십여 년 뒤, 이긴 쪽이 전쟁을 마무리 짓는다.", "refs": ["baekje-ending-anchor"] },
+      { "level": 3, "kind": "direct", "text": "676년, 당군.", "refs": [] }
+    ],
+    "explanation": "676년 신라가 당군을 몰아내 전쟁을 끝냈다. 통일 완성이므로 결말기.",
+    "date_label": "676년",
+    "source": { "name": "삼국사기 신라본기", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 2, "image": null, "image_source": null, "image_license": null, "tags": ["전쟁", "신라"]
+  },
+  {
+    "id": "gaya-founding-01", "type": "myth", "title": "수로왕의 건국 전승", "anchor": false,
+    "answer": { "nation": "gaya", "era": "founding" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "하늘에서 내려온 상자 속 알들에서 여섯 왕이 나왔다는 이야기.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[박혁거세 신화]와 같은 알 이야기 구조이지만 낙동강 하류의 나라다.", "refs": ["silla-founding-anchor"] },
+      { "level": 3, "kind": "direct", "text": "금관가야.", "refs": [] }
+    ],
+    "explanation": "금관가야 건국 전승. 나라가 시작되는 이야기이므로 건국기.",
+    "date_label": "전승 42년",
+    "source": { "name": "삼국유사 가락국기", "url": null, "note": "웹 빌드 샘플 데이터. 전승 연대. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 1, "image": null, "image_source": null, "image_license": null, "tags": ["건국", "가야"]
+  },
+  {
+    "id": "gaya-peak-01", "type": "event", "title": "가라왕 하지의 남제 사신", "anchor": false,
+    "answer": { "nation": "gaya", "era": "peak" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "내륙 산간의 연맹 중심 나라가 바다 건너 남쪽 중국 왕조에 사신을 보내 작위를 받는다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[광개토대왕릉비]에 적힌 남쪽 원정 뒤, 연맹의 중심이 내륙으로 옮겨 가 다시 커진 때다.", "refs": ["goguryeo-peak-anchor"] },
+      { "level": 3, "kind": "direct", "text": "479년, 대가야.", "refs": [] }
+    ],
+    "explanation": "대가야가 남제에 사신을 보내 국제 무대에 나섰다. 연맹이 다시 번성하던 때이므로 전성기.",
+    "date_label": "479년",
+    "source": { "name": "남제서 동남이전", "url": null, "note": "웹 빌드 샘플 데이터. 가야 시기 구분 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 3, "image": null, "image_source": null, "image_license": null, "tags": ["외교", "가야"]
+  },
+  {
+    "id": "gaya-ending-01", "type": "event", "title": "대가야의 멸망", "anchor": false,
+    "answer": { "nation": "gaya", "era": "ending" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "하나로 묶여 있던 작은 나라들의 마지막 중심이 이웃에 흡수된다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[박혁거세 신화]의 나라가 낙동강 서쪽까지 정리한 일이다.", "refs": ["silla-founding-anchor"] },
+      { "level": 3, "kind": "direct", "text": "562년.", "refs": [] }
+    ],
+    "explanation": "금관가야(532)에 이어 대가야(562)가 신라에 흡수되었다. 나라의 마지막이므로 결말기.",
+    "date_label": "562년",
+    "source": { "name": "삼국사기 신라본기", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": false, "disputed_note": null,
+    "difficulty": 2, "image": null, "image_source": null, "image_license": null, "tags": ["멸망", "가야"]
+  },
+  {
+    "id": "gaya-peak-disputed-01", "type": "artifact", "title": "덩이쇠 수출", "anchor": false,
+    "answer": { "nation": "gaya", "era": "peak" },
+    "clues": [
+      { "level": 1, "kind": "description", "text": "철을 일정한 모양으로 만들어 화폐처럼 쓰고 바다 건너로 내다 판다.", "refs": [] },
+      { "level": 2, "kind": "relation", "text": "[박혁거세 신화]와 비슷한 때 시작된 낙동강 하류의 나라가 번성하던 때다.", "refs": ["silla-founding-anchor"] },
+      { "level": 3, "kind": "direct", "text": "낙랑과 왜에 수출.", "refs": [] }
+    ],
+    "explanation": "철 생산과 수출로 번성한 가야 연맹. 해설용 카드(판정 제외).",
+    "date_label": null,
+    "source": { "name": "삼국지 위서 동이전", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
+    "verified": false, "verified_by": null, "disputed": true,
+    "disputed_note": "덩이쇠 교역이 활발했던 시기를 전기 가야(금관가야 중심)로 볼지, 전성기로 묶을지 견해가 갈린다(D3).",
+    "difficulty": 2, "image": null, "image_source": null, "image_license": null, "tags": ["철", "가야"]
+  }
+]
