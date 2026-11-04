@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 768" width="1024" height="768" role="img" aria-label="유물 카드 대체 문양: 굽다리 그릇">
+  <title>유물 카드 대체 문양</title>
+  <rect width="1024" height="768" fill="#EFE6D2"/>
+  <rect x="40" y="40" width="944" height="688" fill="none" stroke="#8A6D3B" stroke-width="3"/>
+  <rect x="56" y="56" width="912" height="656" fill="none" stroke="#8A6D3B" stroke-width="1"/>
+  <path d="M312 270 L712 270 Q700 410 560 440 L560 560 L640 600 L384 600 L464 560 L464 440 Q324 410 312 270 Z" fill="none" stroke="#2B2118" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="512" cy="270" rx="200" ry="26" fill="none" stroke="#2B2118" stroke-width="4"/>
+  <path d="M352 330 Q432 350 512 330 Q592 310 672 330" fill="none" stroke="#8A6D3B" stroke-width="3"/>
+  <path d="M376 380 Q444 398 512 380 Q580 362 648 380" fill="none" stroke="#8A6D3B" stroke-width="3"/>
+  <path d="M470 520 L554 520" fill="none" stroke="#C79A2E" stroke-width="4" stroke-linecap="round"/>
+  <line x1="300" y1="640" x2="724" y2="640" stroke="#8A6D3B" stroke-width="2" stroke-dasharray="14 10"/>
+</svg>

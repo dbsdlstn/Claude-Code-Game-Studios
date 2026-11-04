@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 768" width="1024" height="768" role="img" aria-label="전승 카드 대체 문양: 알과 구름">
+  <title>전승 카드 대체 문양</title>
+  <rect width="1024" height="768" fill="#EFE6D2"/>
+  <rect x="40" y="40" width="944" height="688" fill="none" stroke="#8A6D3B" stroke-width="3"/>
+  <rect x="56" y="56" width="912" height="656" fill="none" stroke="#8A6D3B" stroke-width="1"/>
+  <ellipse cx="512" cy="420" rx="110" ry="150" fill="none" stroke="#2B2118" stroke-width="5"/>
+  <path d="M512 150 L512 210 M392 200 L426 250 M632 200 L598 250 M340 300 L400 322 M684 300 L624 322" fill="none" stroke="#C79A2E" stroke-width="5" stroke-linecap="round"/>
+  <path d="M230 600 Q260 560 310 580 Q340 540 400 570 Q440 540 480 580 L230 600 Z" fill="none" stroke="#8A6D3B" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M544 600 Q584 560 640 580 Q680 540 730 570 Q770 550 800 600 Z" fill="none" stroke="#8A6D3B" stroke-width="3" stroke-linejoin="round"/>
+  <line x1="200" y1="640" x2="824" y2="640" stroke="#8A6D3B" stroke-width="2" stroke-dasharray="14 10"/>
+</svg>

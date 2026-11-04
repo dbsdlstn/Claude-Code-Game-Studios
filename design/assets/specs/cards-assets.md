@@ -3,7 +3,7 @@
 > **Source**: `design/game-brief.md`, `design/card-data-schema.md`
 > **Art Bible**: `design/art/art-bible.md` (§1 한 줄 규칙, §4 색, §8 에셋 규격, 부록 A 고증)
 > **Generated**: 2026-11-04
-> **Status**: 템플릿 확정, 카드별 명세 3장(예시) / 나머지 대기. 카드별 프롬프트는 콘텐츠 세션의 `assets/data/cards/samguk.json`(브랜치 `claude/content-cards`)이 올라오면 그 `id`로 작성한다. 이 시점에는 원격에서 그 브랜치를 찾지 못했다.
+> **Status**: 공통 템플릿 확정. **카드별 프롬프트 44장은 `design/assets/specs/cards-prompts.md`에 있다**(`assets/data/cards/samguk.json` 기준, 전부 Needed). 이 파일 아래의 ASSET-001~003 예시는 초기 임시 id를 썼으므로 실제 id는 `cards-prompts.md`를 따른다. 이미지를 넣는 절차는 `design/assets/image-workflow.md`.
 > **Technical-artist 검증**: NOT RUN. 성능 예산은 `project.yaml`과 art-bible §8의 계산만 반영했다.
 
 ## 1. 공통 규격
@@ -152,6 +152,8 @@ Negative: [네거티브 프롬프트], blood, corpses, explosions, cannons
 ---
 
 ## 대기 목록
-- 카드별 명세: `assets/data/cards/samguk.json` 도착 후 모든 카드 `id`에 대해 작성한다.
-- 기준 카드 3장(광개토대왕릉비, 황산벌 전투, 박혁거세 신화)은 이름과 일러스트가 처음부터 보이므로 우선순위가 높다.
+- 카드별 명세: 작성 완료 → `design/assets/specs/cards-prompts.md`(44장).
+- 기준 카드 4장(광개토대왕릉비, 황산벌 전투, 박혁거세 신화, 수로왕 탄생 신화)은 이름과 일러스트가 처음부터 보이므로 우선순위가 높다.
+- 대체 문양 4종은 `assets/art/placeholders/`에 있다(art-bible §7.1).
 - UI 에셋(인장 4종, 먹 번짐 마스크, 한지 질감): 별도 명세가 필요하다.
+- 이 명세의 예시 id(ASSET-001~003)는 임시다. 예: `silla-peak-02`는 실제 카드에서 이차돈 카드이고 진흥왕 순수비는 `silla-peak-03`이다.
