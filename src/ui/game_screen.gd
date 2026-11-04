@@ -150,15 +150,22 @@ func add_notice(text: String) -> void:
 	_notice_label.visible = true
 
 
-func _on_cell_targeted(nation: String, era: String, by_drop: bool) -> void:
+## 키보드 초점을 카드에 둔다(화면을 열 때, 키보드로 놓은 뒤).
+func focus_default() -> void:
+	_card_view.grab_focus()
+
+
+func _on_cell_targeted(nation: String, era: String, by_drop: bool, by_keyboard: bool) -> void:
 	if by_drop or _card_view.selected:
 		_card_view.set_selected(false)
 		placement_requested.emit(nation, era)
+		if by_keyboard:
+			# 키보드로 놓았으면 다음 카드를 바로 고를 수 있게 초점을 카드로 돌려준다(리뷰 2 L5).
+			_card_view.grab_focus.call_deferred()
 
 
-func _on_selection_changed(is_selected: bool) -> void:
-	# 카드를 고르면 초점을 보드 첫 칸으로 옮겨 방향키로 칸을 고를 수 있게 한다.
-	if is_selected:
-		var first := _board.cell(_config.nation_ids()[0], _config.era_ids()[0])
-		if first != null:
-			first.grab_focus()
+func _on_selection_changed(is_selected: bool, by_keyboard: bool) -> void:
+	# 키보드로 고르면 초점을 보드 첫 칸으로 옮겨 방향키로 칸을 고를 수 있게 한다.
+	# 마우스로 고르면 초점을 옮기지 않는다(리뷰 2 L4).
+	if is_selected and by_keyboard:
+		_board.focus_first_cell(_config)

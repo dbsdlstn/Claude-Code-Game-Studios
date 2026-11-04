@@ -49,9 +49,8 @@ func setup(config: GameConfig, data: TutorialData) -> void:
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation", 16)
 	add_child(body)
-	var anchors: Array[CardData] = [data.anchor]
 	_board = BoardView.new()
-	_board.setup(config, anchors)
+	_board.setup(config, data.board_anchors)
 	_board.cell_targeted.connect(_on_cell_targeted)
 	body.add_child(_board)
 
@@ -76,6 +75,7 @@ func setup(config: GameConfig, data: TutorialData) -> void:
 	side.add_child(_next_button)
 	_card_view = CardView.new()
 	_card_view.more_clues_requested.connect(_on_more)
+	_card_view.selection_changed.connect(_on_selection_changed)
 	side.add_child(_card_view)
 	_render()
 
@@ -126,6 +126,7 @@ func _on_next() -> void:
 			finished.emit(false)
 			return
 	_render()
+	focus_default.call_deferred()
 
 
 func _on_more() -> void:
@@ -135,9 +136,23 @@ func _on_more() -> void:
 		_render()
 
 
-func _on_cell_targeted(nation: String, era: String, by_drop: bool) -> void:
+## 키보드 초점: 놓기 단계 전에는 "다음", 그 뒤에는 카드.
+func focus_default() -> void:
+	if _next_button.visible:
+		_next_button.grab_focus()
+	else:
+		_card_view.grab_focus()
+
+
+func _on_selection_changed(is_selected: bool, by_keyboard: bool) -> void:
+	if is_selected and by_keyboard:
+		_board.focus_first_cell(_config)
+
+
+func _on_cell_targeted(nation: String, era: String, by_drop: bool, by_keyboard: bool) -> void:
 	if _session.solved or (not by_drop and not _card_view.selected):
 		return
+	_card_view.set_selected(false)
 	var c := _session.card
 	if _session.place(nation, era):
 		_board.show_placed(c.nation, c.era, c.title, true)
@@ -149,3 +164,5 @@ func _on_cell_targeted(nation: String, era: String, by_drop: bool) -> void:
 			_step = Step.RELATION
 		_render()
 		_guide.text += "\n\n그 칸이 아닙니다. 3단계 단서까지 열었습니다. 다시 놓아 보세요."
+	if by_keyboard:
+		focus_default.call_deferred()

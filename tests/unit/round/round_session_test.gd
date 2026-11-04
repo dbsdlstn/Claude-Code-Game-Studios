@@ -192,3 +192,67 @@ func test_from_dict_with_unknown_card_returns_null() -> void:
 	var cs := CardLoader.build(Fx.valid_set(), Fx.nation_ids(), Fx.era_ids(), false)
 	var d := {"version": 1, "card_ids": ["no-such-card"], "index": 0, "ink": 5, "max_ink": 5}
 	assert_object(RoundSession.from_dict(d, cs, Fx.nation_ids(), Fx.era_ids())).is_null()
+
+
+func test_new_ids_survive_save_and_restore() -> void:
+	# 리뷰 2 N3: 이어하기 뒤에도 이번 라운드에 새로 모은 카드가 결과·기록에 남는다.
+	# Arrange
+	var cs := CardLoader.build(Fx.valid_set(), Fx.nation_ids(), Fx.era_ids(), false)
+	var queue: Array[CardData] = [cs.get_card("silla-peak"), cs.get_card("gaya-ending")]
+	var s := RoundSession.new(queue, 5, Fx.nation_ids(), Fx.era_ids())
+	s.place_current("silla", "peak")
+	s.note_new_collected("silla-peak")
+	# Act: 저장 → 되살리기 → 남은 카드 처리
+	var saved: Dictionary = JSON.parse_string(JSON.stringify(s.to_dict()))
+	var r := RoundSession.from_dict(saved, cs, Fx.nation_ids(), Fx.era_ids())
+	r.place_current("gaya", "ending")
+	r.note_new_collected("gaya-ending")
+	var p := ProgressData.new()
+	var sm := r.summary()
+	p.record_round_result(sm, sm["new_ids"])
+	# Assert
+	assert_array(sm["new_ids"]).is_equal(["silla-peak", "gaya-ending"])
+	assert_array(p.round_log[0]["new_ids"]).is_equal(["silla-peak", "gaya-ending"])
+
+
+func test_note_new_collected_ignores_duplicates() -> void:
+	var s := _session(["silla-peak"])
+	s.note_new_collected("silla-peak")
+	s.note_new_collected("silla-peak")
+	assert_int(s.new_ids.size()).is_equal(1)
+
+
+func _saved_after_one_wrong() -> Dictionary:
+	var cs := CardLoader.build(Fx.valid_set(), Fx.nation_ids(), Fx.era_ids(), false)
+	var queue: Array[CardData] = [cs.get_card("silla-peak"), cs.get_card("gaya-ending")]
+	var s := RoundSession.new(queue, 5, Fx.nation_ids(), Fx.era_ids())
+	s.place_current("goguryeo", "founding")
+	return JSON.parse_string(JSON.stringify(s.to_dict()))
+
+
+func _restore(d: Dictionary) -> RoundSession:
+	var cs := CardLoader.build(Fx.valid_set(), Fx.nation_ids(), Fx.era_ids(), false)
+	return RoundSession.from_dict(d, cs, Fx.nation_ids(), Fx.era_ids())
+
+
+func test_restore_rejects_counts_that_do_not_add_up() -> void:
+	# 리뷰 2 L9: 정답+오답이 놓은 수와 다르면 버린다.
+	var d := _saved_after_one_wrong()
+	d["correct"] = 1
+	assert_object(_restore(d)).is_null()
+
+
+func test_restore_rejects_ink_not_matching_wrong_count() -> void:
+	var d := _saved_after_one_wrong()
+	d["ink"] = 5
+	assert_object(_restore(d)).is_null()
+
+
+func test_restore_rejects_board_card_in_wrong_cell() -> void:
+	var d := _saved_after_one_wrong()
+	d["placed"] = {"gaya/ending": [{"card_id": "silla-peak", "correct": false}]}
+	assert_object(_restore(d)).is_null()
+
+
+func test_restore_accepts_consistent_save() -> void:
+	assert_object(_restore(_saved_after_one_wrong())).is_not_null()

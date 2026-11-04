@@ -12,6 +12,7 @@ var _stats: Label
 var _list: VBoxContainer
 var _detail: Label
 var _config: GameConfig
+var _close: Button
 
 
 func _init() -> void:
@@ -28,10 +29,10 @@ func _init() -> void:
 	_summary.add_theme_font_size_override("font_size", 22)
 	_summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(_summary)
-	var close := Button.new()
-	close.text = "돌아가기"
-	close.pressed.connect(func() -> void: closed.emit())
-	header.add_child(close)
+	_close = Button.new()
+	_close.text = "돌아가기"
+	_close.pressed.connect(func() -> void: closed.emit())
+	header.add_child(_close)
 
 	_stats = HanjiTheme.small_label("", 15)
 	root.add_child(_stats)
@@ -97,13 +98,24 @@ func show_dogam(config: GameConfig, cards: CardSet, progress: ProgressData) -> v
 			_add_entry(d.title, d, true)
 
 
+## 키보드 초점을 "돌아가기"에 둔다. 카드 목록은 Tab/방향키로 옮겨 간다.
+func focus_default() -> void:
+	_close.grab_focus()
+
+
 ## 플레이 기록 한 줄. st: ProgressData.stats().
 static func format_stats(st: Dictionary) -> String:
 	if int(st["rounds"]) == 0:
 		return "플레이 기록: 아직 끝낸 라운드가 없습니다."
-	return "플레이 기록: 라운드 %d (클리어 %d · 실패 %d) · 정답률 %d%% · 평균 단서 단계 %.1f" % [
-		int(st["rounds"]), int(st["cleared"]), int(st["failed"]),
-		roundi(float(st["accuracy"]) * 100.0), float(st["avg_clue_level"])]
+	var head := "플레이 기록: 라운드 %d (클리어 %d · 실패 %d)" % [int(st["rounds"]), int(st["cleared"]), int(st["failed"])]
+	var logged := int(st["logged_rounds"])
+	if logged == 0:
+		# v1 저장에서 넘어온 라운드는 세부 기록이 없다(리뷰 2 L1).
+		return head + " · 이전 버전 기록이라 정답률·단서 단계 세부가 없습니다."
+	var tail := " · 정답률 %d%% · 평균 단서 단계 %.1f" % [roundi(float(st["accuracy"]) * 100.0), float(st["avg_clue_level"])]
+	if logged < int(st["rounds"]):
+		tail += " (세부 기록이 있는 %d라운드 기준)" % logged
+	return head + tail
 
 
 ## 카드 해설 문장을 만든다(화면 밖에서도 쓸 수 있게 static).

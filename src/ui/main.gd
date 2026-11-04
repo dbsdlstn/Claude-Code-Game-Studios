@@ -12,8 +12,6 @@ var _store: SaveStore
 var _session: RoundSession
 var _rng := RandomNumberGenerator.new()
 var _notice: String = ""
-## 이번 라운드에 새로 도감에 들어간 카드 id.
-var _new_ids: Array = []
 var _last_message: String = ""
 
 var _screen_root: MarginContainer
@@ -23,6 +21,7 @@ var _result: ResultView
 var _dogam: DogamView
 var _help: HelpView
 var _tutorial_view: TutorialView
+var _confirm_new: ConfirmationDialog
 ## 도감·하는 방법을 닫으면 돌아갈 화면.
 var _return_to: Control
 
@@ -53,7 +52,7 @@ func _ready() -> void:
 	if cards_path != _config.cards_path:
 		notices.append("콘텐츠 파일이 없어 테스트 픽스처 사용 (%s)" % cards_path)
 	if font_pick["source"] == HanjiTheme.FONT_SOURCE_MISSING:
-		notices.append("한글 글꼴을 찾지 못함: 한글 TTF를 %s 에 두세요" % _config.ui_font_path)
+		notices.append("목록의 한글 글꼴을 찾지 못함: 글자가 네모로 보이면 한글 TTF를 %s 에 두세요" % _config.ui_font_path)
 	_tutorial = _load_tutorial()
 	if _tutorial == null and not _config.tutorial_path.is_empty():
 		notices.append("튜토리얼 데이터 오류로 튜토리얼을 건너뜀")
@@ -83,7 +82,7 @@ func _build_screens() -> void:
 	add_child(_screen_root)
 
 	_title = TitleScreen.new()
-	_title.start_pressed.connect(_start_new_round)
+	_title.start_pressed.connect(_on_start_pressed)
 	_title.continue_pressed.connect(_continue_round)
 	_title.dogam_pressed.connect(_open_dogam)
 	_title.help_pressed.connect(_open_help)
@@ -112,18 +111,30 @@ func _build_screens() -> void:
 	_help.closed.connect(_close_overlay)
 	_screen_root.add_child(_help)
 
+	# 진행 중 라운드가 있을 때 "시작하기"는 확인을 받는다(리뷰 2 L8). 화면 목록과 섞이지 않게 Main에 붙인다.
+	_confirm_new = ConfirmationDialog.new()
+	_confirm_new.title = "새 라운드"
+	_confirm_new.dialog_text = "진행 중인 라운드를 버리고 새로 시작할까요?\n(도감에 모은 카드는 그대로 남습니다.)"
+	_confirm_new.ok_button_text = "새로 시작"
+	_confirm_new.cancel_button_text = "취소"
+	_confirm_new.theme = HanjiTheme.current()
+	_confirm_new.confirmed.connect(_start_new_round)
+	add_child(_confirm_new)
+
 
 ## 화면 하나만 보이게 한다.
 func _show_only(screen: Control) -> void:
 	for child in _screen_root.get_children():
 		(child as Control).visible = child == screen
+	# 화면마다 키보드 초점의 시작점을 준다(리뷰 2 L5).
+	if screen.has_method("focus_default"):
+		screen.call_deferred("focus_default")
 
 
 func _show_title() -> void:
 	_title.set_can_continue(_progress.has_current_round())
 	_title.set_summary(_dogam_text())
 	_show_only(_title)
-	_title.focus_default()
 
 
 func _open_dogam() -> void:
@@ -160,7 +171,7 @@ func _load_tutorial() -> TutorialData:
 	var path := _config.tutorial_path
 	if path.is_empty() or not FileAccess.file_exists(path):
 		return null
-	var t := TutorialData.parse(FileAccess.get_file_as_string(path), _cards, _config)
+	var t := TutorialData.parse(FileAccess.get_file_as_string(path), _cards, _config, _cards.release_mode)
 	if not t.is_valid():
 		for e: Dictionary in t.errors:
 			push_warning("튜토리얼: [%d] %s %s" % [int(e["rule"]), e["id"], e["message"]])
@@ -189,13 +200,18 @@ func _on_tutorial_finished(skipped: bool) -> void:
 
 # --- 라운드 진행 -------------------------------------------------------------
 
+func _on_start_pressed() -> void:
+	if _progress.has_current_round():
+		_confirm_new.popup_centered()
+	else:
+		_start_new_round()
+
+
 func _start_new_round() -> void:
 	var queue := RoundBuilder.build_queue(_cards, _config.round_size, _rng, _progress.collected)
 	_session = RoundSession.new(queue, _config.start_ink, _config.nation_ids(), _config.era_ids())
-	_new_ids = []
 	_last_message = ""
-	_progress.current_round = _session.to_dict()
-	_save()
+	_save_round()
 	_game.start_round()
 	_refresh()
 	_show_only(_game)
@@ -210,7 +226,6 @@ func _continue_round() -> void:
 		_game.add_notice("저장된 라운드를 이어 갈 수 없어 새 라운드를 시작했습니다")
 		return
 	_session = restored
-	_new_ids = []
 	_last_message = ""
 	_game.restore_round(_session, _cards)
 	_refresh()
@@ -223,8 +238,7 @@ func _refresh() -> void:
 
 func _on_more_clues() -> void:
 	if _session != null and _session.reveal_more():
-		_progress.current_round = _session.to_dict()
-		_save()
+		_save_round()
 		_refresh()
 
 
@@ -237,20 +251,19 @@ func _on_placement(nation: String, era: String) -> void:
 	var card: CardData = r["card"]
 	var was_complete := _progress.is_complete(_playable_ids())
 	if r["correct"] and _progress.collect(card.id):
-		_new_ids.append(card.id)
+		_session.note_new_collected(card.id)
 	var completed_now := not was_complete and _progress.is_complete(_playable_ids())
 	_game.show_placement(r, nation, era)
 	_last_message = "[%s] %s" % [card.title, "정답" if r["correct"] else "오답"]
 
 	if _session.is_over():
 		var summary := _session.summary()
-		_progress.record_round_result(summary, _new_ids)
+		_progress.record_round_result(summary, summary["new_ids"])
 		_save()
-		_result.show_result(_config, _cards, summary, _new_ids, completed_now, _last_message)
+		_result.show_result(_config, _cards, summary, summary["new_ids"], completed_now, _last_message)
 		_show_only(_result)
 		return
-	_progress.current_round = _session.to_dict()
-	_save()
+	_save_round()
 	_refresh()
 	if completed_now:
 		# 게임 클리어(decision-log D16): 라운드 도중에 완성되면 알리고 라운드는 계속한다.
@@ -268,6 +281,12 @@ func _playable_ids() -> PackedStringArray:
 func _dogam_text() -> String:
 	var ids := _playable_ids()
 	return "도감 %d / %d" % [_progress.count_in(ids), ids.size()]
+
+
+## 진행 중 라운드(이번 라운드에 새로 모은 카드 포함)를 저장한다.
+func _save_round() -> void:
+	_progress.current_round = _session.to_dict()
+	_save()
 
 
 func _save() -> void:

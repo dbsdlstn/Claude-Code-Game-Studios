@@ -15,11 +15,14 @@ const WRONG := Color(0.953, 0.769, 0.753)     # 오답 #f3c4c0
 const HOVER := Color(1.0, 0.914, 0.659)       # 끌어 놓기 대상 #ffe9a8
 const ACCENT := Color(0.753, 0.224, 0.169)    # 선택 표시 #c0392b
 
-## 한글이 있는 시스템 글꼴 이름(우선순위 순).
-const FONT_NAMES := [
+## 한글이 있는 시스템 글꼴 이름(우선순위 순). 한글 판정은 이 목록만으로 한다.
+const KOREAN_FONT_NAMES := [
 	"Noto Sans CJK KR", "Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo",
-	"NanumGothic", "NanumBarunGothic", "UnDotum", "sans-serif",
+	"NanumGothic", "NanumBarunGothic", "UnDotum",
 ]
+## 테마에 넣는 이름: 한글 목록 뒤에 일반 글꼴을 붙인다. "sans-serif"는 라틴 글꼴로 풀릴 수 있어
+## 판정에는 쓰지 않는다(리뷰 2 L3). 실제 그리기는 OS 대체 글꼴로 한글이 보일 수도 있다.
+const FALLBACK_FONT_NAME := "sans-serif"
 ## 글꼴이 한글을 그릴 수 있는지 볼 때 쓰는 글자('한', U+D55C).
 const HANGUL_PROBE := 0xD55C
 ## pick_font()가 고른 글꼴의 출처.
@@ -48,7 +51,11 @@ static func box(bg: Color, border: Color = BORDER, border_width: int = 1, margin
 ## 사용 예: var pick := HanjiTheme.pick_font(cfg.ui_font_path); theme = HanjiTheme.build(pick["font"])
 static func pick_font(bundled_path: String) -> Dictionary:
 	var system := SystemFont.new()
-	system.font_names = PackedStringArray(FONT_NAMES)
+	var names := PackedStringArray(KOREAN_FONT_NAMES)
+	names.append(FALLBACK_FONT_NAME)
+	system.font_names = names
+	var probe := SystemFont.new()
+	probe.font_names = PackedStringArray(KOREAN_FONT_NAMES)
 	if not bundled_path.is_empty() and ResourceLoader.exists(bundled_path):
 		var bundled := load(bundled_path) as Font
 		if bundled != null and bundled.has_char(HANGUL_PROBE):
@@ -59,9 +66,9 @@ static func pick_font(bundled_path: String) -> Dictionary:
 				with_fallback.fallbacks = chain
 				return {"font": with_fallback, "source": FONT_SOURCE_BUNDLED}
 			return {"font": bundled, "source": FONT_SOURCE_BUNDLED}
-	if system.has_char(HANGUL_PROBE):
+	if probe.has_char(HANGUL_PROBE):
 		return {"font": system, "source": FONT_SOURCE_SYSTEM}
-	push_warning("한글 글꼴을 찾지 못했다. 한글 TTF를 %s 에 두면 그 글꼴을 쓴다." % bundled_path)
+	push_warning("목록의 한글 글꼴을 찾지 못했다. 글자가 네모로 보이면 한글 TTF를 %s 에 둔다." % bundled_path)
 	return {"font": system, "source": FONT_SOURCE_MISSING}
 
 

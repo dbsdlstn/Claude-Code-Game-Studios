@@ -8,6 +8,7 @@ signal dogam_pressed
 signal title_pressed
 
 var _body: VBoxContainer
+var _first_button: Button
 
 
 func _init() -> void:
@@ -66,17 +67,25 @@ func show_result(config: GameConfig, cards: CardSet, summary: Dictionary, new_id
 				_line("· %s — %s %s\n  %s" % [c.title, config.nation_label(c.nation), config.era_label(c.era), c.explanation])
 
 
+## 키보드 초점을 "새 라운드"에 둔다.
+func focus_default() -> void:
+	if _first_button != null:
+		_first_button.grab_focus()
+
+
 func _button(parent: Control, text: String, on_press: Callable) -> void:
 	var b := Button.new()
 	b.text = text
 	b.pressed.connect(on_press)
 	parent.add_child(b)
+	if _first_button == null:
+		_first_button = b
 
 
-func _heading(text: String, size: int) -> void:
+func _heading(text: String, font_size: int) -> void:
 	var l := Label.new()
 	l.text = text
-	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_font_size_override("font_size", font_size)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_body.add_child(l)
 

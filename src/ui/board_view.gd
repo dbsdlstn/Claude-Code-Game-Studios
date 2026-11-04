@@ -8,8 +8,9 @@ extends GridContainer
 ##   board.setup(cfg, card_set.anchors)
 ##   board.cell_targeted.connect(_on_target)
 
-## 칸에 카드를 놓으려 했다(드롭 또는 고른 카드로 칸 누르기). by_drop: 드롭이면 true.
-signal cell_targeted(nation: String, era: String, by_drop: bool)
+## 칸에 카드를 놓으려 했다(드롭 또는 고른 카드로 칸 누르기).
+## by_drop: 드롭이면 true. by_keyboard: 키보드로 칸을 눌렀으면 true.
+signal cell_targeted(nation: String, era: String, by_drop: bool, by_keyboard: bool)
 
 ## cell_key -> BoardCell
 var _cells: Dictionary = {}
@@ -49,8 +50,8 @@ func setup(config: GameConfig, anchors: Array[CardData]) -> void:
 					titles.append(a.title)
 			var bc := BoardCell.new()
 			bc.setup(n, e, titles)
-			bc.card_dropped.connect(func(cn: String, ce: String) -> void: cell_targeted.emit(cn, ce, true))
-			bc.cell_clicked.connect(func(cn: String, ce: String) -> void: cell_targeted.emit(cn, ce, false))
+			bc.card_dropped.connect(func(cn: String, ce: String) -> void: cell_targeted.emit(cn, ce, true, false))
+			bc.cell_clicked.connect(func(cn: String, ce: String, kb: bool) -> void: cell_targeted.emit(cn, ce, false, kb))
 			_cells[CardData.make_cell_key(n, e)] = bc
 			add_child(bc)
 
@@ -59,6 +60,13 @@ func setup(config: GameConfig, anchors: Array[CardData]) -> void:
 func reset() -> void:
 	for cell: BoardCell in _cells.values():
 		cell.show_empty()
+
+
+## 키보드 초점을 첫 칸으로 옮긴다.
+func focus_first_cell(config: GameConfig) -> void:
+	var c := cell(config.nation_ids()[0], config.era_ids()[0])
+	if c != null:
+		c.grab_focus()
 
 
 ## 칸을 찾는다. 없으면 null.
