@@ -1,19 +1,33 @@
 class_name HanjiTheme
 extends RefCounted
-## 한지·고지도 톤의 기본 테마(placeholder). 아트 에셋이 생기면 교체한다.
+## 한지·고지도 톤의 기본 테마. 색 값은 아트 바이블(design/art/art-bible.md §4) 하나를 따른다
+## (웹 빌드도 같은 hex, decision-log D37). 주석의 hex가 기준이고 Color()는 그 값을 255로 나눈 것이다.
 ## 색은 표시용 값이라 게임 규칙 설정(game_config.json)에 넣지 않았다.
 
-const PAPER := Color(0.937, 0.902, 0.824)     # 한지 바탕 #efe6d2
-const CARD := Color(1.0, 0.98, 0.941)         # 카드 #fffaf0
-const CELL := Color(0.969, 0.941, 0.871)      # 빈 칸 #f7f0de
-const ANCHOR := Color(0.890, 0.839, 0.706)    # 기준 카드 #e3d6b4
-const INK := Color(0.169, 0.129, 0.094)       # 먹색 글자 #2b2118
-const MUTED := Color(0.357, 0.290, 0.208)     # 보조 글자 #5b4a35
-const BORDER := Color(0.541, 0.427, 0.231)    # 테두리 #8a6d3b
-const CORRECT := Color(0.812, 0.910, 0.769)   # 정답 #cfe8c4
-const WRONG := Color(0.953, 0.769, 0.753)     # 오답 #f3c4c0
-const HOVER := Color(1.0, 0.914, 0.659)       # 끌어 놓기 대상 #ffe9a8
-const ACCENT := Color(0.753, 0.224, 0.169)    # 선택 표시 #c0392b
+const PAPER := Color(0.9373, 0.9020, 0.8235)     # 한지 바탕 #efe6d2
+const CARD := Color(1.0000, 0.9804, 0.9412)  # 카드 면 #fffaf0 (바이블에 없음: 칸보다 밝게 둔 구현 선택)
+const CELL := Color(0.9686, 0.9412, 0.8706)      # 빈 칸 #f7f0de
+const ANCHOR := Color(0.8902, 0.8392, 0.7059)    # 기준 카드 #e3d6b4
+const INK := Color(0.1686, 0.1294, 0.0941)       # 먹색 글자 #2b2118
+const MUTED := Color(0.3569, 0.2902, 0.2078)     # 보조 글자 #5b4a35
+const BORDER := Color(0.5412, 0.4275, 0.2314)    # 테두리 #8a6d3b
+const CORRECT := Color(0.8118, 0.9098, 0.7686)   # 정답 #cfe8c4
+const WRONG := Color(0.9529, 0.7686, 0.7529)     # 오답 #f3c4c0
+const HOVER := Color(1.0000, 0.9137, 0.6588)       # 끌어 놓기 대상 #ffe9a8
+const ACCENT := Color(0.7529, 0.2235, 0.1686)    # 선택 표시 #c0392b
+const GOLD := Color(0.7804, 0.6039, 0.1804)  # 금 #C79A2E
+const CORRECT_TEXT := Color(0.1804, 0.3529, 0.1647)  # 정답 글자 #2E5A2A
+const WRONG_TEXT := Color(0.5412, 0.1647, 0.1333)  # 오답 글자 #8A2A22
+const INK_EMPTY := Color(0.7882, 0.7373, 0.6078)  # 먹물 게이지 빈 칸 #C9BC9B
+## 나라 색(아트 바이블 §4.2). 보드 행 머리글과 공개 후 카드에만 쓴다(숨김 카드에는 쓰지 않는다).
+const NATION_COLORS := {
+	"goguryeo": Color(0.6353, 0.2314, 0.1647),  # #A23B2A
+	"baekje": Color(0.1843, 0.3647, 0.4863),  # #2F5D7C
+	"silla": Color(0.7804, 0.6039, 0.1804),  # #C79A2E
+	"gaya": Color(0.3098, 0.4784, 0.3333),  # #4F7A55
+}
+## 카드 유형 표시 이름. 정답 공개 후(해설, 도감)에만 보인다(decision-log D37).
+const TYPE_LABELS := {"event": "사건", "artifact": "유물", "person": "인물", "myth": "전승"}
 
 ## 한글이 있는 시스템 글꼴 이름(우선순위 순). 한글 판정은 이 목록만으로 한다.
 const KOREAN_FONT_NAMES := [
@@ -32,6 +46,41 @@ const FONT_SOURCE_MISSING := "missing"
 
 ## 마지막으로 만든 테마. 노드 트리 밖(드래그 미리보기 등)에서 같은 테마를 쓰기 위해 둔다.
 static var _current: Theme = null
+
+
+## 나라 색. 모르는 나라면 선 색.
+static func nation_color(nation_id: String) -> Color:
+	return NATION_COLORS.get(nation_id, BORDER)
+
+
+## 인장 글자: 나라 라벨의 첫 글자(고구려 → 고). 색만으로 구분하지 않게 한다(바이블 §3).
+static func seal_char(nation_label: String) -> String:
+	return nation_label.substr(0, 1)
+
+
+## 인장(지름 28px 원, 나라 색 바탕에 한지색 글자).
+static func seal(nation_id: String, nation_label: String) -> PanelContainer:
+	var p := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = nation_color(nation_id)
+	sb.set_corner_radius_all(14)
+	p.add_theme_stylebox_override("panel", sb)
+	p.custom_minimum_size = Vector2(28, 28)
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var l := Label.new()
+	l.text = seal_char(nation_label)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.add_theme_color_override("font_color", PAPER)
+	l.add_theme_font_size_override("font_size", 15)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.add_child(l)
+	return p
+
+
+## 카드 유형 표시 이름.
+static func type_label(card_type: String) -> String:
+	return TYPE_LABELS.get(card_type, card_type)
 
 
 ## 색과 테두리로 StyleBoxFlat을 만든다.

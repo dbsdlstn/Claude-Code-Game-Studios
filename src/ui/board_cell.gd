@@ -23,6 +23,8 @@ var era: String = ""
 var _base_style: StyleBoxFlat
 var _focus_style: StyleBoxFlat
 var _hover_style: StyleBoxFlat
+var _highlight_style: StyleBoxFlat
+var _highlight_tween: Tween
 var _hovering: bool = false
 var _anchor_label: Label
 var _content_label: Label
@@ -42,6 +44,7 @@ func setup(cell_nation: String, cell_era: String, anchor_titles: PackedStringArr
 	focus_entered.connect(_restore_style)
 	focus_exited.connect(_restore_style)
 	_hover_style = HanjiTheme.box(HanjiTheme.HOVER, HanjiTheme.ACCENT, 2)
+	_highlight_style = HanjiTheme.box(HanjiTheme.ANCHOR, HanjiTheme.GOLD, 4)
 
 	var box := VBoxContainer.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -70,6 +73,7 @@ func setup(cell_nation: String, cell_era: String, anchor_titles: PackedStringArr
 func show_empty() -> void:
 	_lines = PackedStringArray()
 	_content_label.text = ""
+	_content_label.remove_theme_color_override("font_color")
 	tooltip_text = ""
 	var bg: Color = HanjiTheme.ANCHOR if _anchor_label.visible else HanjiTheme.CELL
 	_set_base(HanjiTheme.box(bg, HanjiTheme.BORDER, 1))
@@ -77,11 +81,18 @@ func show_empty() -> void:
 
 ## 카드를 한 장 더한다. correct가 false면 오답으로 공개된 카드다. 칸 색은 마지막 카드를 따른다.
 func show_placed(title: String, correct: bool) -> void:
-	_lines.append(title if correct else "%s (오답)" % title)
+	# 색만으로 구분하지 않게 ○/× 표시와 글자를 함께 쓴다(바이블 §4.3).
+	_lines.append(line_text(title, correct))
 	_content_label.text = visible_text(_lines, MAX_VISIBLE_LINES)
+	_content_label.add_theme_color_override("font_color", HanjiTheme.CORRECT_TEXT if correct else HanjiTheme.WRONG_TEXT)
 	tooltip_text = "\n".join(_lines)
 	var bg: Color = HanjiTheme.CORRECT if correct else HanjiTheme.WRONG
 	_set_base(HanjiTheme.box(bg, HanjiTheme.BORDER, 2))
+
+
+## 칸에 쌓이는 한 줄. 정답 "○ 제목", 오답 "× 제목 (오답)".
+static func line_text(title: String, correct: bool) -> String:
+	return "○ %s" % title if correct else "× %s (오답)" % title
 
 
 ## 칸에 보일 글: 최근 max_lines줄, 그보다 많으면 맨 위에 "외 n장".
@@ -91,6 +102,16 @@ static func visible_text(lines: PackedStringArray, max_lines: int) -> String:
 		return "\n".join(lines)
 	var shown := lines.slice(lines.size() - max_lines)
 	return "외 %d장\n%s" % [lines.size() - max_lines, "\n".join(shown)]
+
+
+## 기준 카드 칸 강조: 금색 굵은 테두리를 1.2초 보인 뒤 원래대로(관계 단서 → 기준 카드).
+func highlight() -> void:
+	if _highlight_tween != null and _highlight_tween.is_valid():
+		_highlight_tween.kill()
+	add_theme_stylebox_override("panel", _highlight_style)
+	_highlight_tween = create_tween()
+	_highlight_tween.tween_interval(1.2)
+	_highlight_tween.tween_callback(_restore_style)
 
 
 ## 오답으로 고른 칸을 잠깐 붉게 표시한다.

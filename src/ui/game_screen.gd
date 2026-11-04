@@ -22,6 +22,8 @@ var _config: GameConfig
 var _board: BoardView
 var _card_view: CardView
 var _ink_label: Label
+var _ink_empty_label: Label
+var _reveal: RevealView
 var _count_label: Label
 var _dogam_label: Label
 var _notice_label: Label
@@ -41,9 +43,17 @@ func setup(config: GameConfig, cards: CardSet, notice: String) -> void:
 	title.text = "한양 도감 — 삼국시대"
 	title.add_theme_font_size_override("font_size", 24)
 	top.add_child(title)
+	# 먹물 게이지: 채움은 먹색, 빈 칸은 옅은 색(바이블 §4.3). 개수(●○)로도 읽힌다.
+	var ink_box := HBoxContainer.new()
+	ink_box.add_theme_constant_override("separation", 0)
+	top.add_child(ink_box)
 	_ink_label = Label.new()
 	_ink_label.add_theme_font_size_override("font_size", 20)
-	top.add_child(_ink_label)
+	ink_box.add_child(_ink_label)
+	_ink_empty_label = Label.new()
+	_ink_empty_label.add_theme_font_size_override("font_size", 20)
+	_ink_empty_label.add_theme_color_override("font_color", HanjiTheme.INK_EMPTY)
+	ink_box.add_child(_ink_empty_label)
 	_count_label = Label.new()
 	top.add_child(_count_label)
 	_dogam_label = Label.new()
@@ -84,24 +94,38 @@ func setup(config: GameConfig, cards: CardSet, notice: String) -> void:
 	side.add_theme_constant_override("separation", 12)
 	scroll.add_child(side)
 	_card_view = CardView.new()
+	_card_view.set_ref_titles(ref_titles(cards.anchors))
+	_card_view.anchor_ref_focused.connect(_board.highlight_anchor)
 	_card_view.more_clues_requested.connect(func() -> void: more_clues_requested.emit())
 	_card_view.selection_changed.connect(_on_selection_changed)
 	side.add_child(_card_view)
+	_reveal = RevealView.new()
+	side.add_child(_reveal)
 	_message_label = Label.new()
 	_message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_message_label.custom_minimum_size = Vector2(360, 0)
 	side.add_child(_message_label)
 
 
+## 기준 카드 id → 제목(관계 단서 버튼용).
+static func ref_titles(anchors: Array[CardData]) -> Dictionary:
+	var out: Dictionary = {}
+	for a: CardData in anchors:
+		out[a.id] = a.title
+	return out
+
+
 ## 새 라운드: 보드를 비우고 안내를 띄운다.
 func start_round() -> void:
 	_board.reset()
+	_reveal.clear()
 	set_message("단서를 읽고, 보드의 기준 카드와의 관계를 따져 칸을 고르세요.")
 
 
 ## 이어하기: 저장된 라운드에서 이미 놓인 카드를 보드에 다시 그린다.
 func restore_round(session: RoundSession, cards: CardSet) -> void:
 	_board.reset()
+	_reveal.clear()
 	for n in _config.nation_ids():
 		for e in _config.era_ids():
 			for entry: Variant in session.cell_cards(n, e):
@@ -114,7 +138,8 @@ func restore_round(session: RoundSession, cards: CardSet) -> void:
 ## 세션 상태로 상단 정보와 카드를 다시 그린다.
 func refresh(session: RoundSession, dogam_text: String) -> void:
 	var left := session.ink.current
-	_ink_label.text = "먹물 " + "●".repeat(left) + "○".repeat(maxi(session.ink.max_ink - left, 0))
+	_ink_label.text = "먹물 " + "●".repeat(left)
+	_ink_empty_label.text = "○".repeat(maxi(session.ink.max_ink - left, 0))
 	_count_label.text = "카드 %d / %d" % [mini(session.placed_count() + 1, session.total_cards()), session.total_cards()]
 	_dogam_label.text = dogam_text
 	var card := session.current_card()
@@ -129,6 +154,7 @@ func show_placement(r: Dictionary, chosen_nation: String, chosen_era: String) ->
 	var card: CardData = r["card"]
 	var correct: bool = r["correct"]
 	_board.show_placed(card.nation, card.era, card.title, correct)
+	_reveal.show_card(_config, card, correct)
 	if correct:
 		set_message("정답! [%s]\n%s" % [card.title, card.explanation])
 	else:

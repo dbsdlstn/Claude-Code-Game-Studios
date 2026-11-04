@@ -70,8 +70,10 @@ godot --headless -s -d --remote-debug tcp://127.0.0.1:0 res://addons/gdUnit4/bin
 | `tests/unit/round/ink_meter_test.gd` | 먹물 규칙 |
 | `tests/unit/round/tutorial_test.gd` | 연습 카드 판정(먹물 없음), 본 덱과 겹침 거부, **출시 모드에서 확인 전 연습 카드 거부**, disputed 기준 카드 거부, 보드 기준 카드 |
 | `tests/unit/ui/board_cell_text_test.gd` | 한 칸에 많이 쌓일 때 "외 n장" 축약(노드 없이 정적 함수) |
+| `tests/unit/ui/card_view_hidden_test.gd` | **숨김 카드에 유형이 없다**(유형만 다른 카드의 글이 같음, 배지 글자 없음, 제목 없음) |
+| `tests/unit/ui/art_and_theme_test.gd` | 일러스트 경로(이미지/대체 문양), 색 토큰이 아트 바이블 hex와 같음, 인장 글자, ○/× 표기, 기준 카드 → 칸 매핑 |
 | `tests/unit/progress/progress_data_test.gd` | 도감 수집, 도감 완성, 플레이 기록(정답률·평균 단서 단계), 저장 v1/v2, **v1 라운드 수와 기록 정합**, version 읽기 |
-| `tests/integration/cards/card_file_loading_test.gd` | 설정, 픽스처, samguk.json(44장, 칸당 3장, 출시 모드는 규칙 8만), 라운드 12장, tutorial.json |
+| `tests/integration/cards/card_file_loading_test.gd` | 설정, 픽스처, samguk.json(44장, 칸당 3장, 출시 모드는 규칙 8만), 라운드 12장, tutorial.json, 대체 문양 4종 존재, **실제 카드 36장의 숨김 글이 유형과 무관** |
 | `tests/integration/cards/validator_parity_test.gd` | Python 검증기와 같은 39개 케이스 |
 | `tests/integration/save/save_store_test.gd` | user:// 저장/불러오기, 덮어쓰기, 깨진 파일, 교체 중 끊김 복구, 임시·백업 파일 정리, **모르는 새 형식 보관 후 새로 시작** |
 
@@ -104,6 +106,12 @@ python3 tools/gd_card_validator_port.py assets/data/cards/samguk.json   # 0 erro
 - [ ] 정답: 해설과 "본게임 시작". 건너뛰기는 언제든 타이틀로. 둘 다 다음 실행부터 튜토리얼이 자동으로 안 열린다
 
 **본게임**
+- [ ] **숨김 카드에 유형 배지(사건·유물·인물·전승), 인장, 나라색이 없다.** 위쪽 일러스트 영역에는 "?"만 보인다(D37)
+- [ ] 행 머리글: 나라 인장(고·백·신·가 원)과 나라색 이름(고구려 주홍, 백제 청, 신라 금, 가야 녹청)
+- [ ] 관계 단서(2단계) 아래 "▶ [기준 카드] 칸 보기"를 누르거나 Tab으로 초점을 주면 그 기준 카드 칸이 금색 굵은 테두리로 1.2초 강조된다
+- [ ] 놓은 뒤 옆 패널에 공개 카드: 일러스트(이미지가 없으면 유형별 대체 문양 SVG + "그림 준비 중"), 인장, 제목, 유형 배지, 연도. 오답이면 제목 앞에 "×"와 "(오답 공개)"
+- [ ] 칸의 줄: 정답 "○ 제목"(진한 녹색 글자), 오답 "× 제목 (오답)"(진한 붉은 글자). 먹물 게이지는 ●(먹색) ○(옅은 색)
+- [ ] SVG 대체 문양 4종이 import되어 흐리지 않게 보인다(`assets/art/placeholders/*.svg`, import 뒤 `.import` 파일도 커밋)
 - [ ] 보드: 행 고구려·백제·신라·가야, 열 건국기·전성기·결말기, **열 머리글 아래 시기 정의**
 - [ ] 기준 카드 **4장**(광개토대왕릉비·황산벌 전투·박혁거세 신화·수로왕 탄생 신화)이 각 칸에 "기준: …"
 - [ ] 상단: 먹물 ●●●●●, "카드 n / 12", "도감 m / 36", 도감·타이틀 버튼
@@ -123,7 +131,7 @@ python3 tools/gd_card_validator_port.py assets/data/cards/samguk.json   # 0 erro
 **결과·도감**
 - [ ] 라운드 끝: 결과 화면(라운드 클리어 또는 실패, 정답 수, 남은 먹물, 새로 모은 카드 수와 목록, 단서 단계 분포, 틀린 카드 해설), 새 라운드/도감/타이틀
 - [ ] 먹물 5개를 다 쓰면 그 자리에서 실패 결과 화면
-- [ ] 도감: 맞힌 카드만 이름이 열리고 누르면 해설·근거·사실 확인 상태. 기준 카드와 "견해가 나뉘는 기록" **4장**은 항상 보임. 플레이 기록 한 줄(라운드 수, 클리어·실패, 정답률, 평균 단서 단계)
+- [ ] 도감: 맞힌 카드만 이름이 열리고 누르면 공개 카드(일러스트·인장·유형 배지)와 해설·근거·사실 확인 상태(유형 포함). 기준 카드와 "견해가 나뉘는 기록" **4장**은 항상 보임. 플레이 기록 한 줄(라운드 수, 클리어·실패, 정답률, 평균 단서 단계)
 - [ ] 36장을 다 모으면 "[도감 완성]"(라운드 도중이면 메시지, 마지막 카드면 결과 화면에), 도감 제목 "도감 완성 36 / 36". 빨리 보려면 `progress.json`의 `collected`에 35개 id를 넣고 시작
 - [ ] 다시 켜도 도감·플레이 기록이 남는다
 - [ ] v1 형식 `progress.json`(`{"version":1,"collected":[...],"rounds_played":2}`)을 넣으면 도감 플레이 기록이 "라운드 2 … 이전 버전 기록이라 세부가 없습니다"
