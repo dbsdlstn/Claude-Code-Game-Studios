@@ -15,7 +15,15 @@ const CORRECT := Color(0.8118, 0.9098, 0.7686)   # 정답 #cfe8c4
 const WRONG := Color(0.9529, 0.7686, 0.7529)     # 오답 #f3c4c0
 const HOVER := Color(1.0000, 0.9137, 0.6588)       # 끌어 놓기 대상 #ffe9a8
 const ACCENT := Color(0.7529, 0.2235, 0.1686)    # 선택 표시 #c0392b
+## 금은 두 값이다(decision-log D42). GOLD는 한지 대비 약 2.2라 장식(선, 인장 바탕, 클리어 연출)에만,
+## 글자와 키보드 초점에는 GOLD_DARK(대비 4.5 이상)를 쓴다.
 const GOLD := Color(0.7804, 0.6039, 0.1804)  # 금 #C79A2E
+const GOLD_DARK := Color(0.4902, 0.3529, 0.0706)  # 강조(글자·포커스) 짙은 금 #7D5A12
+## 관계 단서 참조와 그 기준 카드 칸 강조(웹 --indigo, 바이블 백제 청과 같은 값).
+const INDIGO := Color(0.1843, 0.3647, 0.4863)  # 참조 #2F5D7C
+const REF_TARGET_BG := Color(0.8902, 0.9255, 0.9490)  # 참조 칸 강조 바탕 #E3ECF2 (웹과 같은 값)
+const FOCUS_BG := Color(0.9725, 0.9294, 0.8000)  # 키보드 초점 칸 바탕 #F8EDCC (웹과 같은 값)
+const SEAL_LIGHT_TEXT := Color(1, 1, 1)  # 인장 글자(어두운 나라색 바탕) #FFFFFF
 const CORRECT_TEXT := Color(0.1804, 0.3529, 0.1647)  # 정답 글자 #2E5A2A
 const WRONG_TEXT := Color(0.5412, 0.1647, 0.1333)  # 오답 글자 #8A2A22
 const INK_EMPTY := Color(0.7882, 0.7373, 0.6078)  # 먹물 게이지 빈 칸 #C9BC9B
@@ -58,21 +66,42 @@ static func seal_char(nation_label: String) -> String:
 	return nation_label.substr(0, 1)
 
 
-## 인장(지름 28px 원, 나라 색 바탕에 한지색 글자).
+## 인장 글자색: 나라 바탕과 대비 4.5 이상이 되는 쪽(흰색 또는 먹). 신라(금 바탕)는 먹 글자(D42, 웹과 같음).
+static func seal_text_color(nation_id: String) -> Color:
+	var bg := nation_color(nation_id)
+	return SEAL_LIGHT_TEXT if contrast_ratio(SEAL_LIGHT_TEXT, bg) >= contrast_ratio(INK, bg) else INK
+
+
+## WCAG 대비율(1~21). 사용 예: HanjiTheme.contrast_ratio(HanjiTheme.INK, HanjiTheme.PAPER)
+static func contrast_ratio(a: Color, b: Color) -> float:
+	var la := _luminance(a)
+	var lb := _luminance(b)
+	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
+
+
+static func _luminance(c: Color) -> float:
+	return 0.2126 * _channel(c.r) + 0.7152 * _channel(c.g) + 0.0722 * _channel(c.b)
+
+
+static func _channel(v: float) -> float:
+	return v / 12.92 if v <= 0.03928 else pow((v + 0.055) / 1.055, 2.4)
+
+
+## 인장(지름 30px 원, 나라 색 바탕, 대비를 맞춘 글자색).
 static func seal(nation_id: String, nation_label: String) -> PanelContainer:
 	var p := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = nation_color(nation_id)
-	sb.set_corner_radius_all(14)
 	p.add_theme_stylebox_override("panel", sb)
-	p.custom_minimum_size = Vector2(28, 28)
+	sb.set_corner_radius_all(15)
+	p.custom_minimum_size = Vector2(30, 30)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var l := Label.new()
 	l.text = seal_char(nation_label)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	l.add_theme_color_override("font_color", PAPER)
-	l.add_theme_font_size_override("font_size", 15)
+	l.add_theme_color_override("font_color", seal_text_color(nation_id))
+	l.add_theme_font_size_override("font_size", 16)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_child(l)
 	return p
@@ -137,7 +166,7 @@ static func build(font: Font = null) -> Theme:
 	t.set_stylebox("hover", "Button", box(HOVER, BORDER, 1, 6.0))
 	t.set_stylebox("pressed", "Button", box(ANCHOR, BORDER, 2, 6.0))
 	t.set_stylebox("disabled", "Button", box(CELL, ANCHOR, 1, 6.0))
-	t.set_stylebox("focus", "Button", box(Color(0, 0, 0, 0), ACCENT, 2, 6.0))
+	t.set_stylebox("focus", "Button", box(Color(0, 0, 0, 0), GOLD_DARK, 3, 6.0))
 	t.set_color("font_color", "Button", INK)
 	t.set_color("font_hover_color", "Button", INK)
 	t.set_color("font_pressed_color", "Button", INK)

@@ -54,6 +54,8 @@ func test_semantic_colors_match_art_bible() -> void:
 		"c79a2e": HanjiTheme.GOLD, "cfe8c4": HanjiTheme.CORRECT, "2e5a2a": HanjiTheme.CORRECT_TEXT,
 		"f3c4c0": HanjiTheme.WRONG, "8a2a22": HanjiTheme.WRONG_TEXT, "ffe9a8": HanjiTheme.HOVER,
 		"c0392b": HanjiTheme.ACCENT, "c9bc9b": HanjiTheme.INK_EMPTY,
+		"7d5a12": HanjiTheme.GOLD_DARK, "2f5d7c": HanjiTheme.INDIGO,
+		"e3ecf2": HanjiTheme.REF_TARGET_BG, "f8edcc": HanjiTheme.FOCUS_BG,
 	}
 	for hex: String in expected:
 		assert_str((expected[hex] as Color).to_html(false)).is_equal(hex)
@@ -83,3 +85,32 @@ func test_anchor_cell_keys_map_anchor_to_its_cell() -> void:
 func test_ref_titles_list_anchor_titles() -> void:
 	var cs := CardLoader.build(Fx.valid_set(), Fx.nation_ids(), Fx.era_ids(), false)
 	assert_str(GameScreen.ref_titles(cs.anchors)[Fx.ANCHOR_ID]).is_equal(Fx.anchor_title(Fx.ANCHOR_ID))
+
+
+
+func test_text_and_focus_colors_meet_contrast_on_paper() -> void:
+	# D42: 글자·포커스 색은 한지 바탕 대비 4.5 이상.
+	for c: Color in [HanjiTheme.INK, HanjiTheme.MUTED, HanjiTheme.GOLD_DARK, HanjiTheme.CORRECT_TEXT,
+			HanjiTheme.WRONG_TEXT, HanjiTheme.INDIGO]:
+		assert_float(HanjiTheme.contrast_ratio(c, HanjiTheme.PAPER)).is_greater_equal(4.5)
+
+
+func test_light_gold_is_decoration_only() -> void:
+	# 바이블 금은 대비가 낮아(약 2.1) 글자·포커스에 쓰지 않는다. 이 값이 바뀌면 D42를 다시 본다.
+	assert_float(HanjiTheme.contrast_ratio(HanjiTheme.GOLD, HanjiTheme.PAPER)).is_less(4.5)
+
+
+func test_seal_text_meets_contrast_for_every_nation() -> void:
+	for id: String in HanjiTheme.NATION_COLORS:
+		var ratio := HanjiTheme.contrast_ratio(HanjiTheme.seal_text_color(id), HanjiTheme.nation_color(id))
+		assert_float(ratio).is_greater_equal(4.5)
+
+
+func test_silla_seal_uses_ink_text_on_gold() -> void:
+	assert_str(HanjiTheme.seal_text_color("silla").to_html(false)).is_equal(HanjiTheme.INK.to_html(false))
+	assert_str(HanjiTheme.seal_text_color("goguryeo").to_html(false)).is_equal("ffffff")
+
+
+func test_contrast_ratio_reference_values() -> void:
+	assert_float(HanjiTheme.contrast_ratio(Color.BLACK, Color.WHITE)).is_equal_approx(21.0, 0.01)
+	assert_float(HanjiTheme.contrast_ratio(Color.WHITE, Color.WHITE)).is_equal_approx(1.0, 0.0001)

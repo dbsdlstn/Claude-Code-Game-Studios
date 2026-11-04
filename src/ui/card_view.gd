@@ -186,6 +186,10 @@ func _ref_button(anchor_id: String, title: String) -> Button:
 	b.text = ref_button_text(title)
 	b.flat = true
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	# 참조 글자는 청(웹 .ref-link와 같은 값). 초점 테두리는 테마의 짙은 금.
+	b.add_theme_color_override("font_color", HanjiTheme.INDIGO)
+	b.add_theme_color_override("font_hover_color", HanjiTheme.INDIGO)
+	b.add_theme_color_override("font_focus_color", HanjiTheme.INDIGO)
 	b.tooltip_text = "보드에서 기준 카드 [%s]가 놓인 칸을 잠깐 강조합니다" % title
 	b.pressed.connect(func() -> void: anchor_ref_focused.emit(anchor_id))
 	b.focus_entered.connect(func() -> void: anchor_ref_focused.emit(anchor_id))
@@ -197,6 +201,7 @@ func _apply_style() -> void:
 	if selected:
 		add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.HOVER, HanjiTheme.ACCENT, 3, 12.0))
 	elif has_focus():
-		add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.CARD, HanjiTheme.ACCENT, 2, 12.0))
+		# 키보드 초점은 짙은 금(D42). 고른 상태(붉은 선택 테두리 + 노란 바탕)와 구분된다.
+		add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.CARD, HanjiTheme.GOLD_DARK, 3, 12.0))
 	else:
 		add_theme_stylebox_override("panel", HanjiTheme.box(HanjiTheme.CARD, HanjiTheme.BORDER, 2, 12.0))

@@ -17,11 +17,60 @@ export function el(tag, attrs = {}, ...children) {
   return node;
 }
 
-/** "[제목]" 표기를 강조 span으로 바꾼다. */
-export function clueText(text) {
-  return text.split(/(\[[^\]]+\])/g).filter(Boolean)
-    .map((part) => (/^\[.+\]$/.test(part) ? el('span', { class: 'ref' }, part) : part));
+/**
+ * "[제목]" 표기를 강조한다. resolveRef(title)이 기준 카드 {id, label}을 돌려주면 버튼으로 만들어
+ * 누르거나 포커스하면 그 기준 카드 칸을 강조할 수 있게 한다(D37). 못 찾으면 글자 강조만.
+ * @param {string} text
+ * @param {(title: string) => ({id: string, label: string} | null)} [resolveRef]
+ */
+export function clueText(text, resolveRef = () => null) {
+  return text.split(/(\[[^\]]+\])/g).filter(Boolean).map((part) => {
+    const m = /^\[(.+)\]$/.exec(part);
+    if (!m) return part;
+    const ref = resolveRef(m[1]);
+    if (!ref) return el('span', { class: 'ref' }, part);
+    return el('button', {
+      type: 'button', class: 'ref ref-link', dataset: { refId: ref.id },
+      'aria-label': `${part} 기준 카드 위치 보기: ${ref.label}`,
+    }, part);
+  });
 }
+
+/**
+ * 공개 후 일러스트(4:3). image가 있으면 그림, 없거나 못 읽으면 유형별 대체 문양(D37, 아트 바이블 §7.1).
+ * @param {object} card
+ * @param {string} assetRoot 저장소에서는 '../', 배포본에서는 ''
+ * @param {string} [extraClass]
+ */
+export function illustration(card, assetRoot, extraClass = '') {
+  const placeholder = `${assetRoot}assets/art/placeholders/placeholder-${card.type}.svg`;
+  const hasImage = typeof card.image === 'string' && card.image !== '';
+  const img = el('img', {
+    src: hasImage ? `${assetRoot}${card.image}` : placeholder,
+    alt: hasImage ? card.title : '',
+    loading: 'lazy', decoding: 'async',
+  });
+  const box = el('figure', { class: `illust${hasImage ? '' : ' illust-placeholder'} ${extraClass}`.trim(), dataset: { kind: hasImage ? 'image' : 'placeholder' } },
+    img, hasImage ? null : el('figcaption', {}, '그림 준비 중'));
+  if (hasImage) {
+    img.addEventListener('error', () => {
+      img.src = placeholder;
+      img.alt = '';
+      box.dataset.kind = 'placeholder';
+      box.classList.add('illust-placeholder');
+      box.append(el('figcaption', {}, '그림 준비 중'));
+    }, { once: true });
+  }
+  return box;
+}
+
+/** 숨김 상태 일러스트: 먹 번짐과 큰 "?". 유형·나라·시기 정보를 담지 않는다(D37). */
+export function hiddenIllustration() {
+  return el('div', { class: 'illust illust-hidden', 'aria-hidden': 'true' }, el('span', {}, '?'));
+}
+
+/** 나라 인장(행 머리글). 색만으로 구분하지 않도록 한 글자를 넣는다(아트 바이블 §3, §4.2). */
+export const NATION_SEAL = { goguryeo: '고', baekje: '백', silla: '신', gaya: '가' };
 
 export const TYPE_LABEL = { event: '사건', artifact: '유물', person: '인물', myth: '전승' };
 export const LEVEL_LABEL = ['', '1단계 · 장면', '2단계 · 관계', '3단계 · 직접 힌트'];

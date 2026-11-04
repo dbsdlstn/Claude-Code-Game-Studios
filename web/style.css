@@ -1,18 +1,28 @@
 /* 한양 도감 웹 빌드 — 한지·고지도 톤. PC 기준(1280×800 이상). */
 :root {
-  --paper: #efe5cf;
-  --paper-2: #f6efdd;
-  --paper-3: #e6d8b8;
-  --ink: #2a211a;
-  --ink-soft: #5c4c3a;
-  --line: #9c8058;
-  --line-soft: #c9b48d;
-  --seal: #a33a2a;         /* 낙관 붉은색 */
-  --seal-soft: #f1d3c9;
-  --celadon: #3d6448;      /* 청자 녹색. 연녹 바탕 위 글자 대비 5.2:1(WCAG AA) */
-  --celadon-soft: #d6e6d3;
-  --indigo: #2f4a63;
-  --gold: #7d5a12;         /* 포커스·강조. 한지 바탕 대비 5:1 이상 */
+  /* 아트 바이블(design/art/art-bible.md) §4.1 월드 팔레트 */
+  --paper: #efe6d2;        /* 한지 */
+  --paper-2: #f7f0de;      /* 옅은 한지(칸) */
+  --paper-3: #e3d6b4;      /* 짙은 한지(기준 카드) */
+  --ink: #2b2118;          /* 먹 */
+  --ink-soft: #5b4a35;     /* 갈먹(보조 글자) */
+  --line: #8a6d3b;         /* 갈색 선 */
+  --line-soft: #c9b48d;    /* 웹 보조: 옅은 선(바이블에 없음) */
+  --gold-accent: #c79a2e;  /* 바이블 금: 장식(클리어·도감 완성)에만. 글자·포커스는 대비 부족(2.2:1) */
+  --gold: #7d5a12;         /* 웹 보조: 글자·포커스용 짙은 금(한지 대비 5:1). D38 참고 */
+  /* §4.2 나라 색 */
+  --goguryeo: #a23b2a;
+  --baekje: #2f5d7c;
+  --silla: #c79a2e;
+  --gaya: #4f7a55;
+  /* §4.3 의미색 */
+  --celadon-soft: #cfe8c4; /* 정답 칸 */
+  --celadon: #2e5a2a;      /* 정답 글자/아이콘 */
+  --seal-soft: #f3c4c0;    /* 오답 칸 */
+  --wrong: #8a2a22;        /* 오답 글자/아이콘 */
+  --select: #c0392b;       /* 선택 테두리 */
+  --seal: #a23b2a;         /* 낙관·강조(고구려색과 같은 값) */
+  --indigo: #2f5d7c;       /* 관계 단서 참조(바이블 청과 같은 값) */
   --shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 2px 6px rgba(60,40,20,.18);
   --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", "AppleMyungjo", serif;
   --sans: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "WenQuanYi Zen Hei", sans-serif;
@@ -97,7 +107,7 @@ button { font: inherit; color: inherit; }
 }
 .card.selected {
   transform: translateY(-3px);
-  box-shadow: 0 0 0 4px var(--paper-2), 0 0 0 6px var(--seal), 0 10px 20px rgba(60,40,20,.25);
+  box-shadow: 0 0 0 4px var(--paper-2), 0 0 0 6px var(--select), 0 10px 20px rgba(60,40,20,.25);
 }
 .card.dragging { opacity: .45; }
 .card.empty { cursor: default; display: grid; place-items: center; color: var(--ink-soft); text-align: center; }
@@ -122,7 +132,7 @@ button { font: inherit; color: inherit; }
 .fb-bad { border-color: var(--seal); background: var(--seal-soft); }
 .fb-head { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
 .fb-ok .fb-head { color: var(--celadon); }
-.fb-bad .fb-head { color: var(--seal); }
+.fb-bad .fb-head { color: var(--wrong); }
 .fb-mark { font-size: 18px; line-height: 1; }
 .fb-title { font-family: var(--serif); font-size: 21px; font-weight: 700; margin: 6px 0 2px; }
 .fb-meta { font-size: 13.5px; color: var(--ink-soft); }
@@ -190,8 +200,8 @@ button { font: inherit; color: inherit; }
 .chip-anchor::before { content: "기준 "; font-family: var(--sans); font-weight: 400; font-size: 11px; color: var(--seal); }
 .chip-ok { border-color: var(--celadon); }
 .chip-ok::before { content: "○ "; color: var(--celadon); font-weight: 700; }
-.chip-bad { border-color: var(--seal); border-style: dashed; color: var(--ink-soft); }
-.chip-bad::before { content: "✕ "; color: var(--seal); font-weight: 700; }
+.chip-bad { border-color: var(--wrong); border-style: dashed; color: var(--ink-soft); }
+.chip-bad::before { content: "✕ "; color: var(--wrong); font-weight: 700; }
 
 /* ---------- 오버레이 ---------- */
 .overlay {
@@ -392,3 +402,39 @@ button { font: inherit; color: inherit; }
 .record-actions { display: flex; gap: 8px; }
 .btn-danger { border-color: var(--seal); color: var(--seal); background: #fbf6ea; }
 .btn-danger.btn-primary, #reset-confirm { background: var(--seal); color: #fff8ef; }
+
+/* ---------- D37: 일러스트 영역, 나라 인장, 기준 카드 참조 ---------- */
+.illust { margin: 0; aspect-ratio: 4 / 3; border-radius: 4px; overflow: hidden; position: relative; background: var(--paper); border: 1px solid var(--line-soft); }
+.illust img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.illust figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 6px; font-size: 12px; color: var(--ink-soft); background: rgba(239,230,210,.85); text-align: right; }
+.illust-hidden {
+  width: 50%; margin: 0 auto 10px; display: grid; place-items: center;
+  background:
+    radial-gradient(ellipse at 50% 55%, rgba(43,33,24,.55), rgba(43,33,24,.32) 38%, rgba(43,33,24,.1) 62%, transparent 75%),
+    radial-gradient(circle at 30% 30%, rgba(43,33,24,.12), transparent 40%),
+    var(--paper);
+}
+.illust-hidden span { font-family: var(--serif); font-size: 54px; font-weight: 700; color: #f7f0de; text-shadow: 0 2px 6px rgba(0,0,0,.35); }
+.illust-side { float: right; width: 128px; margin: 0 0 8px 12px; }
+.illust-detail { width: 100%; margin-bottom: 10px; }
+.tut-card .illust-hidden { width: 46%; }
+.fb::after { content: ""; display: block; clear: both; }
+
+.nation-head { writing-mode: horizontal-tb; letter-spacing: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-left: 5px solid var(--nation, var(--line)); }
+.nation-head .seal {
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--nation); color: #fff; font-family: var(--serif); font-size: 16px; font-weight: 700;
+  box-shadow: 0 0 0 2px var(--paper-2), 0 0 0 3px var(--nation);
+}
+.nation-head .nation-name { font-size: 16px; }
+.nation-goguryeo { --nation: var(--goguryeo); }
+.nation-baekje { --nation: var(--baekje); }
+.nation-silla { --nation: var(--silla); }
+.nation-silla .seal { color: var(--ink); }   /* 금 바탕에는 먹 글자(대비 6:1) */
+.nation-gaya { --nation: var(--gaya); }
+
+.ref-link { font: inherit; font-weight: 700; color: var(--indigo); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+.ref-link:focus-visible { outline: 3px solid var(--gold); outline-offset: 1px; border-radius: 2px; }
+.cell.ref-target { box-shadow: inset 0 0 0 3px var(--indigo); background: #e3ecf2 !important; }
+.cell.ref-target .chip-anchor { outline: 2px solid var(--indigo); }
+.complete-seal, .title-seal { border-color: var(--seal); }

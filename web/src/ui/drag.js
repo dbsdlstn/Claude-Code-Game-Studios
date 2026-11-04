@@ -41,7 +41,7 @@ export function makeDraggable(card, opts) {
     if (!dragging && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 6) {
       dragging = true;
       card.classList.add('dragging');
-      ghost.replaceChildren(el('span', {}, '？ 이름 숨김 카드'), el('span', { class: 'ghost-target' }));
+      ghost.replaceChildren(el('span', {}, '？ 카드'), el('span', { class: 'ghost-target' }));
       ghost.hidden = false;
       board.classList.add('armed', 'dragging');
     }

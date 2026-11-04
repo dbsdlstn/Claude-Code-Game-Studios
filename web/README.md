@@ -32,7 +32,8 @@ python3 tools/build_web.py --release  # verified 카드만. 지금은 전부 ver
 - **튜토리얼**: Godot과 같은 공용 튜토리얼 파일(`assets/data/cards/tutorial.json`: 본 덱의 기준 카드 `anchor_id` + 본 덱에 없는 연습 카드)로 시기 정의 → 단서 1 → 관계 단서로 칸 좁히기 → 배치 → 해설을 직접 해 본다. 먹물·도감에 영향 없음, `건너뛰기` 가능, `하는 방법`에서 다시 할 수 있다.
 - **배치**: 왼쪽 카드를 마우스로 끌어 보드 칸에 놓는다(손 아래 칸이 강조된다). 또는 카드를 눌러 고른 뒤(붉은 테두리) 칸을 누른다.
 - **키보드**: 카드에 포커스 → Enter(고르기, 보드로 포커스 이동) → 방향키로 칸 이동 → Enter로 놓기. Esc는 취소. `단서 더 보기`·`도감`은 Tab으로 간다.
-- **단서 더 보기**: 2단계(기준 카드와의 관계) → 3단계(직접 힌트).
+- **단서 더 보기**: 2단계(기준 카드와의 관계) → 3단계(직접 힌트). 2단계의 `[기준 카드]`를 누르거나 Tab으로 포커스하면 보드에서 그 기준 카드 칸이 강조된다.
+- 숨김 카드는 유형(사건·유물·인물·전승)을 보여 주지 않는다(시기를 알려 주므로, D37). 공개 후 해설과 도감에서 유형과 그림(없으면 유형별 대체 문양)을 보여 준다.
 - **정답**: 칸에 이름이 공개되고(○) 도감에 수집된다. **오답**: 먹물 1 소모, 카드는 정답 칸에 공개(✕)되고 소모된다.
 - **라운드**: 판정 카드 12장. 칸과 무관하게 뽑으므로 한 칸에 여러 장, 빈 칸도 생긴다. 아직 수집하지 않은 카드가 먼저 나온다(D22). 상단에 `카드 n / 12`, `도감 m / 36`.
 - 먹물 5개가 모두 떨어지면 라운드 실패 → 재도전. 먹물이 남은 채 12장을 처리하면 라운드 클리어.
@@ -52,6 +53,7 @@ node --test web/tests/rules.test.js               # 규칙·검증·저장·로�
 node --test web/tests/validator-parity.test.js    # JS 검증기와 tools/validate_cards.py 결과 일치(python3 필요)
 node --test web/tests/e2e.test.mjs                # 브라우저 E2E: 샘플 데이터 + 실제 samguk.json(Playwright, 정적 서버 자동 기동)
 node --test web/tests/e2e-flow.test.mjs           # 타이틀·튜토리얼·결과 화면·도감 disputed 분리·플레이 기록·초기화·낭독 알림 E2E
+node --test web/tests/e2e-art.test.mjs            # 숨김 카드 정보 누출, 일러스트·대체 문양, 나라 인장, 바이블 색, 참조 강조
 node --test web/tests/e2e-dist.test.mjs           # tools/build_web.py를 돌려 dist/web만으로 E2E
 node web/tests/screenshots.mjs           # 화면별 스크린샷 → production/qa/evidence/web/
 ```
@@ -70,4 +72,5 @@ E2E와 스크린샷은 사전 설치된 Playwright(`require('playwright')`)와 `
 | `src/main.js` | 타이틀, 본게임, 결과 화면, 도감, 기록 내보내기 |
 | `src/ui/dom.js`, `src/ui/drag.js` | DOM 도우미, 포인터 드래그 |
 | `src/ui/tutorial.js` | 첫 실행 튜토리얼 |
+| `src/ui/refs.js` | 관계 단서 → 기준 카드 칸 강조 |
 | `.gdignore` | Godot가 이 폴더를 가져오지 않게 한다 |
