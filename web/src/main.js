@@ -9,7 +9,7 @@ import {
   NATIONS, ERAS, nationLabel, eraLabel, validateCards, anchorCards, playableCards, releaseFilter,
   createRound, roundStatus, currentCardId, revealNextClue, placeCard, boardCells, roundStats,
   recordInCollection, serializeRound, restoreRound, restoreCollection, isDogamComplete, dogamProgress,
-  summarizeRound, historyStats, restoreHistory, dataFingerprint, parseTutorial,
+  summarizeRound, historyStats, restoreHistory, dataFingerprint, parseTutorial, TUTORIAL_RELEASE_EMPTY,
 } from './rules.js';
 import { $, el, clueText, TYPE_LABEL, LEVEL_LABEL, inkDrops, illustration, hiddenIllustration, NATION_SEAL } from './ui/dom.js';
 import { makeDraggable } from './ui/drag.js';
@@ -24,7 +24,7 @@ const app = {
   cards: [], cardsById: new Map(), anchors: [], playable: [], dataFile: '', dataId: '',
   round: null, collection: Object.freeze({}), meta: {}, history: [],
   selected: false, lastResult: null, lostInk: false, dogamActive: null,
-  seedParam: null, focusCell: null, tutorial: null,
+  seedParam: null, focusCell: null, tutorial: null, tutorialNotice: '',
 };
 
 const where = (a) => `${nationLabel(a.nation)} ${eraLabel(a.era)}`;
@@ -376,6 +376,8 @@ function showTitle() {
   actions.push(el('button', { type: 'button', class: 'btn', id: 'title-dogam', onclick: openDogam }, '도감'));
   actions.push(el('button', { type: 'button', class: 'btn', id: 'title-howto', onclick: showHowTo }, '하는 방법'));
   $('title-actions').replaceChildren(...actions);
+  $('title-notice').textContent = app.tutorialNotice;
+  $('title-notice').hidden = !app.tutorialNotice;
   $('title-screen').hidden = false;
   actions[0].focus();
 }
@@ -396,13 +398,18 @@ function enterGame(fresh) {
   render();
   // 첫 실행(튜토리얼 미완료이고 진행 기록도 없음)에만 튜토리얼을 자동으로 연다. 이미 플레이한 사람은 "하는 방법"에서 다시 볼 수 있다.
   if (!app.meta.tutorialDone && !hadProgress && app.tutorial) { openTutorial(); return; }
+  if (!app.meta.tutorialDone && !hadProgress && app.tutorialNotice) $('hand-help').textContent = app.tutorialNotice;
   const status = roundStatus(app.round);
   if (status !== 'playing') showEndModal(status);
   else $('card').focus();
 }
 
 function openTutorial() {
-  if (!app.tutorial) { $('card').focus(); return; }
+  if (!app.tutorial) {
+    if (app.tutorialNotice) { $('hand-help').textContent = app.tutorialNotice; announce(app.tutorialNotice); }
+    $('card').focus();
+    return;
+  }
   app.tutorial.open();
 }
 
@@ -606,14 +613,21 @@ function renderDogamDetail() {
 
 /* ------------------------------------------------------------------ 시작 */
 
-/** 공용 튜토리얼 파일(D31)을 읽는다. 없거나 검증에 걸리면 튜토리얼 없이 진행한다. */
+/**
+ * 공용 튜토리얼 파일(D31)을 읽는다. 출시 모드면 사실 확인된 연습 카드만 쓰고(D35·D40), 없으면 튜토리얼을 건너뛰고 알린다.
+ * 그 밖의 오류나 파일이 없을 때도 튜토리얼 없이 진행한다.
+ */
 async function loadTutorial() {
   try {
     const res = await fetch(CONFIG.tutorialDataUrl, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const t = parseTutorial(await res.json(), app.cards);
+    const t = parseTutorial(await res.json(), app.cards, { release: CONFIG.onlyVerified });
+    if (t.errors.some((e) => e.rule === TUTORIAL_RELEASE_EMPTY)) {
+      app.tutorialNotice = '사실 확인된 연습 카드가 없어 튜토리얼을 건너뜁니다. "하는 방법"에서 규칙을 볼 수 있습니다.';
+      return null;
+    }
     if (t.errors.length) { console.warn('[한양 도감] 튜토리얼 파일 오류', t.errors); return null; }
-    return createTutorial({ anchor: t.anchor, card: t.card }, { onFinish: onTutorialFinish, assetRoot: CONFIG.assetRoot });
+    return createTutorial({ anchor: t.anchor, card: t.card, boardAnchors: t.boardAnchors }, { onFinish: onTutorialFinish, assetRoot: CONFIG.assetRoot });
   } catch (e) {
     console.warn('[한양 도감] 튜토리얼 파일을 읽지 못했다', e);
     return null;

@@ -454,36 +454,52 @@ export function dataFingerprint(url, cards) {
   return `${url}|${cards.length}|${fnv1a(ids.join('\n'))}`;
 }
 
+/** 튜토리얼을 출시 모드에서 쓸 연습 카드가 없어 건너뛸 때의 규칙 코드(안내 문구를 따로 보여 준다). */
+export const TUTORIAL_RELEASE_EMPTY = 'TUTORIAL_RELEASE_EMPTY';
+
 /**
- * 공용 튜토리얼 파일(D31)을 해석한다. Godot `TutorialData.parse`와 같은 규칙:
- *   형식 { anchor_id: <본 덱 기준 카드 id>, cards: [스키마 v1 카드...] }, 연습 카드는 cards[0].
- *   - anchor_id가 본 덱의 기준 카드여야 한다.
- *   - [기준 카드, ...cards]를 카드 검증 규칙으로 검사하되 12칸 규칙(R8)은 뺀다(R4로 relation → 기준 카드 확인).
+ * 공용 튜토리얼 파일(D31)을 해석한다. Godot `TutorialData.parse`(D35)와 같은 규칙:
+ *   형식 { anchor_id: <본 덱 기준 카드 id>, cards: [스키마 v1 카드...] }, 연습 카드는 (모드로 거른 뒤) cards[0].
+ *   - anchor_id는 본 덱의 disputed가 아닌 기준 카드여야 한다.
+ *   - cards가 비면 실패. 출시 모드(release)면 verified: true·disputed: false만 남기고, 남는 게 없으면 TUTORIAL_RELEASE_EMPTY.
+ *   - [본 덱 기준 카드 전부, ...cards]를 카드 검증 규칙으로 검사하되 12칸 규칙(R8)은 뺀다(relation은 본 덱 아무 기준 카드나 가리킬 수 있다).
  *   - 연습 카드 id·제목이 본 덱과 겹치지 않고, 기준 카드가 아니며, 판정 카드(disputed 아님)여야 한다.
+ *   - 보드에는 anchor_id 카드와 연습 카드 단서가 가리키는 기준 카드를 보인다(boardAnchors).
  * @param {unknown} data JSON.parse 결과
- * @param {Array<object>} mainCards 검증을 통과한 본 덱
- * @returns {{anchor: object|null, card: object|null, errors: Array<{id: string, rule: string, message: string}>}}
+ * @param {Array<object>} mainCards 검증을 통과한(모드로 거른) 본 덱
+ * @param {{release?: boolean}} [opts]
+ * @returns {{anchor: object|null, card: object|null, boardAnchors: Array<object>, errors: Array<{id: string, rule: string, message: string}>}}
  */
-export function parseTutorial(data, mainCards) {
-  const out = { anchor: null, card: null, errors: [] };
-  const fail = (message) => out.errors.push({ id: '(tutorial)', rule: 'TUTORIAL', message });
+export function parseTutorial(data, mainCards, opts = {}) {
+  const out = { anchor: null, card: null, boardAnchors: [], errors: [] };
+  const fail = (message, rule = 'TUTORIAL') => out.errors.push({ id: '(tutorial)', rule, message });
   if (!data || typeof data !== 'object' || Array.isArray(data)) { fail('튜토리얼 파일이 객체가 아니다.'); return out; }
   const byId = new Map(mainCards.map((c) => [c.id, c]));
   const anchor = typeof data.anchor_id === 'string' ? byId.get(data.anchor_id) : null;
-  if (!anchor || anchor.anchor !== true) { fail(`anchor_id가 본 덱의 기준 카드가 아니다: ${data.anchor_id}`); return out; }
+  if (!anchor || anchor.anchor !== true || anchor.disputed === true) { fail(`anchor_id가 본 덱의 기준 카드가 아니다: ${data.anchor_id}`); return out; }
   if (!Array.isArray(data.cards) || data.cards.length === 0) { fail('튜토리얼 카드가 없다.'); return out; }
-  for (const e of validateCards([anchor, ...data.cards]).errors) if (e.rule !== 'R8') out.errors.push(e);
+  const cards = opts.release ? releaseFilter(data.cards.filter((c) => c && typeof c === 'object')) : data.cards;
+  if (cards.length === 0) { fail('출시 모드에서 쓸 수 있는(사실 확인된) 연습 카드가 없다.', TUTORIAL_RELEASE_EMPTY); return out; }
+  const deckAnchors = mainCards.filter((c) => c.anchor === true);
+  for (const e of validateCards([...deckAnchors, ...cards]).errors) if (e.rule !== 'R8') out.errors.push(e);
   const titles = new Set(mainCards.map((c) => c.title));
-  for (const c of data.cards) {
+  for (const c of cards) {
     if (!c || typeof c !== 'object') continue;
     if (byId.has(c.id)) fail(`연습 카드 id가 본 덱과 겹친다: ${c.id}`);
     if (titles.has(c.title)) fail(`연습 카드 제목이 본 덱과 겹친다: ${c.title}`);
     if (c.anchor === true) fail('연습 카드는 기준 카드일 수 없다.');
   }
   if (out.errors.length) return out;
-  const card = data.cards[0];
+  const card = cards[0];
   if (card.disputed === true) { fail('연습 카드는 판정 카드여야 한다(disputed 아님).'); return out; }
   out.anchor = anchor;
   out.card = card;
+  out.boardAnchors = [anchor];
+  for (const cl of card.clues ?? []) {
+    for (const ref of cl.refs ?? []) {
+      const t = byId.get(ref);
+      if (t?.anchor === true && !out.boardAnchors.includes(t)) out.boardAnchors.push(t);
+    }
+  }
   return out;
 }
