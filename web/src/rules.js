@@ -34,68 +34,159 @@ export function eraLabel(id) {
   return ERAS.find((e) => e.id === id)?.label ?? id;
 }
 
+const NATION_LABELS = Object.fromEntries(NATIONS.map((n) => [n.id, n.label]));
+const ERA_LABELS = Object.fromEntries(ERAS.map((e) => [e.id, e.label]));
+const TARGET_PER_CELL = 3;
+const REQUIRED = {
+  id: 'string', type: 'string', title: 'string', anchor: 'boolean', answer: 'object',
+  clues: 'array', source: 'object', verified: 'boolean', disputed: 'boolean', difficulty: 'int',
+};
+const OPTIONAL_NULLABLE_STR = ['explanation', 'date_label', 'verified_by', 'disputed_note', 'image', 'image_source', 'image_license'];
+const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+const nonEmpty = (v) => typeof v === 'string' && v.trim() !== '';
+const typeOk = (v, t) => {
+  if (t === 'array') return Array.isArray(v);
+  if (t === 'object') return isObj(v);
+  if (t === 'int') return Number.isInteger(v);
+  return typeof v === t;
+};
+
 /**
- * 스키마 v1 검증 규칙 1~8을 확인한다.
+ * 카드 데이터 검증. `tools/validate_cards.py`와 같은 규칙(FIELD, R1~R9)을 같은 순서·같은 대상 id로 낸다.
+ * 두 구현의 일치는 web/tests/validator-parity.test.js가 확인한다.
  * @param {Array<object>} cards
- * @returns {{errors: Array<{id: string|null, rule: number, message: string}>, warnings: Array<{id: string|null, rule: number, message: string}>}}
+ * @param {{release?: boolean}} [opts] release면 규칙 9를 관문으로 적용(출시 카드만으로 12칸이 차야 한다).
+ * @returns {{errors: Array<{id: string, rule: string, message: string}>, warnings: Array<{id: string, rule: string, message: string}>}}
  */
-export function validateCards(cards) {
+export function validateCards(cards, opts = {}) {
   const errors = [];
   const warnings = [];
-  const err = (id, rule, message) => errors.push({ id, rule, message });
+  const err = (id, rule, message) => errors.push({ id: String(id), rule, message });
   if (!Array.isArray(cards)) {
-    err(null, 0, '카드 데이터가 배열이 아니다.');
+    err('<root>', 'FIELD', '카드 데이터가 배열이 아니다.');
     return { errors, warnings };
   }
-  const byId = new Map();
-  for (const c of cards) {
-    if (!c || typeof c.id !== 'string' || c.id === '') { err(null, 1, 'id가 없는 카드가 있다.'); continue; }
-    if (byId.has(c.id)) err(c.id, 1, `id 중복: ${c.id}`);
-    byId.set(c.id, c);
-  }
-  for (const c of cards) {
-    if (!c || typeof c.id !== 'string') continue;
-    const id = c.id;
-    if (typeof c.title !== 'string' || c.title === '') err(id, 0, 'title이 없다.');
-    if (!CARD_TYPES.includes(c.type)) err(id, 0, `type이 잘못되었다: ${c.type}`);
-    if (typeof c.anchor !== 'boolean') err(id, 0, 'anchor가 bool이 아니다.');
-    if (!c.answer || !NATION_IDS.includes(c.answer.nation) || !ERA_IDS.includes(c.answer.era)) {
-      err(id, 2, `answer가 잘못되었다: ${JSON.stringify(c.answer)}`);
+
+  // 필드·타입
+  cards.forEach((c, i) => {
+    if (!isObj(c)) { err(`<index ${i}>`, 'FIELD', '카드가 객체가 아니다.'); return; }
+    const cid = 'id' in c ? c.id : `<index ${i}>`;
+    for (const [k, t] of Object.entries(REQUIRED)) {
+      if (!(k in c)) err(cid, 'FIELD', `필수 필드 '${k}'가 없다.`);
+      else if (!typeOk(c[k], t)) err(cid, 'FIELD', `'${k}'의 타입이 ${t}가 아니다.`);
     }
-    if (c.anchor) {
-      if (!Array.isArray(c.clues) || c.clues.length !== 0) err(id, 3, '기준 카드의 clues는 비어 있어야 한다.');
-    } else {
-      const clues = Array.isArray(c.clues) ? c.clues : [];
-      const levelsOk = clues.length === 3 && clues.every((cl, i) => cl && cl.level === i + 1);
-      if (!levelsOk) {
-        err(id, 3, 'clues는 level 1·2·3 순서로 3개여야 한다.');
-      } else {
-        clues.forEach((cl) => {
-          if (cl.kind !== CLUE_KINDS[cl.level]) err(id, 3, `${cl.level}단계 kind는 ${CLUE_KINDS[cl.level]}여야 한다.`);
-          if (typeof cl.text !== 'string' || cl.text === '') err(id, 3, `${cl.level}단계 단서 본문이 없다.`);
-          if (!Array.isArray(cl.refs)) err(id, 3, `${cl.level}단계 refs가 배열이 아니다.`);
-        });
-        const rel = clues[1];
-        for (const ref of rel.refs ?? []) {
-          const target = byId.get(ref);
-          if (!target) err(id, 4, `relation 단서가 없는 id를 가리킨다: ${ref}`);
-          else if (!target.anchor) warnings.push({ id, rule: 4, message: `relation 단서가 기준 카드가 아닌 ${ref}를 가리킨다.` });
+    for (const k of OPTIONAL_NULLABLE_STR) {
+      if (k in c && c[k] !== null && typeof c[k] !== 'string') err(cid, 'FIELD', `'${k}'는 문자열이나 null이어야 한다.`);
+    }
+    if ('tags' in c && !(Array.isArray(c.tags) && c.tags.every((t) => typeof t === 'string'))) err(cid, 'FIELD', "'tags'는 문자열 배열이어야 한다.");
+    if (!CARD_TYPES.includes(c.type)) err(cid, 'FIELD', `type '${c.type}'이 잘못되었다.`);
+    if (Number.isInteger(c.difficulty) && (c.difficulty < 1 || c.difficulty > 3)) err(cid, 'FIELD', 'difficulty는 1~3이어야 한다.');
+    if (!nonEmpty(c.title)) err(cid, 'FIELD', 'title이 비어 있다.');
+    const src = c.source;
+    if (isObj(src)) {
+      if (!nonEmpty(src.name)) err(cid, 'FIELD', 'source.name이 비어 있다.');
+      if (!('url' in src) || !(src.url === null || typeof src.url === 'string')) err(cid, 'FIELD', 'source.url이 있어야 한다(문자열 또는 null).');
+      else if (typeof src.url === 'string' && !/^https?:\/\//.test(src.url)) err(cid, 'FIELD', 'source.url은 http(s)://로 시작해야 한다.');
+      if (typeof src.note !== 'string') err(cid, 'FIELD', 'source.note는 문자열이어야 한다.');
+    }
+    if (!c.anchor) {
+      if (!nonEmpty(c.explanation)) err(cid, 'FIELD', '일반 카드에는 explanation이 필요하다.');
+      else {
+        const era = isObj(c.answer) ? c.answer.era : undefined;
+        if (era in ERA_LABELS && !c.explanation.includes(ERA_LABELS[era])) err(cid, 'FIELD', `explanation에 시기 이름 '${ERA_LABELS[era]}'이 있어야 한다.`);
+      }
+    }
+  });
+
+  const good = cards.filter(isObj);
+  // R1
+  const seen = new Map();
+  for (const c of good) {
+    if (seen.has(c.id)) err(c.id, 'R1', 'id 중복');
+    seen.set(c.id, c);
+  }
+  // R2
+  for (const c of good) {
+    if (!isObj(c.answer)) continue;
+    if (!(c.answer.nation in NATION_LABELS)) err(c.id, 'R2', `answer.nation '${c.answer.nation}'이 잘못되었다.`);
+    if (!(c.answer.era in ERA_LABELS)) err(c.id, 'R2', `answer.era '${c.answer.era}'이 잘못되었다.`);
+  }
+  // R3, R4, R5
+  for (const c of good) {
+    const cid = c.id;
+    const clues = c.clues;
+    if (!Array.isArray(clues)) continue;
+    if (c.anchor === true) {
+      if (clues.length) err(cid, 'R3', '기준 카드의 clues는 비어 있어야 한다.');
+      continue;
+    }
+    const levels = clues.map((cl) => (isObj(cl) ? cl.level : null));
+    if (levels.length !== 3 || levels.some((lv, i) => lv !== i + 1)) err(cid, 'R3', `단서 level은 [1, 2, 3]이어야 한다: ${JSON.stringify(levels)}`);
+    for (const cl of clues) {
+      if (!isObj(cl)) continue;
+      const { level: lv, kind, refs } = cl;
+      let text = cl.text;
+      if (lv in CLUE_KINDS && kind !== CLUE_KINDS[lv]) err(cid, 'R3', `${lv}단계 kind는 '${CLUE_KINDS[lv]}'이어야 한다.`);
+      if (!nonEmpty(text)) { err(cid, 'R3', `${lv}단계 단서 본문이 비어 있다.`); text = ''; }
+      if (!Array.isArray(refs)) { err(cid, 'R4', `${lv}단계 refs가 배열이 아니다.`); continue; }
+      if (kind === 'relation') {
+        if (!refs.length) err(cid, 'R4', 'relation 단서에는 ref가 1개 이상 필요하다.');
+        for (const r of refs) {
+          const target = seen.get(r);
+          if (!target) { err(cid, 'R4', `ref '${r}'가 없다.`); continue; }
+          if (target.anchor !== true) err(cid, 'R4', `ref '${r}'가 기준 카드가 아니다(배치 보장 없음).`);
+          if (target.disputed === true) err(cid, 'R4', `ref '${r}'가 disputed 카드다.`);
+          if (!text.includes(`[${target.title}]`)) err(cid, 'R4', `relation 본문에 '[${target.title}]'가 있어야 한다.`);
         }
-        if (typeof c.title === 'string' && c.title && clues[0].text?.includes(c.title)) {
-          err(id, 5, '1단계 단서에 title이 들어 있다.');
+      } else if (refs.length) {
+        err(cid, 'R4', `${lv}단계(${kind}) 단서의 refs는 비어 있어야 한다.`);
+      }
+      if (lv === 1 && text) {
+        const title = c.title || '';
+        if (title && text.includes(title)) err(cid, 'R5', '1단계 단서에 title이 들어 있다.');
+        for (const word of [...Object.values(NATION_LABELS), ...Object.values(ERA_LABELS)]) {
+          if (text.includes(word)) err(cid, 'R5', `1단계 단서에 '${word}'가 들어 있다.`);
         }
       }
-      if (typeof c.explanation !== 'string' || c.explanation === '') err(id, 0, 'explanation이 없다.');
     }
-    if (c.disputed === true && !c.disputed_note) err(id, 6, 'disputed 카드에 disputed_note가 없다.');
-    if (c.image && (!c.image_source || !c.image_license)) err(id, 7, 'image가 있으면 image_source와 image_license가 필요하다.');
-    if (!Number.isInteger(c.difficulty) || c.difficulty < 1 || c.difficulty > 3) err(id, 0, 'difficulty는 1~3 정수여야 한다.');
   }
-  for (const n of NATION_IDS) {
-    for (const e of ERA_IDS) {
-      const ok = cards.some((c) => c && !c.disputed && c.answer?.nation === n && c.answer?.era === e);
-      if (!ok) err(null, 8, `${nationLabel(n)} ${eraLabel(e)} 칸에 판정 가능한 카드가 없다.`);
+  // R6
+  for (const c of good) {
+    if (c.disputed === true) {
+      if (!nonEmpty(c.disputed_note)) err(c.id, 'R6', 'disputed 카드에 disputed_note가 없다.');
+      if (c.anchor === true) err(c.id, 'R6', 'disputed 카드는 기준 카드가 될 수 없다.');
+    } else if (c.disputed_note !== null && c.disputed_note !== undefined) {
+      err(c.id, 'R6', 'disputed가 false면 disputed_note는 null이어야 한다.');
     }
+  }
+  // R7
+  for (const c of good) {
+    if (c.image !== null && c.image !== undefined) {
+      for (const k of ['image_source', 'image_license']) if (!nonEmpty(c[k])) err(c.id, 'R7', `image가 있는데 ${k}가 비어 있다.`);
+    }
+  }
+  // R8
+  const cellCounts = (subset) => {
+    const counts = new Map();
+    for (const n of NATION_IDS) for (const e of ERA_IDS) counts.set(`${n}/${e}`, 0);
+    for (const c of subset) {
+      const key = isObj(c.answer) ? `${c.answer.nation}/${c.answer.era}` : '';
+      if (counts.has(key)) counts.set(key, counts.get(key) + 1);
+    }
+    return counts;
+  };
+  const judged = good.filter((c) => c.anchor === false && c.disputed === false);
+  for (const [cell, k] of cellCounts(judged)) {
+    if (k === 0) err(`cell ${cell}`, 'R8', '판정 카드가 없다.');
+    else if (k < TARGET_PER_CELL) warnings.push({ id: `cell ${cell}`, rule: 'R8', message: `판정 카드 ${k}장(목표 ${TARGET_PER_CELL}장)` });
+  }
+  // R9
+  for (const c of good) {
+    if (c.verified === true && !nonEmpty(c.verified_by)) err(c.id, 'R9', 'verified: true면 verified_by가 필요하다.');
+  }
+  if (opts.release) {
+    const releaseJudged = good.filter((c) => c.verified === true && c.disputed === false && c.anchor === false);
+    for (const [cell, k] of cellCounts(releaseJudged)) if (k === 0) err(`cell ${cell}`, 'R9', '출시 카드만으로는 판정 카드가 없다.');
   }
   return { errors, warnings };
 }
@@ -106,14 +197,17 @@ export function anchorCards(cards) {
 }
 
 /**
- * 판정 대상 카드. 기준 카드, disputed 카드, 검증 오류가 있는 카드는 뺀다.
+ * 판정 대상 카드: 기준 카드와 disputed 카드를 뺀다. onlyVerified면 verified: true만(규칙 9).
  * @param {Array<object>} cards
- * @param {{onlyVerified?: boolean, invalidIds?: Set<string>}} [opts]
+ * @param {{onlyVerified?: boolean}} [opts]
  */
 export function playableCards(cards, opts = {}) {
-  const invalid = opts.invalidIds ?? new Set();
-  return cards.filter((c) => c.anchor !== true && c.disputed !== true && !invalid.has(c.id)
-    && (!opts.onlyVerified || c.verified === true));
+  return cards.filter((c) => c.anchor !== true && c.disputed !== true && (!opts.onlyVerified || c.verified === true));
+}
+
+/** 출시 모드 로드 필터(규칙 9): verified: true이고 disputed: false인 카드만 남긴다. */
+export function releaseFilter(cards) {
+  return cards.filter((c) => c.verified === true && c.disputed === false);
 }
 
 /** 시드 고정 난수(mulberry32). 같은 시드는 같은 순서를 낸다. */
@@ -139,13 +233,45 @@ export function shuffle(items, rng) {
 }
 
 /**
+ * 라운드에 낼 카드 id를 고른다(D16): 칸마다 판정 카드 1장, 아직 수집하지 않은 카드를 먼저, 그다음 섞는다.
+ * Godot `RoundBuilder.build_queue`와 같은 절차다(난수 소비 순서까지 같지는 않다).
+ * @param {Array<object>} playable
+ * @param {() => number} rng
+ * @param {Record<string, string>} [collection] {id: 'collected'|'revealed'}
+ * @returns {string[]}
+ */
+export function buildRoundOrder(playable, rng, collection = {}) {
+  const picks = [];
+  for (const n of NATION_IDS) {
+    for (const e of ERA_IDS) {
+      const candidates = playable.filter((c) => c.answer.nation === n && c.answer.era === e);
+      if (!candidates.length) continue;
+      const fresh = candidates.filter((c) => collection[c.id] !== 'collected');
+      const pool = fresh.length ? fresh : candidates;
+      picks.push(pool[Math.floor(rng() * pool.length)].id);
+    }
+  }
+  return shuffle(picks, rng);
+}
+
+/**
  * 새 라운드를 만든다.
  * @param {Array<object>} playable playableCards()의 결과
- * @param {{seed: number, startInk: number}} opts
+ * @param {{seed: number, startInk: number, collection?: Record<string, string>}} opts
  */
-export function createRound(playable, { seed, startInk }) {
-  const order = shuffle(playable.map((c) => c.id), createRng(seed));
-  return Object.freeze({ seed, startInk, ink: startInk, order, index: 0, shown: 1, placements: Object.freeze([]) });
+export function createRound(playable, { seed, startInk, collection = {} }) {
+  const order = buildRoundOrder(playable, createRng(seed), collection);
+  return Object.freeze({ seed, startInk, ink: startInk, order: Object.freeze(order), index: 0, shown: 1, placements: Object.freeze([]) });
+}
+
+/** 판정 카드 전부를 수집했는가(게임 클리어, D16). */
+export function isDogamComplete(playable, collection) {
+  return playable.length > 0 && playable.every((c) => collection[c.id] === 'collected');
+}
+
+/** 도감 진행: 수집 수 / 판정 카드 수. */
+export function dogamProgress(playable, collection) {
+  return { collected: playable.filter((c) => collection[c.id] === 'collected').length, total: playable.length };
 }
 
 /** 'playing' | 'cleared' | 'failed' */
@@ -232,11 +358,21 @@ export function serializeRound(state) {
  */
 export function restoreRound(saved, playable) {
   if (!saved || !Array.isArray(saved.order) || !Array.isArray(saved.placements)) return null;
-  const ids = new Set(playable.map((c) => c.id));
-  if (saved.order.length !== ids.size || !saved.order.every((id) => ids.has(id))) return null;
+  const byId = new Map(playable.map((c) => [c.id, c]));
+  const cellsWithCards = new Set(playable.map((c) => `${c.answer.nation}:${c.answer.era}`));
+  const cells = new Set();
+  for (const id of saved.order) {
+    const c = byId.get(id);
+    if (!c) return null;
+    const key = `${c.answer.nation}:${c.answer.era}`;
+    if (cells.has(key)) return null;
+    cells.add(key);
+  }
+  if (cells.size !== cellsWithCards.size) return null;
   const n = saved.order.length;
   if (!Number.isInteger(saved.index) || saved.index < 0 || saved.index > n) return null;
   if (saved.placements.length !== saved.index) return null;
+  if (saved.placements.some((p, i) => !p || p.id !== saved.order[i])) return null;
   if (!Number.isInteger(saved.ink) || !Number.isInteger(saved.startInk)) return null;
   const shown = Number.isInteger(saved.shown) ? Math.min(Math.max(saved.shown, 1), 3) : 1;
   return Object.freeze({

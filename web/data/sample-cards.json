@@ -203,7 +203,7 @@
       { "level": 2, "kind": "relation", "text": "[박혁거세 신화]와 비슷한 때 시작된 낙동강 하류의 나라가 번성하던 때다.", "refs": ["silla-founding-anchor"] },
       { "level": 3, "kind": "direct", "text": "낙랑과 왜에 수출.", "refs": [] }
     ],
-    "explanation": "철 생산과 수출로 번성한 가야 연맹. 해설용 카드(판정 제외).",
+    "explanation": "철 생산과 수출로 번성한 가야 연맹. 전성기로 묶을지 견해가 갈려 해설용으로만 쓴다(판정 제외).",
     "date_label": null,
     "source": { "name": "삼국지 위서 동이전", "url": null, "note": "웹 빌드 샘플 데이터. 검증 전" },
     "verified": false, "verified_by": null, "disputed": true,

@@ -1,7 +1,8 @@
 // 브라우저 E2E: node --test web/tests/e2e.test.mjs
 import { test, before, after, beforeEach, afterEach, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { chromium, startServer, openGame, currentCard, wrongCell, cellSel, dragTo, clickPlace, inkOf, SAMPLE } from './helpers.mjs';
+import { chromium, startServer, openGame, currentCard, wrongCell, cellSel, dragTo, clickPlace, inkOf, SAMPLE, SAMGUK, SAMGUK_BY_ID } from './helpers.mjs';
+import { NATIONS, ERAS } from '../src/rules.js';
 
 const START_INK = 5;
 const PLAYABLE = SAMPLE.filter((c) => !c.anchor && !c.disputed);
@@ -159,6 +160,38 @@ describe('한양 도감 웹 빌드', () => {
     assert.equal(await page.getAttribute('#dogam-count', 'data-collected'), '1');
   });
 
+  test('키보드: 카드 Enter → 방향키로 칸 이동 → Enter로 놓기, Esc로 취소', async () => {
+    const card = await currentCard(page);
+    await page.focus('#card');
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Enter');
+    assert.equal(await page.evaluate(() => document.activeElement?.dataset.nation + ':' + document.activeElement?.dataset.era), 'goguryeo:founding');
+    await page.keyboard.press('Escape');
+    assert.equal(await page.evaluate(() => document.activeElement?.id), 'card');
+    assert.equal(await page.locator('#card.selected').count(), 0);
+    await page.keyboard.press('Enter');
+    const ni = NATIONS.findIndex((n) => n.id === card.answer.nation);
+    const ei = ERAS.findIndex((e) => e.id === card.answer.era);
+    for (let k = 0; k < ni; k++) await page.keyboard.press('ArrowDown');
+    for (let k = 0; k < ei; k++) await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('#fb[data-result="correct"]');
+    assert.equal(await page.evaluate(() => document.activeElement?.id), 'card');
+  });
+
+  test('드래그 중 손 아래 칸이 강조된다', async () => {
+    const card = await currentCard(page);
+    const from = await page.locator('#card .card-head').boundingBox();
+    const to = await page.locator(cellSel(card.answer)).boundingBox();
+    await page.mouse.move(from.x + 20, from.y + 10);
+    await page.mouse.down();
+    await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 8 });
+    assert.equal(await page.locator(`${cellSel(card.answer)}.over`).count(), 1);
+    assert.equal(await page.isVisible('#drag-ghost'), true);
+    await page.mouse.up();
+    assert.equal(await page.locator('#board .cell.over').count(), 0);
+  });
+
   test('저장 불가 환경(localStorage 예외)에서도 플레이된다', async () => {
     await context.addInitScript(() => {
       Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked'); } });
@@ -167,5 +200,100 @@ describe('한양 도감 웹 빌드', () => {
     const card = await currentCard(page);
     await clickPlace(page, card.answer);
     await page.waitForSelector('#fb[data-result="correct"]');
+  });
+});
+
+describe('실제 데이터(assets/data/cards/samguk.json)', { skip: !SAMGUK && 'samguk.json 없음' }, () => {
+  const JUDGED = (SAMGUK ?? []).filter((c) => !c.anchor && !c.disputed);
+  const cardNow = (p) => currentCard(p, SAMGUK_BY_ID);
+
+  /** 현재 라운드를 끝까지 둔다. wrongAt: 오답으로 둘 순번 집합. 놓은 카드 id 목록을 돌려준다. */
+  async function playRound(p, wrongAt = new Set()) {
+    const ids = [];
+    let i = 0;
+    while (await p.getAttribute('#card', 'data-card-id')) {
+      const card = await cardNow(p);
+      ids.push(card.id);
+      const target = wrongAt.has(i) ? wrongCell(card) : card.answer;
+      await (i % 2 ? dragTo(p, target) : clickPlace(p, target));
+      i++;
+      if (await p.getAttribute('#modal', 'data-kind') === 'complete') break; // 라운드 도중 도감 완성
+    }
+    return ids;
+  }
+
+  async function openReal(p) {
+    await openGame(p, server.base, { seed: 7, data: null });
+    assert.match(await p.innerText('#data-info'), /samguk\.json/);
+  }
+
+  test('기본 경로로 samguk.json을 읽고, 라운드는 칸마다 1장씩 12장', async () => {
+    await openReal(page);
+    assert.match(await page.innerText('#progress'), /카드 1 \/ 12/);
+    assert.match(await page.innerText('#dogam-progress'), new RegExp(`도감 0 / ${JUDGED.length}`));
+    const ids = await playRound(page);
+    assert.equal(ids.length, 12);
+    const cells = new Set(ids.map((id) => { const c = SAMGUK_BY_ID.get(id); return `${c.answer.nation}:${c.answer.era}`; }));
+    assert.equal(cells.size, 12);
+    assert.ok(ids.every((id) => JUDGED.some((c) => c.id === id)), 'disputed·기준 카드는 나오지 않는다');
+    await page.waitForSelector('#modal[data-kind="cleared"]:not([hidden])');
+  });
+
+  test('라운드 클리어 → 새 라운드는 미수집 카드만 → 새로고침 복원 → 3라운드째 도감 완성', async () => {
+    await openReal(page);
+    const r1 = await playRound(page, new Set([3]));
+    await page.waitForSelector('#modal[data-kind="cleared"]:not([hidden])');
+    assert.equal(await page.getAttribute('#dogam-progress', 'data-collected'), '11');
+    await page.click('#modal-retry');
+
+    // 라운드 2: 1라운드에서 수집한 11장은 나오지 않는다(오답으로 공개만 된 1장은 다시 나올 수 있다)
+    const collected1 = new Set(r1.filter((_, i) => i !== 3));
+    const first = await cardNow(page);
+    await clickPlace(page, first.answer);
+    await page.reload();
+    await page.waitForSelector('body[data-ready="true"]');
+    assert.equal(await page.getAttribute('#progress', 'data-index'), '1');
+    assert.equal(await page.getAttribute('#dogam-progress', 'data-collected'), '12');
+    assert.equal(await page.locator(`.chip-ok[data-id="${first.id}"]`).count(), 1);
+    const rest = await playRound(page);
+    const r2 = [first.id, ...rest];
+    assert.equal(r2.length, 12);
+    assert.ok(r2.every((id) => !collected1.has(id)), '수집한 카드가 다시 나왔다');
+    await page.waitForSelector('#modal[data-kind="cleared"]:not([hidden])');
+    assert.equal(await page.getAttribute('#dogam-progress', 'data-collected'), '23');
+
+    // 라운드 3, 4: 남은 카드를 모두 맞히면 도감 완성 화면(라운드 도중에도 뜬다)
+    await page.click('#modal-retry');
+    await playRound(page);
+    let kind = await page.getAttribute('#modal', 'data-kind');
+    if (kind !== 'complete') {
+      await page.click('#modal-retry');
+      await playRound(page);
+      kind = await page.getAttribute('#modal', 'data-kind');
+    }
+    assert.equal(kind, 'complete');
+    assert.match(await page.innerText('#modal-title'), /도감 완성/);
+    assert.equal(await page.getAttribute('#dogam-progress', 'data-collected'), String(JUDGED.length));
+
+    await page.click('#modal-dogam');
+    assert.equal(await page.locator('#dogam .entry[data-state="collected"]').count(), JUDGED.length);
+    const counts = await page.locator('#dogam .cell-count').allInnerTexts();
+    assert.equal(counts.length, 12);
+    assert.ok(counts.every((t) => t === '3 / 3'), counts.join(','));
+    await page.click('#dogam .entry[data-state="collected"]');
+    assert.match(await page.innerText('#dogam-source'), /출처/);
+
+    // 완성 후 새로고침해도 도감은 유지
+    await page.reload();
+    await page.waitForSelector('body[data-ready="true"]');
+    assert.equal(await page.getAttribute('#dogam-progress', 'data-collected'), String(JUDGED.length));
+  });
+
+  test('실제 데이터에서도 오답 5번이면 실패', async () => {
+    await openReal(page);
+    await playRound(page, new Set([0, 1, 2, 3, 4]));
+    await page.waitForSelector('#modal[data-kind="failed"]:not([hidden])');
+    assert.equal(await inkOf(page), 0);
+    assert.equal(await page.getAttribute('#progress', 'data-index'), '5');
   });
 });
