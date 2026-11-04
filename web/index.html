@@ -17,6 +17,7 @@
   <nav class="actions">
     <button id="btn-dogam" type="button" class="btn">도감</button>
     <button id="btn-new" type="button" class="btn btn-quiet">새 라운드</button>
+    <button id="btn-home" type="button" class="btn btn-quiet">처음 화면</button>
   </nav>
 </header>
 
@@ -39,8 +40,47 @@
       <button id="btn-dogam-close" type="button" class="btn">닫기</button>
     </header>
     <div class="dogam-body">
-      <div id="dogam-grid" class="board dogam-grid"></div>
+      <div class="dogam-main">
+        <div id="dogam-grid" class="board dogam-grid"></div>
+        <section class="dogam-section" aria-labelledby="disputed-title">
+          <h3 id="disputed-title">견해가 나뉘는 기록 <span class="section-sub">판정에서 제외하고 해설용으로만 싣는다</span></h3>
+          <div id="dogam-disputed" class="disputed-list"></div>
+        </section>
+        <section class="dogam-section" aria-labelledby="record-title">
+          <h3 id="record-title">플레이 기록 <span class="section-sub">끝난 라운드마다 이 브라우저에 쌓인다</span></h3>
+          <div id="play-record" class="play-record"></div>
+        </section>
+      </div>
       <article id="dogam-detail" class="dogam-detail"></article>
+    </div>
+  </div>
+</div>
+
+<div id="title-screen" class="overlay title-overlay" hidden>
+  <div class="title-sheet" role="dialog" aria-modal="true" aria-labelledby="title-name">
+    <div class="title-seal" aria-hidden="true">圖鑑</div>
+    <h1 id="title-name" class="title-name">한양 도감</h1>
+    <p class="title-sub">삼국시대 — 이름이 숨겨진 사건 카드를 단서로 추리해 나라·시기 칸에 놓고 도감을 채운다.</p>
+    <p id="title-progress" class="title-progress"></p>
+    <div id="title-actions" class="title-actions"></div>
+  </div>
+</div>
+
+<div id="tutorial" class="overlay tutorial-overlay" hidden>
+  <div class="sheet tutorial-sheet" role="dialog" aria-modal="true" aria-labelledby="tut-title">
+    <header class="sheet-head">
+      <h2 id="tut-title">처음 해 보기</h2>
+      <span id="tut-progress" class="dogam-count"></span>
+      <button id="tut-skip" type="button" class="btn btn-quiet">건너뛰기</button>
+    </header>
+    <div class="tutorial-body">
+      <div class="tut-left">
+        <div id="tut-step" class="tut-step" aria-live="polite"></div>
+        <div id="tut-card" class="card tut-card" tabindex="0"></div>
+        <div id="tut-feedback" class="feedback" aria-live="polite"></div>
+        <div class="tut-actions"><button id="tut-next" type="button" class="btn btn-primary">다음</button></div>
+      </div>
+      <div id="tut-board" class="board tut-board" aria-label="연습 보드"></div>
     </div>
   </div>
 </div>

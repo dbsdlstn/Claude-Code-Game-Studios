@@ -9,6 +9,7 @@ import {
   roundStatus, currentCardId, revealNextClue, placeCard, boardCells, roundStats,
   recordInCollection, serializeRound, restoreRound, restoreCollection,
   buildRoundOrder, isDogamComplete, dogamProgress, releaseFilter,
+  summarizeRound, historyStats, restoreHistory,
 } from '../src/rules.js';
 import { createStore } from '../src/storage.js';
 import { loadCards, resolveDataUrls } from '../src/data.js';
@@ -343,16 +344,19 @@ describe('저장과 복원', () => {
     const fake = { getItem: (k) => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, v), removeItem: (k) => mem.delete(k) };
     const store = createStore('k', fake);
     assert.equal(store.load(), null);
-    assert.equal(store.save({ a: 1 }, { x: 'collected' }), true);
-    assert.deepEqual(store.load(), { version: 1, round: { a: 1 }, collection: { x: 'collected' } });
+    assert.equal(store.save({ round: { a: 1 }, collection: { x: 'collected' } }), true);
+    assert.deepEqual(store.load(), { version: 1, round: { a: 1 }, collection: { x: 'collected' }, meta: {}, history: [] });
+    store.save({ round: null, collection: {}, meta: { tutorialDone: true }, history: [{ placed: 1 }] });
+    assert.deepEqual(store.load().meta, { tutorialDone: true });
+    assert.deepEqual(store.load().history, [{ placed: 1 }]);
     mem.set('k', '{not json');
     assert.equal(store.load(), null);
     const throwing = { getItem() { throw new Error('denied'); }, setItem() { throw new Error('quota'); }, removeItem() { throw new Error('x'); } };
     const bad = createStore('k', throwing);
     assert.equal(bad.load(), null);
-    assert.equal(bad.save({}, {}), false);
+    assert.equal(bad.save({}), false);
     assert.doesNotThrow(() => bad.clear());
-    assert.equal(createStore('k', null).save({}, {}), false);
+    assert.equal(createStore('k', null).save({}), false);
   });
 });
 
@@ -374,5 +378,58 @@ describe('데이터 로딩', () => {
   test('?data= 쿼리가 기본 경로를 덮어쓴다', () => {
     assert.deepEqual(resolveDataUrls('?data=x.json', ['a', 'b']), ['x.json']);
     assert.deepEqual(resolveDataUrls('', ['a', 'b']), ['a', 'b']);
+  });
+});
+
+describe('라운드 결과와 플레이 기록', () => {
+  test('placeCard: 처음 맞힌 카드만 isNew, 이미 수집했거나 오답이면 false', () => {
+    const { playable, byId } = setup();
+    const s = createRound(playable, { seed: SEED, startInk: START_INK });
+    const id = currentCardId(s);
+    assert.equal(placeCurrent(s, byId, true).result.isNew, true);
+    const card = byId.get(id);
+    assert.equal(placeCard(s, byId, card.answer.nation, card.answer.era, { [id]: 'collected' }).result.isNew, false);
+    assert.equal(placeCard(s, byId, card.answer.nation, card.answer.era, { [id]: 'revealed' }).result.isNew, true);
+    assert.equal(placeCurrent(s, byId, false).result.isNew, false);
+  });
+
+  test('summarizeRound: 단서 단계 분포, 정답·오답·새 수집 수, 남은 먹물', () => {
+    const { playable, byId } = setup();
+    let s = createRound(playable, { seed: SEED, startInk: START_INK });
+    s = placeCurrent(s, byId, true).state;                       // 1단계 정답
+    s = revealNextClue(s); s = placeCurrent(s, byId, false).state; // 2단계 오답
+    s = revealNextClue(revealNextClue(s)); s = placeCurrent(s, byId, true).state; // 3단계 정답
+    while (roundStatus(s) === 'playing') s = placeCurrent(s, byId, true).state;
+    const h = summarizeRound(s, { at: 'T', dataFile: 'x.json' });
+    assert.equal(h.status, 'cleared');
+    assert.equal(h.placed, 12);
+    assert.equal(h.right, 11);
+    assert.equal(h.wrong, 1);
+    assert.equal(h.newlyCollected, 11);
+    assert.equal(h.inkLeft, START_INK - 1);
+    assert.deepEqual(h.levels, [10, 1, 1]);
+    assert.deepEqual(h.placements.slice(0, 3).map((p) => p.level), [1, 2, 3]);
+    assert.equal(h.dataFile, 'x.json');
+  });
+
+  test('historyStats: 라운드 수, 클리어 수, 정답률, 평균 단서 단계', () => {
+    const rows = [
+      { status: 'cleared', placed: 12, right: 9, levels: [6, 4, 2] },
+      { status: 'failed', placed: 8, right: 3, levels: [8, 0, 0] },
+    ];
+    const st = historyStats(rows);
+    assert.equal(st.rounds, 2);
+    assert.equal(st.cleared, 1);
+    assert.equal(st.failed, 1);
+    assert.equal(st.rate, 60); // 12/20
+    assert.equal(st.avgLevel, 1.4); // (14*1 + 4*2 + 2*3) / 20 = 28/20
+    assert.deepEqual(st.levels, [14, 4, 2]);
+    assert.deepEqual(historyStats([]), { rounds: 0, cleared: 0, failed: 0, placed: 0, right: 0, rate: 0, avgLevel: 0, levels: [0, 0, 0] });
+  });
+
+  test('restoreHistory: 형식이 틀린 줄은 버린다', () => {
+    const ok = { status: 'failed', placed: 5, right: 0, levels: [5, 0, 0] };
+    assert.deepEqual(restoreHistory([ok, null, { placed: 'x' }, { ...ok, status: 'playing' }]), [ok]);
+    assert.deepEqual(restoreHistory('nope'), []);
   });
 });

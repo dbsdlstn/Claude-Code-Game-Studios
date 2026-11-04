@@ -192,6 +192,20 @@ describe('한양 도감 웹 빌드', () => {
     assert.equal(await page.locator('#board .cell.over').count(), 0);
   });
 
+  test('손맛: 정답 칸에 도장, 오답 칸에 먹물 번짐. 동작 줄이기 설정이면 둘 다 숨김', async () => {
+    const c1 = await currentCard(page);
+    await clickPlace(page, c1.answer);
+    assert.equal(await page.locator(`${cellSel(c1.answer)} .stamp`).isVisible(), true);
+    const c2 = await currentCard(page);
+    await clickPlace(page, wrongCell(c2));
+    assert.equal(await page.locator(`${cellSel(wrongCell(c2))} .blot`).count(), 1);
+    assert.equal(await page.locator('#board .stamp').count(), 0, '오답에는 도장이 없다');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const c3 = await currentCard(page);
+    await clickPlace(page, c3.answer);
+    assert.equal(await page.locator(`${cellSel(c3.answer)} .stamp`).isVisible(), false);
+  });
+
   test('저장 불가 환경(localStorage 예외)에서도 플레이된다', async () => {
     await context.addInitScript(() => {
       Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked'); } });
