@@ -23,6 +23,7 @@ var _board: BoardView
 var _card_view: CardView
 var _guide: Label
 var _next_button: Button
+var _reveal: RevealView
 
 
 ## 화면을 만든다.
@@ -76,7 +77,11 @@ func setup(config: GameConfig, data: TutorialData) -> void:
 	_card_view = CardView.new()
 	_card_view.more_clues_requested.connect(_on_more)
 	_card_view.selection_changed.connect(_on_selection_changed)
+	_card_view.set_ref_titles(GameScreen.ref_titles(data.board_anchors))
+	_card_view.anchor_ref_focused.connect(_board.highlight_anchor)
+	_reveal = RevealView.new()
 	side.add_child(_card_view)
+	side.add_child(_reveal)
 	_render()
 
 
@@ -98,7 +103,11 @@ func _render() -> void:
 			_guide.text = "단서 1 — 장면\n카드 이름은 숨겨져 있습니다. 1단계 단서는 나라와 시기를 말하지 않고 장면만 보여 줍니다. 모르겠으면 '단서 더 보기'를 누르거나 '다음'으로 넘어가세요."
 			_next_button.visible = true
 		Step.RELATION:
-			_guide.text = "단서 2 — 관계\n관계 단서는 기준 카드 [%s](%s)를 기준으로 칸을 좁혀 줍니다. 이제 카드를 알맞은 칸에 끌어다 놓아 보세요. 틀려도 먹물은 줄지 않습니다." % [a.title, where]
+			_guide.text = (
+				"단서 2 — 관계\n관계 단서는 기준 카드 [%s](%s)를 기준으로 칸을 좁혀 줍니다. "
+				+ "단서 아래 「▶ [기준 카드] 칸 보기」를 누르면 그 칸이 금색으로 반짝입니다. "
+				+ "이제 카드를 알맞은 칸에 끌어다 놓아 보세요. 틀려도 먹물은 줄지 않습니다."
+			) % [a.title, where]
 			_next_button.visible = false
 		Step.DONE:
 			var c := _session.card
@@ -156,6 +165,7 @@ func _on_cell_targeted(nation: String, era: String, by_drop: bool, by_keyboard: 
 	var c := _session.card
 	if _session.place(nation, era):
 		_board.show_placed(c.nation, c.era, c.title, true)
+		_reveal.show_card(_config, c, true)
 		_step = Step.DONE
 		_render()
 	else:

@@ -87,3 +87,23 @@ func test_tutorial_file_is_valid_and_separate_from_deck() -> void:
 	assert_bool(t.is_valid()).is_true()
 	assert_bool(cs.has_card(t.card.id)).is_false()
 	assert_bool(t.anchor.anchor).is_true()
+
+
+func test_placeholder_art_exists_for_every_card_type() -> void:
+	# 공개 후 이미지가 없을 때 쓰는 대체 문양(아트 바이블 §7.1). import 전에는 원본 파일로 확인한다.
+	for t: String in CardArt.KNOWN_TYPES:
+		assert_bool(FileAccess.file_exists(CardArt.placeholder_path(t))).is_true()
+
+
+func test_samguk_hidden_texts_do_not_depend_on_card_type() -> void:
+	# D37: 숨김 상태의 글은 유형과 무관해야 한다. 실제 카드마다 유형을 바꿔도 글이 같아야 한다.
+	var cfg := GameConfig.load_file(CONFIG_PATH)
+	var cs := CardLoader.load_with_config(cfg.cards_path, cfg, false)
+	var refs := GameScreen.ref_titles(cs.anchors)
+	for c: CardData in cs.playable:
+		var before := CardView.hidden_texts(c, c.clues, refs)
+		var saved_type := c.type
+		c.type = "event" if saved_type != "event" else "myth"
+		var after := CardView.hidden_texts(c, c.clues, refs)
+		c.type = saved_type
+		assert_array(Array(after)).is_equal(Array(before))

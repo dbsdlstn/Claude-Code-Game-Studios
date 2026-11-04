@@ -14,6 +14,8 @@ signal cell_targeted(nation: String, era: String, by_drop: bool, by_keyboard: bo
 
 ## cell_key -> BoardCell
 var _cells: Dictionary = {}
+## 기준 카드 id -> cell_key (관계 단서 강조용)
+var _anchor_cells: Dictionary = {}
 
 
 ## 보드를 만든다. anchors: 보드에 보일 기준 카드.
@@ -37,12 +39,22 @@ func setup(config: GameConfig, anchors: Array[CardData]) -> void:
 		header.add_child(def_label)
 		add_child(header)
 	for n in config.nation_ids():
+		# 행 머리글: 나라 인장 + 나라색 이름(바이블 §3·§4.2). 선택지라 정답 누출이 아니다(D37).
+		var row := HBoxContainer.new()
+		row.custom_minimum_size = Vector2(96, 0)
+		row.alignment = BoxContainer.ALIGNMENT_BEGIN
+		row.add_theme_constant_override("separation", 6)
+		var seal := HanjiTheme.seal(n, config.nation_label(n))
+		seal.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(seal)
 		var row_label := Label.new()
 		row_label.text = config.nation_label(n)
 		row_label.add_theme_font_size_override("font_size", 18)
+		row_label.add_theme_color_override("font_color", HanjiTheme.nation_color(n))
 		row_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		row_label.custom_minimum_size = Vector2(64, 0)
-		add_child(row_label)
+		row_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		row.add_child(row_label)
+		add_child(row)
 		for e in config.era_ids():
 			var titles := PackedStringArray()
 			for a: CardData in anchors:
@@ -54,6 +66,24 @@ func setup(config: GameConfig, anchors: Array[CardData]) -> void:
 			bc.cell_clicked.connect(func(cn: String, ce: String, kb: bool) -> void: cell_targeted.emit(cn, ce, false, kb))
 			_cells[CardData.make_cell_key(n, e)] = bc
 			add_child(bc)
+	_anchor_cells = anchor_cell_keys(anchors)
+
+
+## 기준 카드 id → 칸 키. 사용 예: anchor_cell_keys(card_set.anchors)["goguryeo-peak-anchor"] → "goguryeo/peak"
+static func anchor_cell_keys(anchors: Array[CardData]) -> Dictionary:
+	var out: Dictionary = {}
+	for a: CardData in anchors:
+		out[a.id] = a.cell_key()
+	return out
+
+
+## 기준 카드가 놓인 칸을 잠깐 강조한다(관계 단서를 누르거나 초점을 줄 때). 모르는 id면 아무것도 안 한다.
+func highlight_anchor(anchor_id: String) -> void:
+	if not _anchor_cells.has(anchor_id):
+		return
+	var c: BoardCell = _cells.get(_anchor_cells[anchor_id])
+	if c != null:
+		c.highlight()
 
 
 ## 모든 칸을 비운다.

@@ -11,6 +11,7 @@ var _summary: Label
 var _stats: Label
 var _list: VBoxContainer
 var _detail: Label
+var _reveal: RevealView
 var _config: GameConfig
 var _close: Button
 
@@ -55,11 +56,16 @@ func _init() -> void:
 	detail_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	detail_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(detail_panel)
+	var detail_box := VBoxContainer.new()
+	detail_box.add_theme_constant_override("separation", 8)
+	detail_panel.add_child(detail_box)
+	_reveal = RevealView.new()
+	detail_box.add_child(_reveal)
 	_detail = Label.new()
 	_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_detail.custom_minimum_size = Vector2(320, 0)
 	_detail.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	detail_panel.add_child(_detail)
+	detail_box.add_child(_detail)
 
 
 ## 도감 내용을 다시 그린다.
@@ -74,6 +80,7 @@ func show_dogam(config: GameConfig, cards: CardSet, progress: ProgressData) -> v
 	var complete := collected_count > 0 and collected_count == cards.playable.size()
 	_summary.text = "%s  %d / %d" % ["도감 완성" if complete else "도감", collected_count, cards.playable.size()]
 	_detail.text = "왼쪽에서 모은 카드를 누르면 해설이 열립니다."
+	_reveal.clear()
 	_stats.text = format_stats(progress.stats())
 
 	for n in config.nation_ids():
@@ -122,7 +129,8 @@ static func format_stats(st: Dictionary) -> String:
 static func describe(config: GameConfig, c: CardData) -> String:
 	var lines: PackedStringArray = PackedStringArray()
 	lines.append(c.title)
-	lines.append("%s · %s (%s)" % [config.nation_label(c.nation), config.era_label(c.era), config.era_definition(c.era)])
+	lines.append("%s · %s (%s) · 유형: %s" % [
+		config.nation_label(c.nation), config.era_label(c.era), config.era_definition(c.era), HanjiTheme.type_label(c.type)])
 	if not c.date_label.is_empty():
 		lines.append("연도(참고): " + c.date_label)
 	lines.append("")
@@ -140,10 +148,15 @@ static func describe(config: GameConfig, c: CardData) -> String:
 	return "\n".join(lines)
 
 
+func _show_detail(card: CardData) -> void:
+	_reveal.show_card(_config, card, true)
+	_detail.text = describe(_config, card)
+
+
 func _add_entry(text: String, card: CardData, enabled: bool) -> void:
 	var b := Button.new()
 	b.text = text
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	b.disabled = not enabled
-	b.pressed.connect(func() -> void: _detail.text = describe(_config, card))
+	b.pressed.connect(func() -> void: _show_detail(card))
 	_list.add_child(b)
