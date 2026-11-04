@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "start_ink": 5,
+  "release_mode": false,
+  "cards_path": "res://assets/data/cards/samguk.json",
+  "dev_fallback_cards_path": "res://tests/fixtures/cards_fixture.json",
+  "save_path": "user://progress.json",
+  "nations": [
+    { "id": "goguryeo", "label": "고구려" },
+    { "id": "baekje", "label": "백제" },
+    { "id": "silla", "label": "신라" },
+    { "id": "gaya", "label": "가야" }
+  ],
+  "eras": [
+    { "id": "founding", "label": "건국기", "definition": "건국 전승과 초창기" },
+    { "id": "peak", "label": "전성기", "definition": "영토와 세력이 커지고 번영" },
+    { "id": "ending", "label": "결말기", "definition": "전쟁의 마무리·멸망·통일 완성" }
+  ]
+}

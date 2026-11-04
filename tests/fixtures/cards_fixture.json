@@ -1,0 +1,739 @@
+[
+  {
+    "id": "goguryeo-peak-anchor",
+    "type": "artifact",
+    "title": "광개토대왕릉비",
+    "anchor": true,
+    "answer": {
+      "nation": "goguryeo",
+      "era": "peak"
+    },
+    "clues": [],
+    "explanation": "광개토대왕의 업적을 기록한 비. 고구려 전성기.",
+    "date_label": "414년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "기준"
+    ]
+  },
+  {
+    "id": "baekje-ending-anchor",
+    "type": "event",
+    "title": "황산벌 전투",
+    "anchor": true,
+    "answer": {
+      "nation": "baekje",
+      "era": "ending"
+    },
+    "clues": [],
+    "explanation": "계백의 결사대가 신라군에 맞선 싸움. 백제 결말기.",
+    "date_label": "660년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "기준"
+    ]
+  },
+  {
+    "id": "silla-founding-anchor",
+    "type": "myth",
+    "title": "박혁거세 신화",
+    "anchor": true,
+    "answer": {
+      "nation": "silla",
+      "era": "founding"
+    },
+    "clues": [],
+    "explanation": "알에서 태어난 시조의 건국 전승. 신라 건국기.",
+    "date_label": "전승 기원전 57년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "기준"
+    ]
+  },
+  {
+    "id": "fx-goguryeo-founding-01",
+    "type": "myth",
+    "title": "졸본에서의 건국",
+    "anchor": false,
+    "answer": {
+      "nation": "goguryeo",
+      "era": "founding"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "압록강 중류 산악 지대에서 활 잘 쏘는 인물이 새 나라를 세운다는 이야기.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[광개토대왕릉비]를 세우게 되는 나라의 맨 처음이다.",
+        "refs": [
+          "goguryeo-peak-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "건국 전승 연대는 기원전 37년.",
+        "refs": []
+      }
+    ],
+    "explanation": "고구려 건국 전승(주몽). 나라가 시작되는 사건이므로 건국기.",
+    "date_label": "전승 기원전 37년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-goguryeo-peak-01",
+    "type": "event",
+    "title": "평양 천도",
+    "anchor": false,
+    "answer": {
+      "nation": "goguryeo",
+      "era": "peak"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "나라의 중심을 넓은 평야의 큰 강가로 옮긴다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[광개토대왕릉비]를 세운 왕의 아들이 한 일이다.",
+        "refs": [
+          "goguryeo-peak-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "427년, 장수왕.",
+        "refs": []
+      }
+    ],
+    "explanation": "장수왕의 평양 천도. 남쪽으로 세력을 넓히던 때이므로 전성기.",
+    "date_label": "427년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-goguryeo-ending-01",
+    "type": "event",
+    "title": "살수대첩",
+    "anchor": false,
+    "answer": {
+      "nation": "goguryeo",
+      "era": "ending"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "중국 통일 왕조의 대군이 쳐들어오지만 한 장군의 유인 작전에 무너진다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[광개토대왕릉비]를 세운 나라가 약 200년 뒤 겪은 큰 시험이다.",
+        "refs": [
+          "goguryeo-peak-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "612년, 수나라, 을지문덕.",
+        "refs": []
+      }
+    ],
+    "explanation": "612년 수의 침공을 막아 낸 싸움. 나라의 마지막을 향한 대외 전쟁이므로 결말기.",
+    "date_label": "612년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-baekje-founding-01",
+    "type": "myth",
+    "title": "온조의 위례성 건국",
+    "anchor": false,
+    "answer": {
+      "nation": "baekje",
+      "era": "founding"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "한강 유역에 북쪽에서 내려온 집단이 작은 나라를 세운다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[황산벌 전투]에서 마지막을 맞는 나라의 첫 장면이다.",
+        "refs": [
+          "baekje-ending-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "건국 전승 연대는 기원전 18년.",
+        "refs": []
+      }
+    ],
+    "explanation": "백제 건국 전승. 나라가 시작되는 사건이므로 건국기.",
+    "date_label": "전승 기원전 18년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-baekje-peak-01",
+    "type": "event",
+    "title": "평양성 공격",
+    "anchor": false,
+    "answer": {
+      "nation": "baekje",
+      "era": "peak"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "마한 지역을 아우른 왕이 북쪽으로 군대를 올린다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[황산벌 전투]보다 약 300년 앞선, 이 나라의 가장 강했던 때다.",
+        "refs": [
+          "baekje-ending-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "371년, 상대 나라의 왕이 전사한다.",
+        "refs": []
+      }
+    ],
+    "explanation": "근초고왕 때(4세기 후반) 평양성 공격. 세력이 가장 커진 때이므로 전성기.",
+    "date_label": "371년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-baekje-ending-01",
+    "type": "event",
+    "title": "사비성 함락",
+    "anchor": false,
+    "answer": {
+      "nation": "baekje",
+      "era": "ending"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "연합군에 둘러싸인 도성이 무너지고 왕이 항복한다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[황산벌 전투] 직후 이어진 일이다.",
+        "refs": [
+          "baekje-ending-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "660년, 의자왕.",
+        "refs": []
+      }
+    ],
+    "explanation": "660년 백제 도성 함락. 나라가 끝나는 사건이므로 결말기.",
+    "date_label": "660년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-silla-founding-01",
+    "type": "event",
+    "title": "석탈해의 즉위",
+    "anchor": false,
+    "answer": {
+      "nation": "silla",
+      "era": "founding"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "바다를 건너온 상자에서 나온 인물이 훗날 왕이 된다는 이야기.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[박혁거세 신화] 뒤에 이어지는, 같은 나라 초창기 왕의 이야기다.",
+        "refs": [
+          "silla-founding-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "신라 제4대 왕.",
+        "refs": []
+      }
+    ],
+    "explanation": "신라 초창기의 왕위 전승. 나라의 처음 무렵이므로 건국기.",
+    "date_label": "전승 1세기",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-silla-peak-01",
+    "type": "artifact",
+    "title": "진흥왕 순수비",
+    "anchor": false,
+    "answer": {
+      "nation": "silla",
+      "era": "peak"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "새로 차지한 땅을 둘러보고 기념 비석을 세운다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[박혁거세 신화]의 나라가 한강 유역까지 진출한 때다.",
+        "refs": [
+          "silla-founding-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "6세기 중반.",
+        "refs": []
+      }
+    ],
+    "explanation": "진흥왕 때 신라가 한강 유역을 차지. 영토가 커진 때이므로 전성기.",
+    "date_label": "6세기 중반",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-silla-ending-01",
+    "type": "event",
+    "title": "기벌포 전투",
+    "anchor": false,
+    "answer": {
+      "nation": "silla",
+      "era": "ending"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "예전에 손잡았던 대군을 서해안에서 몰아낸다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[황산벌 전투]로부터 십여 년 뒤, 이긴 쪽이 전쟁을 마무리 짓는다.",
+        "refs": [
+          "baekje-ending-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "676년, 당군.",
+        "refs": []
+      }
+    ],
+    "explanation": "676년 신라가 당군을 몰아냄. 전쟁을 마무리하고 통일을 완성하므로 결말기.",
+    "date_label": "676년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-gaya-founding-01",
+    "type": "myth",
+    "title": "수로왕의 건국 전승",
+    "anchor": false,
+    "answer": {
+      "nation": "gaya",
+      "era": "founding"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "하늘에서 내려온 상자 속 알들에서 여섯 왕이 나왔다는 이야기.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[박혁거세 신화]와 같은 알 이야기 구조이지만 낙동강 하류의 나라다.",
+        "refs": [
+          "silla-founding-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "금관가야.",
+        "refs": []
+      }
+    ],
+    "explanation": "금관가야 건국 전승. 나라가 시작되는 사건이므로 건국기.",
+    "date_label": "전승 42년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-gaya-peak-01",
+    "type": "event",
+    "title": "가라국왕의 남제 사신",
+    "anchor": false,
+    "answer": {
+      "nation": "gaya",
+      "era": "peak"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "내륙 산간의 나라 왕이 바다 건너 남쪽 왕조에 사신을 보내 벼슬을 받는다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[광개토대왕릉비]가 세워진 뒤 약 60년, 낙동강 서쪽 나라가 이름을 알린 때다.",
+        "refs": [
+          "goguryeo-peak-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "479년, 대가야.",
+        "refs": []
+      }
+    ],
+    "explanation": "대가야가 남제에 사신을 보냄. 세력이 커지던 때이므로 전성기.",
+    "date_label": "479년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 3,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-gaya-ending-01",
+    "type": "event",
+    "title": "대가야의 멸망",
+    "anchor": false,
+    "answer": {
+      "nation": "gaya",
+      "era": "ending"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "하나로 묶여 있던 작은 나라들의 마지막 중심이 이웃에 흡수된다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[황산벌 전투]보다 약 100년 앞서, 이긴 쪽 나라가 남쪽부터 정리했다.",
+        "refs": [
+          "baekje-ending-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "562년.",
+        "refs": []
+      }
+    ],
+    "explanation": "대가야가 신라에 흡수됨. 나라가 끝나는 사건이므로 결말기.",
+    "date_label": "562년",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  },
+  {
+    "id": "fx-gaya-peak-disputed",
+    "type": "artifact",
+    "title": "덩이쇠 수출",
+    "anchor": false,
+    "answer": {
+      "nation": "gaya",
+      "era": "peak"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "철을 일정한 모양으로 만들어 화폐처럼 쓰고 바다 건너로 내다 판다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[박혁거세 신화]와 같은 무렵부터 이어진 낙동강 하류의 철 생산이다.",
+        "refs": [
+          "silla-founding-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "낙랑과 왜에 수출.",
+        "refs": []
+      }
+    ],
+    "explanation": "철 생산과 수출로 번성한 가야 연맹.",
+    "date_label": "",
+    "source": {
+      "name": "삼국사기",
+      "url": null,
+      "note": "테스트용 픽스처. 콘텐츠가 아니며 사실 확인 전이다."
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": true,
+    "disputed_note": "가야 전성기로 볼 시점에 견해가 나뉜다(decision-log D3).",
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "픽스처"
+    ]
+  }
+]
