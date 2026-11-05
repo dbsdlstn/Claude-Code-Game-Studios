@@ -1,0 +1,854 @@
+{
+  "schema": 2,
+  "cards": [
+    {
+      "id": "goguryeo-src-25",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "국내성 천도",
+      "year": 3,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": "삼국사기 기년",
+      "reign_label": "유리왕 22년",
+      "source_text": "제사에 쓸 돼지가 달아나 쫓아간 관리가, 산과 물이 깊고 험하며 땅이 기름진 고을을 보고 돌아와 아뢰었다. 이듬해 왕은 그곳으로 도읍을 옮겼다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-dongmyeong"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-gogukcheon"
+            }
+          ],
+          "text": "[동명성왕]이 즉위한 뒤, [고국천왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "유리왕 22년(서기 3년). 졸본에서 국내(위나암)로."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-dongmyeong",
+        "before": "goguryeo-reign-taejo"
+      },
+      "explanation": "유리왕 22년(3년)의 일. 유리왕이 졸본에서 국내(위나암)로 도읍을 옮긴 일. 앞서 21년에 설지가 달아난 제사용 돼지를 쫓다 그 땅을 보고 천도를 건의했다. 427년 장수왕의 평양 천도 전까지 국내성이 도읍이었다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "고구려본기",
+        "volume": 13,
+        "entry": "유리왕 21년 3월·22년 10월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "설지의 건의(21년)와 천도(22년)는 한국민족문화대백과 요약으로 확인. 국내 위나암과 4세기 이후 국내성을 같은 곳으로 보는 것은 후대 동일시라는 견해가 있다(v1 대조). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-26",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "부여 정벌과 대소왕 전사",
+      "year": 22,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "대무신왕 5년",
+      "source_text": "왕이 군사를 이끌고 북쪽 이웃 나라로 가서 그 남쪽에서 싸웠다. 한 장수가 적의 왕을 붙잡아 목을 베었으나, 그 나라를 다 차지하지는 못하고 돌아왔다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-dongmyeong"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-dongcheon"
+            }
+          ],
+          "text": "[동명성왕]이 즉위한 뒤, [동천왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "대무신왕 5년(22년) 2월. 부여 대소왕, 장수 괴유."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-dongmyeong",
+        "before": "goguryeo-reign-taejo"
+      },
+      "explanation": "대무신왕 5년(22년)의 일. 대무신왕이 부여를 공격해 대소왕을 죽인 일. 정벌 자체는 실패했으나 이후 대소왕의 종제가 백성 1만여 명과 함께 투항했다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "고구려본기",
+        "volume": 14,
+        "entry": "대무신왕 5년 2월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "22년 2월 부여 남쪽 진군, 괴유가 대소를 죽임, 정벌 실패는 한국민족문화대백과(대무신왕·괴유) 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-27",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "을파소 등용",
+      "year": 191,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "고국천왕 13년",
+      "source_text": "왕이 여러 부에 어진 사람을 천거하게 하자, 한 신하가 숨어 살며 농사짓던 사람을 추천하였다. 왕은 그를 불러 나라의 으뜸 재상으로 삼았다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-taejo"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-micheon"
+            }
+          ],
+          "text": "[태조왕]이 즉위한 뒤, [미천왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "고국천왕 13년(191년). 안류의 추천, 국상 을파소."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-gogukcheon",
+        "before": "goguryeo-reign-dongcheon"
+      },
+      "explanation": "고국천왕 13년(191년)의 일. 고국천왕이 안류의 추천으로 을파소를 국상에 앉힌 일. 연나부 반란을 진압한 뒤 왕권을 강화하던 때이고, 을파소 재임 중 진대법(194)이 시행되었다.",
+      "exam_tags": [
+        "person",
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "고구려본기",
+        "volume": 16,
+        "entry": "고국천왕 13년 4월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "191년 안류 추천으로 국상 임명은 한국민족문화대백과 을파소 항목 요약과 위키백과로 확인. '숨어 살며 농사짓던'은 확인 자료의 서술 범위(재야에서 농사)이며 원문 대조 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-28",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "비려 정벌",
+      "year": 395,
+      "year_alt": [],
+      "year_basis": "inscription",
+      "year_note": null,
+      "reign_label": "광개토왕 영락 5년",
+      "source_text": "왕이 몸소 군사를 이끌고 북서쪽 유목민 무리를 쳐서 여러 부락을 깨뜨리고 소와 말과 양을 셀 수 없이 얻었다. 돌아오는 길에 국경의 땅을 둘러보았다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-micheon"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-jangsu"
+            }
+          ],
+          "text": "[미천왕]이 즉위한 뒤, [장수왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "광개토왕 영락 5년(395년). 비려(패려), 거란 계통으로 봄."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-gwanggaeto",
+        "before": "goguryeo-reign-jangsu"
+      },
+      "explanation": "광개토왕 영락 5년(395년)의 일. 광개토왕이 거란 계통의 비려를 정벌한 일. 비문 정복 기사의 첫머리이고, 돌아오는 길의 요동 순수와 함께 기록되었다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "광개토왕비",
+        "section": "비문",
+        "volume": null,
+        "entry": "영락 5년 을미조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "영락 5년 패려 정벌과 요동 순수로 이루어진 기사 구성, 패려를 거란 일부로 보는 해석은 학술 논문 요약으로 확인. 부락 수(육칠백 영)는 판독 확인 전이라 넣지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-29",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "백제 58성 공략",
+      "year": 396,
+      "year_alt": [],
+      "year_basis": "inscription",
+      "year_note": null,
+      "reign_label": "광개토왕 영락 6년",
+      "source_text": "왕이 몸소 수군을 이끌고 남쪽 이웃 나라를 쳐서 성 쉰여덟과 마을 칠백을 빼앗았다. 그 나라 왕은 영원히 신하가 되겠다고 맹세하고 아우와 대신을 볼모로 보냈다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-gwanggaeto"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-yeongyang"
+            }
+          ],
+          "text": "[광개토왕]이 즉위한 뒤, [영양왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "광개토왕 영락 6년(396년). 백제 아신왕, 58성 700촌."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-gwanggaeto",
+        "before": "goguryeo-reign-jangsu"
+      },
+      "explanation": "광개토왕 영락 6년(396년)의 일. 광개토왕이 백제를 쳐 58성 700촌을 빼앗고 아신왕의 항복을 받은 일. 한강 이북까지 영토를 넓혔다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "광개토왕비",
+        "section": "비문",
+        "volume": null,
+        "entry": "영락 6년 병신조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "58성 700촌, 수군, 노객 맹세, 왕제와 대신 인질은 2차 자료(itwiki 광개토왕, 언론)로 확인. 58성의 위치는 논쟁이 있다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-30",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "동부여 정벌",
+      "year": 410,
+      "year_alt": [],
+      "year_basis": "inscription",
+      "year_note": null,
+      "reign_label": "광개토왕 영락 20년",
+      "source_text": "옛날 시조의 백성이던 동쪽 나라가 배반하고 조공을 끊자, 왕이 몸소 군사를 이끌고 가니 그 나라가 놀라 귀순하였다. 깨뜨린 성이 예순넷, 마을이 천사백이었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-sosurim"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-jangsu"
+            }
+          ],
+          "text": "[소수림왕]이 즉위한 뒤, [장수왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "광개토왕 영락 20년(410년). 동부여."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-gwanggaeto",
+        "before": "goguryeo-reign-jangsu"
+      },
+      "explanation": "광개토왕 영락 20년(410년)의 일. 광개토왕이 동부여를 정벌해 복속시킨 일. 비문은 동부여를 추모왕의 옛 속민으로 적는다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "광개토왕비",
+        "section": "비문",
+        "volume": null,
+        "entry": "영락 20년 경술조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "영락 20년 동부여 정벌과 64성 1,400촌은 2차 자료로 확인했으나 해당 자료는 판독이 일부 빠져 있다. 숫자는 판독문 대조 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-31",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "호우명 그릇",
+      "year": 415,
+      "year_alt": [],
+      "year_basis": "inscription",
+      "year_note": "그릇에 새긴 해(무덤 축조는 6세기 초로 봄)",
+      "reign_label": "장수왕 3년(을묘년)",
+      "source_text": "이웃 나라 수도의 옛 무덤에서 나온 청동 그릇 바닥에, 세상을 떠난 대왕을 기려 만든 그릇이라는 글자가 새겨져 있었다. 글씨는 그 대왕의 무덤 앞 비석과 닮았다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-sosurim"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-yeongyang"
+            }
+          ],
+          "text": "[소수림왕]이 즉위한 뒤, [영양왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "을묘년(415년) 명문, 광개토왕을 기린 그릇. 1946년 경주 호우총 출토."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-jangsu",
+        "before": "goguryeo-reign-yeongyang"
+      },
+      "explanation": "장수왕 3년(을묘년)(415년)의 일. 광개토왕 사후 3년째(415)에 만든 고구려 그릇이 신라 고분(호우총)에서 나온 것. 400년 신라 구원 이후 신라가 고구려의 영향 아래 있었음을 보여 준다. 무덤은 6세기 초 축조로 보는 견해가 많다.",
+      "exam_tags": [
+        "culture"
+      ],
+      "source_ref": {
+        "work": "호우명 그릇",
+        "section": "명문",
+        "volume": null,
+        "entry": "을묘년 국강상광개토지호태왕 명문",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "을묘년=415년, 1946년 호우총 출토, 비문과 비슷한 글씨, 신라와의 관계 해석은 한국민족문화대백과·itwiki 요약으로 확인. 전래 경로(추모 행사 참석 사신설, 복호 관련설)는 해설에 넣지 않았다. 카드 연도는 그릇에 새긴 해. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-32",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "장안성 천도",
+      "year": 586,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "평원왕 28년",
+      "source_text": "왕이 도읍을 새로 쌓은 성으로 옮겼다. 그 성은 서른 해 넘게 공을 들여 쌓아 온 것이었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-jangsu"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-bojang"
+            }
+          ],
+          "text": "[장수왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "평원왕 28년(586년). 대성산성 일대에서 장안성으로."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-jangsu",
+        "before": "goguryeo-reign-yeongyang"
+      },
+      "explanation": "평원왕 28년(586년)의 일. 평원왕이 평양 대성산성 일대에서 장안성(지금의 평양 시가)으로 도읍을 옮긴 일. 장안성은 552년부터 쌓기 시작했다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "고구려본기",
+        "volume": 19,
+        "entry": "평원왕 28년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "586년 장안성 천도, 552년 축성 시작은 한국민족문화대백과 계열 자료와 학술 논문 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-33",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "온달의 전사",
+      "year": 590,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": "영양왕 즉위년",
+      "reign_label": "영양왕 즉위년",
+      "source_text": "임금의 사위가 된 장수가 빼앗긴 고개 너머 땅을 되찾겠다며 나섰다가, 한 성 아래에서 싸우던 중 날아온 화살에 맞아 죽었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-gwanggaeto"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-bojang"
+            }
+          ],
+          "text": "[광개토왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "영양왕 원년(590년). 온달, 아단성."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-yeongyang",
+        "before": "goguryeo-reign-bojang"
+      },
+      "explanation": "영양왕 즉위년(590년)의 일. 평원왕의 사위 온달이 신라에 빼앗긴 죽령 이북 땅을 되찾으려 나섰다가 아단성 아래에서 전사한 일(삼국사기 열전). 이야기 부분(바보 온달과 평강 공주)은 설화성이 강하다.",
+      "exam_tags": [
+        "person",
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "열전",
+        "volume": 45,
+        "entry": "온달전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "590년 출정과 아단성 전사, 화살에 맞음은 2차 자료로 확인. 아단성의 위치(서울 아차산성 설 등)와 온달 설화의 역사성은 이견이 있어 지문에 위치를 쓰지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-34",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "노자 강론",
+      "year": 624,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "영류왕 7년",
+      "source_text": "서쪽 대국이 도사를 보내 천존의 상과 도법을 전하자, 왕과 나라 사람 수천 명이 노자의 가르침을 들었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-yeongyang"
+            }
+          ],
+          "text": "[영양왕]이 즉위한 뒤의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "영류왕 7년(624년). 당의 도사, 도교."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-yeongyang",
+        "before": "goguryeo-reign-bojang"
+      },
+      "explanation": "영류왕 7년(624년)의 일. 영류왕 때 당에서 도사를 보내 노자의 도법을 강론한 일. 643년 연개소문의 도교 진흥 요청보다 앞선다.",
+      "exam_tags": [
+        "culture"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "고구려본기",
+        "volume": 20,
+        "entry": "영류왕 7년 2월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "624년 당 도사의 노자 강론과 천존상, 왕과 수천 명 청강은 위키문헌 백과 전사본·itwiki 한국의 도교 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-35",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "연개소문의 정변",
+      "year": 642,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": "같은 해 보장왕 즉위 전의 일",
+      "reign_label": "영류왕 25년",
+      "source_text": "왕과 대신들이 자신을 없애려 한다는 것을 안 장수가 군대 사열을 핑계로 대신들을 불러 모아 백여 명을 죽였다. 이어 궁에 들어가 왕을 죽이고, 왕의 조카를 새 왕으로 세웠다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-jangsu"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-bojang"
+            }
+          ],
+          "text": "[장수왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "영류왕 25년(642년) 10월. 연개소문, 보장왕 옹립."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-yeongyang",
+        "before": "goguryeo-reign-bojang",
+        "same_year": "before_next_accession"
+      },
+      "explanation": "영류왕 25년(642년)의 일. 연개소문이 영류왕과 대신들을 죽이고 보장왕을 세운 뒤 막리지로 실권을 쥔 일. 같은 해 보장왕이 즉위했지만 정변이 먼저다. 천리장성 공사를 감독하던 중이었다.",
+      "exam_tags": [
+        "person",
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "고구려본기",
+        "volume": 20,
+        "entry": "영류왕 25년 10월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "642년 10월 정변, 대신 100여 명(180명이라는 기록도 있음), 영류왕 살해, 조카 장(보장왕) 옹립은 2차 자료(itwiki 연개소문 등)로 확인. 열전 개소문조에도 있다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    },
+    {
+      "id": "goguryeo-src-36",
+      "kind": "source",
+      "nation": "goguryeo",
+      "title": "연남생의 당 투항",
+      "year": 666,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "보장왕 25년",
+      "source_text": "권력자가 죽은 뒤 뒤를 이은 맏아들이 지방을 돌아보는 사이 두 아우에게 쫓겨났다. 그는 옛 도읍의 성으로 달아나 아들을 서쪽 대국에 보내 항복하고 구원을 청하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goguryeo-reign-jangsu"
+            }
+          ],
+          "text": "[장수왕]이 즉위한 뒤의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "보장왕 25년(666년). 연남생, 아우 남건·남산, 아들 헌성."
+        }
+      ],
+      "answer": {
+        "after": "goguryeo-reign-bojang",
+        "before": null
+      },
+      "explanation": "보장왕 25년(666년)의 일. 연개소문 사후 맏아들 남생이 동생들에게 밀려 국내성 세력을 이끌고 당에 투항한 일. 지배층 분열로 668년 멸망으로 이어진다. 같은 해 12월 연개소문의 아우 연정토는 신라에 투항했다(다른 사건).",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "고구려본기",
+        "volume": 22,
+        "entry": "보장왕 25년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "666년 남생 축출과 당 투항, 아들 헌성 파견은 2차 자료로 확인. 연개소문 사망은 666년(삼국사기 열전)과 665년(한국민족문화대백과) 설이 있다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차는 확인 못 함(D83 원칙으로 exam_rounds 비움). 원문 대조 필요. 검증 전(D79·D84)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "고구려",
+        "M2-B3"
+      ]
+    }
+  ]
+}
