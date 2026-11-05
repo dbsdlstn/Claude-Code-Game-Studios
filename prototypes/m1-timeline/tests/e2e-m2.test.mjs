@@ -165,3 +165,60 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     assert.ok(await noOverflow(page));
   }));
 }
+
+// D100: 백제 카드가 manifest에 들어오기 전에, 고정 데이터로 나라가 둘일 때를 미리 확인한다.
+const TWO = 'tests/fixtures/manifest-two-nations.json';
+const BJ = normalizeDeck(JSON.parse(readFileSync(new URL('./fixtures/baekje-fixture.json', import.meta.url), 'utf8'))).deck;
+const BJ_BY_ID = new Map(BJ.cards.map((c) => [c.id, c]));
+for (const [name, opts] of Object.entries(VIEWPORTS)) {
+  const mobile = name === 'mobile';
+  const tap = (page, sel) => (mobile ? page.locator(sel).tap() : page.click(sel));
+  test(`${name}: 나라가 둘이면 백제가 활성, 나라별 연표·세션은 따로, 카드 진행은 한 저장에`, { skip: !REAL && '실제 데이터 없음' }, () => withPage(opts, async (page) => {
+    await openProto(page, server.base, { data: null, title: null, manifest: TWO });
+    await page.waitForSelector('#title:not([hidden])');
+    assert.deepEqual(await page.locator('#title-nations .nation').evaluateAll((b) => b.map((x) => [x.dataset.nation, x.disabled])), [['goguryeo', false], ['baekje', false], ['silla', true], ['gaya', true]]);
+    // 고구려 한 장
+    await tap(page, '#title-play');
+    const g1 = await currentCard(page, REAL_BY_ID);
+    await pressGap(page, (await gapsFor(page, g1)).right, mobile);
+    await tap(page, '#btn-next');
+    await tap(page, '#btn-home');
+    // 백제로
+    await tap(page, '#title-nations [data-nation="baekje"]');
+    await page.waitForURL(/nation=baekje/);
+    await page.waitForSelector('#title:not([hidden])');
+    assert.equal(await page.getAttribute('#title-nations [data-nation="baekje"]', 'aria-pressed'), 'true');
+    assert.match(await page.innerText('#title-progress'), new RegExp(`백제 카드 ${BJ.cards.length}장 중 0장 학습`));
+    assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'start', '백제는 처음');
+    assert.match(await page.innerText('#title-stats'), /레벨 1/);
+    await tap(page, '#title-play');
+    assert.match(await page.innerText('#timeline-title'), /백제 왕대 연표/);
+    assert.deepEqual(await page.locator('#timeline .row-anchor').evaluateAll((r) => r.map((x) => x.dataset.id)), [...BJ.anchors].sort((a, b) => a.order - b.order).map((a) => a.id));
+    assert.match(await page.innerText('#session-no'), /세션 1/);
+    const b1 = await currentCard(page, BJ_BY_ID);
+    assert.ok(b1, '백제 카드가 나온다');
+    await pressGap(page, (await gapsFor(page, b1)).right, mobile);
+    const save = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:save:v2')));
+    assert.deepEqual(Object.keys(save.nations).sort(), ['baekje', 'goguryeo']);
+    assert.ok(save.cards[g1.id]?.introduced && save.cards[b1.id]?.introduced, '두 나라 카드 진행이 한 저장에');
+    assert.equal(save.last_nation, 'baekje');
+    assert.ok(save.rewards.xp > 0, '보상은 나라 공통');
+    // 다시 열면 마지막 나라(백제). 고구려로 돌아가면 고구려 세션 번호를 잇는다(나라를 바꾸면 페이지를 다시 여므로
+    // 1장 이상 한 세션은 §5대로 끝난 것으로 처리되고 다음 세션 2가 된다).
+    await page.goto(page.url().replace(/&?nation=baekje/, ''));
+    await page.waitForSelector('#title:not([hidden])');
+    assert.equal(await page.getAttribute('#title-nations [data-nation="baekje"]', 'aria-pressed'), 'true');
+    await tap(page, '#title-nations [data-nation="goguryeo"]');
+    await page.waitForURL(/nation=goguryeo/);
+    await page.waitForSelector('#title:not([hidden])');
+    assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'continue');
+    await tap(page, '#title-play');
+    assert.match(await page.innerText('#timeline-title'), /고구려 왕대 연표/);
+    assert.match(await page.innerText('#session-no'), /세션 2/);
+    assert.match(await page.innerText('#notice'), /지난 세션 1/);
+    const s2 = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:save:v2')).nations);
+    assert.equal(s2.goguryeo.completed_sessions, 1);
+    assert.equal(s2.baekje.completed_sessions, 1, '백제 세션 번호는 따로(공유했다면 고구려가 2)');
+    assert.ok(await noOverflow(page));
+  }));
+}

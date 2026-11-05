@@ -157,21 +157,24 @@ describe('보상 골격(D79-3 원칙)', () => {
   });
 });
 
-describe('실제 덱 목록(assets/data/cards/v2/manifest.json)', () => {
-  test('고구려 파일을 모두 합치면 오류 없음, 사료 id 겹침 없음, 모든 카드가 한 칸에서만 정답', async () => {
-    const dir = path.dirname(V2_PATH);
-    const man = JSON.parse(readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
-    const g = man.nations.find((n) => n.id === 'goguryeo');
-    const raws = g.files.map((f) => JSON.parse(readFileSync(path.join(dir, f), 'utf8')));
-    const m = mergeV2(raws);
-    assert.deepEqual(m.errors, []);
-    const { normalizeDeck } = await import('../js/data.js');
-    const { validateDeck, buildTimeline, correctGaps } = await import('../js/rules.js');
-    const n = normalizeDeck(m.raw);
-    assert.deepEqual(n.errors, []);
-    assert.deepEqual(validateDeck(n.deck), []);
-    const t = buildTimeline(n.deck.anchors);
-    for (const c of n.deck.cards) assert.equal(correctGaps(t, c.order).length, 1, c.id);
-    assert.ok(n.deck.cards.length >= 12);
-  });
+describe('실제 덱 목록(assets/data/cards/v2/manifest.json): 파일이 있는 나라마다', () => {
+  const dir = path.dirname(V2_PATH);
+  const man = JSON.parse(readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
+  for (const nation of man.nations.filter((n) => n.files.length)) {
+    test(`${nation.label}: 파일을 모두 합치면 오류 없음, 사료 id 겹침 없음, 앵커 12 이하, 모든 카드가 한 칸에서만 정답`, async () => {
+      const raws = nation.files.map((f) => JSON.parse(readFileSync(path.join(dir, f), 'utf8')));
+      const m = mergeV2(raws);
+      assert.deepEqual(m.errors, []);
+      const { normalizeDeck } = await import('../js/data.js');
+      const { validateDeck, buildTimeline, correctGaps } = await import('../js/rules.js');
+      const n = normalizeDeck(m.raw);
+      assert.deepEqual(n.errors, []);
+      assert.deepEqual(validateDeck(n.deck), []);
+      assert.equal(n.deck.nation, nation.id);
+      assert.ok(n.deck.anchors.length <= 12, '나라별 앵커 상한 12(D85)');
+      const t = buildTimeline(n.deck.anchors);
+      for (const c of n.deck.cards) assert.equal(correctGaps(t, c.order).length, 1, c.id);
+    });
+  }
+
 });

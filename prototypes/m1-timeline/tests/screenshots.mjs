@@ -29,6 +29,12 @@ try {
     // 앵커 12개(D85 대비, 테스트 고정 데이터): 콘텐츠 반영 뒤에는 위 기본 덱 화면이 그대로 12개가 된다.
     await openProto(page, server.base, { data: 'tests/fixtures/goguryeo-12anchors.json', seed: 11 });
     await shot('20-twelve-anchors', true);
+    // 나라가 둘일 때(D100, 백제는 테스트 고정 데이터): 타이틀과 백제 연표
+    await openProto(page, server.base, { data: null, title: null, manifest: 'tests/fixtures/manifest-two-nations.json', nation: 'baekje' });
+    await shot('21-two-nations-title');
+    await page.click('#title-play');
+    await shot('22-baekje-timeline');
+    await page.evaluate(() => localStorage.clear());
     // 처음 안내(D74-5)
     await openProto(page, server.base, { data: DATA, seed: 11, intro: '1' });
     await shot('00-intro');
