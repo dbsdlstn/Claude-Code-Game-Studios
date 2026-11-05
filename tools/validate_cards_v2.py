@@ -68,6 +68,8 @@ VARIANTS (design/card-variants-spec.md, D121; optional `variants` list):
       answer.before anchor's title (the neighbouring king) is a warning.
   V20 variant verification follows V14, with variant_hash(variant) (text and
       angle) as the content hash.
+  OBS (D180) a variant naming another same-deck card's title or a term of its
+      level-2 direct clue is printed ("uses ... key term(s)").
   V21 the card content_hash ignores variants (content_hash() never reads them).
   R4 is a runtime rule (unverified variants are skipped), not a release error.
 
@@ -619,6 +621,35 @@ def validate_events(sources, registry, strict=False):
     return errs, warns, obs
 
 
+def card_keywords(card):
+    """Title plus the terms of the level-2 direct clue (after its first '. ')."""
+    words = {card.get("title")} if nonempty(card.get("title")) else set()
+    clues = card.get("clues") if isinstance(card.get("clues"), list) else []
+    direct = next((c.get("text") for c in clues if isinstance(c, dict) and c.get("level") == 2), "") or ""
+    tail = direct.split(". ", 1)[1] if ". " in direct else ""
+    for part in re.split(r"[,·]", tail.rstrip(".")):
+        part = re.sub(r"\(.*?\)|『|』|'", "", part).strip()
+        if len(part) >= 2 and not YEAR_RE.search(part):
+            words.add(part)
+    return words
+
+
+def variant_crossref_obs(sources):
+    """D180 observation: a variant names another same-deck card's title or key term."""
+    lines = []
+    for c in sources:
+        own = card_keywords(c)
+        for var in c.get("variants") or []:
+            vt = var.get("text") if isinstance(var, dict) and nonempty(var.get("text")) else ""
+            for o in sources:
+                if o is c or o.get("nation") != c.get("nation"):
+                    continue
+                hits = sorted(w for w in card_keywords(o) - own if w in vt)
+                if hits:
+                    lines.append(f"variant {c.get('id')}/{var.get('id')} uses {o.get('id')} key term(s): {', '.join(hits)}")
+    return lines
+
+
 def read_manifest():
     """Return (paths, file->nation, errors) from the manifest."""
     try:
@@ -691,7 +722,7 @@ def main(argv):
           + (" (release mode)" if release else ""))
     for line in observations(anchors, sources):
         print("OBS   " + line)
-    for line in event_obs + VARIANT_OBS:
+    for line in event_obs + VARIANT_OBS + variant_crossref_obs(sources):
         print("OBS   " + line)
     for w in warnings:
         print("WARN  " + w)

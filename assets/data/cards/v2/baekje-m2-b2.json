@@ -440,8 +440,8 @@
       "variants": [
         {
           "id": "v2",
-          "angle": "result",
-          "text": "북쪽 큰 나라가 남쪽으로 세력을 넓혀 오자, 이 나라는 동쪽 이웃 나라와 손을 잡았다. 사신이 오가며 선물을 주고받았고, 두 나라의 화친은 뒷날 혼인으로 더 굳어졌다.",
+          "angle": "record",
+          "text": "왕이 동쪽 이웃 나라에 사신을 보내 화친을 맺었다. 이듬해 다시 사신이 말과 매를 가져가자 그 나라는 황금과 구슬로 답례하였다.",
           "text_basis": "own_paraphrase_from_original",
           "verification": {
             "verified": false,

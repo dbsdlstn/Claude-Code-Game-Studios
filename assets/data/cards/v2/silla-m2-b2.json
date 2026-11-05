@@ -583,8 +583,8 @@
       "variants": [
         {
           "id": "v2",
-          "angle": "result",
-          "text": "장군이 이끈 군대가 가야에 마지막까지 남아 있던 큰 나라를 무너뜨렸다. 이로써 가야의 여러 나라가 모두 이 나라에 들어왔다.",
+          "angle": "actor",
+          "text": "왕의 명을 받은 장군이 등을 돌린 가야의 한 나라를 쳤다. 젊은 장수가 먼저 성문에 이르러 깃발을 세우자, 뒤따른 군대가 성을 함락하였다.",
           "text_basis": "own_paraphrase_from_original",
           "verification": {
             "verified": false,
