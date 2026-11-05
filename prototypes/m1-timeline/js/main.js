@@ -410,7 +410,7 @@ function renderTimeline() {
   $('timeline').classList.toggle('asking', asking);
   $('timeline').classList.toggle('compact', compact);
   fill($('confirm-dock'), dock);
-  $('timeline-title').textContent = `${app.deck.nation_label ?? ''} 왕대 연표`;
+  fill($('timeline-title'), app.study ? null : seal(app.nation), app.study ? '' : ' ', `${app.deck.nation_label ?? ''} 왕대 연표`);
   $('timeline-help').textContent = asking
     ? (compact
       ? (needsConfirm() ? '사건이 일어난 왕 줄의 ＋를 누른 뒤 "이 칸에 꽂기"로 확정하세요. ＋는 "이 왕 즉위 이후 ~ 다음 왕 즉위 이전"입니다.' : '사건이 일어난 왕 줄의 ＋를 누르세요(이 왕 즉위 이후 ~ 다음 왕 즉위 이전). 카드를 끌어 놓아도 됩니다.')
@@ -544,8 +544,8 @@ function rewardBlocks() {
     blocks.push(el('section', { class: 'stage', dataset: { stage: 'goal' }, id: 'stage-goal' },
       el('p', { id: 'summary-goal' }, `오늘 목표 달성 · +${G.xp}`),
       el('p', { id: 'summary-streak' }, G.broken ? `다시 오셨네요. 최고 연속 ${G.broken.best}일 · 오늘부터 1일째` : `연속 ${G.streak}일째예요`),
-      G.usedPasses ? el('p', { id: 'summary-pass-used' }, `쉬는 날 보호권을 ${G.usedPasses}장 썼어요. 연속 ${G.streak}일이 이어졌어요`) : null,
-      G.earnedPass ? el('p', { id: 'summary-pass-earned' }, `쉬는 날 보호권을 얻었어요 (${R.streak.rest_pass_max}장까지 모아요)`) : null));
+      G.usedPasses ? el('p', { id: 'summary-pass-used' }, `휴식권을 ${G.usedPasses}장 썼어요. 연속 ${G.streak}일이 이어졌어요`) : null,
+      G.earnedPass ? el('p', { id: 'summary-pass-earned' }, `휴식권을 얻었어요 (${R.streak.rest_pass_max}장까지 모아요)`) : null));
   }
   // F 레벨
   const L2 = g.level;
@@ -686,6 +686,13 @@ function nextSession() {
 
 /* ------------------------------------------------------------------ 숙련 도감, 오답 노트, 기록 */
 
+/** 나라 인장(art-bible §4.2): 지름 28px 원 + 글자. 장식이므로 낭독에서는 숨긴다(이름이 옆에 있다). */
+function seal(nationId) {
+  const S = CONFIG.nationSeals[nationId];
+  if (!S) return null;
+  return el('span', { class: 'seal', 'aria-hidden': 'true', dataset: { seal: nationId }, style: `background:${S.bg};color:${S.fg}` }, S.ch);
+}
+
 /* 도감(design/ux/dogam.md): 프로필 줄 + 탭 4개(카드·업적·칭호·오답 노트). 열 때마다 카드 탭. */
 
 /** 저장된 모든 나라의 카드 진행(현재 나라는 메모리의 최신 값). */
@@ -719,7 +726,7 @@ function renderDogamProfile() {
   fill($('dogam-profile'), rw ? [
     el('p', { class: 'title-honor', id: 'dogam-honor' }, currentTitle(rw, R)),
     levelBar(rw),
-    el('p', { class: 'source-note', id: 'dogam-streak' }, `연속 ${rw.streak}일 · 최고 ${rw.best_streak}일 · 보호권 ${rw.rest_passes}장`),
+    el('p', { class: 'source-note', id: 'dogam-streak' }, `연속 ${rw.streak}일 · 최고 ${rw.best_streak}일 · 휴식권 ${rw.rest_passes}장`),
   ] : null);
 }
 
@@ -761,7 +768,7 @@ function renderDogamCards() {
   fill($('dogam-nations'), nations.length >= 2 ? nations.map((n) => el('button', {
     type: 'button', class: 'chip nation', dataset: { nation: n.id }, 'aria-pressed': n.id === cur.id ? 'true' : 'false',
     onclick: () => { app.dogam.nation = n.id; app.dogam.filter = 'all'; $('card-detail').hidden = true; renderDogamCards(); },
-  }, n.label)) : null);
+  }, seal(n.id), ' ', n.label)) : null);
   const s = sessionIndex();
   const info = deck.cards.map((c) => {
     const e = progress[c.id];
@@ -909,6 +916,20 @@ function renderNote() {
 }
 
 /** 인출 로그 내보내기: 줄마다 JSON(JSONL), m1-plan §11 규격. */
+/** 손상된 저장 원문(`:broken`)을 파일로 내려받는다(M2 F11 "백업 내보내기"). */
+function exportBroken() {
+  const parts = [];
+  for (const k of [CONFIG.storageKey, CONFIG.rewardsKey]) {
+    try { const v = localStorage.getItem(`${k}:broken`); if (v) parts.push(`# ${k}\n${v}`); } catch { /* 무시 */ }
+  }
+  const url = URL.createObjectURL(new Blob([parts.join('\n\n') + '\n'], { type: 'text/plain' }));
+  const a = el('a', { href: url, download: 'hanyang-broken-save.txt' });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function exportLog() {
   if (!app.study && app.rewards) {
     const rw = app.rewards;
@@ -1116,7 +1137,8 @@ async function init() {
   app.participant = app.study ? app.study.participant : (params.get('participant') || saved?.participant || '-').slice(0, 20);
   const restored = restoreSession(saved?.current, app.deck.cards);
   // M2 F11: 저장 손상 안내(조용히 사라지지 않게). 원문은 storage.js가 따로 보관한다.
-  if (!app.study && (app.baseStore.corrupt || app.rewardsStore.corrupt)) {
+  app.corrupt = !app.study && (app.baseStore.corrupt || app.rewardsStore.corrupt);
+  if (app.corrupt) {
     app.notice = '저장된 기록을 읽지 못해 새로 시작했어요. 이전 기록은 이 기기에 따로 보관했어요.';
   }
   if (!app.study) {
@@ -1320,13 +1342,26 @@ function renderTitleNations() {
     const tot = [...plans.values()].reduce((x, p) => ({ due: x.due + p.due, fresh: x.fresh + p.fresh }), { due: 0, fresh: 0 });
     fill($('title-nations'),
       el('p', { class: 'nation-total', id: 'title-nation-total' }, `오늘 복습 모두 ${tot.due}장 · 새 카드 ${tot.fresh}장`),
-      el('div', { class: 'nation-list', role: 'radiogroup', 'aria-label': '나라' }, order.map((n) => {
+      el('div', {
+        class: 'nation-list', role: 'radiogroup', 'aria-label': '나라',
+        // 방향키로 행 사이를 옮기고 Enter·Space로 고른다(title-screen.md §4, 접근성)
+        onkeydown: (e) => {
+          const rows = [...e.currentTarget.querySelectorAll('.nation-row')];
+          const i = rows.indexOf(document.activeElement);
+          const d = ['ArrowDown', 'ArrowRight'].includes(e.key) ? 1 : ['ArrowUp', 'ArrowLeft'].includes(e.key) ? -1 : 0;
+          if (!d || i < 0) return;
+          e.preventDefault();
+          const next = rows[(i + d + rows.length) % rows.length];
+          rows.forEach((r) => { r.tabIndex = r === next ? 0 : -1; });
+          next.focus();
+        },
+      }, order.map((n) => {
         const p = plans.get(n.id);
         const on = n.id === app.nation;
         const label = `${n.label}, ${deckOf(n.id).cards.length}장 중 ${learned(n.id)}장 학습, 오늘 복습 ${p.due}장 새 카드 ${p.fresh}장`;
-        return el('button', { type: 'button', role: 'radio', class: 'nation-row' + (on ? ' is-on' : ''), dataset: { nation: n.id }, 'aria-checked': on ? 'true' : 'false', 'aria-label': label, onclick: () => switchNation(n) },
+        return el('button', { type: 'button', role: 'radio', class: 'nation-row' + (on ? ' is-on' : ''), dataset: { nation: n.id }, 'aria-checked': on ? 'true' : 'false', tabindex: on ? '0' : '-1', 'aria-label': label, onclick: () => switchNation(n) },
           el('span', { class: 'nation-mark', 'aria-hidden': 'true' }, on ? '●' : '○'),
-          el('span', { class: 'nation-name' }, n.label),
+          el('span', { class: 'nation-name' }, seal(n.id), ' ', n.label),
           el('span', { class: 'nation-meta' }, `${deckOf(n.id).cards.length}장 중 ${learned(n.id)} 학습`, el('br'), `오늘 복습 ${p.due} · 새 ${p.fresh}`),
           most && most.id === n.id && p.due > 0 ? el('span', { class: 'nation-hint' }, '오늘 가장 많아요') : null);
       })),
@@ -1337,7 +1372,7 @@ function renderTitleNations() {
     el('div', { class: 'nation-chips' }, nations.map((n) => el('button', {
       type: 'button', class: 'chip nation', dataset: { nation: n.id }, 'aria-pressed': n.id === app.nation ? 'true' : 'false', disabled: !active.includes(n),
       onclick: () => switchNation(n),
-    }, n.label, active.includes(n) ? null : el('span', { class: 'nation-soon' }, ' 준비 중')))),
+    }, seal(n.id), ' ', n.label, active.includes(n) ? null : el('span', { class: 'nation-soon' }, ' 준비 중')))),
     active.length === 2 ? el('p', { class: 'source-note', id: 'title-nation-total' }, active.map((n) => `${n.label} 복습 ${plans.get(n.id).due} · 새 ${plans.get(n.id).fresh}`).join(' / ')) : null);
 }
 
@@ -1378,7 +1413,8 @@ function showTitle() {
   if (plan.guarded && plan.unintroduced) extra.push(`아직 열리지 않은 카드 ${plan.unintroduced}장 · 복습을 먼저 마치면 열려요`);
   if (app.rewards && app.rewards.day.key === dayOpts().today && app.rewards.day.sessions >= R.daily_session_soft_cap) extra.push('오늘은 충분히 했어요. 내일 이어서 해요');
   if (app.notice && !app.started) extra.push(app.notice);
-  fill($('title-today'), today, ...extra.map((t) => [el('br'), el('small', { class: 'title-note' }, t)]));
+  const brokenBtn = app.corrupt ? el('button', { type: 'button', class: 'btn btn-small', id: 'btn-broken-export', onclick: exportBroken }, '이전 기록 내려받기') : null;
+  fill($('title-today'), today, ...extra.map((t) => [el('br'), el('small', { class: 'title-note' }, t)]), brokenBtn ? [el('br'), brokenBtn] : null);
   Object.assign($('title-today').dataset, { mode: plan.mode, due: String(plan.due), fresh: String(plan.fresh), left: String(plan.left), minutes: String(mins) });
   $('title-play').textContent = label;
   $('title-play').dataset.mode = plan.mode;

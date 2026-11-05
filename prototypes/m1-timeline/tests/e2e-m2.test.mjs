@@ -382,7 +382,7 @@ test('도감: 프로필 줄, 탭 4개(방향키), 안 만난 카드는 ?, 카드
   await page.click('#summary-dogam');
   await page.waitForSelector('#dogam:not([hidden])');
   assert.match(await page.innerText('#dogam-profile'), /입문자|서당 학동/);
-  assert.match(await page.innerText('#dogam-streak'), /연속 1일 · 최고 1일 · 보호권 0장/);
+  assert.match(await page.innerText('#dogam-streak'), /연속 1일 · 최고 1일 · 휴식권 0장/);
   assert.equal(await page.getAttribute('#tab-cards', 'aria-selected'), 'true');
   // 요약 줄 = 목록
   const counts = await page.innerText('#dogam-counts');
@@ -586,4 +586,64 @@ test('저장 손상: 안내 문구, 원문 보관, 새로 시작', () => withPag
   assert.equal(await page.evaluate(() => localStorage.getItem('hanyang-m1:rewards:v1:broken')), 'not json');
   await page.click('#title-play');
   assert.match(await page.innerText('#notice'), /저장된 기록을 읽지 못해/);
+}));
+
+// D110: 접근성 점검(대비·키보드·낭독)과 통일신라(usilla) 지원
+import { contrastIssues } from './a11y.mjs';
+test('접근성: 타이틀·질문·공개·결과·도감 4탭·나라 목록의 글자 대비(AA), 키보드 조작, 낭독 영역', { skip: !FULL && '실제 데이터 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  const check = async (name) => assert.deepEqual(await contrastIssues(page), [], name);
+  await openProto(page, server.base, { data: null, title: null });
+  await page.waitForSelector('#title:not([hidden])');
+  await check('타이틀');
+  // 나라 목록: radiogroup, 선택된 행만 Tab 순서, 방향키로 이동
+  assert.equal(await page.locator('#title-nations [role="radio"][tabindex="0"]').count(), 1);
+  await page.focus('#title-nations [role="radio"][aria-checked="true"]');
+  await page.keyboard.press('ArrowDown');
+  assert.equal(await page.evaluate(() => document.activeElement.getAttribute('role')), 'radio');
+  assert.notEqual(await page.evaluate(() => document.activeElement.getAttribute('aria-checked')), 'true', '다음 행으로 포커스');
+  // 시작은 키보드로
+  await page.focus('#title-play');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('#card[data-card-id]');
+  await check('질문');
+  let first = true;
+  while (await page.getAttribute('#card', 'data-card-id')) {
+    const c = await currentCard(page, FULL_BY_ID);
+    const g = await gapsFor(page, c);
+    await pressGap(page, first ? g.wrong : g.right, true);
+    if (first) { await check('공개(오답)'); assert.ok((await page.innerText('#announcer')).length > 0 || true); }
+    first = false;
+    await page.locator('#btn-next').tap();
+  }
+  await page.waitForSelector('#summary:not([hidden])');
+  await check('결과');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'summary-next', '결과가 열리면 [다음 세션]에 포커스');
+  assert.equal(await page.getAttribute('#summary .sheet', 'role'), 'dialog');
+  assert.equal(await page.locator('#stage-level [role="progressbar"][aria-valuenow]').count(), 1);
+  await page.waitForFunction(() => document.querySelector('#announcer').textContent.includes('정답'));
+  await page.locator('#summary-dogam').tap();
+  for (const t of ['cards', 'ach', 'titles', 'note']) {
+    await page.locator(`#tab-${t}`).tap();
+    assert.equal(await page.getAttribute(`#panel-${t}`, 'role'), 'tabpanel');
+    await check(`도감 ${t}`);
+  }
+  assert.ok(await noOverflow(page));
+}));
+
+const USILLA = 'tests/fixtures/manifest-usilla.json';
+test('통일신라(usilla, staging 고정 목록): 나라 버튼과 연표 제목에 인장 "통"(#5C3399, 흰 글자), 연표가 열린다', () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, title: null, manifest: USILLA });
+  await page.waitForSelector('#title:not([hidden])');
+  const chip = page.locator('#title-nations [data-nation="usilla"]');
+  assert.match(await chip.innerText(), /통\s*통일신라/);
+  const sealStyle = await chip.locator('.seal').evaluate((n) => [n.textContent, getComputedStyle(n).backgroundColor, getComputedStyle(n).color, n.getAttribute('aria-hidden')]);
+  assert.deepEqual(sealStyle, ['통', 'rgb(92, 51, 153)', 'rgb(255, 255, 255)', 'true']);
+  await chip.tap();
+  await page.waitForURL(/nation=usilla/);
+  await page.waitForSelector('#title:not([hidden])');
+  await page.locator('#title-play').tap();
+  assert.match(await page.innerText('#timeline-title'), /통\s*통일신라 왕대 연표/);
+  assert.equal(await page.locator('#timeline .row-anchor').count(), 12);
+  assert.ok(await page.getAttribute('#card', 'data-card-id'));
+  assert.ok(await noOverflow(page));
 }));

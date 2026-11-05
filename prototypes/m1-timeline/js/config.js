@@ -51,6 +51,18 @@ export const CONFIG = Object.freeze({
     'data/decks.json',
   ]),
   defaultNation: 'goguryeo',
+  /**
+   * 나라 인장(art-bible §4.2, D135): 색만이 아니라 글자로도 구분한다. 신라는 금색에 먹 글자, 나머지는 흰 글자.
+   * 발해 색은 보류(D183)라 회색 임시.
+   */
+  nationSeals: Object.freeze({
+    goguryeo: Object.freeze({ ch: '고', bg: '#A23B2A', fg: '#FFFFFF' }),
+    baekje: Object.freeze({ ch: '백', bg: '#2F5D7C', fg: '#FFFFFF' }),
+    silla: Object.freeze({ ch: '신', bg: '#C79A2E', fg: '#2B2118' }),
+    gaya: Object.freeze({ ch: '가', bg: '#4F7A55', fg: '#FFFFFF' }),
+    usilla: Object.freeze({ ch: '통', bg: '#5C3399', fg: '#FFFFFF' }),
+    balhae: Object.freeze({ ch: '발', bg: '#5B5B5B', fg: '#FFFFFF' }),
+  }),
   /** 타이틀의 "약 k분"(D93·D102): 카드 한 장에 드는 시간 추정(초). M1 관찰 전 임시값. */
   secondsPerCard: 40,
   /**
