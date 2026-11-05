@@ -44,7 +44,7 @@ test('dist/m1만으로 실제 초안을 읽고 모바일에서 한 장 꽂기, �
     await page.waitForSelector('#title:not([hidden])');
     assert.equal((await page.locator('#title-nations [data-nation="goguryeo"]').evaluate((b) => b.getAttribute('aria-checked') ?? b.getAttribute('aria-pressed'))), 'true');
     assert.match(await page.innerText('#title-play'), /복습 시작|새 카드 시작|이어하기/);
-    assert.match(await page.innerText('#title-today'), /오늘 복습 \d+장 · 새 카드 \d+장 · 약 \d+분|이어서/);
+    assert.match(await page.innerText('#title-today'), /이번 세션 \d+장\(복습 \d+ · 새 \d+\) · 약 \d+분|이어서/);
     assert.deepEqual(failed, []);
     // 사람 테스트 모드도 묶음만으로 돈다: 참가자 만들기 → pre 한 장 → 방식 B 화면.
     await page.goto(`http://127.0.0.1:${port}/index.html?study=1&participant=P1`);
