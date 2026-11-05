@@ -35,7 +35,10 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       const orders = await page.locator('#timeline .row').evaluateAll((r) => r.map((x) => Number(x.dataset.order)));
       assert.deepEqual(orders, SAMPLE.anchors.map((a) => a.order).sort((a, b) => a - b));
       assert.equal(await page.locator('#timeline .gap').count(), SAMPLE.anchors.length + 1);
-      assert.match(await page.innerText('#progress'), /카드 1 \/ 6/);
+      assert.match(await page.innerText('#progress'), /카드 1 \/ 8/);
+      // 기준 카드는 왕 단위: 왕 이름 + 재위 기간
+      assert.deepEqual(await page.locator('#timeline .row-anchor .row-title').allInnerTexts(), ['동명성왕', '소수림왕', '광개토왕', '장수왕', '보장왕']);
+      assert.match(await page.locator('#timeline .row-anchor .row-year').nth(1).innerText(), /371~384/);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       assert.ok(overflow <= 0, `가로 넘침 ${overflow}px`);
       if (mobile) {
@@ -90,42 +93,55 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       assert.equal(await page.getAttribute('#result-box', 'data-to'), '1', '단서 2개 열고 맞히면 상자 그대로(1)');
     }));
 
-    test('세션 끝 → 결과, 다음 세션은 복습 대상이 먼저, 숙련 도감 반영, 상자 이동', () => withPage(async (page) => {
+    test('세션 끝 → 결과, 틀린 카드는 세션 끝에 다시 풀기, 다음 세션 복습, 숙련 도감, 상자 이동', () => withPage(async (page) => {
       let i = 0;
       const wrongIds = [];
+      const seen = new Set();
       while (await page.getAttribute('#card', 'data-card-id')) {
         const card = await currentCard(page);
         const { right, wrong } = await gapsFor(page, card);
-        const bad = i % 3 === 1;
-        if (bad) wrongIds.push(card.id);
-        await pressGap(page, bad ? wrong : right, mobile);
+        const retry = seen.has(card.id);
+        seen.add(card.id);
+        if (retry) {
+          assert.ok(wrongIds.includes(card.id), '맞힌 카드는 다시 나오지 않는다');
+          assert.equal(await page.locator('#retry-badge').count(), 1);
+          assert.equal(await page.locator(`#timeline .row[data-id="${card.id}"]`).count(), 0, '다시 풀기 중에는 답이 연표에 없다');
+          await pressGap(page, right, mobile);
+          assert.match(await page.innerText('#result-box'), /그대로/);
+        } else {
+          const bad = i % 3 === 1;
+          if (bad) wrongIds.push(card.id);
+          await pressGap(page, bad ? wrong : right, mobile);
+          i++;
+        }
         await page.click('#btn-next');
-        i++;
       }
+      assert.equal(i, 8);
       await page.waitForSelector('#summary:not([hidden])');
-      assert.equal(await page.getAttribute('#summary-stats', 'data-right'), String(6 - wrongIds.length));
+      assert.equal(await page.getAttribute('#summary-stats', 'data-right'), String(8 - wrongIds.length));
+      assert.match(await page.innerText('#summary-retry'), new RegExp(`${wrongIds.length} / ${wrongIds.length} 성공`));
       assert.match(await page.innerText('#summary-due'), new RegExp(`${wrongIds.length}장`));
       await page.click('#summary-dogam');
       await page.waitForSelector('#dogam:not([hidden])');
-      assert.equal(await page.locator('#dogam-list .medal-bronze').count(), 6 - wrongIds.length);
-      assert.equal(await page.locator('#dogam-list .medal-none').count(), wrongIds.length);
+      assert.equal(await page.locator('#dogam-list .medal-bronze').count(), 8 - wrongIds.length);
+      assert.equal(await page.locator('#dogam-list .medal-none').count(), wrongIds.length, '다시 풀기는 상자를 올리지 않는다');
       await page.click('#dogam-close');
       await page.click('#summary-next');
       assert.match(await page.innerText('#session-no'), /세션 2/);
-      // 세션 2: 카드 6장 전부 다시 나오지만(카드가 적음) 오답 카드가 포함되고, 오답 카드를 맞히면 1→3
+      // 세션 2: 카드 8장이 다시 나오고(카드가 적음), 오답 카드를 맞히면 1→3, 나머지는 3→5
       const ids = [];
       while (await page.getAttribute('#card', 'data-card-id')) {
         const card = await currentCard(page);
         ids.push(card.id);
         const { right } = await gapsFor(page, card);
         await pressGap(page, right, mobile);
-        if (wrongIds.includes(card.id)) assert.deepEqual([await page.getAttribute('#result-box', 'data-from'), await page.getAttribute('#result-box', 'data-to')], ['1', '3']);
-        else assert.deepEqual([await page.getAttribute('#result-box', 'data-from'), await page.getAttribute('#result-box', 'data-to')], ['3', '5']);
+        const pair = [await page.getAttribute('#result-box', 'data-from'), await page.getAttribute('#result-box', 'data-to')];
+        assert.deepEqual(pair, wrongIds.includes(card.id) ? ['1', '3'] : ['3', '5']);
         await page.click('#btn-next');
       }
       assert.ok(wrongIds.every((id) => ids.includes(id)));
       await page.click('#summary-dogam');
-      assert.equal(await page.getAttribute('#dogam-counts', 'data-gold'), String(6 - wrongIds.length));
+      assert.equal(await page.getAttribute('#dogam-counts', 'data-gold'), String(8 - wrongIds.length));
     }));
 
     test('저장·복원: 새로고침하면 세션 번호, 진행, 연 단서, 상자가 그대로', () => withPage(async (page) => {
@@ -157,7 +173,30 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       assert.equal(await page.locator('#dogam-list [data-mastery="unseen"]').count(), SAMPLE.cards.length);
     }));
 
+    if (mobile) {
+      test('모바일 오탭 방지: 틈을 누르면 고르기만, 취소하면 그대로, "이 자리에 꽂기"로 확정', () => withPage(async (page) => {
+        const card = await currentCard(page);
+        const { right, wrong } = await gapsFor(page, card);
+        await page.locator(`#timeline .gap[data-gap="${wrong}"]`).tap();
+        assert.equal(await page.locator('#result').count(), 0, '한 번 탭으로는 꽂히지 않는다');
+        assert.equal(await page.getAttribute(`#timeline .gap[data-gap="${wrong}"]`, 'aria-pressed'), 'true');
+        await page.locator('#cancel-place').tap();
+        assert.equal(await page.locator('#confirm-place').count(), 0);
+        await page.locator(`#timeline .gap[data-gap="${right}"]`).tap();
+        assert.match(await page.innerText('.confirm-bar'), /사이|앞|뒤/);
+        await page.locator('#confirm-place').tap();
+        await page.waitForSelector('#result[data-result="correct"]');
+      }));
+    }
+
     if (!mobile) {
+      test('데스크톱은 한 번 클릭으로 꽂힌다(확인 없음)', () => withPage(async (page) => {
+        const card = await currentCard(page);
+        await page.click(`#timeline .gap[data-gap="${(await gapsFor(page, card)).right}"]`);
+        await page.waitForSelector('#result[data-result="correct"]');
+        assert.equal(await page.locator('#confirm-place').count(), 0);
+      }));
+
       test('데스크톱 보조: 카드를 끌어 틈에 놓기', () => withPage(async (page) => {
         const card = await currentCard(page);
         const { right } = await gapsFor(page, card);
@@ -207,7 +246,9 @@ describe('실제 콘텐츠 초안(assets/data/cards/v2-draft/goguryeo-m1.json)',
         assert.match(await page.innerText('#data-warn'), /사실 확인 전/);
         assert.match(await page.innerText('#progress'), /카드 1 \/ 8/);
         const anchorTitles = await page.locator('#timeline .row-anchor .row-title').allInnerTexts();
-        assert.deepEqual(anchorTitles, [...REAL.anchors].sort((a, b) => a.order - b.order).map((a) => a.title));
+        assert.deepEqual(anchorTitles, [...REAL.anchors].sort((a, b) => a.order - b.order).map((a) => a.title.replace(/\s*즉위$/, '')));
+        // 재위 기간(data/reigns.json, 표시용)
+        assert.deepEqual(await page.locator('#timeline .row-anchor .row-year').allInnerTexts(), ['기원전 37~기원전 19', '371~384', '391~412', '413~491', '642~668']);
         let n = 0;
         while (await page.getAttribute('#card', 'data-card-id')) {
           const card = await currentCard(page, REAL_BY_ID);

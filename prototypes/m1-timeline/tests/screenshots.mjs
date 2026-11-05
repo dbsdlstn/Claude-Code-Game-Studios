@@ -24,7 +24,19 @@ try {
     };
     await openProto(page, server.base, { data: DATA, seed: 11 });
     await shot('01-question');
+    if (mobile) {
+      const c0 = await currentCard(page);
+      const g = page.locator(`#timeline .gap[data-gap="${(await gapsFor(page, c0)).right}"]`);
+      await g.scrollIntoViewIfNeeded();
+      await g.tap();
+      await shot('01c-confirm');
+      await page.locator('#cancel-place').tap();
+      await page.evaluate(() => window.scrollTo(0, 0));
+    }
     await shot('01b-question-full', true);
+    // 전체 화면 캡처는 뷰포트를 잠시 바꾸므로(이후 탭 좌표가 어긋남) 다시 연다.
+    await page.reload();
+    await page.waitForSelector('body[data-ready="true"]');
     await page.click('#btn-clue');
     await page.locator('#clues .ref-link').first().focus();
     await shot('02-clue-ref');
@@ -36,8 +48,10 @@ try {
     await pressGap(page, (await gapsFor(page, card)).wrong, mobile);
     await shot('04-wrong');
     await page.click('#btn-next');
+    let retryShot = false;
     while (await page.getAttribute('#card', 'data-card-id')) {
       card = await currentCard(page);
+      if (!retryShot && await page.locator('#retry-badge').count()) { await shot('04b-retry'); retryShot = true; }
       await pressGap(page, (await gapsFor(page, card)).right, mobile);
       await page.click('#btn-next');
     }
