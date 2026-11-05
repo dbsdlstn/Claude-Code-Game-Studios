@@ -1,6 +1,6 @@
 {
  "schema": 2,
- "_note": "PROTOTYPE 테스트 고정 데이터(D117): 고려 앵커 + 무신정변(앵커 없는 의종 때) + 광종 카드 1장, D173 해설 첫 줄 확인용. 실제 카드 사본, 사실 확인 대상 아님.",
+ "_note": "PROTOTYPE 테스트 고정 데이터(D117·D118): 고려 앵커 + 무신정변(실제 카드, 해설에 '실제로는' 있음) + 만적의 난 사본에서 '실제로는' 문장을 뺀 가짜 카드 + 광종 카드. D173/D193 중복 방지 확인용, 사실 확인 대상 아님.",
  "cards": [
   {
    "id": "goryeo-reign-taejo",
@@ -363,11 +363,47 @@
    "v1_id": null
   },
   {
+   "id": "goryeo-reign-chungnyeol",
+   "kind": "anchor",
+   "nation": "goryeo",
+   "title": "충렬왕",
+   "order": 11,
+   "reign": {
+    "start": 1274,
+    "end": 1308,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "고려 제25대 왕.",
+   "source_ref": {
+    "work": "고려사",
+    "section": "세가",
+    "volume": null,
+    "entry": "충렬왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "재위 1274~1298, 1298 충선왕에게 양위했다가 같은 해 복위해 1308까지(itwiki 충렬왕·나무위키 계열). 앵커 끝은 1308로 둔다(1298 양위 구간은 칸 판정에 영향 없음). D174로 추가(원 간섭기 칸 분리). 권 번호는 원문 대조 필요. D218. 검증 전."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
    "id": "goryeo-reign-gongmin",
    "kind": "anchor",
    "nation": "goryeo",
    "title": "공민왕",
-   "order": 11,
+   "order": 12,
    "reign": {
     "start": 1351,
     "end": 1374,
@@ -409,7 +445,7 @@
    "kind": "anchor",
    "nation": "goryeo",
    "title": "우왕",
-   "order": 12,
+   "order": 13,
    "reign": {
     "start": 1374,
     "end": 1388,
@@ -445,7 +481,7 @@
    "kind": "anchor",
    "nation": "goryeo",
    "title": "공양왕",
-   "order": 13,
+   "order": 14,
    "reign": {
     "start": 1389,
     "end": 1392,
@@ -515,7 +551,7 @@
     "before": "goryeo-reign-myeongjong",
     "same_year": "before_next_accession"
    },
-   "explanation": "의종 24년(1170년)의 일. 무신정변을 일으킨 무신들이 정변 직후 의종을 내쫓고 명종을 추대한 일. 이후 약 100년 동안 무신이 권력을 잡았다.",
+   "explanation": "의종 24년(1170년)의 일. 실제로는 의종 때의 일이다(연표에서는 [인종] 칸에 놓인다). 무신정변을 일으킨 무신들이 정변 직후 의종을 내쫓고 명종을 추대한 일. 이후 약 100년 동안 무신이 권력을 잡았다.",
    "exam_tags": [
     "war",
     "institution"
@@ -548,6 +584,79 @@
    "tags": [
     "고려",
     "G-B1"
+   ]
+  },
+  {
+   "id": "goryeo-test-offlist-noline",
+   "kind": "source",
+   "nation": "goryeo",
+   "title": "(테스트) 해설에 실제로는 없는 카드",
+   "year": 1198,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "신종 원년",
+   "source_text": "한 권세가의 종이 산에서 나무하던 노비들을 모아 들고일어나기로 꾀하였으나, 일이 새어 나가 백여 명이 붙잡혀 강물에 던져졌다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goryeo-reign-myeongjong"
+      },
+      {
+       "op": "before",
+       "ref": "goryeo-reign-wonjong"
+      }
+     ],
+     "text": "[명종]이 즉위한 뒤, [원종]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "신종 원년(1198년). 만적, 개경 북산, 노비 봉기 모의."
+    }
+   ],
+   "answer": {
+    "after": "goryeo-reign-myeongjong",
+    "before": "goryeo-reign-gojong"
+   },
+   "explanation": "최충헌의 사노비 만적이 개경 북산에서 노비들을 모아 봉기를 꾀한 일. 발각되어 실패했다. 무신 집권기 신분 질서의 동요를 보여 준다.",
+   "exam_tags": [
+    "war",
+    "person"
+   ],
+   "source_ref": {
+    "work": "고려사",
+    "section": "세가",
+    "volume": null,
+    "entry": "신종 원년 5월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "1198 만적 등 6명의 북산 모의, 발각, 100여 명 투강은 itwiki 만적의 난·데일리안 요약으로 확인. 만적이 최충헌의 사노비였다는 해설 서술은 통설(원문 확인 필요). 신종은 앵커가 아니라 명종 칸. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D216)."
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "event_key": "1198-manjeok-plot",
+   "tags": [
+    "고려",
+    "G-B3"
    ]
   },
   {
