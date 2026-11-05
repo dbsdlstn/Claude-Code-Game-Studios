@@ -6,8 +6,9 @@
 import { CONFIG } from './config.js';
 import { createStore } from './storage.js';
 import { loadRaw, normalizeDeck, loadManifest, loadNationDeck } from './data.js';
-import { nationStoreAdapter, lastNation } from './save.js';
+import { nationStoreAdapter, lastNation, migrateSave } from './save.js';
 import { dayKey, newRewards, restoreRewards, levelOf, settleSession, achievementDefs, achievementStats, currentTitle } from './rewards.js';
+import { titleForLevel } from './rewards.js';
 import { buildTimeline, correctGaps, slotAnchorId } from './rules.js';
 import {
   validateDeck, gapBounds, selectableGaps, buildSession, createSessionState, currentId, revealClue, placeCurrent,
@@ -47,7 +48,8 @@ const app = {
   study: null,
   /** M2: 나라와 덱 목록, 보상(테스트 모드에서는 null). */
   nation: CONFIG.defaultNation, nations: [], rewards: null, lastReward: null, started: false, titleOn: false,
-  rewardsStore: createStore(CONFIG.rewardsKey), slotOfCard: new Map(),
+  rewardsStore: createStore(CONFIG.rewardsKey), slotOfCard: new Map(), nationDecks: new Map(),
+  dogam: { tab: 'cards', nation: null, filter: 'all', achFilter: 'all', collapsed: new Set() },
 };
 /** 보상 수치: config 기본값 위에 assets/data/config/rewards.json(init에서 읽음). */
 let R = CONFIG.rewards;
@@ -596,37 +598,223 @@ function nextSession() {
 
 /* ------------------------------------------------------------------ 숙련 도감, 오답 노트, 기록 */
 
+/* 도감(design/ux/dogam.md): 프로필 줄 + 탭 4개(카드·업적·칭호·오답 노트). 열 때마다 카드 탭. */
+
+/** 저장된 모든 나라의 카드 진행(현재 나라는 메모리의 최신 값). */
+function allProgress() {
+  const raw = migrateSave(createStore(CONFIG.storageKey).load(), CONFIG.defaultNation);
+  return { ...(raw?.cards ?? {}), ...app.progress };
+}
+/** 활성 나라 목록: [{id, label, deck}] (현재 나라 먼저 아니라 manifest 순서). */
+function activeNations() {
+  const list = app.nations.filter((n) => n.files.length).map((n) => ({ id: n.id, label: n.label, deck: n.id === app.nation ? app.deck : app.nationDecks.get(n.id) })).filter((n) => n.deck);
+  return list.length ? list : [{ id: app.nation, label: app.deck.nation_label ?? app.nation, deck: app.deck }];
+}
+const GRADE_TEXT = ['익히는 중', '동', '은', '금'];
+const md = (iso) => { const [, m, d] = String(iso).split('-').map(Number); return `${m}월 ${d}일`; };
+
 function openDogam() {
-  const counts = gradeCounts(app.deck.cards, app.progress, L);
-  $('dogam-counts').textContent = `현재 등급: 금 ${counts.gold} · 은 ${counts.silver} · 동 ${counts.bronze} · 학습 중 ${counts.none} · 미학습 ${counts.unseen}`;
-  $('dogam-counts').dataset.gold = String(counts.gold);
-  const cards = [...app.deck.cards].sort((a, b) => a.order - b.order);
-  const s = sessionIndex();
-  fill($('dogam-list'), ...cards.map((c) => {
-    const e = app.progress[c.id];
-    const g = e?.introduced ? gradeOf(e, L) : -1;
-    const key = g < 0 ? 'unseen' : GRADE_KEY[g];
-    const wait = e?.introduced ? Math.max(0, e.due_session - s) : null;
-    return el('li', { class: `dogam-row medal-${key}`, dataset: { id: c.id, mastery: key, best: String(e?.best_grade ?? 0) } },
-      el('span', { class: 'medal' }, g < 0 ? '미학습' : (g === 0 ? '학습 중' : GRADE_NAME[g])),
-      el('span', { class: 'dogam-main' },
-        el('span', { class: 'dogam-title' }, e?.introduced ? c.title : '？？？'),
-        el('span', { class: 'dogam-sub' }, e?.introduced
-          ? `${shortYear(c)} · 상자 ${e.box}${e.probation ? '(재학습)' : ''} · ${wait === 0 ? '복습할 때' : `${wait}세션 뒤`} · 최고 ${GRADE_NAME[e.best_grade]} · 틀린 횟수 ${e.lapses}`
-          : '아직 만나지 않은 카드')));
-  }));
-  // 오답 노트(§6)
-  const note = wrongNoteIds(app.deck.cards, app.progress);
-  fill($('note-list'), ...(note.length ? note.map((id) => {
-    const c = app.cardsById.get(id);
-    return el('li', { dataset: { id } }, el('details', {}, el('summary', {}, `${c.title} · ${c.year_label}`), el('p', {}, c.explanation)));
-  }) : [el('li', { class: 'source-note' }, '없음')]));
-  $('btn-note-practice').disabled = note.length === 0;
-  $('btn-note-practice').dataset.count = String(note.length);
+  app.dogam.nation = app.nation;
+  app.dogam.filter = 'all';
+  $('card-detail').hidden = true;
+  renderDogamProfile();
+  selectTab('cards');
   $('participant').value = app.participant;
   $('log-count').textContent = `인출 기록 ${app.log.length}줄`;
   $('dogam').hidden = false;
   $('dogam-close').focus();
+}
+
+function renderDogamProfile() {
+  const rw = app.rewards;
+  fill($('dogam-profile'), rw ? [
+    el('p', { class: 'title-honor', id: 'dogam-honor' }, currentTitle(rw, R)),
+    levelBar(rw),
+    el('p', { class: 'source-note', id: 'dogam-streak' }, `연속 ${rw.streak}일 · 최고 ${rw.best_streak}일 · 보호권 ${rw.rest_passes}장`),
+  ] : null);
+}
+
+const TABS = ['cards', 'ach', 'titles', 'note'];
+function selectTab(tab) {
+  app.dogam.tab = tab;
+  for (const t of TABS) {
+    const on = t === tab;
+    $(`tab-${t}`).setAttribute('aria-selected', on ? 'true' : 'false');
+    $(`tab-${t}`).tabIndex = on ? 0 : -1;
+    $(`panel-${t}`).hidden = !on;
+  }
+  if (tab === 'cards') renderDogamCards();
+  if (tab === 'ach') renderAchievements();
+  if (tab === 'titles') renderTitles();
+  if (tab === 'note') renderNote();
+}
+
+function setupTabs() {
+  for (const t of TABS) $(`tab-${t}`).addEventListener('click', () => selectTab(t));
+  $('dogam-tabs').addEventListener('keydown', (e) => {
+    const i = TABS.indexOf(app.dogam.tab);
+    const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (!d) return;
+    e.preventDefault();
+    const t = TABS[(i + d + TABS.length) % TABS.length];
+    selectTab(t);
+    $(`tab-${t}`).focus();
+  });
+}
+
+/** 카드 탭: 나라 칩, 요약(필터), 왕 줄 + 그 칸 카드(연표 순서). */
+function renderDogamCards() {
+  const nations = activeNations();
+  const cur = nations.find((n) => n.id === app.dogam.nation) ?? nations[0];
+  const deck = cur.deck;
+  const progress = cur.id === app.nation ? app.progress : allProgress();
+  fill($('dogam-nations'), nations.length >= 2 ? nations.map((n) => el('button', {
+    type: 'button', class: 'chip nation', dataset: { nation: n.id }, 'aria-pressed': n.id === cur.id ? 'true' : 'false',
+    onclick: () => { app.dogam.nation = n.id; app.dogam.filter = 'all'; $('card-detail').hidden = true; renderDogamCards(); },
+  }, n.label)) : null);
+  const s = sessionIndex();
+  const info = deck.cards.map((c) => {
+    const e = progress[c.id];
+    const g = e?.introduced ? gradeOf(e, L) : -1;
+    const review = !!e?.introduced && ((e.lapses >= 1 && e.box <= 2) || (cur.id === app.nation && e.due_session <= s));
+    return { c, e, g, key: g < 0 ? 'unseen' : GRADE_KEY[g], review };
+  });
+  const count = (k) => info.filter((x) => x.key === k).length;
+  const counts = { gold: count('gold'), silver: count('silver'), bronze: count('bronze'), none: count('none'), unseen: count('unseen') };
+  $('dogam-counts').textContent = `${cur.label} ${deck.cards.length}장 · 금 ${counts.gold} · 은 ${counts.silver} · 동 ${counts.bronze} · 익히는 중 ${counts.none} · 아직 안 만남 ${counts.unseen}`;
+  $('dogam-counts').dataset.gold = String(counts.gold);
+  const FILTERS = [['all', '전체'], ['gold', '금'], ['silver', '은'], ['bronze', '동'], ['none', '익히는 중'], ['unseen', '아직 안 만남'], ['review', '복습 필요']];
+  fill($('dogam-filters'), FILTERS.map(([k, label]) => el('button', {
+    type: 'button', class: 'chip filter', dataset: { filter: k }, 'aria-pressed': app.dogam.filter === k ? 'true' : 'false',
+    onclick: () => { app.dogam.filter = k; renderDogamCards(); },
+  }, label)));
+  const pass = (x) => app.dogam.filter === 'all' || (app.dogam.filter === 'review' ? x.review : x.key === app.dogam.filter);
+  const t = buildTimeline(deck.anchors, []);
+  const anchors = [...deck.anchors].sort((a, b) => a.order - b.order);
+  const bySlot = new Map(anchors.map((a) => [a.id, []]));
+  for (const x of info) bySlot.get(slotAnchorId(t, correctGaps(t, x.c.order)[0]))?.push(x);
+  const rows = [];
+  let shown = 0;
+  if (counts.unseen === deck.cards.length && app.dogam.filter === 'all') {
+    rows.push(el('li', { class: 'source-note', id: 'dogam-empty' }, '아직 만난 카드가 없어요. 첫 세션을 시작해 보세요'));
+  }
+  for (const a of anchors) {
+    const items = bySlot.get(a.id).sort((p, q) => p.c.order - q.c.order);
+    const vis = items.filter(pass);
+    if (!vis.length && app.dogam.filter !== 'all') continue;
+    if (!items.length) continue;
+    const silver = items.filter((x) => x.g >= 2).length;
+    const open = !app.dogam.collapsed.has(a.id);
+    rows.push(el('li', { class: 'dogam-king', dataset: { king: a.id } }, el('button', {
+      type: 'button', class: 'king-row', 'aria-expanded': open ? 'true' : 'false',
+      onclick: () => { if (open) app.dogam.collapsed.add(a.id); else app.dogam.collapsed.delete(a.id); renderDogamCards(); },
+    }, el('span', { class: 'king-row-name' }, `${open ? '▾' : '▸'} ${a.reign ?? a.title}`), el('span', { class: 'king-row-prog' }, `${silver}/${items.length}`))));
+    if (!open) continue;
+    for (const x of vis) {
+      shown += 1;
+      const { c, e, g, key } = x;
+      const wait = e?.introduced && cur.id === app.nation ? Math.max(0, e.due_session - s) : null;
+      rows.push(el('li', { class: `dogam-row medal-${key}`, dataset: { id: c.id, mastery: key, best: String(e?.best_grade ?? 0) } },
+        el('button', {
+          type: 'button', class: 'dogam-card', disabled: g < 0, 'aria-label': g < 0 ? '아직 만나지 않은 카드' : `${c.title}, ${g === 0 ? '익히는 중' : `${GRADE_NAME[g]} 등급`}`,
+          onclick: () => showCardDetail(cur, c, e),
+        },
+        el('span', { class: 'medal' }, g < 0 ? '?' : GRADE_TEXT[g]),
+        el('span', { class: 'dogam-main' },
+          el('span', { class: 'dogam-title' }, g < 0 ? '? 아직 만나지 않았어요' : c.title),
+          el('span', { class: 'dogam-sub' }, e?.introduced
+            ? `${shortYear(c)} · 상자 ${e.box}${e.probation ? '(재학습)' : ''}${wait === null ? '' : ` · ${wait === 0 ? '복습할 때' : `${wait}세션 뒤`}`} · 최고 ${GRADE_NAME[e.best_grade]} · 틀린 횟수 ${e.lapses}`
+            : '만나면 열려요'),
+          x.review ? el('span', { class: 'row-tag' }, '복습') : null))));
+    }
+  }
+  if (!shown && app.dogam.filter !== 'all') rows.push(el('li', { class: 'source-note', id: 'dogam-none' }, '조건에 맞는 카드가 없어요 ', el('button', { type: 'button', class: 'btn btn-small', onclick: () => { app.dogam.filter = 'all'; renderDogamCards(); } }, '필터 지우기')));
+  fill($('dogam-list'), rows);
+  $('dogam-shown').textContent = `${deck.cards.length}장 중 ${shown}장 표시`;
+}
+
+function showCardDetail(nation, c, e) {
+  if (!e?.introduced) return;
+  const s = sessionIndex();
+  const box = $('card-detail');
+  fill(box,
+    el('div', { class: 'sheet-head' }, el('h3', { id: 'detail-title' }, c.title), el('button', { type: 'button', class: 'btn btn-small', id: 'detail-close', onclick: () => { box.hidden = true; } }, '닫기')),
+    el('p', { class: 'result-meta' }, c.year_label),
+    el('p', {}, c.explanation),
+    c.exam_note ? el('p', { class: 'result-note' }, el('b', {}, '출제 주제 '), c.exam_note) : null,
+    el('p', { class: 'result-source' }, `출처: ${c.source?.name ?? ''}`),
+    el('p', { class: 'source-note', id: 'detail-state' }, `${GRADE_TEXT[gradeOf(e, L)]} · 상자 ${e.box}${nation.id === app.nation ? ` · 다음 복습 ${Math.max(0, e.due_session - s) === 0 ? '지금' : `${e.due_session - s}세션 뒤`}` : ''} · 틀린 횟수 ${e.lapses}`),
+    nation.id === app.nation ? el('button', { type: 'button', class: 'btn btn-small', id: 'detail-practice', onclick: () => startPractice('card', [c.id]) }, '이 카드만 연습') : null);
+  box.hidden = false;
+  box.scrollIntoView?.({ block: 'nearest' });
+  $('detail-close').focus();
+}
+
+/** 업적 탭: 획득(최근 순) → 진행도 높은 순 → 나머지. 미획득도 조건을 보인다. */
+function renderAchievements() {
+  const rw = app.rewards;
+  if (!rw) { fill($('ach-list')); return; }
+  const nations = activeNations();
+  const progressAll = allProgress();
+  const statsOf = (deck) => achievementStats({
+    cards: deck.cards, progress: progressAll, gradeOf: (e) => gradeOf(e, L),
+    slotOf: (c) => { const t = buildTimeline(deck.anchors, []); return slotAnchorId(t, correctGaps(t, c.order)[0]); },
+    rewards: rw, session: null,
+  });
+  const items = [];
+  const globalStats = statsOf({ cards: nations.flatMap((n) => n.deck.cards), anchors: app.deck.anchors });
+  for (const d of achievementDefs()) items.push({ d, st: globalStats, scope: 'all' });
+  for (const n of nations) {
+    const st = statsOf(n.deck);
+    for (const d of achievementDefs(n.id, n.label).filter((x) => x.nation)) items.push({ d, st, scope: n.id });
+  }
+  const FILTERS = [['all', '전체'], ['got', '획득'], ['todo', '미획득'], ...nations.map((n) => [n.id, n.label])];
+  fill($('ach-filters'), FILTERS.map(([k, label]) => el('button', {
+    type: 'button', class: 'chip filter', dataset: { filter: k }, 'aria-pressed': app.dogam.achFilter === k ? 'true' : 'false',
+    onclick: () => { app.dogam.achFilter = k; renderAchievements(); },
+  }, label)));
+  const f = app.dogam.achFilter;
+  const rows = items.map(({ d, st, scope }) => {
+    const got = rw.achievements[d.id];
+    const pr = !got && d.progress ? d.progress(st) : null;
+    return { d, got, pr, scope, ratio: pr ? pr[0] / pr[1] : 0 };
+  }).filter((x) => f === 'all' || (f === 'got' ? x.got : f === 'todo' ? !x.got : x.scope === f))
+    .sort((a, b) => (b.got ? 1 : 0) - (a.got ? 1 : 0) || String(b.got ?? '').localeCompare(String(a.got ?? '')) || b.ratio - a.ratio);
+  fill($('ach-list'), rows.map(({ d, got, pr }) => el('li', { class: `ach-row${got ? ' ach-got' : ''}`, dataset: { id: d.id, got: got ? '1' : '0' } },
+    el('span', { class: 'ach-name' }, `${got ? '획득' : '미획득'} · ${d.name}`),
+    el('span', { class: 'ach-desc' }, d.desc),
+    el('span', { class: 'ach-state' }, got ? `획득 · ${md(got)}` : pr ? `${pr[0]}/${pr[1]}` : '아직 달성하지 않았어요'))));
+}
+
+/** 칭호 탭: 레벨이 된 칭호만 고를 수 있다. 고르면 고정(레벨업이 덮어쓰지 않음), "자동"은 고정 해제. */
+function renderTitles() {
+  const rw = app.rewards;
+  if (!rw) { fill($('title-list')); return; }
+  const level = levelOf(rw.xp, R).level;
+  const pick = (name) => { app.rewards = { ...app.rewards, title_pinned: name }; saveRewards(); renderDogamProfile(); renderTitles(); };
+  fill($('title-list'),
+    el('li', { class: 'title-row' }, el('span', {}, `자동(가장 높은 칭호: ${titleForLevel(level, R)})`),
+      el('button', { type: 'button', class: 'btn btn-small', id: 'title-auto', 'aria-pressed': rw.title_pinned ? 'false' : 'true', onclick: () => pick(null) }, rw.title_pinned ? '선택' : '사용 중')),
+    R.titles.map(([lv, name]) => el('li', { class: 'title-row', dataset: { title: name } },
+      el('span', {}, `${name} · Lv ${lv}`),
+      level < lv ? el('span', { class: 'source-note' }, `Lv ${lv}에 얻어요`)
+        : el('button', { type: 'button', class: 'btn btn-small', 'aria-pressed': rw.title_pinned === name ? 'true' : 'false', onclick: () => pick(name) },
+          rw.title_pinned === name ? '사용 중' : '선택'))));
+}
+
+/** 오답 노트 탭(leitner-spec §6). */
+function renderNote() {
+  const note = wrongNoteIds(app.deck.cards, app.progress);
+  fill($('note-list'), note.length ? note.map((id) => {
+    const c = app.cardsById.get(id);
+    const e = app.progress[id];
+    return el('li', { dataset: { id } }, el('details', {},
+      el('summary', {}, `${c.title} · 틀린 횟수 ${e.lapses} · 상자 ${e.box}`),
+      el('p', {}, c.explanation),
+      e.probation ? el('p', { class: 'source-note' }, '두 번 연속 맞히면 올라가요') : null));
+  }) : [el('li', { class: 'source-note', id: 'note-empty' }, "오답 노트가 비어 있어요. 틀렸던 카드를 모두 익혔다면 업적 '오답 노트 비우기'가 열려요")]);
+  $('btn-note-practice').disabled = note.length === 0;
+  $('btn-note-practice').dataset.count = String(note.length);
 }
 
 /** 인출 로그 내보내기: 줄마다 JSON(JSONL), m1-plan §11 규격. */
@@ -831,6 +1019,7 @@ async function init() {
 
   setupDrag();
   setupRefs();
+  setupTabs();
   if (app.study) {
     $('btn-dogam').replaceWith(el('a', { class: 'btn btn-small', id: 'btn-menu', href: app.study.menuUrl }, '진행자'));
     $('btn-home').hidden = true;
@@ -940,6 +1129,10 @@ async function loadDeck(params) {
   app.nation = nation.id;
   app.store = nationStoreAdapter(app.store, nation.id, CONFIG.defaultNation);
   const norm = await loadNationDeck(nation);
+  // 다른 나라 덱도 읽어 둔다(타이틀 나라 목록의 오늘 할 일, 도감의 나라 전환). 실패한 나라는 건너뛴다.
+  await Promise.all(usable.filter((n) => n.id !== nation.id).map(async (n) => {
+    try { const d = await loadNationDeck(n); if (d.deck && !d.errors.length) app.nationDecks.set(n.id, d.deck); } catch { /* 건너뜀 */ }
+  }));
   const files = nation.files.map((f) => f.split('/').pop());
   return { url: `${nation.id}:${files.join('+')}`, label: `${nation.label} ${files.join(', ')}`, deck: norm.deck, convErrors: norm.errors };
 }
@@ -956,17 +1149,79 @@ function setupTitle(wantIntro, params) {
   });
   $('title-dogam').addEventListener('click', openDogam);
   $('title-howto').addEventListener('click', () => { titleWantsIntro = false; showIntro(0); });
+  app.titleParams = params;
+}
+
+/** 다른 나라의 다음 세션 미리 보기(저장된 진행으로). 현재 나라는 todayPlan(). */
+function planFor(nationId) {
+  if (nationId === app.nation) return todayPlan();
+  const deck = app.nationDecks.get(nationId);
+  if (!deck) return { mode: 'done', due: 0, fresh: 0, left: 0 };
+  const raw = migrateSave(createStore(CONFIG.storageKey).load(), CONFIG.defaultNation);
+  const progress = restoreProgress(raw?.cards, deck.cards, L);
+  const n = raw?.nations?.[nationId] ?? {};
+  const cur = restoreSession(n.current, deck.cards);
+  if (cur && !cur.practice && currentId(cur)) {
+    // 0장이면 이어서, 1장 이상이면 다음 실행에서 끝난 것으로 처리되므로 다음 세션을 보인다
+    if (attemptsOf(cur) === 0) return { mode: 'continue', due: 0, fresh: 0, left: cur.queue.length - cur.index };
+  }
+  const done = (n.completed_sessions ?? 0) + (cur && attemptsOf(cur) >= L.count_session_min_answers ? 1 : 0);
+  const pick = buildSession(deck.cards, progress, done + 1, L, 1);
+  return { mode: pick.due ? 'review' : pick.fresh ? 'new' : 'done', due: pick.due, fresh: pick.fresh, left: pick.due + pick.fresh };
+}
+
+/** 나라를 바꾼다. 진행 중 세션(1장 이상 풀고 남음)이 있으면 먼저 확인한다(title-screen.md, D100 대체). */
+function switchNation(n) {
+  if (n.id === app.nation) return;
+  const go = () => {
+    const q = new URLSearchParams(app.titleParams ?? location.search);
+    q.set('nation', n.id);
+    q.delete('data');
+    location.assign(`?${q}`);
+  };
+  if (app.state && !app.state.practice && currentId(app.state) && attemptsOf(app.state) >= 1) {
+    openModal(`${n.label}로 옮길까요?`, [el('p', {}, `지금 세션을 끝내고 ${n.label}로 옮길까요? 푼 카드는 저장돼요.`)],
+      [el('button', { type: 'button', class: 'btn', id: 'switch-cancel', onclick: closeModal }, '취소'),
+        el('button', { type: 'button', class: 'btn btn-primary', id: 'switch-confirm', onclick: () => { closeModal(); go(); } }, '옮기기')], 'switch');
+    return;
+  }
+  go();
+}
+
+/** 타이틀의 나라 선택: 활성 1~2개는 칩 줄 + 요약 한 줄, 3개 이상은 세로 목록(행마다 오늘 할 일). */
+function renderTitleNations() {
   const nations = app.nations.length ? app.nations : [{ id: app.nation, label: app.deck.nation_label ?? app.nation, files: ['-'] }];
-  fill($('title-nations'), nations.map((n) => el('button', {
-    type: 'button', class: 'chip nation', dataset: { nation: n.id }, 'aria-pressed': n.id === app.nation ? 'true' : 'false', disabled: !n.files.length,
-    onclick: () => {
-      if (n.id === app.nation) return;
-      const q = new URLSearchParams(params);
-      q.set('nation', n.id);
-      q.delete('data');
-      location.assign(`?${q}`);
-    },
-  }, n.label, n.files.length ? null : el('span', { class: 'nation-soon' }, ' 준비 중'))));
+  const active = nations.filter((n) => n.files.length && (n.id === app.nation || app.nationDecks.has(n.id)));
+  const plans = new Map(active.map((n) => [n.id, planFor(n.id)]));
+  const deckOf = (id) => (id === app.nation ? app.deck : app.nationDecks.get(id));
+  const allP = active.length > 1 ? allProgress() : app.progress;
+  const learned = (id) => deckOf(id).cards.filter((c) => allP[c.id]?.introduced).length;
+  const soon = nations.filter((n) => !active.includes(n));
+  if (active.length >= 3) {
+    const order = [...active].sort((a, b) => (plans.get(b.id).left > 0) - (plans.get(a.id).left > 0) || nations.indexOf(a) - nations.indexOf(b));
+    const most = [...active].sort((a, b) => plans.get(b.id).due - plans.get(a.id).due)[0];
+    const tot = [...plans.values()].reduce((x, p) => ({ due: x.due + p.due, fresh: x.fresh + p.fresh }), { due: 0, fresh: 0 });
+    fill($('title-nations'),
+      el('p', { class: 'nation-total', id: 'title-nation-total' }, `오늘 복습 모두 ${tot.due}장 · 새 카드 ${tot.fresh}장`),
+      el('div', { class: 'nation-list', role: 'radiogroup', 'aria-label': '나라' }, order.map((n) => {
+        const p = plans.get(n.id);
+        const on = n.id === app.nation;
+        const label = `${n.label}, ${deckOf(n.id).cards.length}장 중 ${learned(n.id)}장 학습, 오늘 복습 ${p.due}장 새 카드 ${p.fresh}장`;
+        return el('button', { type: 'button', role: 'radio', class: 'nation-row' + (on ? ' is-on' : ''), dataset: { nation: n.id }, 'aria-checked': on ? 'true' : 'false', 'aria-label': label, onclick: () => switchNation(n) },
+          el('span', { class: 'nation-mark', 'aria-hidden': 'true' }, on ? '●' : '○'),
+          el('span', { class: 'nation-name' }, n.label),
+          el('span', { class: 'nation-meta' }, `${deckOf(n.id).cards.length}장 중 ${learned(n.id)} 학습`, el('br'), `오늘 복습 ${p.due} · 새 ${p.fresh}`),
+          most && most.id === n.id && p.due > 0 ? el('span', { class: 'nation-hint' }, '오늘 가장 많아요') : null);
+      })),
+      soon.length ? el('details', { class: 'nation-soon-list' }, el('summary', {}, `준비 중 ${soon.length}개`), el('p', { class: 'source-note' }, soon.map((n) => n.label).join(' · '))) : null);
+    return;
+  }
+  fill($('title-nations'),
+    el('div', { class: 'nation-chips' }, nations.map((n) => el('button', {
+      type: 'button', class: 'chip nation', dataset: { nation: n.id }, 'aria-pressed': n.id === app.nation ? 'true' : 'false', disabled: !active.includes(n),
+      onclick: () => switchNation(n),
+    }, n.label, active.includes(n) ? null : el('span', { class: 'nation-soon' }, ' 준비 중')))),
+    active.length === 2 ? el('p', { class: 'source-note', id: 'title-nation-total' }, active.map((n) => `${n.label} 복습 ${plans.get(n.id).due} · 새 ${plans.get(n.id).fresh}`).join(' / ')) : null);
 }
 
 /**
@@ -999,6 +1254,7 @@ function showTitle() {
     done: '오늘 할 카드를 모두 했습니다. 미리 복습은 연습입니다.',
   }[plan.mode];
   const label = { continue: `이어하기 · ${plan.left}장 남음`, review: '복습 시작', new: '새 카드 시작', done: '오늘 끝 · 미리 복습' }[plan.mode];
+  renderTitleNations();
   $('title-today').textContent = today;
   Object.assign($('title-today').dataset, { mode: plan.mode, due: String(plan.due), fresh: String(plan.fresh), left: String(plan.left), minutes: String(mins) });
   $('title-play').textContent = label;

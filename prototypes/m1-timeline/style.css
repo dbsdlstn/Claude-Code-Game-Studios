@@ -287,3 +287,37 @@ body { min-height: 100vh; background-attachment: fixed; }
 .ach b { color: var(--seal); }
 .title-honor { font-family: var(--serif); font-weight: 700; color: var(--ink); }
 #summary .sheet-actions { flex-wrap: wrap; }
+/* D104: 도감 탭(design/ux/dogam.md) */
+.dogam-profile { display: grid; gap: 4px; margin-bottom: 8px; }
+.dogam-profile p { margin: 0; }
+.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; border-bottom: 2px solid var(--line); margin-bottom: 10px; }
+.tab { min-height: 44px; border: 0; background: transparent; font: inherit; font-weight: 700; color: var(--ink-soft); cursor: pointer; border-bottom: 3px solid transparent; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--seal); }
+.panel { display: grid; gap: 8px; }
+.filters, .dogam-nations { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip.filter { font: inherit; font-size: 13px; cursor: pointer; min-height: 36px; }
+.chip[aria-pressed="true"] { background: var(--seal); color: #fff8ef; border-color: #7d2a1e; }
+.dogam-king { list-style: none; }
+.king-row { width: 100%; min-height: 44px; display: flex; justify-content: space-between; align-items: center; font: inherit; font-weight: 700; background: var(--paper-3); border: 1px solid var(--line); border-radius: 6px; padding: 0 12px; cursor: pointer; }
+.king-row-prog { font-size: 13px; color: var(--ink-soft); }
+.dogam-card { width: 100%; display: grid; grid-template-columns: 72px 1fr; gap: 10px; align-items: center; text-align: left; font: inherit; background: transparent; border: 0; padding: 6px 4px; min-height: 44px; cursor: pointer; color: inherit; }
+.dogam-card[disabled] { cursor: default; color: var(--ink-soft); }
+.card-detail { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fbf6ea; }
+.card-detail p { margin: 4px 0; }
+.ach-list, .title-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ach-row { display: grid; gap: 2px; padding: 8px 10px; border: 1px solid var(--line-soft); border-radius: 6px; background: var(--paper-2); }
+.ach-got { border-color: var(--gold); background: #fbf2d6; }
+.ach-name { font-weight: 700; }
+.ach-desc, .ach-state { font-size: 13px; color: var(--ink-soft); }
+.title-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; padding: 4px 10px; border: 1px solid var(--line-soft); border-radius: 6px; }
+/* D104: 타이틀 나라 목록(활성 3개 이상, title-screen.md) */
+.title-nations { display: grid; gap: 6px; width: 100%; justify-items: center; }
+.nation-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.nation-list { display: grid; gap: 6px; width: 100%; }
+.nation-row { display: grid; grid-template-columns: 22px auto 1fr; gap: 4px 10px; align-items: center; min-height: 56px; padding: 6px 12px; text-align: left; font: inherit; border: 1px solid var(--line-soft); border-radius: 8px; background: var(--paper-2); cursor: pointer; color: inherit; }
+.nation-row.is-on { border: 2px solid var(--seal); font-weight: 700; }
+.nation-name { font-family: var(--serif); font-size: 17px; }
+.nation-meta { font-size: 13px; color: var(--ink-soft); text-align: right; font-weight: 400; }
+.nation-hint { grid-column: 2 / -1; font-size: 12px; color: var(--gold); }
+.nation-total { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.nation-soon-list summary { font-size: 13px; color: var(--ink-soft); cursor: pointer; }

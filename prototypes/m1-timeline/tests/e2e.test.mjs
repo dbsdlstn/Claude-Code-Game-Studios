@@ -130,6 +130,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       await page.waitForSelector('#dogam:not([hidden])');
       assert.equal(await page.locator(`#dogam-list [data-id="${card.id}"][data-mastery="none"]`).count(), 1);
       assert.match(await page.innerText(`#dogam-list [data-id="${card.id}"]`), /최고 없음 · 틀린 횟수 1/);
+      await page.click('#tab-note');
       assert.equal(await page.locator(`#note-list [data-id="${card.id}"]`).count(), 1);
       await page.click('#btn-note-practice');
       assert.equal(await page.locator('#practice-badge').count(), 1);
