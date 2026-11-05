@@ -149,3 +149,15 @@ button { font: inherit; color: inherit; }
 .confirm-text { flex: 1 1 100%; font-size: 13.5px; color: var(--ink-soft); }
 .confirm-bar .btn { flex: 1; }
 .badge-retry { border-color: var(--indigo); color: var(--indigo); margin-left: auto; }
+
+/* D66: 오답 노트, 기록, 빈 세션 */
+.note { border-top: 1px dashed var(--line-soft); margin-top: 14px; padding-top: 10px; }
+.note h3 { font-family: var(--serif); font-size: 17px; margin: 0 0 6px; }
+.note-list { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 4px; font-size: 14.5px; }
+.note-list details { background: #fbf6ea; border: 1px solid var(--line-soft); border-radius: 6px; padding: 6px 10px; }
+.note-list summary { cursor: pointer; font-weight: 700; }
+.participant { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.participant input { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; width: 8em; background: #fff; }
+.empty-title { font-family: var(--serif); font-weight: 700; font-size: 17px; margin: 0 0 6px; }
+.btn-quiet { background: transparent; margin-top: 8px; }
+.notice { color: var(--indigo); font-weight: 700; }

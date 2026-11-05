@@ -1,320 +1,380 @@
 // PROTOTYPE - NOT FOR PRODUCTION (M1, decision-log D56)
 // M1 규칙 단위 테스트: node --test prototypes/m1-timeline/tests/rules.test.js
+// leitner-spec §10 수용 기준 1~13과 §7 시뮬레이션 수치를 그대로 재현한다.
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { CONFIG } from '../js/config.js';
+import { CONFIG, LEITNER_DEFAULT, M1_OVERRIDE } from '../js/config.js';
 import {
-  validateDeck, buildTimeline, isCorrectGap, correctGaps, promotionFor, applyResult, isDue, mastery,
-  buildSession, createRng, createSession, currentId, revealClue, placeCurrent, sessionTimeline, isSessionDone,
-  sessionSummary, masteryCounts, dueCount, restoreProgress, restoreSession, dataFingerprint, isRetry,
+  validateDeck, buildTimeline, isCorrectGap, correctGaps, selectableGaps, slotAnchorId, isNearMiss,
+  nextBox, schedule, gradeOf, isDue, newEntry, buildSession, earlyReviewIds, wrongNoteIds, sessionSeed,
+  createSessionState, currentId, revealClue, placeCurrent, sessionTimeline, isSessionDone, isRetry, attemptsOf,
+  completedAfter, sessionSummary, gradeCounts, logLine, restoreProgress, restoreSession, dataFingerprint,
 } from '../js/rules.js';
+import { normalizeDeck, formatOf, loadRaw, yearText } from '../js/data.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SAMPLE = JSON.parse(readFileSync(path.join(here, '..', 'data', 'sample.json'), 'utf8'));
 const BY_ID = new Map(SAMPLE.cards.map((c) => [c.id, c]));
-const SEED = 777;
+const D = { ...LEITNER_DEFAULT, slotBeforeFirst: false, placedJoinTimeline: false }; // 명세 기본값
+const M1 = CONFIG.leitner;                                                          // M1 덮어쓰기
+const DRAFT_PATH = path.join(here, '..', '..', '..', 'assets', 'data', 'cards', 'v2-draft', 'goguryeo-m1.json');
+const V2_PATH = path.join(here, '..', '..', '..', 'assets', 'data', 'cards', 'v2', 'goguryeo-m1.json');
 
-/** 학습 기록 없이 시작하는 세션. */
-const fresh = (session = 1, cfg = CONFIG) => createSession(SAMPLE.cards, {}, session, cfg, SEED);
-/** 지금 카드의 맞는 틈. */
-function rightGap(state, cfg = CONFIG) {
-  const card = BY_ID.get(currentId(state));
-  return correctGaps(sessionTimeline(state, SAMPLE.anchors, cfg), card.order)[0];
-}
-function wrongGap(state, cfg = CONFIG) {
-  const items = sessionTimeline(state, SAMPLE.anchors, cfg);
-  const card = BY_ID.get(currentId(state));
-  for (let k = 0; k <= items.length; k++) if (!isCorrectGap(items, k, card.order)) return k;
-  throw new Error('오답 틈이 없다');
-}
+/** n장짜리 덱(id 순서 = 덱 순서). */
+const deckOf = (n) => Array.from({ length: n }, (_, i) => ({ id: `c${String(i + 1).padStart(2, '0')}` }));
 
-describe('데이터', () => {
-  test('샘플 데이터는 검증 오류가 없다', () => {
-    assert.deepEqual(validateDeck(SAMPLE), []);
-  });
-  test('사료 지문에 이름, 기준 카드 order 중복, 없는 ref를 잡는다', () => {
-    const bad = structuredClone(SAMPLE);
-    bad.cards[0].source_text = `${bad.cards[0].title}를 했다`;
-    bad.anchors[1].order = bad.anchors[0].order;
-    bad.cards[1].clues[0].refs = ['nope'];
-    const errs = validateDeck(bad).join('\n');
-    assert.match(errs, /사료 지문에 이름/);
-    assert.match(errs, /order가 같으면/);
-    assert.match(errs, /nope/);
+describe('설정', () => {
+  test('명세 §8 기본값과 M1 덮어쓰기', () => {
+    assert.deepEqual([...LEITNER_DEFAULT.intervals], [1, 2, 4, 7, 12]);
+    assert.deepEqual({ ...LEITNER_DEFAULT.grades }, { bronze: 3, silver: 4, gold: 5 });
+    assert.deepEqual({ ...M1_OVERRIDE }, { session_size: 6, new_min: 6 });
+    assert.equal(M1.session_size, 6);
+    assert.equal(M1.intervals.length, 5);
   });
 });
 
-describe('연표 위치 판정', () => {
-  const items = buildTimeline(SAMPLE.anchors);
-  test('기준 카드는 시간순, 틈은 n+1개', () => {
-    assert.deepEqual(items.map((i) => i.order), [-37, 371, 391, 413, 642]);
-    assert.equal(correctGaps(items, 427).length, 1);
+describe('§10 상자 갱신(1~6, 13)', () => {
+  const at = (box) => ({ ...newEntry(), introduced: true, box });
+  test('1. 새 카드(상자 1)를 깨끗하게 맞히면 상자 2, due = s+2', () => {
+    const e = schedule(undefined, { correct: true, clueUsed: 0, session: 5 }, D);
+    assert.deepEqual([e.box, e.due_session, e.introduced], [2, 7, true]);
   });
-  test('앞뒤 기준 카드 사이만 정답', () => {
-    assert.deepEqual(correctGaps(items, 194), [1]);   // 동명성왕(-37)과 소수림왕(371) 사이
-    assert.deepEqual(correctGaps(items, 427), [4]);   // 장수왕(413)과 보장왕(642) 사이
-    assert.deepEqual(correctGaps(items, -100), [0]);  // 맨 앞
-    assert.deepEqual(correctGaps(items, 700), [5]);   // 맨 뒤
-    assert.equal(isCorrectGap(items, 2, 194), false);
-    assert.equal(isCorrectGap(items, 9, 194), false);
+  test('2. 상자 3을 관계 단서로 맞히면 상자 3, due = s+4', () => {
+    const e = schedule(at(3), { correct: true, clueUsed: 1, session: 5 }, D);
+    assert.deepEqual([e.box, e.due_session], [3, 9]);
   });
-  test('같은 해는 양쪽 틈 모두 정답', () => {
-    assert.deepEqual(correctGaps(items, 371), [1, 2]);
+  test('3. 상자 3을 직접 단서로 맞히면 상자 2', () => {
+    assert.equal(schedule(at(3), { correct: true, clueUsed: 2, session: 5 }, D).box, 2);
   });
-  test('놓인 카드가 연표에 들어가 틈이 잘게 나뉜다', () => {
-    const t = buildTimeline(SAMPLE.anchors, [{ id: 'x', order: 194, correct: true }]);
-    assert.deepEqual(correctGaps(t, 3), [1]);       // 건국과 진대법(194) 사이
-    assert.deepEqual(correctGaps(t, 250), [2]);     // 진대법과 낙랑군 축출 사이
+  test('4. 상자 1을 직접 단서로 맞혀도 상자 1', () => {
+    assert.equal(schedule(at(1), { correct: true, clueUsed: 2, session: 5 }, D).box, 1);
   });
-});
-
-describe('단서 비용과 Leitner 상자', () => {
-  test('단서를 볼수록 승급 폭이 준다', () => {
-    assert.deepEqual([0, 1, 2, 3].map((n) => promotionFor(n, CONFIG)), [2, 1, 0, 0]);
+  test('5. 상자 5를 깨끗하게 맞히면 상자 5, due = s+12', () => {
+    const e = schedule(at(5), { correct: true, clueUsed: 0, session: 5 }, D);
+    assert.deepEqual([e.box, e.due_session], [5, 17]);
   });
-  test('처음 맞힘: 단서 0이면 1→3, 단서 1이면 1→2, 단서 2면 1→1', () => {
-    assert.equal(applyResult(undefined, { correct: true, cluesUsed: 0, session: 1 }, CONFIG).box, 3);
-    assert.equal(applyResult(undefined, { correct: true, cluesUsed: 1, session: 1 }, CONFIG).box, 2);
-    assert.equal(applyResult(undefined, { correct: true, cluesUsed: 2, session: 1 }, CONFIG).box, 1);
+  test('6. 오답이면 상자 1, due = s+1, lapses +1, clean_streak 0', () => {
+    const e = schedule({ ...at(4), clean_streak: 3, lapses: 1 }, { correct: false, clueUsed: 0, session: 5 }, D);
+    assert.deepEqual([e.box, e.due_session, e.lapses, e.clean_streak], [1, 6, 2, 0]);
   });
-  test('오답은 상자 1로, 상한은 5', () => {
-    const e = applyResult({ box: 4, due: 3, seen: 2, right: 2, wrong: 0 }, { correct: false, cluesUsed: 0, session: 5 }, CONFIG);
-    assert.equal(e.box, 1);
-    assert.equal(e.wrong, 1);
-    assert.equal(applyResult({ box: 5, due: 1, seen: 1, right: 1, wrong: 0 }, { correct: true, cluesUsed: 0, session: 1 }, CONFIG).box, 5);
-  });
-  test('재출제: 상자 b에서 세션 s에 답하면 s + intervals[b]부터 다시 나온다', () => {
-    const e = applyResult(undefined, { correct: true, cluesUsed: 0, session: 2 }, CONFIG); // 상자 3
-    assert.equal(e.due, 2 + CONFIG.intervals[3]);
-    assert.equal(isDue(e, e.due - 1), false);
-    assert.equal(isDue(e, e.due), true);
-    assert.equal(isDue(undefined, 99), false);
-  });
-  test('숙련 등급: 상자 2 동, 4 은, 5 금', () => {
-    assert.equal(mastery(undefined, CONFIG), 'unseen');
-    assert.deepEqual([1, 2, 3, 4, 5].map((box) => mastery({ box }, CONFIG)), ['none', 'bronze', 'bronze', 'silver', 'gold']);
-  });
-});
-
-describe('세션 구성', () => {
-  const cfg8 = { ...CONFIG, sessionSize: 4 };
-  test('카드가 적으면 있는 만큼, 처음엔 모두 새 카드', () => {
-    const s = buildSession(SAMPLE.cards, {}, 1, CONFIG, createRng(1));
-    assert.equal(s.ids.length, 8);
-    assert.equal(s.fresh, 8);
-  });
-  test('복습 대상(때가 된 카드)을 새 카드보다 먼저 고른다', () => {
-    const progress = { 'gg-c-ansi': { box: 1, due: 2 }, 'gg-c-taehak': { box: 2, due: 2 }, 'gg-c-jindae': { box: 3, due: 9 } };
-    const s = buildSession(SAMPLE.cards, progress, 2, cfg8, createRng(1));
-    assert.equal(s.due, 2);
-    assert.ok(s.ids.includes('gg-c-ansi') && s.ids.includes('gg-c-taehak'));
-    assert.ok(!s.ids.includes('gg-c-jindae'), '때가 안 된 카드는 새 카드가 모자랄 때만');
-    assert.equal(s.fresh, 2);
-  });
-  test('새 카드도 없으면 가장 빨리 돌아올 카드로 채운다', () => {
-    const progress = Object.fromEntries(SAMPLE.cards.map((c, i) => [c.id, { box: 3, due: 10 + i }]));
-    const s = buildSession(SAMPLE.cards, progress, 2, cfg8, createRng(1));
-    assert.equal(s.early, 4);
-    assert.deepEqual([...s.ids].sort(), SAMPLE.cards.slice(0, 4).map((c) => c.id).sort());
-  });
-  test('세션 크기 설정을 지킨다', () => {
-    assert.equal(buildSession(SAMPLE.cards, {}, 1, { ...CONFIG, sessionSize: 3 }, createRng(1)).ids.length, 3);
-  });
-});
-
-describe('세션 진행', () => {
-  test('정답: 다음 카드, 단서 수 초기화, 상자 승급, 연표에 들어감', () => {
-    let s = fresh();
-    s = revealClue(s, 2);
-    const id = currentId(s);
-    const r = placeCurrent(s, rightGap(s), BY_ID, SAMPLE.anchors, {}, CONFIG);
-    assert.equal(r.result.correct, true);
-    assert.equal(r.result.cluesUsed, 1);
-    assert.equal(r.result.boxTo, 2);
-    assert.equal(r.progress[id].box, 2);
-    assert.equal(r.state.index, 1);
-    assert.equal(r.state.clues, 0);
-    assert.equal(sessionTimeline(r.state, SAMPLE.anchors, CONFIG).length, SAMPLE.anchors.length + 1);
-  });
-  test('오답: 상자 1, 맞는 틈을 알려 주고, 카드는 맞는 자리에 들어감', () => {
-    const s = fresh();
-    const card = BY_ID.get(currentId(s));
-    const r = placeCurrent(s, wrongGap(s), BY_ID, SAMPLE.anchors, {}, CONFIG);
-    assert.equal(r.result.correct, false);
-    assert.equal(r.result.boxTo, 1);
-    assert.deepEqual(r.result.correctGaps, [rightGap(s)]);
-    const items = sessionTimeline(r.state, SAMPLE.anchors, CONFIG);
-    const idx = items.findIndex((i) => i.id === card.id);
-    assert.ok((items[idx - 1]?.order ?? -Infinity) <= card.order && card.order <= (items[idx + 1]?.order ?? Infinity));
-    assert.equal(items[idx].correct, false);
-  });
-  test('단서는 카드의 단서 수까지만 열린다', () => {
-    let s = fresh();
-    s = revealClue(revealClue(revealClue(s, 2), 2), 2);
-    assert.equal(s.clues, 2);
-  });
-  test('잘못된 틈 번호는 무시', () => {
-    const s = fresh();
-    assert.equal(placeCurrent(s, 99, BY_ID, SAMPLE.anchors, {}, CONFIG).result, null);
-  });
-  test('세션 끝, 요약, 다음 세션 복습 대상', () => {
-    let s = fresh();
-    let progress = {};
-    let i = 0;
-    while (!isSessionDone(s)) {
-      if (i === 1) s = revealClue(s, 2);
-      const k = i === 2 ? wrongGap(s) : rightGap(s);
-      ({ state: s, progress } = placeCurrent(s, k, BY_ID, SAMPLE.anchors, progress, CONFIG));
-      i++;
+  test('13. 단서 0·1·2 × 정답·오답의 모든 조합(상자 1~5)', () => {
+    const expect = (box, correct, clue) => (!correct ? 1 : clue === 0 ? Math.min(5, box + 1) : clue === 1 ? box : Math.max(1, box - 1));
+    for (let box = 1; box <= 5; box++) for (const correct of [true, false]) for (const clue of [0, 1, 2]) {
+      assert.equal(nextBox(box, correct, clue, D), expect(box, correct, clue), `box ${box} ${correct} ${clue}`);
     }
-    const sum = sessionSummary(s);
-    assert.deepEqual([sum.total, sum.right, sum.clues, sum.noClueRight], [8, 7, 1, 6]);
-    assert.deepEqual([sum.retried, sum.retryRight], [1, 1]);
-    // 세션 1 다음: 오답(상자 1, +1)과 단서 1개 정답(상자 2, +2)
-    assert.equal(dueCount(SAMPLE.cards, progress, 2), 1);
-    assert.equal(dueCount(SAMPLE.cards, progress, 3), 2);
-    assert.deepEqual(masteryCounts(SAMPLE.cards, progress, CONFIG), { unseen: 0, none: 1, bronze: 7, silver: 0, gold: 0 });
-    // 다음 세션은 때가 된 카드가 먼저
-    const s2 = createSession(SAMPLE.cards, progress, 2, { ...CONFIG, sessionSize: 2 }, SEED);
-    assert.equal(s2.mix.due, 1);
-  });
-  test('같은 카드를 여러 세션에 걸쳐 단서 없이 맞히면 금까지 오른다', () => {
-    let e;
-    for (let session = 1; session <= 3; session++) e = applyResult(e, { correct: true, cluesUsed: 0, session }, CONFIG);
-    assert.equal(mastery(e, CONFIG), 'gold');
   });
 });
 
-describe('세션 안 다시 풀기(D61)', () => {
-  test('틀린 카드는 세션 끝에 한 번 더, 맞힌 카드는 다시 나오지 않는다', () => {
-    let s = fresh();
-    const first = currentId(s);
-    ({ state: s } = placeCurrent(s, wrongGap(s), BY_ID, SAMPLE.anchors, {}, CONFIG));
-    assert.equal(s.queue.length, s.base + 1);
-    assert.equal(s.queue.at(-1), first);
-    ({ state: s } = placeCurrent(s, rightGap(s), BY_ID, SAMPLE.anchors, {}, CONFIG));
-    assert.equal(s.queue.length, s.base + 1);
+describe('§10 등급(12)', () => {
+  test('동 box≥3, 은 ≥4, 금 = box 5이면서 마지막이 깨끗한 정답', () => {
+    const e = (box, clean_streak = 1) => ({ ...newEntry(), introduced: true, box, clean_streak });
+    assert.deepEqual([1, 2, 3, 4, 5].map((b) => gradeOf(e(b), D)), [0, 0, 1, 2, 3]);
+    assert.equal(gradeOf(e(5, 0), D), 2, '상자 5라도 마지막이 깨끗하지 않으면 은');
+    assert.equal(gradeOf(undefined, D), 0);
+  });
+  test('best_grade는 내려가지 않고 현재 등급은 상자에서 계산', () => {
+    let x;
+    for (let s = 1; s <= 30 && gradeOf(x, D) < 3; s++) x = schedule(x, { correct: true, clueUsed: 0, session: s }, D);
+    assert.equal(x.best_grade, 3);
+    x = schedule(x, { correct: false, clueUsed: 0, session: 40 }, D);
+    assert.equal(gradeOf(x, D), 0);
+    assert.equal(x.best_grade, 3);
+  });
+});
+
+/** 하루 1세션, 항상 깨끗하게 맞히는 학습자. 0장 세션도 하루로 센다(§7 시뮬레이션과 같은 가정, D66). */
+function simulate(n, sessions, cfg = D) {
+  const deck = deckOf(n);
+  let progress = {};
+  const out = [];
+  for (let s = 1; s <= sessions; s++) {
+    const { ids, due, fresh } = buildSession(deck, progress, s, cfg, sessionSeed(1, s));
+    for (const id of ids) progress = { ...progress, [id]: schedule(progress[id], { correct: true, clueUsed: 0, session: s }, cfg) };
+    out.push({ s, count: ids.length, due, fresh, progress });
+  }
+  return out;
+}
+
+describe('§7 시뮬레이션 재현', () => {
+  test('(1) 한 카드를 늘 깨끗하게: (1,2,3) (3,3,7) (7,4,14) (14,5,26) (26,5,38), 동 3·은 7·금 14', () => {
+    let e;
+    let s = 1;
+    const seen = [];
+    const firstGrade = {};
+    for (let i = 0; i < 5; i++) {
+      e = schedule(e, { correct: true, clueUsed: 0, session: s }, D);
+      seen.push([s, e.box, e.due_session]);
+      const g = gradeOf(e, D);
+      for (let k = 1; k <= g; k++) firstGrade[k] ??= s;
+      s = e.due_session;
+    }
+    assert.deepEqual(seen, [[1, 2, 3], [3, 3, 7], [7, 4, 14], [14, 5, 26], [26, 5, 38]]);
+    assert.deepEqual(firstGrade, { 1: 3, 2: 7, 3: 14 });
   });
 
-  test('다시 풀기: 연표에서 그 카드의 공개된 자리를 빼고, 상자는 바꾸지 않으며, 다시 틀려도 또 내지 않는다', () => {
-    let s = fresh();
+  test('(2) 12장 덱: 새 카드 4·4·4, 세션 3은 8장, 모두 동 세션 5, 모두 은 9, 첫 금 14, 모두 금 16, 0장 세션 6·13·17~20', () => {
+    const r = simulate(12, 20);
+    assert.deepEqual(r.slice(0, 3).map((x) => x.fresh), [4, 4, 4]);
+    assert.equal(r[2].count, 8);
+    const firstAll = (pred) => r.find((x) => deckOf(12).every((c) => pred(x.progress[c.id])))?.s;
+    assert.equal(firstAll((e) => e?.box >= 3), 5);
+    assert.equal(firstAll((e) => e?.box >= 4), 9);
+    assert.equal(firstAll((e) => gradeOf(e, D) === 3), 16);
+    assert.equal(r.find((x) => deckOf(12).some((c) => gradeOf(x.progress[c.id], D) === 3))?.s, 14);
+    const empty = r.filter((x) => x.count === 0).map((x) => x.s);
+    for (const s of [6, 13, 17, 18, 19, 20]) assert.ok(empty.includes(s), `세션 ${s}는 0장이어야 한다(실제 0장: ${empty})`);
+  });
+});
+
+describe('§10 세션 구성(7, 9)', () => {
+  test('도래 카드 먼저(상자 낮은 순 → due 오래된 순 → 덱 순서), 새 카드 예약 2장, 새 카드 최대 S/2, 남는 자리 안 채움', () => {
+    const deck = deckOf(14);
+    const p = {};
+    const put = (id, box, due) => { p[id] = { ...newEntry(), introduced: true, box, due_session: due }; };
+    // 도래 8장(자리 6 = 8 - 예약 2), 정렬 확인용
+    put('c01', 3, 1); put('c02', 1, 4); put('c03', 2, 2); put('c04', 1, 2); put('c05', 2, 1); put('c06', 3, 3); put('c07', 1, 2); put('c08', 4, 1);
+    put('c09', 1, 99); // 도래 안 함
+    const r = buildSession(deck, p, 5, D, 1);
+    assert.equal(r.due, 6);
+    assert.equal(r.fresh, 2, '새 카드 예약 2장');
+    // 정렬된 도래 순서에서 앞 6장: 상자1(c04 due2, c07 due2, c02 due4) → 상자2(c05 due1, c03 due2) → 상자3(c01 due1)
+    assert.deepEqual([...r.ids].filter((id) => p[id]).sort(), ['c01', 'c02', 'c03', 'c04', 'c05', 'c07']);
+    assert.deepEqual([...r.ids].filter((id) => !p[id]).sort(), ['c10', 'c11']);
+  });
+
+  test('도래가 적으면 새 카드를 S/2까지, 그래도 남으면 채우지 않는다', () => {
+    const deck = deckOf(20);
+    const p = { c01: { ...newEntry(), introduced: true, box: 1, due_session: 1 } };
+    const r = buildSession(deck, p, 1, D, 1);
+    assert.deepEqual([r.due, r.fresh, r.ids.length], [1, 4, 5]);
+  });
+
+  test('도래도 새 카드도 없으면 0장(미리 복습으로 채우지 않음)', () => {
+    const deck = deckOf(3);
+    const p = Object.fromEntries(deck.map((c) => [c.id, { ...newEntry(), introduced: true, box: 3, due_session: 9 }]));
+    assert.equal(buildSession(deck, p, 2, D, 1).ids.length, 0);
+    assert.deepEqual(earlyReviewIds(deck, p, D), ['c01', 'c02', 'c03']);
+  });
+
+  test('M1 덮어쓰기: 첫 세션에 6장 모두 도입', () => {
+    const r = buildSession(deckOf(6), {}, 1, M1, 1);
+    assert.deepEqual([r.ids.length, r.fresh], [6, 6]);
+  });
+
+  test('9. 같은 시드와 상태면 같은 큐, 세션 번호가 다르면 순서가 바뀔 수 있다', () => {
+    const deck = deckOf(8);
+    const a = buildSession(deck, {}, 1, D, sessionSeed(42, 1)).ids;
+    assert.deepEqual(buildSession(deck, {}, 1, D, sessionSeed(42, 1)).ids, a);
+    const orders = new Set([1, 2, 3, 4].map((s) => buildSession(deck, {}, s, { ...D, new_min: 8, new_max_ratio: 1 }, sessionSeed(42, s)).ids.join()));
+    assert.ok(orders.size > 1);
+  });
+});
+
+/** 샘플로 학습 세션 하나. */
+function sampleSession(cfg = M1, progress = {}, session = 1) {
+  const { ids } = buildSession(SAMPLE.cards, progress, session, cfg, sessionSeed(7, session));
+  return createSessionState(session, ids, { kind: 'learn' });
+}
+const right = (st, cfg = M1) => correctGaps(sessionTimeline(st, SAMPLE.anchors, cfg), BY_ID.get(currentId(st)).order)[0];
+function wrong(st, cfg = M1, near = false) {
+  const items = sessionTimeline(st, SAMPLE.anchors, cfg);
+  const r = right(st, cfg);
+  const ks = selectableGaps(items, cfg).filter((k) => k !== r);
+  return near ? ks.find((k) => Math.abs(k - r) === 1) : ks.sort((a, b) => Math.abs(b - r) - Math.abs(a - r))[0];
+}
+
+describe('칸 판정과 인접 칸 오답', () => {
+  const items = buildTimeline(SAMPLE.anchors);
+  test('칸 = 앵커 사이, 첫 앵커 앞은 칸이 아니다', () => {
+    assert.deepEqual(selectableGaps(items, M1), [1, 2, 3, 4, 5]);
+    assert.deepEqual(correctGaps(items, 194), [1]);
+    assert.equal(slotAnchorId(items, 1), SAMPLE.anchors[0].id);
+    assert.equal(isCorrectGap(items, 2, 194), false);
+  });
+  test('인접 칸 오답은 near_miss', () => {
+    assert.equal(isNearMiss([3], 2), true);
+    assert.equal(isNearMiss([3], 4), true);
+    assert.equal(isNearMiss([3], 5), false);
+    assert.equal(isNearMiss([3], 3), false);
+  });
+  test('첫 앵커 앞 틈은 고를 수 없다(무시)', () => {
+    const st = sampleSession();
+    assert.equal(placeCurrent(st, 0, BY_ID, SAMPLE.anchors, {}, M1).result, null);
+  });
+});
+
+describe('세션 진행과 §10(8, 10, 11)', () => {
+  test('정답: 상자 갱신, 다음 카드, 단서 초기화; 놓은 카드는 칸을 나누지 않는다', () => {
+    let st = sampleSession();
+    st = revealClue(st, 2);
+    const id = currentId(st);
+    const r = placeCurrent(st, right(st), BY_ID, SAMPLE.anchors, {}, M1);
+    assert.equal(r.result.correct, true);
+    assert.equal(r.result.clueUsed, 1);
+    assert.equal(r.progress[id].box, 1, '관계 단서로 맞히면 승급 없음');
+    assert.deepEqual([r.state.index, r.state.clues], [1, 0]);
+    assert.equal(sessionTimeline(r.state, SAMPLE.anchors, M1).length, SAMPLE.anchors.length);
+  });
+
+  test('오답: 상자 1, near_miss 기록, 세션 끝에 재도전 1회; 10. 재도전은 상자·일정을 바꾸지 않는다', () => {
+    let st = sampleSession();
     let progress = {};
-    const first = currentId(s);
-    ({ state: s, progress } = placeCurrent(s, wrongGap(s), BY_ID, SAMPLE.anchors, progress, CONFIG));
-    while (!isRetry(s)) ({ state: s, progress } = placeCurrent(s, rightGap(s), BY_ID, SAMPLE.anchors, progress, CONFIG));
-    assert.equal(currentId(s), first);
-    const items = sessionTimeline(s, SAMPLE.anchors, CONFIG);
-    assert.ok(!items.some((i) => i.id === first), '답이 연표에 보이면 안 된다');
-    assert.equal(items.length, SAMPLE.anchors.length + s.base - 1);
+    const first = currentId(st);
+    let r = placeCurrent(st, wrong(st, M1, true), BY_ID, SAMPLE.anchors, progress, M1);
+    assert.equal(r.result.nearMiss, true);
+    ({ state: st, progress } = r);
+    assert.equal(st.queue.at(-1), first);
+    while (!isRetry(st)) ({ state: st, progress } = placeCurrent(st, right(st), BY_ID, SAMPLE.anchors, progress, M1));
     const before = progress[first];
-    const r = placeCurrent(s, wrongGap(s), BY_ID, SAMPLE.anchors, progress, CONFIG);
+    r = placeCurrent(st, wrong(st), BY_ID, SAMPLE.anchors, progress, M1);
     assert.equal(r.result.retry, true);
-    assert.equal(r.progress[first], before, '상자 그대로');
-    assert.equal(r.state.queue.length, s.queue.length, '다시 틀려도 또 내지 않는다');
+    assert.equal(r.progress[first], before);
     assert.equal(isSessionDone(r.state), true);
-    assert.deepEqual(sessionSummary(r.state).retried, 1);
+    assert.equal(sessionSummary(r.state).retried, 1);
   });
 
-  test('설정으로 끌 수 있다', () => {
-    const cfg = { ...CONFIG, retryWrongInSession: false };
-    const s = createSession(SAMPLE.cards, {}, 1, cfg, SEED);
-    const r = placeCurrent(s, wrongGap(s, cfg), BY_ID, SAMPLE.anchors, {}, cfg);
-    assert.equal(r.state.queue.length, s.queue.length);
+  test('8. 미리 복습과 오답 노트 다시 풀기는 상태를 바꾸지 않는다', () => {
+    const progress = { [SAMPLE.cards[0].id]: { ...newEntry(), introduced: true, box: 2, due_session: 9, lapses: 1 } };
+    for (const kind of ['early', 'note']) {
+      let st = createSessionState(3, [SAMPLE.cards[0].id], { kind });
+      const r = placeCurrent(st, wrong(st), BY_ID, SAMPLE.anchors, progress, M1);
+      assert.equal(r.progress, progress);
+      assert.equal(r.result.practice, true);
+      assert.equal(r.state.queue.length, 1, '연습은 재도전도 없다');
+      st = r.state;
+      assert.equal(completedAfter(4, st, M1), 4, '연습은 세션으로 세지 않는다');
+    }
   });
 
-  test('다시 풀기 중 저장·복원, 옛 저장(base 없음)도 복원', () => {
-    let s = fresh();
-    ({ state: s } = placeCurrent(s, wrongGap(s), BY_ID, SAMPLE.anchors, {}, CONFIG));
-    while (!isRetry(s)) ({ state: s } = placeCurrent(s, rightGap(s), BY_ID, SAMPLE.anchors, {}, CONFIG));
-    const back = restoreSession(JSON.parse(JSON.stringify(s)), SAMPLE.cards);
-    assert.deepEqual(JSON.parse(JSON.stringify(back)), JSON.parse(JSON.stringify(s)));
-    const bad = JSON.parse(JSON.stringify(s));
-    bad.queue[bad.queue.length - 1] = bad.queue[1]; // 맞힌 카드를 다시 풀기에 넣은 저장
-    assert.equal(restoreSession(bad, SAMPLE.cards), null);
-    const old = JSON.parse(JSON.stringify(fresh()));
-    delete old.base; delete old.retryResults;
-    assert.equal(restoreSession(old, SAMPLE.cards).base, old.queue.length);
+  test('11. 한 장이라도 인출하면 completed_sessions +1, 0장이면 그대로', () => {
+    const st = sampleSession();
+    assert.equal(completedAfter(0, st, M1), 0);
+    const r = placeCurrent(st, right(st), BY_ID, SAMPLE.anchors, {}, M1);
+    assert.equal(attemptsOf(r.state), 1);
+    assert.equal(completedAfter(0, r.state, M1), 1);
+  });
+
+  test('오답 노트: lapses ≥ 1이고 box ≤ 2', () => {
+    const p = {
+      a: { ...newEntry(), introduced: true, box: 1, lapses: 1 },
+      b: { ...newEntry(), introduced: true, box: 3, lapses: 2 },
+      c: { ...newEntry(), introduced: true, box: 2, lapses: 0 },
+    };
+    assert.deepEqual(wrongNoteIds([{ id: 'a' }, { id: 'b' }, { id: 'c' }], p), ['a']);
+  });
+
+  test('등급 집계(현재 등급)', () => {
+    const p = { [SAMPLE.cards[0].id]: { ...newEntry(), introduced: true, box: 3 } };
+    assert.deepEqual(gradeCounts(SAMPLE.cards, p, M1), { unseen: SAMPLE.cards.length - 1, none: 0, bronze: 1, silver: 0, gold: 0 });
+  });
+});
+
+describe('인출 로그(m1-plan §11 규격)', () => {
+  test('필드와 값', () => {
+    const st = sampleSession();
+    const r = placeCurrent(st, wrong(st, M1, true), BY_ID, SAMPLE.anchors, {}, M1).result;
+    const line = logLine({ ts: 123, participant: 'P1', result: r, session: 1, msOnCard: 4567 });
+    assert.deepEqual(Object.keys(line), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
+    assert.deepEqual([line.phase, line.arm, line.correct, line.near_miss, line.box_before, line.box_after, line.relearn], ['learn', 'A', false, true, null, 1, false]);
+    assert.ok(SAMPLE.anchors.some((a) => a.id === line.slot_chosen));
+  });
+  test('연습 줄에는 practice: true', () => {
+    const st = createSessionState(1, [SAMPLE.cards[0].id], { kind: 'early' });
+    const r = placeCurrent(st, right(st), BY_ID, SAMPLE.anchors, {}, M1).result;
+    assert.equal(logLine({ ts: 1, participant: '-', result: r, session: 1, msOnCard: 0 }).practice, true);
   });
 });
 
 describe('저장과 복원', () => {
-  test('세션 왕복', () => {
-    let s = fresh();
-    s = placeCurrent(s, rightGap(s), BY_ID, SAMPLE.anchors, {}, CONFIG).state;
-    s = revealClue(s, 2);
-    const back = restoreSession(JSON.parse(JSON.stringify(s)), SAMPLE.cards);
-    assert.deepEqual(JSON.parse(JSON.stringify(back)), JSON.parse(JSON.stringify(s)));
+  test('세션 왕복(재도전 포함)', () => {
+    let st = sampleSession();
+    ({ state: st } = placeCurrent(st, wrong(st), BY_ID, SAMPLE.anchors, {}, M1));
+    st = revealClue(st, 2);
+    assert.deepEqual(JSON.parse(JSON.stringify(restoreSession(JSON.parse(JSON.stringify(st)), SAMPLE.cards))), JSON.parse(JSON.stringify(st)));
   });
-  test('깨진 세션과 없는 카드는 버린다', () => {
-    const s = JSON.parse(JSON.stringify(fresh()));
-    assert.equal(restoreSession({ ...s, queue: ['ghost'] }, SAMPLE.cards), null);
-    assert.equal(restoreSession({ ...s, index: 2 }, SAMPLE.cards), null);
-    assert.equal(restoreSession(null, SAMPLE.cards), null);
+  test('깨진 세션, 없는 카드, 잘못된 상자는 버린다', () => {
+    const st = JSON.parse(JSON.stringify(sampleSession()));
+    assert.equal(restoreSession({ ...st, queue: ['ghost'] }, SAMPLE.cards), null);
+    assert.equal(restoreSession({ ...st, index: 2 }, SAMPLE.cards), null);
+    const p = restoreProgress({ [SAMPLE.cards[0].id]: { box: 2, due_session: 3 }, ghost: { box: 2, due_session: 3 }, [SAMPLE.cards[1].id]: { box: 9, due_session: 1 } }, SAMPLE.cards, M1);
+    assert.deepEqual(Object.keys(p), [SAMPLE.cards[0].id]);
+    assert.equal(p[SAMPLE.cards[0].id].lapses, 0, '빠진 필드는 기본값');
   });
-  test('학습 기록: 없는 id와 잘못된 상자 제거', () => {
-    const p = restoreProgress({ 'gg-c-ansi': { box: 2, due: 3 }, ghost: { box: 2, due: 3 }, 'gg-c-taehak': { box: 9, due: 1 } }, SAMPLE.cards, CONFIG);
-    assert.deepEqual(Object.keys(p), ['gg-c-ansi']);
-  });
-  test('데이터 식별자: 연도(order)가 바뀌면 달라진다', () => {
-    const a = dataFingerprint('x', SAMPLE);
+  test('데이터 식별자는 연도가 바뀌면 달라진다', () => {
     const b = structuredClone(SAMPLE);
     b.cards[0].order += 1;
-    assert.notEqual(a, dataFingerprint('x', b));
-    assert.equal(a, dataFingerprint('x', structuredClone(SAMPLE)));
+    assert.notEqual(dataFingerprint('x', SAMPLE), dataFingerprint('x', b));
   });
 });
 
-describe('데이터 로더(js/data.js)', async () => {
-  const { normalizeDeck, formatOf, loadRaw } = await import('../js/data.js');
-  const REAL_PATH = path.join(here, '..', '..', '..', 'assets', 'data', 'cards', 'v2-draft', 'goguryeo-m1.json');
-  const { existsSync } = await import('node:fs');
-  const raw = existsSync(REAL_PATH) ? JSON.parse(readFileSync(REAL_PATH, 'utf8')) : null;
+describe('데이터 로더(js/data.js)', () => {
+  const draft = existsSync(DRAFT_PATH) ? JSON.parse(readFileSync(DRAFT_PATH, 'utf8')) : null;
 
-  test('샘플은 그대로, 알 수 없는 형식은 오류', () => {
+  test('샘플: 왕 단위 앵커, 검증 통과', () => {
     assert.equal(formatOf(SAMPLE), 'm1-draft');
-    assert.equal(normalizeDeck(SAMPLE).deck, SAMPLE);
-    assert.deepEqual(normalizeDeck({ foo: 1 }).errors, ['알 수 없는 데이터 형식']);
+    assert.deepEqual(validateDeck(SAMPLE), []);
+    assert.ok(SAMPLE.anchors.every((a) => a.reign && a.reign_range));
   });
 
-  test('콘텐츠 초안: 변환 후 검증 오류 없음, 앵커·카드 수가 원본과 같음, 앞면은 사료 지문', { skip: !raw && '초안 없음' }, () => {
-    const n = normalizeDeck(raw);
+  test('임시 형식 초안: 변환·검증 통과, 모든 앵커에 재위 기간, 모든 카드가 timeline 칸에서 정답', { skip: !draft && '초안 없음' }, () => {
+    const n = normalizeDeck(draft);
     assert.equal(n.format, 'v2-draft-content');
     assert.deepEqual(n.errors, []);
     assert.deepEqual(validateDeck(n.deck), []);
-    assert.equal(n.deck.anchors.length, raw.anchors.length);
-    assert.equal(n.deck.cards.length, raw.cards.length);
-    assert.ok(raw.anchors.length <= 10, '기준 카드는 최대 10장(D63)');
-    assert.equal(n.deck.cards[0].source_text, raw.cards[0].front);
-  });
-
-  test('콘텐츠 초안: 모든 카드가 timeline.after/before가 가리키는 기준 카드 사이에서 정답', { skip: !raw && '초안 없음' }, () => {
-    const { deck } = normalizeDeck(raw);
-    const t = buildTimeline(deck.anchors);
-    for (const c of raw.cards) {
-      const k = correctGaps(t, deck.cards.find((x) => x.id === c.id).order);
+    assert.ok(n.deck.anchors.every((a) => a.reign_range), '앵커 reign_range가 데이터에 있어야 한다(reigns.json 삭제, D66)');
+    const t = buildTimeline(n.deck.anchors);
+    for (const c of draft.cards) {
+      const k = correctGaps(t, n.deck.cards.find((x) => x.id === c.id).order);
       assert.equal(k.length, 1, c.id);
-      const before = k[0] > 0 ? t[k[0] - 1].id : null;
-      const after = k[0] < t.length ? t[k[0]].id : null;
-      assert.equal(before, c.timeline.after ?? null, `${c.id} 앞`);
-      assert.equal(after, c.timeline.before ?? null, `${c.id} 뒤`);
+      assert.equal(t[k[0] - 1]?.id ?? null, c.timeline.after ?? null, `${c.id} 앞`);
+      assert.equal(t[k[0]]?.id ?? null, c.timeline.before ?? null, `${c.id} 뒤`);
     }
   });
 
-  test('같은 해 기준 카드와의 순서는 timeline으로, 모순이면 오류', () => {
-    const base = { _format: 'v2-draft-content x', nation: 'goguryeo',
-      anchors: [{ id: 'a1', title: 'A1', year: 100, year_label: '100년' }, { id: 'a2', title: 'A2', year: 200, year_label: '200년' }],
-      cards: [{ id: 'c1', title: 'C1', year: 200, year_label: '200년', front: '지문', clues: [], timeline: { after: 'a1', before: 'a2' } }] };
-    assert.equal(normalizeDeck(base).deck.cards[0].order, 199.5);
-    const bad = structuredClone(base);
-    bad.cards[0].year = 300;
-    assert.match(normalizeDeck(bad).errors.join(), /먼저가 아니다/);
+  test('스키마 v2(명세 예시 모양): 앵커 재위, 사료 카드 앞면·단서 refs·정답 칸, disputed 제외', () => {
+    const anchor = (id, title, order, start, end) => ({ id, kind: 'anchor', nation: 'goguryeo', title, order, reign: { start, end, basis: 'chronicle' }, summary: `${title}.`, source_ref: { work: '삼국사기', section: '고구려본기', entry: `${title}조` }, verification: { verified: false } });
+    const raw = {
+      schema: 2,
+      cards: [
+        anchor('goguryeo-reign-jangsu', '장수왕', 2, 413, 491),
+        anchor('goguryeo-reign-sosurim', '소수림왕', 1, 371, 384),
+        {
+          id: 'goguryeo-src-07', kind: 'source', nation: 'goguryeo', title: '평양 천도', year: 427, year_basis: 'chronicle', reign_label: '장수왕 15년',
+          source_text: '왕이 도읍을 옮겼다.', text_basis: 'own_paraphrase_from_original',
+          clues: [{ level: 1, kind: 'relation', relations: [{ op: 'after', ref: 'goguryeo-reign-jangsu' }], text: '[장수왕]이 즉위한 뒤의 일이다.' }, { level: 2, kind: 'direct', text: '427년.' }],
+          answer: { after: 'goguryeo-reign-jangsu', before: null }, explanation: '장수왕 15년(427).', exam_tags: ['institution', 'war'], disputed: false,
+          source_ref: { work: '삼국사기', section: '고구려본기', volume: '권18', entry: '장수왕 15년조' }, verification: { verified: false },
+        },
+        { id: 'goguryeo-src-99', kind: 'source', nation: 'goguryeo', title: '갈리는 카드', year: 380, disputed: true, answer: { after: 'goguryeo-reign-sosurim', before: 'goguryeo-reign-jangsu' }, clues: [] },
+      ],
+    };
+    const n = normalizeDeck(raw);
+    assert.equal(n.format, 'v2');
+    assert.deepEqual(n.errors, []);
+    assert.deepEqual(validateDeck(n.deck), []);
+    assert.deepEqual(n.deck.anchors.map((a) => [a.title, a.order, a.reign_range]), [['소수림왕', 371, '371~384'], ['장수왕', 413, '413~491']]);
+    assert.equal(n.deck.cards.length, 1, 'disputed 카드는 판정에서 뺀다');
+    const c = n.deck.cards[0];
+    assert.deepEqual([c.source_text, c.clues[0].refs[0], c.reign, c.exam_note], ['왕이 도읍을 옮겼다.', 'goguryeo-reign-jangsu', '장수왕 15년', '제도·정치 · 전쟁·대외']);
+    assert.match(c.source.name, /권18/);
+    assert.deepEqual(correctGaps(buildTimeline(n.deck.anchors), c.order), [2]);
+    // 정답 칸 밖 연도는 오류
+    raw.cards[2].year = 400;
+    assert.match(normalizeDeck(raw).errors.join(), /이후가 아니다/);
   });
 
-  test('loadRaw: 앞 경로가 없으면 다음 경로', async () => {
-    const r = await loadRaw(['a', 'b'], async (u) => ({ ok: u === 'b', status: 404, json: async () => ({ x: 1 }) }));
+  test('스키마 v2 파일이 생기면 변환·검증 통과', { skip: !existsSync(V2_PATH) && 'v2 파일 아직 없음' }, () => {
+    const n = normalizeDeck(JSON.parse(readFileSync(V2_PATH, 'utf8')));
+    assert.deepEqual(n.errors, []);
+    assert.deepEqual(validateDeck(n.deck), []);
+  });
+
+  test('연도 표기, loadRaw', async () => {
+    assert.equal(yearText(-37), '기원전 37년');
+    const r = await loadRaw(['a', 'b'], async (u) => ({ ok: u === 'b', status: 404, json: async () => ({}) }));
     assert.equal(r.url, 'b');
   });
 });

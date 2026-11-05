@@ -18,12 +18,13 @@ export const PROTO_ROOT = path.resolve(here, '..');
 export const REPO_ROOT = path.resolve(here, '..', '..', '..');
 export const SAMPLE = JSON.parse(readFileSync(path.join(PROTO_ROOT, 'data', 'sample.json'), 'utf8'));
 export const BY_ID = new Map([...SAMPLE.cards, ...SAMPLE.anchors].map((c) => [c.id, c]));
-const REAL_PATH = path.join(REPO_ROOT, 'assets', 'data', 'cards', 'v2-draft', 'goguryeo-m1.json');
+// 실제 데이터: 스키마 v2가 있으면 그것, 없으면 임시 형식 초안(설정의 dataUrls 순서와 같다).
+const V2_PATH = path.join(REPO_ROOT, 'assets', 'data', 'cards', 'v2', 'goguryeo-m1.json');
+const DRAFT_PATH = path.join(REPO_ROOT, 'assets', 'data', 'cards', 'v2-draft', 'goguryeo-m1.json');
+export const REAL_PATH = existsSync(V2_PATH) ? V2_PATH : DRAFT_PATH;
 /** 콘텐츠 세션의 실제 고구려 초안(정규화 후). 없으면 null. */
-/** 재위 표시용 표(data/reigns.json). */
-export const REIGNS = JSON.parse(readFileSync(path.join(PROTO_ROOT, 'data', 'reigns.json'), 'utf8'));
-export const REAL = existsSync(REAL_PATH) ? normalizeDeck(JSON.parse(readFileSync(REAL_PATH, 'utf8')), REIGNS).deck : null;
-/** 연표 기준 카드 줄의 기대 표시(재위 기간, 없으면 즉위 연도) — 데이터에서 계산한다. */
+export const REAL = existsSync(REAL_PATH) ? normalizeDeck(JSON.parse(readFileSync(REAL_PATH, 'utf8'))).deck : null;
+/** 연표 기준 카드 줄의 기대 표시(앵커의 재위 기간, 없으면 즉위 연도) — 데이터에서 계산한다. */
 export function expectedAnchorYears(deck) {
   return [...deck.anchors].sort((a, b) => a.order - b.order).map((a) => a.reign_range ?? a.year_label.split('(')[0].trim());
 }
@@ -57,9 +58,10 @@ export async function startServer() {
 }
 
 /** data: 'data/sample.json'(기본) 또는 null(설정의 기본 경로 = 실제 초안). */
-export async function openProto(page, base, { seed = 7, data = 'data/sample.json' } = {}) {
+export async function openProto(page, base, { seed = 7, data = 'data/sample.json', participant = null } = {}) {
   const q = new URLSearchParams({ seed: String(seed) });
   if (data) q.set('data', data);
+  if (participant) q.set('participant', participant);
   await page.goto(`${base}/prototypes/m1-timeline/index.html?${q}`);
   await page.waitForSelector('body[data-ready="true"]');
 }
@@ -69,13 +71,14 @@ export async function currentCard(page, byId = BY_ID) {
   return id ? byId.get(id) : null;
 }
 
-/** 화면의 연표(기준 + 놓인 카드)를 읽어 맞는 틈과 틀린 틈을 계산한다. */
-export async function gapsFor(page, card) {
-  const items = await page.locator('#timeline .row').evaluateAll((rows) => rows.map((r) => ({ id: r.dataset.id, order: Number(r.dataset.order) })));
+/** 화면의 연표 앵커를 읽어 맞는 칸과 틀린 칸(가장 먼 칸, near면 한 칸 차이)을 계산한다. 칸 k = 앵커 k 이후. */
+export async function gapsFor(page, card, { near = false } = {}) {
+  const items = await page.locator('#timeline .row-anchor').evaluateAll((rows) => rows.map((r) => ({ id: r.dataset.id, order: Number(r.dataset.order), kind: 'anchor' })));
   const t = buildTimeline([], []).concat(items);
   const right = correctGaps(t, card.order)[0];
-  let wrong = null;
-  for (let k = 0; k <= t.length; k++) if (!isCorrectGap(t, k, card.order)) { wrong = k; break; }
+  const ks = await page.locator('#timeline .gap').evaluateAll((g) => g.map((x) => Number(x.dataset.gap)));
+  const others = ks.filter((k) => !isCorrectGap(t, k, card.order));
+  const wrong = near ? others.find((k) => Math.abs(k - right) === 1) : others.sort((a, b) => Math.abs(b - right) - Math.abs(a - right))[0];
   return { right, wrong };
 }
 
@@ -90,4 +93,15 @@ export async function pressGap(page, k, mobile) {
     await g.click();
   }
   await page.waitForSelector('#result');
+}
+
+/** 저장소 내용을 바꾸고 다시 연다(빈 세션 등 상태 만들기). fn(save) → save. */
+export async function editSave(page, fn) {
+  await page.evaluate((src) => {
+    const k = 'hanyang-m1:save:v2';
+    const s = JSON.parse(localStorage.getItem(k));
+    localStorage.setItem(k, JSON.stringify((0, eval)(src)(s)));
+  }, `(${fn.toString()})`);
+  await page.reload();
+  await page.waitForSelector('body[data-ready="true"]');
 }

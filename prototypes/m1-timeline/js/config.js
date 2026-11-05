@@ -1,35 +1,43 @@
 // PROTOTYPE - NOT FOR PRODUCTION (M1, decision-log D56)
 /**
  * M1 프로토타입 설정. 데이터 경로와 학습 수치는 여기 한 곳에서 바꾼다.
- * design/leitner-spec.md가 오면 이 값을 그 명세에 맞춘다(지금은 보수적 초기값, decision-log D59).
+ * 학습 수치는 `design/leitner-spec.md` §8(기본값)에 M1 덮어쓰기(`production/playtest/m1-plan.md`)를 얹는다(D66).
  */
+
+/** leitner-spec §8 기본값(본 구현의 assets/data/config/leitner.json 예시와 같은 키). */
+export const LEITNER_DEFAULT = Object.freeze({
+  boxes: 5,
+  intervals: Object.freeze([1, 2, 4, 7, 12]),
+  session_size: 8, session_size_min: 5, session_size_max: 10,
+  new_min: 2, new_max_ratio: 0.5,
+  pad_with_early_review: false,
+  relearn_in_session: true,
+  clue_rules: Object.freeze({ relation: 'hold', direct: 'demote_1' }),
+  wrong_box: 1,
+  grades: Object.freeze({ bronze: 3, silver: 4, gold: 5 }),
+  count_session_min_answers: 1,
+});
+
+/** M1 덮어쓰기: 세션 크기 6, 첫 세션에 6장 모두 도입(leitner-spec §8, m1-plan §11). */
+export const M1_OVERRIDE = Object.freeze({ session_size: 6, new_min: 6 });
+
 export const CONFIG = Object.freeze({
   /** 앞에서부터 처음 읽히는 파일을 쓴다. `?data=경로`로 덮어쓸 수 있다. 경로는 index.html 기준. */
   dataUrls: Object.freeze([
-    '../../assets/data/cards/v2-draft/goguryeo-m1.json', // 콘텐츠 세션 초안(D58). 형식 변환은 js/data.js
+    '../../assets/data/cards/v2/goguryeo-m1.json',       // 스키마 v2(콘텐츠가 옮기면 여기)
+    '../../assets/data/cards/v2-draft/goguryeo-m1.json', // 임시 형식(D58). 형식 변환은 js/data.js
     'data/sample.json',
   ]),
-  /** 기준 카드(왕) 재위 기간 표시용 표. 없으면 즉위 연도만 보인다. */
-  reignsUrl: 'data/reigns.json',
-  /** 한 세션의 카드 수(짧은 세션). 카드가 더 적으면 있는 만큼. */
-  sessionSize: 8,
-  /** Leitner 상자 수. 1이 가장 자주, 마지막이 가장 드물게 나온다. */
-  boxCount: 5,
-  /** 상자별 재출제 간격(세션 수). index = 상자 번호. 상자 b에서 세션 s에 답했으면 s + intervals[b] 세션부터 다시 나온다. */
-  intervals: Object.freeze([0, 1, 2, 4, 8, 16]),
-  /** 정답일 때 승급 폭. index = 이번 카드에서 연 단서 수. 단서를 볼수록 덜 오른다(단서 비용). */
-  promoteByClues: Object.freeze([2, 1, 0]),
-  /** 오답이면 이 상자로 내려간다. */
-  wrongBox: 1,
-  /** 처음 보는 카드의 출발 상자(승급은 여기서 계산). */
-  startBox: 1,
-  /** 숙련 도감 등급: 상자 번호 하한. */
-  mastery: Object.freeze({ bronze: 2, silver: 4, gold: 5 }),
-  /** true면 이번 세션에 놓은 카드도 연표에 들어가 이후 틈이 잘게 나뉜다(Timeline 방식). */
-  placedJoinTimeline: true,
-  /** true면 세션 안에서 틀린 카드를 세션 끝에 한 번 더 낸다(인출 연습). 상자는 바꾸지 않는다(D61). */
-  retryWrongInSession: true,
+  leitner: Object.freeze({
+    ...LEITNER_DEFAULT,
+    ...M1_OVERRIDE,
+    /** 칸 = 앵커 사이(스키마 v2). 첫 앵커 앞은 칸이 아니다. */
+    slotBeforeFirst: false,
+    /** false: 놓은 카드가 칸을 나누지 않는다(칸 = 왕대, m1-plan "앵커 10개와 칸 10개"). D59의 true에서 바꿈(D66). */
+    placedJoinTimeline: false,
+  }),
   /** 틈을 누른 뒤 "이 자리에 꽂기" 확인을 받을지: 'coarse'(터치 화면만), 'always', 'never'. `?confirm=1|0`으로 덮어쓴다. */
   confirmPlacement: 'coarse',
-  storageKey: 'hanyang-m1:save:v1',
+  /** 저장 형식이 leitner-spec §2로 바뀌어 키를 올렸다(이전 저장은 읽지 않는다). */
+  storageKey: 'hanyang-m1:save:v2',
 });
