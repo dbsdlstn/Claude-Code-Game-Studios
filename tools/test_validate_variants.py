@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Mutation tests for the passage-variant rules V16-V21 (design/card-variants-spec.md §8.7-8).
+"""Mutation tests for the passage-variant rules V16-V21 (design/card-variants-spec.md §8.7-8)
+and the 삼국사기 volume range rule V13a (D154).
 
 Usage: python3 tools/test_validate_variants.py   (stdlib unittest, no file writes)
 """
@@ -92,6 +93,25 @@ class VariantRules(unittest.TestCase):
         h = v.content_hash(card)
         card["variants"][0]["text"] += " 덧붙인 문장."
         self.assertEqual(v.content_hash(card), h)
+
+
+class VolumeRange(unittest.TestCase):
+    """V13a (D154): 삼국사기 권 number must fit the section."""
+
+    def check(self, cid, vol):
+        cards = copy.deepcopy(BASE)
+        next(c for c in cards if c["id"] == cid)["source_ref"]["volume"] = vol
+        return codes(v.validate(cards)[0])
+
+    def test_baekje_bongi_section_number_is_error(self):
+        self.assertIn("V13a", self.check("baekje-src-25", 3))
+
+    def test_goguryeo_and_silla_out_of_range_is_error(self):
+        self.assertIn("V13a", self.check("goguryeo-src-09", 5))
+        self.assertIn("V13a", self.check("silla-src-04", 13))
+
+    def test_in_range_volume_passes(self):
+        self.assertNotIn("V13a", self.check("baekje-src-25", 25))
 
 
 if __name__ == "__main__":

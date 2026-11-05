@@ -724,7 +724,23 @@
         "신라",
         "S-B1"
       ],
-      "event_key": "503-silla-name-and-title"
+      "event_key": "503-silla-name-and-title",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "result",
+          "text": "임금의 칭호를 이웃 나라들과 같게 바꾸고 나라 이름을 하나로 정하였다. 바로 전 해에는 임금이 죽을 때 사람을 함께 묻던 풍습을 금하였다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
+      ]
     },
     {
       "id": "silla-src-05",
@@ -796,7 +812,23 @@
         "신라",
         "S-B1"
       ],
-      "event_key": "520-silla-yullyeong"
+      "event_key": "520-silla-yullyeong",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "result",
+          "text": "관리의 옷 색을 등급마다 정하고 나라의 법을 처음 반포하여, 왕을 중심으로 나라를 다스리는 틀을 세웠다. 앞서 군사를 맡는 관청도 두었다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
+      ]
     },
     {
       "id": "silla-src-06",
@@ -873,7 +905,23 @@
         "신라",
         "S-B1"
       ],
-      "event_key": "528-silla-buddhism"
+      "event_key": "528-silla-buddhism",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "actor",
+          "text": "왕이 새 종교를 일으키려 하였으나 신하들이 반대하였다. 한 젊은 신하가 목숨을 걸고 나섰고, 그가 죽을 때 기이한 일이 일어나자 더는 반대하는 사람이 없었다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
+      ]
     },
     {
       "id": "silla-src-07",
@@ -946,7 +994,23 @@
         "S-B1",
         "가야"
       ],
-      "event_key": "532-geumgwan-annex"
+      "event_key": "532-geumgwan-annex",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "actor",
+          "text": "가야의 한 나라 마지막 왕이 가족과 보물을 이끌고 와서 항복하였다. 그의 아들은 뒷날 이 나라의 장수가 되었고, 그 후손 가운데 삼국 통일의 명장이 나왔다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
+      ]
     },
     {
       "id": "silla-src-08",
@@ -1018,7 +1082,23 @@
         "신라",
         "S-B1"
       ],
-      "event_key": "553-sinju"
+      "event_key": "553-sinju",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "result",
+          "text": "동맹을 맺었던 서쪽 이웃 나라가 되찾은 큰 강 하류를 이 나라가 차지해 새 주로 삼았다. 이 일로 두 나라의 동맹이 깨지고 이듬해 큰 싸움이 벌어졌다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
+      ]
     },
     {
       "id": "silla-src-09",

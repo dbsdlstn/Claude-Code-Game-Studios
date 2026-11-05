@@ -579,7 +579,23 @@
         "S-B2",
         "가야"
       ],
-      "event_key": "562-daegaya-conquest"
+      "event_key": "562-daegaya-conquest",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "result",
+          "text": "장군이 이끈 군대가 가야에 마지막까지 남아 있던 큰 나라를 무너뜨렸다. 이로써 가야의 여러 나라가 모두 이 나라에 들어왔다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
+      ]
     },
     {
       "id": "silla-src-21",
