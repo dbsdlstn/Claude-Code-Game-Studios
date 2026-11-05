@@ -54,19 +54,25 @@ export const CONFIG = Object.freeze({
   /** 타이틀의 "약 k분"(D93·D102): 카드 한 장에 드는 시간 추정(초). M1 관찰 전 임시값. */
   secondsPerCard: 40,
   /**
-   * 보상(M2 골격, D79-3·D82). design/rewards-spec.md가 오기 전의 임시 수치. 원칙: 학습 신호와 같은 방향
-   * (단서 없는 정답 > 단서 정답 > 오답 = 0), 승급·등급에 큰 보상, 재도전·연습·세션 길이로는 보상 없음, 연속일이 끊겨도 벌 없음.
-   * 테스트 모드(`?study=1`)에서는 끈다.
+   * 보상 기본값 = design/rewards-spec.md §9(D120, D103). 원칙: 학습 신호와 같은 방향, 승급·등급에 큰 보상,
+   * 인출 XP·하루 목표는 하루 2세션까지, 세션 완료 보너스 없음, 연속일이 끊겨도 벌 없음(휴식권). 테스트 모드(`?study=1`)에서는 끈다.
    */
   rewards: Object.freeze({
     enabled: true,
-    xp: Object.freeze({ clean: 10, clue_relation: 5, clue_direct: 3, wrong: 0, box_up: 5, grade_up: Object.freeze([0, 20, 40, 80]), session_done: 10, daily_goal: 20 }),
-    /** 레벨 n → n+1에 필요한 XP = base + step × (n − 1). */
-    level: Object.freeze({ base: 100, step: 50 }),
+    xp: Object.freeze({ clean: 10, clue_relation: 5, clue_direct: 3, wrong: 0, box_up: 5, grade_up: Object.freeze([0, 20, 40, 80]), daily_goal: 20 }),
+    xp_sessions_per_day: 2,
+    level: Object.freeze({ base: 25, step: 30 }),
     daily_goal_sessions: 1,
-    /** 업적 기준값(이름과 판정은 js/rewards.js). */
-    achievements: Object.freeze({ sessions: 1, streak: 7, bronze: 1, silver: 1, gold: 1, level: 5 }),
+    goal_min_cards: 3,
+    streak: Object.freeze({ rest_pass_every: 7, rest_pass_max: 2, day_rollover_hour: 3 }),
+    titles: Object.freeze([[1, '입문자'], [5, '서당 학동'], [10, '향교 유생'], [15, '성균관 유생'], [20, '진사'], [30, '급제자'], [40, '대제학']]),
+    /** 하루 권장 상한(§14, D94): 넘으면 안내만 한다. */
+    daily_session_soft_cap: 3,
   }),
+  /** 보상 수치 파일(rewards-spec §9). 있으면 위 기본값을 덮어쓴다. */
+  rewardsUrls: Object.freeze(['../../assets/data/config/rewards.json']),
+  /** 보상 저장 키(rewards-spec §8·§10: 학습 저장과 분리). */
+  rewardsKey: 'hanyang-m1:rewards:v1',
   /** 처음 실행 안내(D74-5): 일반 학습 모드에서 한 번, 건너뛰기 가능. 테스트 모드는 진행자 대본이 대신한다. `?intro=0|1`로 강제. */
   introKey: 'hanyang-m1:intro:v1',
   /** 사람 테스트 모드(`?study=1`, m1-plan §4·§5·§11, D72). 참가자마다 저장 키가 따로다. */

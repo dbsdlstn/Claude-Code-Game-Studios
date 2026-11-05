@@ -1,112 +1,243 @@
-// PROTOTYPE - NOT FOR PRODUCTION (M2, decision-log D82)
+// PROTOTYPE - NOT FOR PRODUCTION (M2, decision-log D82 → D103)
 /**
- * 보상 골격: XP·레벨·연속 학습일·하루 목표·업적. 순수 함수(시간은 인자로). 수치는 config.rewards.
- * 원칙(D79-3): 보상은 학습 신호와 같은 방향. 단서 없는 정답 > 단서 정답 > 오답(0). 승급과 숙련 등급 상승에 큰 보상.
- * 재도전·연습은 0, 세션 길이로 주는 보상 없음(세션 완료 보너스는 장수와 무관한 고정값), 연속일이 끊겨도 벌 없음.
+ * 보상: XP·레벨·칭호·연속 학습일(휴식권)·하루 목표·업적. `design/rewards-spec.md`(D120) 구현.
+ * 순수 함수(날짜는 인자). 보상은 **읽기 전용**(§8): 상자·일정·재학습 표시를 쓰지 않는다. 테스트 모드에서는 부르지 않는다.
+ * 수치는 assets/data/config/rewards.json(§9), 없으면 config.js의 기본값.
  */
 
+/* ------------------------------------------------------------------ 저장(§10) */
+
 export function newRewards() {
-  return { xp: 0, sessions_done: 0, streak: { current: 0, best: 0, last_day: null }, daily: { day: null, sessions: 0, goal_met: false }, achievements: {} };
+  return {
+    format: 'hanyang-dogam-rewards', version: 1,
+    xp: 0, level: 1, sessions_done: 0, streak: 0, best_streak: 0, rest_passes: 0,
+    last_goal_date: null, goal_days_total: 0,
+    achievements: {}, title: null, title_pinned: null,
+    /** 그날의 세션 수와 목표(§1.3 하루 2세션 상한, §3.2). */
+    day: { key: null, sessions: 0, goal_met: false },
+    /** 정산한 세션 id(멱등, 최근 것만). */
+    settled: [],
+  };
 }
 
-/** 저장된 보상을 읽는다(모양이 틀리면 새로). */
+/** 저장된 보상을 읽는다. 골격(D82) 모양도 옮긴다. 모양이 틀린 값은 기본값. */
 export function restoreRewards(saved) {
   const r = newRewards();
   if (!saved || typeof saved !== 'object') return r;
-  if (Number.isFinite(saved.xp) && saved.xp >= 0) r.xp = Math.floor(saved.xp);
-  if (Number.isInteger(saved.sessions_done) && saved.sessions_done >= 0) r.sessions_done = saved.sessions_done;
-  if (saved.streak && typeof saved.streak === 'object') r.streak = { ...r.streak, ...saved.streak };
-  if (saved.daily && typeof saved.daily === 'object') r.daily = { ...r.daily, ...saved.daily };
-  if (saved.achievements && typeof saved.achievements === 'object') r.achievements = { ...saved.achievements };
+  const num = (v, d = 0) => (Number.isFinite(v) && v >= 0 ? Math.floor(v) : d);
+  r.xp = num(saved.xp);
+  r.sessions_done = num(saved.sessions_done);
+  if (saved.format === 'hanyang-dogam-rewards') {
+    r.streak = num(saved.streak); r.best_streak = num(saved.best_streak); r.rest_passes = num(saved.rest_passes);
+    r.last_goal_date = typeof saved.last_goal_date === 'string' ? saved.last_goal_date : null;
+    r.goal_days_total = num(saved.goal_days_total);
+    r.title_pinned = typeof saved.title_pinned === 'string' ? saved.title_pinned : null;
+    if (saved.day && typeof saved.day === 'object') r.day = { key: saved.day.key ?? null, sessions: num(saved.day.sessions), goal_met: !!saved.day.goal_met };
+    if (Array.isArray(saved.settled)) r.settled = saved.settled.filter((x) => typeof x === 'string').slice(-50);
+  } else if (saved.streak && typeof saved.streak === 'object') {
+    // 골격(D82): { streak: {current, best, last_day}, daily, achievements: {first_session…} }
+    r.streak = num(saved.streak.current); r.best_streak = num(saved.streak.best);
+    r.last_goal_date = typeof saved.streak.last_day === 'string' ? saved.streak.last_day : null;
+  }
+  if (saved.achievements && typeof saved.achievements === 'object') {
+    const legacy = { first_session: 'first-step', first_bronze: 'first-bronze', first_silver: 'first-silver', first_gold: 'first-gold', streak_7: 'streak-7' };
+    for (const [k, v] of Object.entries(saved.achievements)) if (typeof v === 'string') r.achievements[legacy[k] ?? k] = v.slice(0, 10);
+  }
   return r;
 }
 
-/** 지역 날짜 YYYY-MM-DD. */
-export function dayKey(date) {
+/* ------------------------------------------------------------------ 날짜(§3.1) */
+
+/** 하루 = 기기 달력 날짜, 오전 rolloverHour시에 바뀐다. YYYY-MM-DD. */
+export function dayKey(date, rolloverHour = 0) {
+  const d = new Date(date.getTime() - rolloverHour * 3600000);
   const p = (x) => String(x).padStart(2, '0');
-  return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`;
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
-function dayDiff(a, b) {
+export function dayDiff(a, b) {
   const t = (k) => { const [y, m, d] = k.split('-').map(Number); return Date.UTC(y, m - 1, d); };
   return Math.round((t(b) - t(a)) / 86400000);
 }
 
-/**
- * 한 번 인출한 결과의 XP. result는 rules.placeCurrent·study.rateCurrent의 result 모양.
- * @param {number} bestBefore 인출 전 최고 등급, bestAfter 인출 뒤 최고 등급(최고 등급이 처음 오를 때만 등급 보상 → 떨어졌다 다시 올라도 반복 보상 없음)
- * @returns {{xp: number, parts: Array<[string, number]>}}
- */
-export function xpForAnswer(result, bestBefore, bestAfter, cfg) {
-  const X = cfg.xp;
-  const parts = [];
-  if (!result || result.retry || result.practice) return { xp: 0, parts };
-  if (result.correct) {
-    if (result.clueUsed <= 0) parts.push(['단서 없이 정답', X.clean]);
-    else if (result.clueUsed === 1) parts.push(['관계 단서 후 정답', X.clue_relation]);
-    else parts.push(['직접 단서 후 정답', X.clue_direct]);
-  } else if (X.wrong) parts.push(['오답', X.wrong]);
-  if (result.boxTo !== null && result.boxTo > (result.boxFrom ?? 1)) parts.push(['상자 승급', X.box_up]);
-  for (let g = bestBefore + 1; g <= bestAfter; g++) if (X.grade_up[g]) parts.push([['', '동', '은', '금'][g] + ' 등급 첫 달성', X.grade_up[g]]);
-  return { xp: parts.reduce((s, [, v]) => s + v, 0), parts };
+/* ------------------------------------------------------------------ 레벨·칭호(§2, §5) */
+
+/** 누적 XP C(L) = base(L−1) + step(L−1)(L−2)/2. */
+export function xpForLevel(level, cfg) {
+  const n = level - 1;
+  return cfg.level.base * n + (cfg.level.step * n * (n - 1)) / 2;
 }
 
-/** 레벨: n → n+1에 base + step×(n−1) XP. @returns {{level, into, need}} */
+/** @returns {{level, into, need}} 레벨 n → n+1에 base + step(n−1). */
 export function levelOf(xp, cfg) {
   let level = 1;
-  let rest = xp;
-  for (;;) {
-    const need = cfg.level.base + cfg.level.step * (level - 1);
-    if (rest < need) return { level, into: rest, need };
-    rest -= need;
-    level += 1;
-  }
+  while (xp >= xpForLevel(level + 1, cfg)) level += 1;
+  return { level, into: xp - xpForLevel(level, cfg), need: xpForLevel(level + 1, cfg) - xpForLevel(level, cfg) };
 }
 
-/** XP를 더한다. */
-export function addXp(rw, xp) {
-  return { ...rw, xp: rw.xp + Math.max(0, xp) };
+/** 그 레벨에서 얻은 칭호 중 가장 높은 것. */
+export function titleForLevel(level, cfg) {
+  let t = cfg.titles[0][1];
+  for (const [lv, name] of cfg.titles) if (level >= lv) t = name;
+  return t;
 }
 
-/** 업적 목록: id, 이름, 판정(stats → bool). 기준값은 cfg.achievements. */
-export function achievementDefs(cfg) {
-  const A = cfg.achievements;
-  return [
-    { id: 'first_session', name: '첫 세션', test: (s) => s.sessions_done >= A.sessions },
-    { id: 'first_bronze', name: '첫 동 등급', test: (s) => s.bronzePlus >= A.bronze },
-    { id: 'first_silver', name: '첫 은 등급', test: (s) => s.silverPlus >= A.silver },
-    { id: 'first_gold', name: '첫 금 등급', test: (s) => s.gold >= A.gold },
-    { id: 'streak_7', name: `${A.streak}일 연속`, test: (s) => s.streakBest >= A.streak },
-    { id: 'level_5', name: `레벨 ${A.level}`, test: (s) => s.level >= A.level },
+/** 표시할 칭호: 고정한 칭호가 아직 쓸 수 있으면 그것(레벨업이 덮어쓰지 않음, dogam §5), 아니면 가장 높은 것. */
+export function currentTitle(rw, cfg) {
+  const level = levelOf(rw.xp, cfg).level;
+  const pinned = cfg.titles.find(([lv, name]) => name === rw.title_pinned && level >= lv);
+  return pinned ? pinned[1] : titleForLevel(level, cfg);
+}
+
+/* ------------------------------------------------------------------ 인출 XP(§1) */
+
+/** 본 인출 하나의 결과 종류. */
+export function answerKind(rec) {
+  if (!rec.correct) return 'wrong';
+  if (rec.clueUsed <= 0) return 'clean';
+  return rec.clueUsed === 1 ? 'relation' : 'direct';
+}
+
+/** 인출 XP(10/5/3/0). 보너스 제외. */
+export function answerXp(rec, cfg) {
+  return { clean: cfg.xp.clean, relation: cfg.xp.clue_relation, direct: cfg.xp.clue_direct, wrong: cfg.xp.wrong }[answerKind(rec)];
+}
+
+/** 승급(+5, 상자가 오를 때)과 등급(최고 등급이 처음 오를 때) 보너스. 세션 수와 무관하게 항상(§1.3). */
+export function bonusXp(rec, cfg) {
+  const boxUp = rec.boxTo !== null && rec.boxTo !== undefined && rec.boxTo > (rec.boxFrom ?? 1);
+  const grades = [];
+  for (let g = (rec.bestFrom ?? 0) + 1; g <= (rec.bestTo ?? 0); g++) grades.push(g);
+  return { boxUp, boxXp: boxUp ? cfg.xp.box_up : 0, grades, gradeXp: grades.reduce((s, g) => s + (cfg.xp.grade_up[g] ?? 0), 0) };
+}
+
+/* ------------------------------------------------------------------ 업적(§4) */
+
+/**
+ * 업적 정의. stats는 achievementStats()가 만든다. 나라별 업적 id는 `nation-*:{나라}`.
+ * progress(stats) → [현재, 목표] 또는 null(진행도 없음).
+ */
+export function achievementDefs(nation = null, nationLabel = '') {
+  const N = nationLabel || nation || '';
+  const defs = [
+    { id: 'first-step', name: '첫 걸음', desc: '첫 세션을 마쳤어요', test: (s) => s.sessionsDone >= 1, progress: (s) => [Math.min(1, s.sessionsDone), 1] },
+    { id: 'first-bronze', name: '첫 동', desc: '카드 하나가 동 등급이 되었어요', test: (s) => s.bronzePlus >= 1, progress: null },
+    { id: 'first-silver', name: '첫 은', desc: '카드 하나가 은 등급이 되었어요', test: (s) => s.silverPlus >= 1, progress: null },
+    { id: 'first-gold', name: '첫 금', desc: '카드 하나를 금 등급까지 올렸어요', test: (s) => s.gold >= 1, progress: null },
+    { id: 'clean-session', name: '깨끗한 한 판', desc: '한 세션에서 5장을 모두 힌트 없이 맞혔어요', test: (s) => s.sessionCards >= 5 && s.sessionClean === s.sessionCards, progress: null },
+    { id: 'wrong-note-clear', name: '오답 노트 비우기', desc: '틀렸던 카드를 모두 다시 익혔어요', test: (s) => s.lapsed >= 3 && s.lapsedRecovered === s.lapsed, progress: (s) => (s.lapsed >= 3 ? [s.lapsedRecovered, s.lapsed] : null) },
+    { id: 'streak-3', name: '사흘 연속', desc: '3일 이어서 공부했어요', test: (s) => s.bestStreak >= 3, progress: (s) => [Math.min(3, s.streak), 3] },
+    { id: 'streak-7', name: '일주일 연속', desc: '7일 이어서 공부했어요', test: (s) => s.bestStreak >= 7, progress: (s) => [Math.min(7, s.streak), 7] },
+    { id: 'streak-30', name: '한 달 연속', desc: '30일 이어서 공부했어요', test: (s) => s.bestStreak >= 30, progress: (s) => [Math.min(30, s.streak), 30] },
+    { id: 'goal-days-10', name: '열흘의 공부', desc: '공부한 날이 10일이 되었어요', test: (s) => s.goalDays >= 10, progress: (s) => [Math.min(10, s.goalDays), 10] },
+    { id: 'goal-days-50', name: '쉰 날의 공부', desc: '공부한 날이 50일이 되었어요', test: (s) => s.goalDays >= 50, progress: (s) => [Math.min(50, s.goalDays), 50] },
+    { id: 'comeback', name: '다시 오셨네요', desc: '쉬었다가 돌아와 공부했어요', test: (s) => !!s.comeback, progress: null },
+    { id: 'king-silver', name: '왕대 하나 은', desc: '한 왕 때의 카드를 모두 은 등급 이상으로 올렸어요', test: (s) => s.kingSilver, progress: null },
   ];
+  if (nation) {
+    defs.push(
+      { id: `nation-intro:${nation}`, name: `${N} 연표 도입 완료`, desc: '모든 카드를 한 번씩 만났어요', nation, test: (s) => s.total > 0 && s.introduced === s.total, progress: (s) => [s.introduced, s.total] },
+      { id: `nation-bronze:${nation}`, name: `${N} 동 완성`, desc: '모든 카드가 동 등급 이상이에요', nation, test: (s) => s.total > 0 && s.bronzePlus === s.total, progress: (s) => [s.bronzePlus, s.total] },
+      { id: `nation-silver:${nation}`, name: `${N} 은 완성`, desc: '모든 카드가 은 등급 이상이에요', nation, test: (s) => s.total > 0 && s.silverPlus === s.total, progress: (s) => [s.silverPlus, s.total] },
+      { id: `nation-gold:${nation}`, name: `${N} 금 완성`, desc: '모든 카드가 금 등급이에요', nation, test: (s) => s.total > 0 && s.gold === s.total, progress: (s) => [s.gold, s.total] },
+    );
+  }
+  return defs;
 }
 
 /**
- * 학습 세션을 마쳤을 때(인출 1장 이상): 세션 보너스, 하루 목표, 연속일, 업적.
- * @param {{gold:number, silver:number, bronze:number}} grades 현재 등급 수(rules.gradeCounts)
- * @returns {{rewards, gained: {xp:number, parts:Array}, newAchievements: Array<{id,name}>, streakChanged: boolean}}
+ * 업적 판정에 쓰는 값(저장 데이터에서 계산, 저장하지 않음).
+ * @param {{cards, progress, gradeOf: (entry)=>0..3, slotOf: (card)=>string, rewards, session?: {cards, clean}, comeback?}} a
  */
-export function finishSessionRewards(rw, { attempts, grades }, now, cfg) {
-  if (!attempts) return { rewards: rw, gained: { xp: 0, parts: [] }, newAchievements: [], streakChanged: false };
-  const today = dayKey(now);
-  const parts = [['세션 완료', cfg.xp.session_done]];
-  let daily = rw.daily.day === today ? { ...rw.daily } : { day: today, sessions: 0, goal_met: false };
-  daily.sessions += 1;
-  if (!daily.goal_met && daily.sessions >= cfg.daily_goal_sessions) { daily.goal_met = true; parts.push(['오늘 목표 달성', cfg.xp.daily_goal]); }
-  let streak = { ...rw.streak };
-  const before = streak.current;
-  if (streak.last_day !== today) {
-    streak.current = streak.last_day && dayDiff(streak.last_day, today) === 1 ? streak.current + 1 : 1;
-    streak.last_day = today;
-    streak.best = Math.max(streak.best, streak.current);
+export function achievementStats({ cards, progress, gradeOf, slotOf, rewards, session = null, comeback = false }) {
+  let gold = 0; let silverPlus = 0; let bronzePlus = 0; let introduced = 0; let lapsed = 0; let lapsedRecovered = 0;
+  const bySlot = new Map();
+  for (const c of cards) {
+    const e = progress[c.id];
+    const g = e?.introduced ? gradeOf(e) : 0;
+    if (e?.introduced) introduced += 1;
+    if (g >= 3) gold += 1;
+    if (g >= 2) silverPlus += 1;
+    if (g >= 1) bronzePlus += 1;
+    if ((e?.lapses ?? 0) >= 1) { lapsed += 1; if (e.box >= 3) lapsedRecovered += 1; }
+    const k = slotOf(c);
+    const v = bySlot.get(k) ?? { n: 0, silver: 0 };
+    v.n += 1; if (g >= 2) v.silver += 1;
+    bySlot.set(k, v);
   }
-  const gainedXp = parts.reduce((s, [, v]) => s + v, 0);
-  let next = { ...rw, xp: rw.xp + gainedXp, sessions_done: rw.sessions_done + 1, daily, streak, achievements: { ...rw.achievements } };
-  const stats = {
-    sessions_done: next.sessions_done, gold: grades.gold, silverPlus: grades.silver + grades.gold, bronzePlus: grades.bronze + grades.silver + grades.gold,
-    streakBest: streak.best, level: levelOf(next.xp, cfg).level,
+  const kingSilver = [...bySlot.values()].some((v) => v.n >= 2 && v.silver === v.n);
+  return {
+    total: cards.length, gold, silverPlus, bronzePlus, introduced, lapsed, lapsedRecovered, kingSilver,
+    sessionsDone: rewards.sessions_done,
+    sessionCards: session?.cards ?? 0, sessionClean: session?.clean ?? 0,
+    streak: rewards.streak, bestStreak: rewards.best_streak, goalDays: rewards.goal_days_total, comeback,
   };
-  const newAchievements = achievementDefs(cfg).filter((a) => !next.achievements[a.id] && a.test(stats)).map(({ id, name }) => ({ id, name }));
-  for (const a of newAchievements) next.achievements[a.id] = now.toISOString();
-  return { rewards: next, gained: { xp: gainedXp, parts }, newAchievements, streakChanged: streak.current !== before };
+}
+
+/* ------------------------------------------------------------------ 세션 정산(§1~§6) */
+
+/**
+ * 학습 세션 하나를 정산한다(세션 끝에 한 번, 같은 sessionId는 다시 정산하지 않는다).
+ * @param {object} rw 보상 상태
+ * @param {{sessionId: string, records: Array, base: number, retries?: number}} session records = 본 인출(첫 시도)마다
+ *   {id, correct, clueUsed, boxFrom, boxTo, bestFrom, bestTo, probation}. base = 세션 큐의 원래 장수(목표 판정용).
+ * @param {(rw) => object} statsFor 업적 판정 값(정산 뒤 보상 상태를 받아 achievementStats 결과를 돌려준다)
+ * @param {Date} now
+ * @returns {{rewards, report: object|null}} 이미 정산한 세션이면 report null
+ */
+export function settleSession(rw, { sessionId, records, base }, statsFor, now, cfg, defs = achievementDefs()) {
+  if (rw.settled.includes(sessionId) || !records.length) return { rewards: rw, report: null };
+  const today = dayKey(now, cfg.streak.day_rollover_hour);
+  const day = rw.day.key === today ? { ...rw.day } : { key: today, sessions: 0, goal_met: false };
+  day.sessions += 1;
+  const xpAllowed = day.sessions <= cfg.xp_sessions_per_day;
+  const lines = records.map((r) => {
+    const kind = answerKind(r);
+    const b = bonusXp(r, cfg);
+    const ax = xpAllowed ? answerXp(r, cfg) : 0;
+    return { id: r.id, kind, xp: ax, boxUp: b.boxUp, boxFrom: r.boxFrom ?? null, boxTo: r.boxTo ?? null, boxXp: b.boxXp, grades: b.grades, gradeXp: b.gradeXp, probation: !!r.probation, total: ax + b.boxXp + b.gradeXp };
+  });
+  // 하루 목표(§3.2): 본 인출이 goal_min_cards장 이상, 또는 세션 카드가 그보다 적으면 그 전부
+  const need = Math.min(cfg.goal_min_cards, Math.max(1, base));
+  const goalNow = records.length >= need;
+  let goal = null;
+  let next = { ...rw, day, sessions_done: rw.sessions_done + 1, achievements: { ...rw.achievements }, settled: [...rw.settled, sessionId].slice(-50) };
+  let comeback = false;
+  if (goalNow && !day.goal_met) {
+    day.goal_met = true;
+    goal = { xp: xpAllowed ? cfg.xp.daily_goal : 0, usedPasses: 0, earnedPass: false, broken: null, streak: 0 };
+    const last = rw.last_goal_date;
+    let streak = rw.streak;
+    let passes = rw.rest_passes;
+    if (!last) streak = 1;
+    else if (last !== today) {
+      const gap = dayDiff(last, today);
+      const missed = gap - 1;
+      if (gap >= 8) comeback = true;
+      if (missed <= 0) streak += 1;
+      else if (passes >= missed) { passes -= missed; goal.usedPasses = missed; streak += 1; }
+      else { if (streak > 0) goal.broken = { prev: streak, best: Math.max(rw.best_streak, streak) }; streak = 1; }
+    }
+    if (streak > 0 && streak % cfg.streak.rest_pass_every === 0 && streak !== rw.streak && passes < cfg.streak.rest_pass_max) { passes += 1; goal.earnedPass = true; }
+    goal.streak = streak;
+    next = { ...next, streak, best_streak: Math.max(rw.best_streak, streak), rest_passes: passes, last_goal_date: today, goal_days_total: rw.goal_days_total + 1 };
+  }
+  const sessionXp = lines.reduce((s, l) => s + l.total, 0) + (goal?.xp ?? 0);
+  const lvFrom = levelOf(rw.xp, cfg).level;
+  next.xp = rw.xp + sessionXp;
+  const lv = levelOf(next.xp, cfg);
+  next.level = lv.level;
+  const titleFrom = currentTitle(rw, cfg);
+  next.title = currentTitle(next, cfg);
+  const stats = statsFor(next, { cards: records.length, clean: lines.filter((l) => l.kind === 'clean').length, comeback });
+  const newAchievements = defs.filter((a) => !next.achievements[a.id] && a.test(stats)).map(({ id, name, desc }) => ({ id, name, desc }));
+  for (const a of newAchievements) next.achievements[a.id] = today;
+  return {
+    rewards: next,
+    report: {
+      sessionId, lines, sessionXp, capped: !xpAllowed, goal, daySessions: day.sessions,
+      level: { from: lvFrom, to: lv.level, into: lv.into, need: lv.need }, title: { from: titleFrom, to: next.title },
+      achievements: newAchievements,
+    },
+  };
 }

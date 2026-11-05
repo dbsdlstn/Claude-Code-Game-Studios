@@ -22,6 +22,7 @@ ROOT = HERE.parent.parent
 V2 = ROOT / "assets" / "data" / "cards" / "v2" / "goguryeo-m1.json"
 REPO_URLS = ["'../../assets/data/cards/v2/goguryeo-m1.json',"]
 DIST_URL = "'data/cards/goguryeo-m1.json',"
+REPO_REWARDS = "'../../assets/data/config/rewards.json'"
 REPO_MANIFEST = "'../../assets/data/cards/v2/manifest.json', // 콘텐츠가 만들면 이것"
 COPY = ["index.html", "style.css", "js", "data"]
 
@@ -70,6 +71,13 @@ def main(argv):
         shutil.copy2(src, cards_dir / src.name)
     text = text.replace(REPO_URLS[0], DIST_URL if src else "")
     text = text.replace(REPO_MANIFEST, "")
+    # 보상 수치(rewards-spec §9, D103): 있으면 data/rewards.json으로
+    rewards = ROOT / "assets" / "data" / "config" / "rewards.json"
+    if rewards.exists():
+        shutil.copy2(rewards, out / "data" / "rewards.json")
+        text = text.replace(REPO_REWARDS, "'data/rewards.json'")
+    else:
+        text = text.replace(REPO_REWARDS, "")
     config.write_text(text, encoding="utf-8")
     try:
         commit = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()

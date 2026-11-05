@@ -272,3 +272,18 @@ body { min-height: 100vh; background-attachment: fixed; }
 .chip.nation[disabled] { font-size: 12.5px; padding: 2px 9px; min-height: 30px; opacity: .5; }
 .chip.nation[disabled] .nation-soon { font-size: 11px; }
 .timeline.compact .row-compact .row-year { white-space: normal; word-break: keep-all; line-height: 1.25; }
+/* D103: 세션 결과 정산(design/ux/session-result.md) */
+.stage { border-top: 1px dashed var(--line-soft); padding: 10px 0 4px; display: grid; gap: 4px; }
+.stage p { margin: 0; }
+.stage-head { border-top: 0; padding-top: 0; }
+.stage h3 { margin: 0; font-size: 15px; }
+.big-score { font-family: var(--serif); font-size: 26px; font-weight: 700; }
+.settle-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.settle { display: grid; grid-template-columns: 1fr auto; gap: 0 8px; font-size: 15px; }
+.settle-xp { color: var(--gold); }
+.settle-sub, .settle-hint { grid-column: 1 / -1; font-size: 13px; color: var(--ink-soft); padding-left: 10px; }
+.settle-grade { color: var(--gold); font-weight: 700; }
+.settle-total { font-weight: 700; color: var(--gold); }
+.ach b { color: var(--seal); }
+.title-honor { font-family: var(--serif); font-weight: 700; color: var(--ink); }
+#summary .sheet-actions { flex-wrap: wrap; }
