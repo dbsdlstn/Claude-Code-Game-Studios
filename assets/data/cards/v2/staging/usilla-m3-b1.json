@@ -1,0 +1,1313 @@
+{
+  "schema": 2,
+  "cards": [
+    {
+      "id": "usilla-reign-sinmun",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "신문왕",
+      "order": 1,
+      "reign": {
+        "start": 681,
+        "end": 692,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제31대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 8,
+        "entry": "신문왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "681 즉위(김흠돌의 난 직전), 692년 가을 7월 사망(삼국사기 12년 인용). 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-seongdeok",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "성덕왕",
+      "order": 2,
+      "reign": {
+        "start": 702,
+        "end": 737,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제33대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 8,
+        "entry": "성덕왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "효소왕 재위 692~702 표기와 '재위 36년'으로 간접 확인. 702 명시 문장 미확인. 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-gyeongdeok",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "경덕왕",
+      "order": 3,
+      "reign": {
+        "start": 742,
+        "end": 765,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제35대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 9,
+        "entry": "경덕왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 742~765는 경주시 자료, 원년 742는 삼국사기 번역 인용. 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-hyegong",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "혜공왕",
+      "order": 4,
+      "reign": {
+        "start": 765,
+        "end": 780,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제36대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 9,
+        "entry": "혜공왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "765년 8세 즉위(encykorea), 780 김지정의 난 중 피살. 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-seondeok",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "선덕왕",
+      "order": 5,
+      "reign": {
+        "start": 780,
+        "end": 785,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제37대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 9,
+        "entry": "선덕왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "김양상. 780 즉위로 하대 시작. 신라 덱의 선덕여왕(silla-reign-seondeok)과는 나라 접두로 구분. 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-wonseong",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "원성왕",
+      "order": 6,
+      "reign": {
+        "start": 785,
+        "end": 798,
+        "basis": "chronicle"
+      },
+      "reign_alt": [
+        {
+          "start": 785,
+          "end": 799,
+          "note": "사망 연도를 799로 적는 자료"
+        }
+      ],
+      "summary": "신라 제38대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 10,
+        "entry": "원성왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 785~798(위키백과, 사망 798/799 표기 차이). 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-heondeok",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "헌덕왕",
+      "order": 7,
+      "reign": {
+        "start": 809,
+        "end": 826,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제41대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 10,
+        "entry": "헌덕왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "809 애장왕을 죽이고 즉위(위키백과). 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-heungdeok",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "흥덕왕",
+      "order": 8,
+      "reign": {
+        "start": 826,
+        "end": 836,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제42대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 10,
+        "entry": "흥덕왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 826~836(검색 요약). 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-munseong",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "문성왕",
+      "order": 9,
+      "reign": {
+        "start": 839,
+        "end": 857,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제46대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 11,
+        "entry": "문성왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "839 신무왕 사망 뒤 즉위(thewiki). 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-jinseong",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "진성여왕",
+      "order": 10,
+      "reign": {
+        "start": 887,
+        "end": 897,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제51대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 11,
+        "entry": "진성여왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "887 정강왕 사망 뒤 즉위, 897 효공왕에게 양위(위키백과). 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-hyogong",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "효공왕",
+      "order": 11,
+      "reign": {
+        "start": 897,
+        "end": 912,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제52대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 12,
+        "entry": "효공왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 897~912(encykorea·위키백과). 설계 D133에 따라 추가. 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-reign-gyeongsun",
+      "kind": "anchor",
+      "nation": "usilla",
+      "title": "경순왕",
+      "order": 12,
+      "reign": {
+        "start": 927,
+        "end": 935,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "신라 제56대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 12,
+        "entry": "경순왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "927 견훤이 경애왕을 죽인 뒤 옹립, 935년 12월(양력 936년 1월) 고려에 귀부(itwiki). 권 번호는 원문 대조 필요. D203에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "usilla-src-01",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "국학 설치",
+      "year": 682,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "신문왕 2년",
+      "source_text": "나라의 학교를 세우고 이를 맡을 관리를 두어, 젊은 귀족들이 유학을 배우게 하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-sinmun"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-gyeongdeok"
+            }
+          ],
+          "text": "[신문왕]이 즉위한 뒤, [경덕왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "신문왕 2년(682년). 국학."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-sinmun",
+        "before": "usilla-reign-seongdeok"
+      },
+      "explanation": "신문왕 2년(682년)의 일. 신문왕이 유학 교육 기관인 국학을 세운 일. 대사 이하 관등이나 관등이 없는 15~30세의 귀족 자제가 배웠다. 왕권을 뒷받침할 관리를 기르려는 뜻으로 본다.",
+      "exam_tags": [
+        "institution",
+        "culture"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 8,
+        "entry": "신문왕 2년 6월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "682 국학 정비(경 설치)와 입학 대상은 itwiki·encykorea 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "682-gukhak",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-02",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "9주 5소경 완성",
+      "year": 685,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "신문왕 5년",
+      "source_text": "새로 얻은 땅까지 아울러 전국을 아홉 개의 큰 주로 나누는 일을 마치고, 지방의 요지에 작은 서울들을 두었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-sinmun"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-gyeongdeok"
+            }
+          ],
+          "text": "[신문왕]이 즉위한 뒤, [경덕왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "신문왕 5년(685년). 완산주·청주 설치, 서원경·남원경."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-sinmun",
+        "before": "usilla-reign-seongdeok"
+      },
+      "explanation": "신문왕 5년(685년)의 일. 신문왕이 완산주·청주를 두어 9주를 완성하고 서원경·남원경을 두어 5소경을 갖춘 일. 통일 뒤 넓어진 영토를 다스리기 위한 지방 제도다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 8,
+        "entry": "신문왕 5년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "685 완산주·청주 설치로 9주 완성, 서원경·남원경으로 5소경은 itwiki 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "685-nine-ju-five-sogyeong",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-03",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "관료전 지급",
+      "year": 687,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "신문왕 7년",
+      "source_text": "문무 관리들에게 등급에 따라 땅을 나누어 주었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-sinmun"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-gyeongdeok"
+            }
+          ],
+          "text": "[신문왕]이 즉위한 뒤, [경덕왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "신문왕 7년(687년). 관료전."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-sinmun",
+        "before": "usilla-reign-seongdeok"
+      },
+      "explanation": "신문왕 7년(687년)의 일. 신문왕이 관리에게 관료전을 준 일. 관료전은 조세만 거두는 땅으로, 2년 뒤 녹읍을 없애는 조치와 함께 귀족의 경제 기반을 줄였다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 8,
+        "entry": "신문왕 7년 5월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "687 관료전 지급은 itwiki·encykorea 요약으로 확인. '조세만 거두는 땅'은 통설 서술. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "687-gwallyojeon",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-04",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "녹읍 폐지",
+      "year": 689,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "신문왕 9년",
+      "source_text": "관리들이 고을에서 조세와 노동력을 거두던 땅을 없애고, 대신 해마다 곡식을 등급에 따라 내려 주게 하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-sinmun"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-hyegong"
+            }
+          ],
+          "text": "[신문왕]이 즉위한 뒤, [혜공왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "신문왕 9년(689년). 녹읍 폐지, 세조 지급."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-sinmun",
+        "before": "usilla-reign-seongdeok"
+      },
+      "explanation": "신문왕 9년(689년)의 일. 신문왕이 녹읍을 없애고 해마다 조를 차등 있게 준 일. 귀족이 땅과 사람을 지배하던 기반을 줄여 왕권을 강화했다. 녹읍은 757년 경덕왕 때 되살아났다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 8,
+        "entry": "신문왕 9년 정월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "689 녹읍 폐지와 '해마다 조를 차등 지급(逐年賜租)'은 encykorea 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "689-nogeup-abolition",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-05",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "정전 지급",
+      "year": 722,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "성덕왕 21년",
+      "source_text": "처음으로 백성에게 땅을 나누어 주었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-sinmun"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-hyegong"
+            }
+          ],
+          "text": "[신문왕]이 즉위한 뒤, [혜공왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "성덕왕 21년(722년). 정전."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-seongdeok",
+        "before": "usilla-reign-gyeongdeok"
+      },
+      "explanation": "성덕왕 21년(722년)의 일. 성덕왕이 백성에게 정전을 준 일. 정전의 정확한 성격은 논쟁이 있으나 농민의 토지 보유를 안정시키려는 조치로 본다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 8,
+        "entry": "성덕왕 21년 8월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "722 정전 지급과 성격 논쟁은 위키백과 요약으로 확인. 월은 원문 대조 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "722-jeongjeon",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-06",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "녹읍 부활",
+      "year": 757,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "경덕왕 16년",
+      "source_text": "안팎의 관리들에게 다달이 주던 녹봉을 없애고, 다시 고을의 땅을 녹으로 내려 주었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-seongdeok"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-seondeok"
+            }
+          ],
+          "text": "[성덕왕]이 즉위한 뒤, [선덕왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "경덕왕 16년(757년). 월봉 폐지, 녹읍 부활."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-gyeongdeok",
+        "before": "usilla-reign-hyegong"
+      },
+      "explanation": "경덕왕 16년(757년)의 일. 경덕왕이 월봉을 없애고 녹읍을 되살린 일. 신문왕이 689년 없앤 녹읍이 다시 생겨 진골 귀족의 경제 기반이 커졌다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 9,
+        "entry": "경덕왕 16년 3월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "757년 3월 월봉 폐지·녹읍 부활은 위키문헌 삼국사기 번역(16년 757 3월)과 encykorea로 확인. D157에서 743년(경덕왕 2년)이 함께 검색되었으나 검색 요약의 오기로 보인다(번역문이 16년 기사로 적음). 원문 대조 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "757-nogeup-restoration",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-07",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "혜공왕의 죽음",
+      "year": 780,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "혜공왕 16년",
+      "source_text": "높은 귀족이 반란을 일으켜 궁궐을 에워싸자, 다른 귀족들이 군사를 일으켜 이를 쳤다. 그 와중에 왕과 왕비가 반란군에게 해를 입었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-gyeongdeok"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-wonseong"
+            }
+          ],
+          "text": "[경덕왕]이 즉위한 뒤, [원성왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "혜공왕 16년(780년). 김지정의 난, 김양상, 하대의 시작."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-hyegong",
+        "before": "usilla-reign-seondeok",
+        "same_year": "before_next_accession"
+      },
+      "explanation": "혜공왕 16년(780년)의 일. 김지정의 난 중에 혜공왕이 죽고, 난을 진압한 김양상이 선덕왕으로 즉위한 일. 무열왕계 왕위가 끊기고 신라 하대가 시작되었다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 9,
+        "entry": "혜공왕 16년 4월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "780 김지정의 난과 혜공왕 피살, 김양상(선덕왕) 즉위·하대 시작은 itwiki 신라 하대 요약으로 확인. 같은 해 선덕왕 즉위 전 일이라 same_year(설계 D133). 반란군과 진압군 중 누가 왕을 죽였는지는 원문 대조 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "780-hyegong-death",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-08",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "독서삼품과",
+      "year": 788,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "원성왕 4년",
+      "source_text": "처음으로 글을 얼마나 읽었는지에 따라 세 등급으로 나누어 관리를 뽑는 제도를 두었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-seondeok"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-heondeok"
+            }
+          ],
+          "text": "[선덕왕]이 즉위한 뒤, [헌덕왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "원성왕 4년(788년). 독서삼품과."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-wonseong",
+        "before": "usilla-reign-heondeok"
+      },
+      "explanation": "원성왕 4년(788년)의 일. 원성왕이 유학 실력으로 관리를 뽑는 독서삼품과를 둔 일. 진골 귀족의 반대로 효과는 적었다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 10,
+        "entry": "원성왕 4년 봄조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "788 독서삼품과와 효과가 적었다는 평가는 itwiki 신라 하대 요약과 학술 논문으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "788-dokseo-sampumgwa",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-09",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "김헌창의 난",
+      "year": 822,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "헌덕왕 14년",
+      "source_text": "지방을 다스리던 관리가 아버지가 왕위에 오르지 못한 것을 원망하여 반란을 일으키고, 나라 이름과 해를 세는 이름을 따로 정하였다. 관군이 그 성을 함락하자 그는 스스로 목숨을 끊었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-wonseong"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-munseong"
+            }
+          ],
+          "text": "[원성왕]이 즉위한 뒤, [문성왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "헌덕왕 14년(822년). 웅천주 도독 김헌창, 국호 장안·연호 경운."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-heondeok",
+        "before": "usilla-reign-heungdeok"
+      },
+      "explanation": "헌덕왕 14년(822년)의 일. 웅천주 도독 김헌창이 아버지 김주원이 왕이 되지 못한 것을 이유로 일으킨 반란. 통일신라 최대의 내란으로, 하대 왕위 다툼을 보여 준다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 10,
+        "entry": "헌덕왕 14년 3월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "822 김헌창의 난, 장안·경운, 웅진성 함락과 자결은 itwiki 요약으로 확인. 825년 아들 김범문의 난은 별개 사건. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "822-kim-heonchang-revolt",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-10",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "청해진 설치",
+      "year": 828,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "흥덕왕 3년",
+      "source_text": "당에서 돌아온 사람이 바닷길의 요지에 진을 두어 해적을 막겠다고 청하자, 왕이 군사 만 명을 주어 그곳을 지키게 하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-wonseong"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-munseong"
+            }
+          ],
+          "text": "[원성왕]이 즉위한 뒤, [문성왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "흥덕왕 3년(828년). 장보고, 완도."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-heungdeok",
+        "before": "usilla-reign-munseong"
+      },
+      "explanation": "흥덕왕 3년(828년)의 일. 장보고가 완도에 청해진을 세운 일. 해적을 몰아내고 당·일본과의 무역을 이끌었다. 846년 장보고가 살해되고 851년 청해진은 없어졌다.",
+      "exam_tags": [
+        "institution",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 10,
+        "entry": "흥덕왕 3년 4월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "828 청해진 설치, 군사 1만, 846 피살, 851 폐지는 itwiki 장보고 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "828-cheonghaejin",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-11",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "원종·애노의 난",
+      "year": 889,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "진성여왕 3년",
+      "source_text": "여러 고을이 세금을 바치지 않아 나라 창고가 비었다. 관리를 보내 독촉하자 곳곳에서 도적이 일어났고, 한 고을에서는 두 사람이 성에 웅거하여 반란을 일으켰다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-jinseong"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-gyeongsun"
+            }
+          ],
+          "text": "[진성여왕]이 즉위한 뒤, [경순왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "진성여왕 3년(889년). 사벌주, 원종·애노."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-jinseong",
+        "before": "usilla-reign-hyogong"
+      },
+      "explanation": "진성여왕 3년(889년)의 일. 사벌주(상주)에서 원종·애노가 일으킨 농민 봉기. 이를 시작으로 각지에서 봉기가 이어졌고 견훤·궁예 같은 세력이 일어났다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 11,
+        "entry": "진성왕 3년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "889 원종·애노의 난(사벌주)과 이후 봉기 확산은 itwiki 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "889-wonjong-aeno-revolt",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    },
+    {
+      "id": "usilla-src-12",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "시무 10여 조",
+      "year": 894,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "진성여왕 8년",
+      "source_text": "당에서 공부하고 돌아온 학자가 나라를 바로잡을 방책 여남은 가지를 글로 지어 왕에게 올렸다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-heungdeok"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-hyogong"
+            }
+          ],
+          "text": "[흥덕왕]이 즉위한 뒤, [효공왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "진성여왕 8년(894년). 최치원."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-jinseong",
+        "before": "usilla-reign-hyogong"
+      },
+      "explanation": "진성여왕 8년(894년)의 일. 최치원이 진성여왕에게 개혁안인 시무 10여 조를 올린 일. 실행되지 못했고, 신라 말 6두품 지식인의 좌절을 보여 준다.",
+      "exam_tags": [
+        "person",
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 11,
+        "entry": "진성왕 8년 2월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "894 시무 10여 조와 '실행되지 못했다'는 itwiki 요약으로 확인. 6두품 해석은 통설 서술. 월은 원문 대조 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D203)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "894-choi-chiwon-reform",
+      "tags": [
+        "통일신라",
+        "U-B1"
+      ]
+    }
+  ]
+}
