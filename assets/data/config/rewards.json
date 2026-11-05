@@ -1,5 +1,5 @@
 {
-  "_note": "보상 수치(design/rewards-spec.md §9·§14, D120·D121·D128). 웹 프로토타입이 읽는다(D103·D107). 없거나 키가 빠지면 prototypes/m1-timeline/js/config.js의 기본값.",
+  "_note": "보상 수치(design/rewards-spec.md §9·§14, D120·D121·D128·D184). 웹 프로토타입이 읽는다(D103·D107·D109). 없거나 키가 빠지면 prototypes/m1-timeline/js/config.js의 기본값.",
   "xp": {
     "clean": 10,
     "clue_relation": 5,
@@ -16,7 +16,7 @@
     ],
     "daily_goal": 20
   },
-  "xp_sessions_per_day": 2,
+  "xp_cards_per_day": 24,
   "level": {
     "base": 25,
     "step": 30

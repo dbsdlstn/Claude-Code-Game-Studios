@@ -35,9 +35,11 @@ try {
     await page.click('#title-play');
     await shot('22-baekje-timeline', true);
     await page.evaluate(() => localStorage.clear());
-    // 나라 3개(D104, 신라는 테스트 고정 데이터): 세로 목록
-    await openProto(page, server.base, { data: null, title: null, manifest: 'tests/fixtures/manifest-three-nations.json' });
-    await shot('23-three-nations-title');
+    // 신라(실제 데이터, 나라 3개 세로 목록): 타이틀과 신라 연표
+    await openProto(page, server.base, { data: null, title: null, nation: 'silla' });
+    await shot('23-silla-title');
+    await page.click('#title-play');
+    await shot('24-silla-timeline', true);
     await page.evaluate(() => localStorage.clear());
     // 처음 안내(D74-5)
     await openProto(page, server.base, { data: DATA, seed: 11, intro: '1' });
