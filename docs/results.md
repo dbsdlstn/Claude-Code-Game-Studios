@@ -1,7 +1,7 @@
 # 한양 도감: 결과 요약
 
 > 메인 디렉터(총괄 세션)가 갱신한다. 자세한 기록은 `docs/decision-log.md`, `docs/orchestration-log.md`.
-> 마지막 갱신: 2026-11-05 19:45 UTC
+> 마지막 갱신: 2026-11-05 19:55 UTC
 
 ## ✅ M1 사람 테스트 준비 완료
 고구려 사료 카드 12장으로 "이 게임이 단순 플래시카드보다 한능검 공부에 나은가"를 확인하는 테스트를 할 수 있다. 차단 항목은 모두 해소됐고(평가 세션 재확인), 남은 준비는 아래 "사용자가 할 일"의 사람만 가능한 두 가지다.
@@ -42,11 +42,11 @@
 git clone https://github.com/dbsdlstn/Claude-Code-Game-Studios.git
 cd Claude-Code-Game-Studios
 git checkout claude/integration
-python3 -m http.server 8000   # Windows는 py -m http.server 8000
+py -m http.server 8000      # Mac/Linux는 python3 -m http.server 8000
 ```
-- M2(최신, 4개 나라): http://localhost:8000/prototypes/m1-timeline/
-- v0(옛 나라×시기 보드, 동결): http://localhost:8000/web/
-- 화면 미리보기: `production/qa/evidence/m1/`
+- 최신 M2(4개 나라 120장): http://localhost:8000/prototypes/m1-timeline/
+- 자주 막히는 것(404, py 없음, 포트, 휴대폰 접속 등): `prototypes/m1-timeline/README.md`
+- 화면 미리보기: `production/qa/evidence/m2/`
 
 ## 사용자가 할 일 (사람만 가능한 것)
 - **사람 테스트 전 체크리스트 한 장**: `docs/m2b-checklist.md`(최소 사실 확인 범위 = 고구려 36장+왕 12명, 2명).
