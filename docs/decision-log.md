@@ -1298,6 +1298,9 @@
 - **세션 줄**: 타이틀 "오늘 24장 중 남은 n장" 아래 줄을 "이번 세션 n장(복습 a · 새 b) · 약 k분"으로(이어하기·끝은 그대로).
 - 단위 99, e2e 67 통과. 스크린샷 71장. 이후 웹 결정 번호는 D260~.
 
+## 2026-11-05 D222. manifest-*.json 무시 규칙 테스트 (콘텐츠 세션)
+- 디렉터가 integration에서 검증기 M1이 `manifest-*.json`(웹 테스트용 덱 목록, 예: manifest-m2test.json)을 카드 파일로 보지 않게 고쳤다. 병합 뒤 `tools/test_validate_events.py`에 ManifestListing 테스트 2개 추가: 임시 폴더에서 manifest-m2test.json·events.json은 무시되고, 목록에 없는 카드 파일(b.json)은 여전히 "not listed"로 잡힌다. 예외를 끈 검증기에서 첫 테스트가 실패하는 것을 확인했다.
+
 ## 남은 문제
 - 카드 44장 전부 `verified: false`. 사람의 사실 확인 전에는 출시 빌드에 넣을 카드가 없다(`validate_cards.py --release` 실패가 정상).
 - 같은 사료(삼국사기 전승)에 기댄 건국기 카드가 많다. 플레이에서 건국기 칸이 단서 3단계 의존으로 쏠리는지 볼 것.
