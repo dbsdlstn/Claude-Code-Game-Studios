@@ -14,6 +14,8 @@ signal cell_targeted(nation: String, era: String, by_drop: bool, by_keyboard: bo
 
 ## 클릭만 했을 때 강조를 지우는 시간(웹 refs.js와 같은 2.5초).
 const REF_CLICK_SECONDS := 2.5
+## 시기 정의 한 줄의 최대 글자 수(열 폭 176px, 13px 글꼴 기준. "영토와 세력이 커지고 번영"이 한 줄에 들어간 것을 화면에서 확인).
+const DEFINITION_LINE_CHARS := 14
 
 ## cell_key -> BoardCell
 var _cells: Dictionary = {}
@@ -36,9 +38,9 @@ func setup(config: GameConfig, anchors: Array[CardData]) -> void:
 		name_label.add_theme_font_size_override("font_size", 18)
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		header.add_child(name_label)
-		var def_label := HanjiTheme.small_label(config.era_definition(e))
-		# 단어 단위로만 줄을 바꾼다("전/쟁기"처럼 낱말 중간에서 끊기지 않게, CI 화면 S2).
-		def_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+		# 한글은 자동 줄바꿈이 음절 사이에서도 끊는다("전/쟁기", CI 화면 S2·S3). 띄어쓰기에서 직접 나눈다.
+		var def_label := HanjiTheme.small_label(wrap_at_spaces(config.era_definition(e), DEFINITION_LINE_CHARS))
+		def_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 		def_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		def_label.custom_minimum_size = Vector2(176, 0)
 		header.add_child(def_label)
@@ -78,6 +80,24 @@ func setup(config: GameConfig, anchors: Array[CardData]) -> void:
 			_cells[CardData.make_cell_key(n, e)] = bc
 			add_child(bc)
 	_anchor_cells = anchor_cell_keys(anchors)
+
+
+## 띄어쓰기에서만 줄을 나눈다. 한 줄이 max_chars를 넘지 않게 낱말을 채운다(낱말 하나가 더 길면 그대로 한 줄).
+## 사용 예: wrap_at_spaces("멸망·통일로 이어지는 마지막 전쟁기", 14) → "멸망·통일로 이어지는\n마지막 전쟁기"
+static func wrap_at_spaces(text: String, max_chars: int) -> String:
+	var lines := PackedStringArray()
+	var current := ""
+	for word in text.split(" ", false):
+		if current.is_empty():
+			current = word
+		elif current.length() + 1 + word.length() <= max_chars:
+			current += " " + word
+		else:
+			lines.append(current)
+			current = word
+	if not current.is_empty():
+		lines.append(current)
+	return "\n".join(lines)
 
 
 ## 기준 카드 id → 칸 키. 사용 예: anchor_cell_keys(card_set.anchors)["goguryeo-peak-anchor"] → "goguryeo/peak"

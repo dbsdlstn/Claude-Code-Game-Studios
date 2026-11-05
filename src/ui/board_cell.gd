@@ -115,7 +115,13 @@ func _line_label(text: String, color: Color) -> Label:
 	var l := Label.new()
 	l.text = text
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# 자동 줄바꿈 Label은 컨테이너 안에서 폭이 0으로 잡혀 칸이 세로로 늘어난다(CI 화면 S3).
+	# 한 줄로 두고 넘치면 말줄임, 전체 목록은 칸 툴팁으로 본다.
+	l.autowrap_mode = TextServer.AUTOWRAP_OFF
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	l.clip_text = true
+	l.custom_minimum_size = Vector2(40, 0)
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.add_theme_font_size_override("font_size", 14)
 	l.add_theme_color_override("font_color", color)
