@@ -1327,6 +1327,138 @@
       ],
       "status": "owned",
       "note": ""
+    },
+    {
+      "key": "956-nobi-angeom",
+      "year": 956,
+      "title": "노비안검법",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-01 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "958-gwageo",
+      "year": 958,
+      "title": "과거 실시",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-02 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "983-twelve-mok",
+      "year": 983,
+      "title": "12목 설치",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-03 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "993-seohui-negotiation",
+      "year": 993,
+      "title": "서희의 담판",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-04 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "1019-gwiju-battle",
+      "year": 1019,
+      "title": "귀주대첩",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-05 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "1104-byeolmuban",
+      "year": 1104,
+      "title": "별무반 편성",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-06 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "1126-yi-jagyeom-revolt",
+      "year": 1126,
+      "title": "이자겸의 난",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-07 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "1135-myocheong-revolt",
+      "year": 1135,
+      "title": "묘청의 서경 천도 운동",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-08 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "1170-musin-coup",
+      "year": 1170,
+      "title": "무신정변",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-09 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "1176-mangi-mangsoi",
+      "year": 1176,
+      "title": "망이·망소이의 난",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-10 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "1232-ganghwa-capital",
+      "year": 1232,
+      "title": "강화 천도",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-11 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "1356-ssangseong-recovery",
+      "year": 1356,
+      "title": "쌍성총관부 수복",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-12 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
     }
   ],
   "distinct_pairs": [

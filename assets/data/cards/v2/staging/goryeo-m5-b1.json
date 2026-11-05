@@ -1,0 +1,1317 @@
+{
+  "schema": 2,
+  "cards": [
+    {
+      "id": "goryeo-reign-taejo",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "태조",
+      "order": 1,
+      "reign": {
+        "start": 918,
+        "end": 943,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제1대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "태조 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 918~943(itwiki 태조). 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-gwangjong",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "광종",
+      "order": 2,
+      "reign": {
+        "start": 949,
+        "end": 975,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제4대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "광종 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 949~975(itwiki 광종). 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-seongjong",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "성종",
+      "order": 3,
+      "reign": {
+        "start": 981,
+        "end": 997,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제6대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "성종 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 981~997(나무위키 계열 목록, 영문 위키). 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-hyeonjong",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "현종",
+      "order": 4,
+      "reign": {
+        "start": 1009,
+        "end": 1031,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제8대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "현종 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1009~1031(목종 시해 뒤 즉위). 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-munjong",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "문종",
+      "order": 5,
+      "reign": {
+        "start": 1046,
+        "end": 1083,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제11대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "문종 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1046~1083. 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-sukjong",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "숙종",
+      "order": 6,
+      "reign": {
+        "start": 1095,
+        "end": 1105,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제15대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "숙종 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1095~1105. 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-injong",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "인종",
+      "order": 7,
+      "reign": {
+        "start": 1122,
+        "end": 1146,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제17대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "인종 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1122~1146(encykorea). 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-myeongjong",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "명종",
+      "order": 8,
+      "reign": {
+        "start": 1170,
+        "end": 1197,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제19대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "명종 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1170~1197(무신정변 뒤 옹립). 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-gojong",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "고종",
+      "order": 9,
+      "reign": {
+        "start": 1213,
+        "end": 1259,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제23대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "고종 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1213~1259. 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-wonjong",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "원종",
+      "order": 10,
+      "reign": {
+        "start": 1259,
+        "end": 1274,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제24대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "원종 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1259~1274. 1269 영종 폐립 구간을 따로 적는 목록이 있다. 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-gongmin",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "공민왕",
+      "order": 11,
+      "reign": {
+        "start": 1351,
+        "end": 1374,
+        "basis": "chronicle"
+      },
+      "reign_alt": [
+        {
+          "start": 1352,
+          "end": 1374,
+          "note": "즉위를 1352로 적는 자료(위키문헌 계열)"
+        }
+      ],
+      "summary": "고려 제31대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "공민왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1351~1374(encykorea). 1352 즉위로 적는 자료가 있다(reign_alt). 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-reign-u",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "우왕",
+      "order": 12,
+      "reign": {
+        "start": 1374,
+        "end": 1388,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제32대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "열전(신우전)",
+        "volume": null,
+        "entry": "우왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1374~1388(영문 위키 목록). 권 번호는 원문 대조 필요. D211에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "goryeo-src-01",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "노비안검법",
+      "year": 956,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "광종 7년",
+      "source_text": "본래 양인이었다가 억울하게 노비가 된 사람을 조사하여 다시 양인으로 돌려놓게 하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-gwangjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-hyeonjong"
+            }
+          ],
+          "text": "[광종]이 즉위한 뒤, [현종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "광종 7년(956년). 노비안검법."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-gwangjong",
+        "before": "goryeo-reign-seongjong"
+      },
+      "explanation": "광종 7년(956년)의 일. 광종이 노비안검법을 실시한 일. 호족이 거느린 노비를 줄여 호족 세력을 누르고 왕권을 강화하려는 정책이었다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "광종 7년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "956 노비안검법과 목적은 itwiki 요약으로 확인. 기사가 세가·형법지 중 어디에 있는지는 원문 확인 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "956-nobi-angeom",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-02",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "과거 실시",
+      "year": 958,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "광종 9년",
+      "source_text": "중국에서 귀화한 신하의 건의에 따라 처음으로 시험을 치러 관리를 뽑았고, 그 신하가 시험을 맡았다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-taejo"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-seongjong"
+            }
+          ],
+          "text": "[태조]가 즉위한 뒤, [성종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "광종 9년(958년). 쌍기, 과거."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-gwangjong",
+        "before": "goryeo-reign-seongjong"
+      },
+      "explanation": "광종 9년(958년)의 일. 광종이 쌍기의 건의로 과거를 처음 실시한 일. 쌍기가 지공거를 맡았고 제술업·명경업·잡업으로 나누었다. 공신·호족 대신 시험 출신 관료를 키워 왕권을 강화했다.",
+      "exam_tags": [
+        "institution",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "광종 9년 5월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "958년 5월 첫 과거, 쌍기 지공거, 과목 구분은 encykorea·itwiki 요약으로 확인. 쌍기 귀화·건의를 957로 보는 자료가 있다(같은 광종 칸). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "958-gwageo",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-03",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "12목 설치",
+      "year": 983,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "성종 2년",
+      "source_text": "처음으로 지방의 중요한 고을 열두 곳에 중앙의 관리를 보내 다스리게 하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-gwangjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-hyeonjong"
+            }
+          ],
+          "text": "[광종]이 즉위한 뒤, [현종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "성종 2년(983년). 12목."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-seongjong",
+        "before": "goryeo-reign-hyeonjong"
+      },
+      "explanation": "성종 2년(983년)의 일. 성종이 12목을 두고 지방관을 파견한 일. 지방관 파견의 시초로, 최승로의 시무 28조를 받아들여 중앙집권 체제를 갖춘 정책의 하나다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "성종 2년 2월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "983 12목 설치(지방관 파견 시초)는 위키문헌 글로벌 세계 대백과 요약으로 확인. 월은 원문 확인 필요. 시무 28조 연도(982)는 미확인이라 해설에 연도를 쓰지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "983-twelve-mok",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-04",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "서희의 담판",
+      "year": 993,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "성종 12년",
+      "source_text": "북쪽 나라 장수가 대군을 이끌고 와서 땅을 내놓으라고 하자, 한 신하가 적진에 가서 담판하여 군대를 물러가게 하고 압록강 동쪽 땅을 차지할 길을 열었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-taejo"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-hyeonjong"
+            }
+          ],
+          "text": "[태조]가 즉위한 뒤, [현종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "성종 12년(993년). 서희, 소손녕, 거란 1차 침입."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-seongjong",
+        "before": "goryeo-reign-hyeonjong"
+      },
+      "explanation": "성종 12년(993년)의 일. 거란 1차 침입 때 서희가 소손녕과 담판해 거란군을 물리고 강동 6주를 얻은 일. 서희는 994~996년 여진을 몰아내고 성을 쌓았다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "열전",
+        "volume": null,
+        "entry": "서희전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "993 담판, 압록강 동쪽 280리, 994~996 축성은 itwiki·언론 요약으로 확인. 담판 조건(입조·연호, 송과 단교)의 해석은 자료마다 달라 지문에 쓰지 않았다. 80만 대군은 과장설. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "993-seohui-negotiation",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-05",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "귀주대첩",
+      "year": 1019,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "현종 10년",
+      "source_text": "물러가던 적군을 장수가 이끄는 군대가 길목에서 크게 무찔러, 살아서 돌아간 적이 수천에 지나지 않았다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-seongjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-munjong"
+            }
+          ],
+          "text": "[성종]이 즉위한 뒤, [문종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "현종 10년(1019년). 강감찬, 거란 3차 침입."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-hyeonjong",
+        "before": "goryeo-reign-munjong"
+      },
+      "explanation": "현종 10년(1019년)의 일. 거란 3차 침입 때 상원수 강감찬이 귀주에서 돌아가던 거란군을 크게 무찌른 싸움. 이후 거란은 대군을 보내지 못했다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "열전",
+        "volume": null,
+        "entry": "강감찬전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1019년 2월 귀주대첩, 살아 돌아간 거란군 수천은 itwiki 요약으로 확인. 3차 침입 장수는 요사 등은 소배압, 고려사 강감찬전은 소손녕으로 적는다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1019-gwiju-battle",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-06",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "별무반 편성",
+      "year": 1104,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "숙종 9년",
+      "source_text": "기병에 밀려 진 장수가 왕에게 아뢰어, 기병에 맞설 새 군사 조직을 따로 만들었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-sukjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-myeongjong"
+            }
+          ],
+          "text": "[숙종]이 즉위한 뒤, [명종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "숙종 9년(1104년). 윤관, 별무반, 여진."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-sukjong",
+        "before": "goryeo-reign-injong"
+      },
+      "explanation": "숙종 9년(1104년)의 일. 윤관이 여진에게 진 뒤 건의해 별무반을 편성한 일. 예종 2년(1107) 여진을 정벌하고 동북 9성을 쌓았으나 1109년 돌려주었다.",
+      "exam_tags": [
+        "institution",
+        "war"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "열전",
+        "volume": null,
+        "entry": "윤관전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1104 윤관 패전과 별무반 건의·편성은 itwiki 윤관 요약으로 확인. 신기군·신보군·항마군 구성은 이번 검색으로 확인하지 못해 쓰지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1104-byeolmuban",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-07",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "이자겸의 난",
+      "year": 1126,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "인종 4년",
+      "source_text": "왕의 외척으로 권력을 쥔 신하가 난을 일으켜 궁궐을 장악하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-sukjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-gojong"
+            }
+          ],
+          "text": "[숙종]이 즉위한 뒤, [고종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "인종 4년(1126년). 이자겸."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-injong",
+        "before": "goryeo-reign-myeongjong"
+      },
+      "explanation": "인종 4년(1126년)의 일. 왕의 외척 이자겸이 일으킨 난. 묘청의 서경 천도 운동과 함께 문벌 귀족 사회가 흔들렸음을 보여 준다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "열전",
+        "volume": null,
+        "entry": "이자겸전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1126 이자겸의 난과 '문벌 사회 동요' 해석은 기출 해설 요약으로 확인. 척준경·궁궐 화재 등 세부는 확인하지 못해 쓰지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1126-yi-jagyeom-revolt",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-08",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "묘청의 서경 천도 운동",
+      "year": 1135,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "인종 13년",
+      "source_text": "도읍을 서북쪽 옛 도읍으로 옮기자고 주장하던 승려가 뜻을 이루지 못하자 그곳에서 난을 일으켰다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-sukjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-gojong"
+            }
+          ],
+          "text": "[숙종]이 즉위한 뒤, [고종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "인종 13년(1135년). 묘청, 서경."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-injong",
+        "before": "goryeo-reign-myeongjong"
+      },
+      "explanation": "인종 13년(1135년)의 일. 묘청이 서경 천도를 주장하다 서경에서 일으킨 난. 김부식이 이끈 관군에게 진압되었다. 이자겸의 난과 함께 문벌 사회가 흔들린 사건이다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "열전(반역)",
+        "volume": null,
+        "entry": "묘청전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1135 묘청의 서경 천도 운동은 기출 해설 요약으로 확인. 국호·연호(대위·천개)와 김부식 진압은 검색으로 확인하지 못해 지문에서 뺐다(해설의 김부식 진압은 통설, 원문 확인 필요). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1135-myocheong-revolt",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-09",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "무신정변",
+      "year": 1170,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "의종 24년",
+      "source_text": "무신들이 들고일어나 문신들을 죽이고 왕을 몰아낸 뒤 새 왕을 세웠다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-sukjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-myeongjong"
+            }
+          ],
+          "text": "[숙종]이 즉위한 뒤, [명종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "의종 24년(1170년). 무신정변."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-injong",
+        "before": "goryeo-reign-myeongjong",
+        "same_year": "before_next_accession"
+      },
+      "explanation": "의종 24년(1170년)의 일. 무신정변으로 의종이 쫓겨나고 명종이 즉위한 일. 이후 약 100년 동안 무신이 권력을 잡았다.",
+      "exam_tags": [
+        "war",
+        "institution"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "의종 24년 8월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1170 무신정변은 itwiki 요약으로 확인. 같은 해 명종 즉위 전 일이라 same_year(인종 칸, 설계 goryeo-scope·디렉터 지시). 정중부·이의방·보현원 등 세부는 이번 검색으로 확인하지 못해 쓰지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1170-musin-coup",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-10",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "망이·망소이의 난",
+      "year": 1176,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "명종 6년",
+      "source_text": "특수 행정 구역에 사는 사람들이 무거운 부담과 차별에 맞서 들고일어났다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-injong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-wonjong"
+            }
+          ],
+          "text": "[인종]이 즉위한 뒤, [원종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "명종 6년(1176년). 공주 명학소, 망이·망소이."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-myeongjong",
+        "before": "goryeo-reign-gojong"
+      },
+      "explanation": "명종 6년(1176년)의 일. 공주 명학소에서 망이·망소이가 일으킨 봉기. 무신 집권기 지방 통제가 느슨해지고 수탈이 심해지자 일어난 하층민 봉기의 하나다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "명종 6년 정월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1176 명학소 망이·망소이는 itwiki 무신 집권기의 민란 요약으로 확인. 월은 원문 확인 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1176-mangi-mangsoi",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-11",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "강화 천도",
+      "year": 1232,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "고종 19년",
+      "source_text": "북쪽 대군의 침입을 피해 권력을 쥔 무신이 도읍을 바다 건너 섬으로 옮겼다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-myeongjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-gongmin"
+            }
+          ],
+          "text": "[명종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "고종 19년(1232년). 최우, 강화도, 몽골."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-gojong",
+        "before": "goryeo-reign-wonjong"
+      },
+      "explanation": "고종 19년(1232년)의 일. 몽골 1차 침입(1231) 뒤 최우가 강화도로 도읍을 옮긴 일. 고려는 강화도에서 몽골과 오래 맞섰다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "고종 19년 6월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1232 최우 주도 강화 천도는 itwiki 고려 몽골 전쟁 요약으로 확인. 6월/7월 자료 차이가 있어 월은 원문 확인 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1232-ganghwa-capital",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    },
+    {
+      "id": "goryeo-src-12",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "쌍성총관부 수복",
+      "year": 1356,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "공민왕 5년",
+      "source_text": "왕이 원에 기대던 세력을 없애고, 군사를 보내 북쪽 땅에 원이 두었던 관청을 쳐서 그 땅을 되찾았다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-wonjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-u"
+            }
+          ],
+          "text": "[원종]이 즉위한 뒤, [우왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "공민왕 5년(1356년). 기철, 유인우, 쌍성총관부."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-gongmin",
+        "before": "goryeo-reign-u"
+      },
+      "explanation": "공민왕 5년(1356년)의 일. 공민왕이 기철 등 부원 세력을 없애고 유인우를 보내 쌍성총관부를 되찾은 반원 개혁. 이자춘(이성계의 아버지)이 내응했다.",
+      "exam_tags": [
+        "war",
+        "institution"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "공민왕 5년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1356 기철 제거, 유인우의 쌍성 공격, 이자춘 내응은 itwiki 쌍성총관부·공민왕 요약으로 확인. '이성계의 아버지'는 통설(원문 확인 필요). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문(고려사·고려사절요) 대조 필요. 검증 전(D79·D180·D211)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1356-ssangseong-recovery",
+      "tags": [
+        "고려",
+        "G-B1"
+      ]
+    }
+  ]
+}
