@@ -1,36 +1,39 @@
 # 한양 도감: 결과 요약
 
 > 메인 디렉터(총괄 세션)가 갱신한다. 자세한 기록은 `docs/decision-log.md`, `docs/orchestration-log.md`.
-> 마지막 갱신: 2026-11-05 03:32 UTC
+> 마지막 갱신: 2026-11-05 16:30 UTC
 
 ## ✅ M1 사람 테스트 준비 완료
 고구려 사료 카드 12장으로 "이 게임이 단순 플래시카드보다 한능검 공부에 나은가"를 확인하는 테스트를 할 수 있다. 차단 항목은 모두 해소됐고(평가 세션 재확인), 남은 준비는 아래 "사용자가 할 일"의 사람만 가능한 두 가지다.
 
 **테스트 방법 (5줄 요약)**
-1. PC에서 `python3 prototypes/m1-timeline/build.py` 후 `python3 -m http.server 8000 --directory dist/m1`
+1. 테스트용 고정 버전은 브랜치 `claude/m1-test-build`(`git checkout claude/m1-test-build`). PC에서 `py prototypes/m1-timeline/build.py` 후 `py -m http.server 8000 --directory dist/m1`(Mac/Linux는 `python3`)
 2. 참가자 휴대폰(같은 와이파이)에서 `http://<PC IP>:8000/index.html?study=1`, 진행자 코드 `1592`
 3. 진행자 안내서: `prototypes/m1-timeline/STUDY.md`(한 장), 자세한 계획: `production/playtest/m1-plan.md`
 4. 참가자 한능검 준비생 1~2명. **Day 0 90분**(사전 시험 → 두 방식 학습 → 직후 시험) + **다음 날 20분**(재인출 시험)
 5. 진행자 메뉴의 "기록 내보내기(JSONL)"를 Day 0·Day 1 끝에 받아 저장소 `production/playtest/`에 올리면 분석은 디렉터가 한다.
 
 ## 지금 상태
-- M1: 일반 학습 모드(첫 실행 30초 안내, 간격 반복, 숙련 도감) + 테스트 모드. 자동 테스트 90개 통과, 카드 형식 v2 검증 통과.
-- 재평가: 한능검 적합성 2→5, 학습 흐름 4→7, 모바일 사용 불가→5. 차단 항목 B1~B7 해소.
-- 카드: 독립 대조 3회(마지막 24개 모두 일치), 사람 원문 대조는 아직.
+- **M2 시작(사용자 피드백 반영)**: 타이틀 화면, 학습을 해치지 않는 보상 시스템(경험치·레벨·연속일·업적), 한능검 기출 근거로 카드 확대(고구려 36장 → 백제·신라·가야).
+- 사람 테스트용 M1은 브랜치 `claude/m1-test-build`로 고정 보존(새 기능은 테스트 모드에서 꺼짐).
+- 완료: 타이틀 화면·보상 1차, **게임에 고구려 카드 36장·연표 왕 12명 표시**, 묶음 2·3 대조(묶음 3 수정 2건 반영 중). 테스트 114개 통과.
+- 진행 중: 보상 명세 확정, 백제 기출 주제 조사.
 
 ## 최근 결정
-- D78 테스트 계획서 최종 정리(반 표, 판정 지표, 고국원왕 정정 대본)
-- D74 재평가 차단 항목 처리: 공정한 "어느 왕 때인가" 시험, 같은 칸 카드는 다른 반, 틀린 카드는 2번 연속 맞혀야 승급, 첫 실행 안내
-- D72 사람 테스트 모드(플래시카드 비교, 교차 배정, 기록 규격)
-- D68 관계 단서는 후보를 2~3칸으로 좁힘
-- D56 한능검 1급 대상으로 전환, 사료 카드 + 왕대 연표 + 간격 반복
+- D85 고구려 연표 왕 10→12(문자명왕·영류왕 추가). 장수왕·영양왕 칸에 카드가 몰려서
+- D83 기출 회차는 문항까지 확인된 것만 표기
+- D79 M2: 타이틀 화면, 보상은 "단서 없는 정답 > 단서 쓴 정답 > 오답" 순, 기출은 주제·빈도 근거로만(문항 복제 안 함), 고구려 36장부터 단계 확대
+- D78 테스트 계획서 최종 정리
+- D74 재평가 차단 항목 처리
+- D68 관계 단서는 후보 2~3칸
+- D56 한능검 1급 대상으로 전환
 
 ## 그냥 해 보기 (PC)
 ```
 git clone https://github.com/dbsdlstn/Claude-Code-Game-Studios.git
 cd Claude-Code-Game-Studios
 git checkout claude/integration
-python3 -m http.server 8000
+python3 -m http.server 8000   # Windows는 py -m http.server 8000
 ```
 - M1(새 방향): http://localhost:8000/prototypes/m1-timeline/
 - v0(옛 나라×시기 보드, 동결): http://localhost:8000/web/
@@ -43,5 +46,6 @@ python3 -m http.server 8000
 - **네트워크 허용 (1분, 선택)**: 원문 자동 대조용 `db.history.go.kr`, `ko.wikisource.org`. 세션 제목 줄의 클라우드 환경 메뉴 → Edit → Network access → Allowed domains(https://code.claude.com/docs/en/cloud-environments#network-access).
 
 ## 다음 작업
-- 테스트 결과(JSONL)가 오면 분석 → 판정(계속 / 방향 수정) → 다음 마일스톤(스키마 v2 본 구현, 삼국 전체로 확장) 결정.
-- 그 전까지는 범위를 넓히지 않는다(D56). 세션들은 대기.
+- 설계: 보상 명세, 타이틀 화면, 카드 확대 계획
+- 콘텐츠: 기출 이용 조건, 삼국 기출 주제 빈도표, 고구려 묶음 2 → 대조 → 다음 묶음
+- 웹: 타이틀 화면, 여러 덱 로딩, 보상 구현

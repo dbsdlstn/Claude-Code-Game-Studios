@@ -207,3 +207,44 @@ a.btn-primary { color: #fff8ef; }
 }
 #confirm-dock .confirm-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; margin: 0; border-radius: 0; border-width: 2px 0 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 14px rgba(60,40,20,.18); }
 @media (min-width: 900px) { #confirm-dock .confirm-bar { left: 50%; right: auto; width: min(560px, 100%); transform: translateX(-50%); border-width: 2px; border-radius: 10px 10px 0 0; } }
+
+/* M2: 타이틀 화면, 보상(D82) */
+.on-title .top, .on-title .layout { display: none; }
+.title-screen { min-height: 80vh; display: grid; place-items: center; padding: 24px 16px; }
+.title-inner { width: min(520px, 100%); display: grid; gap: 14px; justify-items: center; text-align: center; }
+.title-seal { margin: 0; width: 64px; height: 64px; display: grid; place-items: center; font-family: var(--serif); font-size: 34px; color: #fff8ef; background: var(--seal); border-radius: 8px; transform: rotate(-4deg); box-shadow: 0 4px 10px rgba(60,40,20,.25); }
+.title-name { font-family: var(--serif); font-size: 34px; margin: 0; letter-spacing: .04em; }
+.title-tag { margin: 0; color: var(--ink-soft); }
+.title-nations { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.chip.nation { cursor: pointer; font: inherit; }
+.chip.nation[aria-pressed="true"] { background: var(--seal); color: #fff8ef; border-color: #7d2a1e; }
+.chip.nation[disabled] { opacity: .55; cursor: default; }
+.nation-soon { font-size: 12px; }
+.title-stats { width: 100%; display: grid; gap: 6px; font-size: 14px; color: var(--ink-soft); }
+.title-stats p { margin: 0; }
+.title-actions { width: 100%; display: grid; gap: 8px; }
+.title-play { font-size: 18px; min-height: 52px; }
+.level { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; width: 100%; font-size: 13.5px; }
+.level-name { font-weight: 700; color: var(--gold); }
+.level-track { height: 10px; border-radius: 999px; background: var(--paper-3); overflow: hidden; border: 1px solid var(--line-soft); }
+.level-fill { display: block; height: 100%; background: var(--gold-accent); }
+.level-num { color: var(--ink-soft); white-space: nowrap; }
+.result-xp { margin: 4px 0; font-weight: 700; color: var(--gold); }
+.xp-parts { font-weight: 400; font-size: 13px; color: var(--ink-soft); }
+.rewards { border-top: 1px dashed var(--line-soft); margin-top: 10px; padding-top: 10px; display: grid; gap: 6px; }
+.rewards p { margin: 0; font-size: 14px; }
+.rewards-xp b { color: var(--gold); font-size: 16px; }
+.rewards-ach { color: var(--seal); font-weight: 700; }
+/* M2: 머리줄에 "처음" 버튼이 늘어 좁은 화면에서 넘치지 않게 */
+.brand { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 420px) {
+  .top { gap: 6px; padding: 10px 12px; }
+  .brand { font-size: 17px; }
+  .brand-sub { display: none; }
+  .top .btn-small { padding: 6px 9px; }
+}
+/* 타이틀 아래 배경이 잘리던 것(짧은 페이지에서 body가 화면보다 짧음) */
+html { background-color: var(--paper); min-height: 100%; }
+body { min-height: 100vh; background-attachment: fixed; }
+.kings { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+@media (min-width: 700px) { .kings { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }

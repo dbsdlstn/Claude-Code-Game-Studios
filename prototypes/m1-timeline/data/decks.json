@@ -1,0 +1,9 @@
+{
+  "_note": "PROTOTYPE - NOT FOR PRODUCTION (M2, D82). 나라별 카드 파일 목록. 경로는 이 파일 기준. 콘텐츠가 assets/data/cards/v2/manifest.json을 만들면 그것이 먼저 쓰인다.",
+  "nations": [
+    { "id": "goguryeo", "label": "고구려", "files": ["../../../assets/data/cards/v2/goguryeo-m1.json"] },
+    { "id": "baekje", "label": "백제", "files": [] },
+    { "id": "silla", "label": "신라", "files": [] },
+    { "id": "gaya", "label": "가야", "files": [] }
+  ]
+}
