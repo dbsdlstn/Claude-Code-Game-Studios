@@ -72,7 +72,8 @@
         "신라",
         "가야",
         "S-B3"
-      ]
+      ],
+      "event_key": "42-garak-founding"
     },
     {
       "id": "silla-src-26",
@@ -144,7 +145,8 @@
         "신라",
         "가야",
         "S-B3"
-      ]
+      ],
+      "event_key": "522-daegaya-marriage"
     },
     {
       "id": "silla-src-27",
@@ -217,7 +219,8 @@
         "신라",
         "가야",
         "S-B3"
-      ]
+      ],
+      "event_key": "551-ureuk"
     }
   ]
 }

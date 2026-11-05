@@ -75,7 +75,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "246-hwando-fall"
     },
     {
       "id": "goguryeo-src-14",
@@ -146,7 +147,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "311-seoanpyeong-capture"
     },
     {
       "id": "goguryeo-src-15",
@@ -217,7 +219,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "342-former-yan-invasion"
     },
     {
       "id": "goguryeo-src-16",
@@ -288,7 +291,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "391-yeongnak-era"
     },
     {
       "id": "goguryeo-src-17",
@@ -359,7 +363,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "414-gwanggaeto-stele"
     },
     {
       "id": "goguryeo-src-18",
@@ -430,7 +435,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "494-buyeo-surrender"
     },
     {
       "id": "goguryeo-src-19",
@@ -501,7 +507,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "598-liaoxi-attack"
     },
     {
       "id": "goguryeo-src-20",
@@ -568,7 +575,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "600-sinjip"
     },
     {
       "id": "goguryeo-src-21",
@@ -637,7 +645,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "631-cheolli-wall"
     },
     {
       "id": "goguryeo-src-22",
@@ -704,7 +713,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "645-ansi-battle"
     },
     {
       "id": "goguryeo-src-23",
@@ -771,7 +781,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "668-pyongyang-fall"
     },
     {
       "id": "goguryeo-src-24",
@@ -841,7 +852,8 @@
       "tags": [
         "고구려",
         "M2-B2"
-      ]
+      ],
+      "event_key": "670-goguryeo-revival"
     }
   ]
 }

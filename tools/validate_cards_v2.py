@@ -2,12 +2,13 @@
 """Validate v2 card data against design/card-data-schema-v2.md.
 
 Usage:
-    python3 tools/validate_cards_v2.py [path ...] [--release]
+    python3 tools/validate_cards_v2.py [path ...] [--release] [--strict-events]
 
     path       v2 card JSON file(s). Default: the files listed in
                assets/data/cards/v2/manifest.json, validated nation by nation
                (anchors and ids still checked across all listed files).
     --release  also apply the release gate (R1-R3 below).
+    --strict-events  E1 (missing event_key) becomes an error (M3 onwards).
 
 Exit code 0 = all checks passed, 1 = rule violations, 2 = file/JSON error.
 Standard library only. The v1 validator (tools/validate_cards.py) is separate
@@ -65,6 +66,25 @@ MANIFEST (default run, D86): assets/data/cards/v2/manifest.json is
       manifest) is listed exactly once;
   M2  every card in a file listed under nation X has nation X.
 
+EVENTS (default run only, D97; design/event-registry.md): the registry
+  assets/data/cards/v2/events.json is {"schema": 1, "events": [...],
+  "distinct_pairs": [...]}. One event, one deck.
+  E1  every source card has event_key (warning; error with --strict-events).
+  E2  event_key matches ^[a-z0-9]+(-[a-z0-9]+)*$; registry keys likewise
+      and unique.
+  E3  cards sharing an event_key sit in one deck, unless the registry entry
+      is a perspective_pair listing exactly those cards.
+  E4  a card's event_key is in the registry and the card is the entry's
+      owner_card (or one of its pair_cards).
+  E5  registry year == the card's year.
+  E6  participants contains the owner card's nation.
+  E7  perspective_pair: pair_cards has exactly 2 cards in different decks,
+      both carrying the key; owner_card is one of them; pair_reason non-empty.
+  E8  status in {owned, planned, perspective_pair, absorbed}; owned and
+      perspective_pair cards exist; owned/pair need owner_card.
+  OBS same year + overlapping exam_tags in different decks with different
+      keys and not in distinct_pairs ("may be the same event"); counts.
+
 OBSERVATIONS (printed, never errors): cards per gap, candidate gaps left after
 the level-1 relation clue, gap length in years.
 """
@@ -78,6 +98,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 V2_DIR = ROOT / "assets/data/cards/v2"
 MANIFEST = V2_DIR / "manifest.json"
+EVENTS = V2_DIR / "events.json"
+EVENT_STATUS = {"owned", "planned", "perspective_pair", "absorbed"}
+KEY_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 V1_FILES = [ROOT / "assets/data/cards/samguk.json", ROOT / "assets/data/cards/tutorial.json"]
 
 NATIONS = {"goguryeo", "baekje", "silla", "gaya"}
@@ -412,6 +435,89 @@ def observations(anchors, sources):
     return lines
 
 
+def validate_events(sources, registry, strict=False):
+    """E1-E8 and the duplicate-suspect observation. Returns (errors, warnings, obs)."""
+    errs, warns, obs = [], [], []
+    byid = {c.get("id"): c for c in sources}
+    if not (isinstance(registry, dict) and registry.get("schema") == 1
+            and isinstance(registry.get("events"), list)):
+        return [f"[E8] {EVENTS.name}: top level must be {{\"schema\": 1, \"events\": [...]}}"], [], []
+    entries = {}
+    for e in registry["events"]:
+        k = e.get("key") if isinstance(e, dict) else None
+        if not (isinstance(k, str) and KEY_RE.match(k)):
+            errs.append(f"[E2] registry: bad key {k!r}")
+            continue
+        if k in entries:
+            errs.append(f"[E2] registry: key {k} listed more than once")
+        entries[k] = e
+    cards_by_key = {}
+    missing = 0
+    for c in sources:
+        k = c.get("event_key")
+        if k is None:
+            missing += 1
+            (errs if strict else warns).append(f"[E1] {c.get('id')}: no event_key")
+            continue
+        if not (isinstance(k, str) and KEY_RE.match(k)):
+            errs.append(f"[E2] {c.get('id')}: bad event_key {k!r}")
+            continue
+        cards_by_key.setdefault(k, []).append(c)
+        e = entries.get(k)
+        if e is None:
+            errs.append(f"[E4] {c.get('id')}: event_key {k} not in {EVENTS.name}")
+            continue
+        allowed = list(e.get("pair_cards") or []) if e.get("status") == "perspective_pair" else [e.get("owner_card")]
+        if c.get("id") not in allowed:
+            errs.append(f"[E4] {c.get('id')}: event_key {k} is owned by {', '.join(map(str, allowed))}")
+        if e.get("year") != c.get("year"):
+            errs.append(f"[E5] {k}: registry year {e.get('year')} != card {c.get('id')} year {c.get('year')}")
+    for k, cs in cards_by_key.items():
+        decks = {c.get("nation") for c in cs}
+        e = entries.get(k) or {}
+        if len(decks) > 1 and not (e.get("status") == "perspective_pair"
+                                   and sorted(c.get("id") for c in cs) == sorted(e.get("pair_cards") or [])):
+            errs.append(f"[E3] {k}: cards in more than one deck: {', '.join(sorted(c.get('id') for c in cs))}")
+        elif len(cs) > 1 and len(decks) == 1:
+            errs.append(f"[E3] {k}: more than one card in deck {cs[0].get('nation')}: {', '.join(sorted(c.get('id') for c in cs))}")
+    for k, e in entries.items():
+        st = e.get("status")
+        if st not in EVENT_STATUS:
+            errs.append(f"[E8] {k}: status {st!r} not in {sorted(EVENT_STATUS)}")
+            continue
+        own = e.get("owner_card")
+        if st in ("owned", "perspective_pair"):
+            if own not in byid:
+                errs.append(f"[E8] {k}: owner_card {own!r} does not exist")
+                continue
+            if byid[own].get("event_key") is not None and own not in [c.get("id") for c in cards_by_key.get(k, [])]:
+                errs.append(f"[E4] {k}: owner_card {own} does not carry this event_key")
+            if byid[own].get("nation") not in (e.get("participants") or []):
+                errs.append(f"[E6] {k}: participants lack the owner's nation {byid[own].get('nation')}")
+        if st == "perspective_pair":
+            pc = e.get("pair_cards") or []
+            ok = (len(pc) == 2 and all(x in byid for x in pc)
+                  and len({byid[x].get("nation") for x in pc}) == 2
+                  and all(byid[x].get("event_key") == k for x in pc)
+                  and own in pc and nonempty(e.get("pair_reason")))
+            if not ok:
+                errs.append(f"[E7] {k}: perspective_pair needs 2 cards in different decks carrying the key, owner among them, and a pair_reason")
+    distinct = {frozenset(d.get("cards") or []) for d in registry.get("distinct_pairs") or [] if isinstance(d, dict)}
+    for i, a in enumerate(sources):
+        for b in sources[i + 1:]:
+            if (a.get("nation") != b.get("nation") and a.get("year") == b.get("year")
+                    and set(a.get("exam_tags") or []) & set(b.get("exam_tags") or [])
+                    and a.get("event_key") != b.get("event_key")
+                    and frozenset((a.get("id"), b.get("id"))) not in distinct):
+                obs.append(f"may be the same event: {a.get('id')} / {b.get('id')} ({a.get('year')})")
+    counts = {}
+    for e in entries.values():
+        counts[e.get("status")] = counts.get(e.get("status"), 0) + 1
+    obs.append("events: " + ", ".join(f"{k} {v}" for k, v in sorted(counts.items()))
+               + f"; cards without event_key: {missing}")
+    return errs, warns, obs
+
+
 def read_manifest():
     """Return (paths, file->nation, errors) from the manifest."""
     try:
@@ -435,13 +541,14 @@ def read_manifest():
             paths.append(str(p))
     for f in sorted(glob.glob(str(V2_DIR / "*.json"))):
         p = Path(f).resolve()
-        if p != MANIFEST.resolve() and p not in owner:
+        if p not in (MANIFEST.resolve(), EVENTS.resolve()) and p not in owner:
             errs.append(f"[M1] manifest: {p.name} is not listed")
     return paths, owner, errs
 
 
 def main(argv):
     release = "--release" in argv
+    strict_events = "--strict-events" in argv
     paths = [a for a in argv if not a.startswith("--")]
     owner, manifest_errors = {}, []
     if not paths:
@@ -469,9 +576,21 @@ def main(argv):
         cards.extend(data["cards"])
     errors, warnings, anchors, sources = validate(cards, release)
     errors = manifest_errors + errors
+    event_obs = []
+    if owner:
+        try:
+            registry = json.loads(EVENTS.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as e:
+            print(f"ERROR reading {EVENTS}: {e}")
+            return 2
+        e_err, e_warn, event_obs = validate_events(sources, registry, strict_events)
+        errors += e_err
+        warnings += e_warn
     print(f"files: {len(paths)}{' (from manifest)' if owner else ''}, anchors: {len(anchors)}, source cards: {len(sources)}"
           + (" (release mode)" if release else ""))
     for line in observations(anchors, sources):
+        print("OBS   " + line)
+    for line in event_obs:
         print("OBS   " + line)
     for w in warnings:
         print("WARN  " + w)

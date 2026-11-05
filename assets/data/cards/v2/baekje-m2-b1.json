@@ -466,7 +466,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "371-pyongyang-fortress-battle"
     },
     {
       "id": "baekje-src-02",
@@ -537,7 +538,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "375-seogi"
     },
     {
       "id": "baekje-src-03",
@@ -608,7 +610,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "384-baekje-buddhism"
     },
     {
       "id": "baekje-src-04",
@@ -679,7 +682,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "472-letter-to-wei"
     },
     {
       "id": "baekje-src-05",
@@ -751,7 +755,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "475-hanseong-fall"
     },
     {
       "id": "baekje-src-06",
@@ -822,7 +827,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "475-ungjin-capital"
     },
     {
       "id": "baekje-src-07",
@@ -893,7 +899,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "493-baekje-silla-marriage"
     },
     {
       "id": "baekje-src-08",
@@ -965,7 +972,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "521-memorial-to-liang"
     },
     {
       "id": "baekje-src-09",
@@ -1032,7 +1040,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "538-sabi-capital"
     },
     {
       "id": "baekje-src-10",
@@ -1104,7 +1113,8 @@
         "백제",
         "B-B1",
         "가야"
-      ]
+      ],
+      "event_key": "554-gwansan-battle"
     },
     {
       "id": "baekje-src-11",
@@ -1171,7 +1181,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "639-mireuksa-reliquary"
     },
     {
       "id": "baekje-src-12",
@@ -1238,7 +1249,8 @@
       "tags": [
         "백제",
         "B-B1"
-      ]
+      ],
+      "event_key": "642-daeya-attack"
     }
   ]
 }

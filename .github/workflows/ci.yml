@@ -47,6 +47,9 @@ jobs:
       - name: Validate v2 cards (M1)
         run: python3 tools/validate_cards_v2.py
 
+      - name: Event registry rules (E1-E8 mutation tests)
+        run: python3 tools/test_validate_events.py
+
       - name: Validator parity (Python)
         run: python3 tools/validator_parity.py
 
