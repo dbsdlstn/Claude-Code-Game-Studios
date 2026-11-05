@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import net from 'node:net';
 import { buildTimeline, correctGaps, isCorrectGap } from '../js/rules.js';
-import { normalizeDeck } from '../js/data.js';
+import { normalizeDeck, mergeV2 } from '../js/data.js';
 import { existsSync } from 'node:fs';
 
 const require = createRequire(import.meta.url);
@@ -28,6 +28,18 @@ export function expectedAnchorYears(deck) {
   return [...deck.anchors].sort((a, b) => a.order - b.order).map((a) => a.reign_range ?? a.year_label.split('(')[0].trim());
 }
 export const REAL_BY_ID = new Map(REAL ? [...REAL.cards, ...REAL.anchors].map((c) => [c.id, c]) : []);
+// 일반 모드의 실제 덱(M2): 덱 목록(manifest)의 기본 나라 파일을 모두 합친 것. 기대값은 여기서 계산한다(카드·앵커 수를 고정하지 않는다).
+// 테스트 모드(?study=1)는 계속 REAL(M1 파일 하나).
+const MANIFEST_PATH = existsSync(path.join(path.dirname(V2_PATH), 'manifest.json'))
+  ? path.join(path.dirname(V2_PATH), 'manifest.json') : path.join(PROTO_ROOT, 'data', 'decks.json');
+const MANIFEST = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8'));
+export const FULL_NATION = MANIFEST.nations.find((n) => n.id === 'goguryeo');
+const FULL_FILES = (FULL_NATION?.files ?? []).map((f) => path.resolve(path.dirname(MANIFEST_PATH), f));
+export const FULL = FULL_FILES.length && FULL_FILES.every((f) => existsSync(f))
+  ? normalizeDeck(mergeV2(FULL_FILES.map((f) => JSON.parse(readFileSync(f, 'utf8')))).raw).deck : null;
+export const FULL_BY_ID = new Map(FULL ? [...FULL.cards, ...FULL.anchors].map((c) => [c.id, c]) : []);
+/** 화면 아래 데이터 줄의 기대값: "고구려 a.json, b.json · 카드 n장 · 기준 m장". */
+export const FULL_INFO = FULL ? `${FULL_NATION.label} ${FULL_FILES.map((f) => path.basename(f)).join(', ')} · 카드 ${FULL.cards.length}장 · 기준 ${FULL.anchors.length}장` : '';
 
 /** 모바일 세로 390×844(터치)와 데스크톱 1280×720. */
 export const VIEWPORTS = {

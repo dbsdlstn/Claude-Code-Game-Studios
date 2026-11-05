@@ -53,8 +53,8 @@ describe('여러 덱(manifest)', () => {
     assert.equal(m.nations[0].files[0], 'http://x/cards/a.json');
     const n = await loadNationDeck(m.nations[0], fetchFn);
     assert.deepEqual(n.errors, []);
-    assert.equal(n.deck.cards.length, 12);
-    assert.equal(n.deck.anchors.length, 10);
+    assert.equal(n.deck.cards.length, sources.length);
+    assert.equal(n.deck.anchors.length, anchors.length);
     await assert.rejects(loadNationDeck(m.nations[1], fetchFn), /아직 카드가 없다/);
   });
   test('프로토타입 덱 목록(data/decks.json): 고구려에 M1 파일, 나머지 나라는 준비 중', () => {
@@ -154,5 +154,24 @@ describe('보상 골격(D79-3 원칙)', () => {
   });
   test('dayKey는 지역 날짜', () => {
     assert.equal(dayKey(new Date(2026, 0, 2, 23, 59)), '2026-01-02');
+  });
+});
+
+describe('실제 덱 목록(assets/data/cards/v2/manifest.json)', () => {
+  test('고구려 파일을 모두 합치면 오류 없음, 사료 id 겹침 없음, 모든 카드가 한 칸에서만 정답', async () => {
+    const dir = path.dirname(V2_PATH);
+    const man = JSON.parse(readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
+    const g = man.nations.find((n) => n.id === 'goguryeo');
+    const raws = g.files.map((f) => JSON.parse(readFileSync(path.join(dir, f), 'utf8')));
+    const m = mergeV2(raws);
+    assert.deepEqual(m.errors, []);
+    const { normalizeDeck } = await import('../js/data.js');
+    const { validateDeck, buildTimeline, correctGaps } = await import('../js/rules.js');
+    const n = normalizeDeck(m.raw);
+    assert.deepEqual(n.errors, []);
+    assert.deepEqual(validateDeck(n.deck), []);
+    const t = buildTimeline(n.deck.anchors);
+    for (const c of n.deck.cards) assert.equal(correctGaps(t, c.order).length, 1, c.id);
+    assert.ok(n.deck.cards.length >= 12);
   });
 });

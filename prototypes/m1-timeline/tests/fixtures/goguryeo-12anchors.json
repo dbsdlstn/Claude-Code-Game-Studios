@@ -1,0 +1,1334 @@
+{
+ "schema": 2,
+ "_note": "PROTOTYPE 테스트 고정 데이터: M1 파일에 앵커 2개(문자명왕 491, 영류왕 618)를 더한 12앵커 덱. 화면 배치 확인용이며 사실 확인 대상 아님.",
+ "cards": [
+  {
+   "id": "goguryeo-reign-dongmyeong",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "동명성왕",
+   "order": 1,
+   "reign": {
+    "start": -37,
+    "end": -19,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "고구려 제1대 왕.",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 13,
+    "entry": "시조 동명성왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "삼국사기 기년(전승). 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "goguryeo-reign-taejo",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "태조왕",
+   "order": 2,
+   "reign": {
+    "start": 53,
+    "end": 146,
+    "basis": "chronicle"
+   },
+   "reign_alt": [
+    {
+     "start": 53,
+     "end": 165,
+     "note": "146년 동생 수성(차대왕)에게 왕위를 넘긴 뒤 165년에 죽었다는 기록 기준(사망까지)"
+    },
+    {
+     "start": 53,
+     "end": 121,
+     "note": "후한서 기년: 121년 태조왕 사망·차대왕 즉위(한국민족문화대백과 차대왕 요약, M1 3차 대조)"
+    }
+   ],
+   "summary": "고구려 제6대 왕.",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 15,
+    "entry": "태조대왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가. 146년 차대왕에게 양위(한국민족문화대백과 태조왕, 위키백과). 끝 연도를 145년으로 적는 자료가 있다는 웹 표 메모는 이번 검색으로 확인하지 못했다. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "goguryeo-reign-gogukcheon",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "고국천왕",
+   "order": 3,
+   "reign": {
+    "start": 179,
+    "end": 197,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "고구려 제9대 왕.",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 16,
+    "entry": "고국천왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가. 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "goguryeo-reign-dongcheon",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "동천왕",
+   "order": 4,
+   "reign": {
+    "start": 227,
+    "end": 248,
+    "basis": "chronicle"
+   },
+   "reign_alt": [
+    {
+     "start": 227,
+     "end": 247,
+     "note": "끝 연도를 247년으로 적는 백과 표기(M1 3차 대조)"
+    }
+   ],
+   "summary": "고구려 제11대 왕.",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 17,
+    "entry": "동천왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가. 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "goguryeo-reign-micheon",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "미천왕",
+   "order": 5,
+   "reign": {
+    "start": 300,
+    "end": 331,
+    "basis": "chronicle"
+   },
+   "reign_alt": [
+    {
+     "start": 300,
+     "end": 330,
+     "note": "한국민족문화대백과 정의부 표기"
+    },
+    {
+     "start": 300,
+     "end": 332,
+     "note": "삼국사기 역주 표기로 소개됨"
+    }
+   ],
+   "summary": "고구려 제15대 왕.",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 17,
+    "entry": "미천왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "봉상왕 9년(300) 창조리의 정변으로 봉상왕이 폐위된 뒤 즉위. 연표·백과 미러와 한국민족문화대백과(창조리 관련 항목) 등 2차 자료 여럿으로 확인(M1 2차 대조 일치). D62에서 추가. 331년 2월 재위 32년 만에 사망, 고국원왕 즉위(한국민족문화대백과 미천왕·고국원왕). 끝 연도가 자료마다 다르다. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "goguryeo-reign-sosurim",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "소수림왕",
+   "order": 6,
+   "reign": {
+    "start": 371,
+    "end": 384,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "고구려 제17대 왕.",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 18,
+    "entry": "소수림왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "goguryeo-reign-gwanggaeto",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "광개토왕",
+   "order": 7,
+   "reign": {
+    "start": 391,
+    "end": 412,
+    "basis": "inscription"
+   },
+   "reign_alt": [
+    {
+     "start": 392,
+     "end": 413,
+     "note": "삼국사기 기년"
+    }
+   ],
+   "summary": "고구려 제19대 왕.",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 18,
+    "entry": "광개토왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "수험 표준 표기는 비문 기년(D60). 웹 검색(2차 자료) 기준, 원문 대조 전(D65). 즉위 연도는 광개토왕비 기년(수험 표준), 삼국사기는 392~413."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "goguryeo-reign-jangsu",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "장수왕",
+   "order": 8,
+   "reign": {
+    "start": 413,
+    "end": 491,
+    "basis": "chronicle"
+   },
+   "reign_alt": [
+    {
+     "start": 412,
+     "end": 491,
+     "note": "광개토왕비 기년으로 계산한 즉위(소수 견해)"
+    }
+   ],
+   "summary": "고구려 제20대 왕.",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 18,
+    "entry": "장수왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "수험 표준 표기는 삼국사기 기년(D60). 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "goguryeo-reign-yeongyang",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "영양왕",
+   "order": 10,
+   "reign": {
+    "start": 590,
+    "end": 618,
+    "basis": "chronicle"
+   },
+   "reign_alt": [
+    {
+     "start": 589,
+     "end": 617,
+     "note": "1년 이른 연도를 병기한 자료(위키백과 일부)"
+    }
+   ],
+   "summary": "고구려 제26대 왕.",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 20,
+    "entry": "영양왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "평원왕 32년(590) 사망 후 태자가 즉위. 한국민족문화대백과 영양왕 항목 요약과 위키백과로 확인(재위 590~618, 589/617 이설을 적은 자료도 있음). D63에서 추가. 한국민족문화대백과 영양왕, 위키백과(재위 590년 10월~618년 9월). 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "goguryeo-reign-bojang",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "보장왕",
+   "order": 12,
+   "reign": {
+    "start": 642,
+    "end": 668,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "고구려 제28대 왕.",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 21,
+    "entry": "보장왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "fixture-reign-munja",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "문자명왕",
+   "order": 9,
+   "reign": {
+    "start": 491,
+    "end": 519,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "문자명왕(테스트용 가상 앵커, D85 대비 화면 확인용).",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 13,
+    "entry": "시조 동명성왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "삼국사기 기년(전승). 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "fixture-reign-yeongnyu",
+   "kind": "anchor",
+   "nation": "goguryeo",
+   "title": "영류왕",
+   "order": 11,
+   "reign": {
+    "start": 618,
+    "end": 642,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "영류왕(테스트용 가상 앵커, D85 대비 화면 확인용).",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 13,
+    "entry": "시조 동명성왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "삼국사기 기년(전승). 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "goguryeo-src-01",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "동옥저 정복",
+   "year": 56,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "태조왕 4년",
+   "source_text": "왕이 동쪽 바닷가의 옥저를 쳐서 그 땅을 빼앗아 고을로 삼았다. 이로써 나라의 경계가 동쪽으로는 큰 바다에, 남쪽으로는 살수에 닿게 되었다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-dongmyeong"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-dongcheon"
+      }
+     ],
+     "text": "[동명성왕]이 즉위한 뒤, [동천왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "태조왕 때, 56년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-taejo",
+    "before": "goguryeo-reign-gogukcheon"
+   },
+   "explanation": "태조왕 4년(56년)의 일. 태조왕이 동옥저를 정복해 동해안으로 영토를 넓힌 일. 시험 연결: 태조왕: 옥저 정복, 계루부 고씨 왕위 세습(수험 정리에서 함께 묶음).",
+   "exam_tags": [
+    "war"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 15,
+    "entry": "태조대왕 4년 7월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "56년은 삼국사기 기년. 정복 주체를 계루부와 여러 나부의 연합으로 보는 연구도 있다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-02",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "진대법",
+   "year": 194,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "고국천왕 16년",
+   "source_text": "사냥 나간 왕이 길가에서 우는 사람을 보고 까닭을 물으니, 흉년이 들어 품을 팔 데가 없어 어머니를 봉양할 수 없다고 했다. 왕은 그에게 옷과 먹을 것을 내주고, 관청에 명하여 해마다 봄에서 가을 사이에 나라 곡식을 집집의 식구 수에 맞추어 빌려주고 겨울에 거두어들이게 하였다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-taejo"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-dongcheon"
+      }
+     ],
+     "text": "[태조왕]이 즉위한 뒤, [동천왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "고국천왕 때, 194년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-gogukcheon",
+    "before": "goguryeo-reign-dongcheon"
+   },
+   "explanation": "고국천왕 16년(194년)의 일. 고국천왕이 을파소를 국상으로 삼은 뒤 실시한 빈민 구제 제도. 시험 연결: 고국천왕: 진대법, 을파소 등용, 5부 개편·부자 상속(연도는 확인 못 함).",
+   "exam_tags": [
+    "institution"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 16,
+    "entry": "고국천왕 16년 10월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "빌려주는 기간(봄 3월~가을 7월)과 갚는 시기(겨울 10월)는 원문 대조로 확인할 것. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": "goguryeo-founding-03",
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-03",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "서안평 공격",
+   "year": 242,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "동천왕 16년",
+   "source_text": "왕이 장수를 보내 요동의 서안평을 습격하여 깨뜨렸다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-dongcheon"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-gwanggaeto"
+      }
+     ],
+     "text": "[동천왕]이 즉위한 뒤, [광개토왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "동천왕 때, 242년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-dongcheon",
+    "before": "goguryeo-reign-micheon"
+   },
+   "explanation": "동천왕 16년(242년)의 일. 동천왕이 위의 요동 거점 서안평(요동과 낙랑을 잇는 길목)을 공격한 일. 이 공격 뒤 위 관구검의 침입(삼국사기 246년, 중국 기록 244~245년)으로 환도성이 함락된다. 미천왕의 서안평 점령(311)과 구별할 것. 시험 연결: 동천왕: 서안평 공격, 관구검 침입, 밀우·유유.",
+   "exam_tags": [
+    "war"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 17,
+    "entry": "동천왕 16년조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "242년은 동천왕 즉위(227) 기준 16년. 위치 설명은 해설로 옮겼다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-04",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "낙랑군 축출",
+   "year": 313,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "미천왕 14년",
+   "source_text": "왕이 낙랑군을 쳐서 남녀 2천여 명을 사로잡아 왔다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-gogukcheon"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-sosurim"
+      }
+     ],
+     "text": "[고국천왕]이 즉위한 뒤, [소수림왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "미천왕 때, 313년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-micheon",
+    "before": "goguryeo-reign-sosurim"
+   },
+   "explanation": "미천왕 14년(313년)의 일. 미천왕이 낙랑군을 공격해 몰아낸 일. 앞서 311년 서안평을 차지했고, 이듬해(314) 대방군도 쳤다. 시험 연결: 미천왕: 서안평 점령(311), 낙랑군 축출(313).",
+   "exam_tags": [
+    "war"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 17,
+    "entry": "미천왕 14년 10월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "낙랑군의 요동 이동설(자치통감 313년 장통 기사) 쟁점이 있다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-05",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "고국원왕 전사",
+   "year": 371,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": "같은 해(371) 10월 전사 뒤 소수림왕이 즉위했다. 즉위 연도와 같지만 즉위 전의 일이다.",
+   "reign_label": "고국원왕 41년",
+   "source_text": "겨울에 남쪽 이웃 나라의 왕이 군사 3만을 이끌고 평양성을 쳐 왔다. 왕이 군사를 내어 막다가 날아온 화살에 맞았고, 그달에 세상을 떠났다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-micheon"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-gwanggaeto"
+      }
+     ],
+     "text": "[미천왕]이 즉위한 뒤, [광개토왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "고국원왕 때, 371년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-micheon",
+    "before": "goguryeo-reign-sosurim",
+    "same_year": "before_next_accession"
+   },
+   "explanation": "고국원왕 41년(371년)의 일. 백제 근초고왕의 평양성 공격으로 고국원왕이 전사한 일. 이어 소수림왕이 즉위해 체제를 정비한다. 시험 연결: 고국원왕: 전연 침입(342), 평양성 전사(371). 소수림왕 업적과 순서를 묻는다.",
+   "exam_tags": [
+    "war"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 18,
+    "entry": "고국원왕 41년 10월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "소수림왕 즉위와 같은 해(371)이나 즉위보다 먼저 일어난 일이라 [소수림왕 즉위]보다 먼저로 둔다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-06",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "불교 전래",
+   "year": 372,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "소수림왕 2년",
+   "source_text": "여름에 북쪽 중국 왕조의 임금이 사신과 승려를 보내 불상과 경전을 전해 왔다. 왕은 사신을 보내 답례하였다. 같은 해 대학을 세워 자제를 가르쳤다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-micheon"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-jangsu"
+      }
+     ],
+     "text": "[미천왕]이 즉위한 뒤, [장수왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "소수림왕 때, 372년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-sosurim",
+    "before": "goguryeo-reign-gwanggaeto"
+   },
+   "explanation": "소수림왕 2년(372년)의 일. 전진 왕 부견이 승려 순도를 보내 불교를 전한 일. 같은 해 태학을 세웠다(태학은 귀족 자제를 가르친 교육 기관으로 설명된다. '귀족'은 원문이 아니라 해설이다). 시험 연결: 소수림왕: 불교 수용·태학 설립(372), 율령 반포(373)를 묶어서 묻는다.",
+   "exam_tags": [
+    "culture"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 18,
+    "entry": "소수림왕 2년 6월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "삼국사기 소수림왕 4년에 아도가 왔다는 기사가 있다. 초문사·이불란사 창건(375)의 출전은 원문 확인 필요(encykorea와 위키문헌 발췌가 엇갈림). 372년 이전에 불교를 아는 이가 있었다는 견해도 있다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-07",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "율령 반포",
+   "year": 373,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "소수림왕 3년",
+   "source_text": "처음으로 나라의 법령을 정하여 널리 알렸다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-sosurim"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-jangsu"
+      }
+     ],
+     "text": "[소수림왕]이 즉위한 뒤, [장수왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "소수림왕 때, 373년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-sosurim",
+    "before": "goguryeo-reign-gwanggaeto"
+   },
+   "explanation": "소수림왕 3년(373년)의 일. 소수림왕이 율령을 반포해 중앙집권 체제의 바탕을 마련한 일. 시험 연결: 소수림왕: 불교·태학(372), 율령(373).",
+   "exam_tags": [
+    "institution"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 18,
+    "entry": "소수림왕 3년조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "원문 기사가 매우 짧아 지문만으로는 다른 제도와 구별하기 어렵다. 단서 의존도가 높을 것. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-08",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "신라 구원",
+   "year": 400,
+   "year_alt": [],
+   "year_basis": "inscription",
+   "year_note": null,
+   "reign_label": "광개토왕 영락 10년",
+   "source_text": "왕이 보병과 기병 5만을 보내 이웃 나라를 구하게 하였다. 그 나라 성들 사이에 왜인이 가득했으나 군대가 이르자 물러났고, 군대는 이를 쫓아 남쪽 가야 땅의 성까지 이르렀다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-sosurim"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-yeongyang"
+      }
+     ],
+     "text": "[소수림왕]이 즉위한 뒤, [영양왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "광개토왕 때, 400년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-gwanggaeto",
+    "before": "goguryeo-reign-jangsu"
+   },
+   "explanation": "광개토왕 영락 10년(400년)의 일. 광개토왕이 신라의 요청으로 군대를 보내 왜를 물리친 일. 고구려가 신라에 영향력을 미치게 된다. 시험 연결: 광개토왕: 영락 연호, 거란·후연, 신라 구원(400).",
+   "exam_tags": [
+    "war"
+   ],
+   "source_ref": {
+    "work": "광개토왕비",
+    "section": "비문",
+    "volume": null,
+    "entry": "영락 10년 경자조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "비문 일부 글자의 판독에 이견이 있다(임나가라 종발성 등). 면·행 번호는 판독문으로 확인한 뒤 넣는다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": "goguryeo-peak-03",
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-09",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "평양 천도",
+   "year": 427,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "장수왕 15년",
+   "source_text": "왕이 도읍을 국내성에서 평양으로 옮겼다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-gwanggaeto"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-yeongyang"
+      }
+     ],
+     "text": "[광개토왕]이 즉위한 뒤, [영양왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "장수왕 때, 427년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-jangsu",
+    "before": "goguryeo-reign-yeongyang"
+   },
+   "explanation": "장수왕 15년(427년)의 일. 장수왕이 국내성에서 평양으로 도읍을 옮겨 남진의 발판을 마련한 일. 시험 연결: 장수왕: 평양 천도(427) → 한성 함락(475) → 백제 웅진 천도 순서.",
+   "exam_tags": [
+    "institution"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 18,
+    "entry": "장수왕 15년조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "지문이 짧고 '평양'이 들어 있어 쉬운 카드. 247년 동천왕의 '평양성' 천도와 헷갈리지 않게 해설에 적을 것. 원문 기사는 '도읍을 평양으로 옮겼다'(移都平壤) 한 줄이다. 출발지 국내성은 원문이 아니라 통설(itwiki 장수왕, 언론 해설)로 확인해 넣었다(디렉터 판단, D71). 247년 동천왕의 '평양성' 기사와 혼동하지 않게 출발지를 밝혔다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": "goguryeo-peak-01",
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-10",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "한성 함락",
+   "year": 475,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "장수왕 63년",
+   "source_text": "가을에 왕이 군사 3만을 이끌고 남쪽 이웃 나라를 쳐서 그 도읍을 함락하고, 그 나라 왕을 죽인 뒤 남녀 수천 명을 사로잡아 돌아왔다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-gwanggaeto"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-bojang"
+      }
+     ],
+     "text": "[광개토왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "장수왕 때, 475년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-jangsu",
+    "before": "goguryeo-reign-yeongyang"
+   },
+   "explanation": "장수왕 63년(475년)의 일. 장수왕이 백제 한성을 함락하고 개로왕을 죽인 일. 백제는 웅진으로 도읍을 옮긴다. 시험 연결: 장수왕 남진의 결과. 승려 도림 일화(백제본기 개로왕 21년)와 함께 나온다.",
+   "exam_tags": [
+    "war"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 18,
+    "entry": "장수왕 63년 9월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "사로잡은 수(8천)는 원문 대조 후 넣을 것. 지금은 '수천 명'으로 썼다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": "goguryeo-peak-02",
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-11",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "살수대첩",
+   "year": 612,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "영양왕 23년",
+   "source_text": "적의 장수에게 시를 보내 그 공이 이미 높으니 그만 돌아가라고 넌지시 권하였다. 적군이 물러가다 살수를 반쯤 건넜을 때 뒤에서 쳐서 크게 무찔렀다. 처음 요하를 건너온 30만 5천 명 가운데 요동성까지 살아 돌아간 자는 2천 7백 명뿐이었다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-jangsu"
+      },
+      {
+       "op": "before",
+       "ref": "goguryeo-reign-bojang"
+      }
+     ],
+     "text": "[장수왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "영양왕 때, 612년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-yeongyang",
+    "before": "goguryeo-reign-bojang"
+   },
+   "explanation": "영양왕 23년(612년)의 일. 을지문덕이 수의 별동대를 살수에서 크게 무찌른 싸움. 시험 연결: 영양왕: 요서 선제공격(598), 이문진 신집(600), 살수대첩(612). 을지문덕의 시(여수장우중문시).",
+   "exam_tags": [
+    "war",
+    "person"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 20,
+    "entry": "영양왕 23년조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "요하를 건넌 9군 30만 5천 명, 요동성 생환 2,700명은 2차 자료(encykorea 살수대첩, itwiki)로 재확인. 같은 수치를 자치통감에 돌리는 자료도 있어 출전 표기는 원문 확인 필요. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전 함께 볼 출처: 권44 열전 제4 을지문덕"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": "goguryeo-ending-01",
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "goguryeo-src-12",
+   "kind": "source",
+   "nation": "goguryeo",
+   "title": "도교 진흥 요청",
+   "year": 643,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "보장왕 2년",
+   "source_text": "권력을 쥔 대신이 왕에게, 지금 유교와 불교는 성하나 도교는 그렇지 못하니 당에 사신을 보내 구하자고 아뢰었다. 당은 도사 여덟 명과 노자의 경전을 보내왔고, 왕은 승려들의 절을 거두어 그들을 머물게 하였다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "goguryeo-reign-jangsu"
+      }
+     ],
+     "text": "[장수왕]이 즉위한 뒤의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "보장왕 때, 643년."
+    }
+   ],
+   "answer": {
+    "after": "goguryeo-reign-bojang",
+    "before": null
+   },
+   "explanation": "보장왕 2년(643년)의 일. 연개소문의 요청으로 당에서 도사와 『도덕경』을 받아들인 일. 승려 보덕이 이에 반발해 백제로 떠났다는 전승이 있다. 시험 연결: 보장왕·연개소문: 정변(642), 도교 장려(643), 안시성(645). 영류왕 때(624)에도 당 도사의 노자 강론이 있었다.",
+   "exam_tags": [
+    "culture"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 21,
+    "entry": "보장왕 2년 3월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "'승려의 절을 취해 머물게 했다(取僧寺館之)'는 우리역사넷 '연개소문의 도교 수용'과 한국사DB 비교보기를 인용한 검색 요약으로 확인(원문 페이지는 직접 열지 못함). '세 가르침은 솥의 세 발과 같다(三敎鼎足)' 비유는 독립 대조에서 확인되지 않아 확인될 때까지 지문에서 뺐다(D63). 판본에 따라 僧寺/浮屠寺 표기 차이가 있다. 도사 이름(숙달, 삼국유사는 敍達)은 해설에만 둔다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  }
+ ]
+}
