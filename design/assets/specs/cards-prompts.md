@@ -1,9 +1,9 @@
-# 카드별 이미지 생성 프롬프트 (44장)
+# 카드별 이미지 생성 프롬프트 (본 덱 45장 + 튜토리얼 1장)
 
 > **Source**: `assets/data/cards/samguk.json` (`id`, `title`, `type`, `answer`)
 > **규격**: `design/assets/specs/cards-assets.md` §1, 화풍 규칙: `design/art/art-bible.md`
-> **Generated**: 2026-11-04 (`id` 순서는 카드 데이터 순서)
-> **Status**: 카드 44장 전부 `Needed`. 이미지는 사용자가 외부 도구로 생성한다. 절차는 `design/assets/image-workflow.md`.
+> **Generated**: 2026-11-04, 2026-11-05 갱신(황조가와 튜토리얼 카드 추가, 진대법은 `disputed` 표시) · `id` 순서는 카드 데이터 순서
+> **Status**: 본 덱 45장과 튜토리얼 카드 1장 전부 `Needed`. 이미지는 사용자가 외부 도구로 생성한다. 절차는 `design/assets/image-workflow.md`.
 
 ## 사용법
 1. 카드 블록의 **Prompt**를 복사해 이미지 도구에 붙여 넣는다. 화풍 고정 문구가 이미 들어 있다.
@@ -12,7 +12,7 @@
 4. **고증 주의**를 보고 결과를 검수한다. "확인 필요"는 자료로 확인되지 않았다는 뜻이다. 확인되기 전에는 그 표현을 이미지에 넣지 않는다.
 
 - 장면 문장에는 나라 이름·연도·글자를 넣지 않는다(art-bible §8, cards-assets §2.3).
-- **disputed** 표시 카드(4장)는 판정에서 제외되는 카드지만 도감에는 나오므로 이미지가 필요하다.
+- **disputed** 표시 카드(5장)는 판정에서 제외되는 카드지만 도감에는 나오므로 이미지가 필요하다.
 - **anchor** 표시 카드(4장)는 처음부터 이름과 일러스트가 보이므로 가장 먼저 만든다.
 - 고증 주의는 외부 자료를 읽어 확인한 것이 아니라 일반 통설에 기반한 것이다(art-bible 부록 A와 같은 한계).
 - 사건 설명의 근거는 각 카드의 `source`(카드 JSON)에 있다. 이 문서는 그림 장면만 다룬다.
@@ -66,7 +66,7 @@ photorealistic, 3D render, anime, manga, cartoon, glossy, neon, high saturation,
 
 ### goguryeo-founding-03 — 진대법 실시
 
-`event` · 건국기 · 파일 `assets/art/cards/goguryeo-founding-03.png` · Status: Needed
+`event` · 건국기 · disputed · 파일 `assets/art/cards/goguryeo-founding-03.png` · Status: Needed
 
 **Prompt**
 ```
@@ -76,7 +76,21 @@ A raised-floor granary building in spring fields, villagers in simple clothes re
 ```
 photorealistic, 3D render, anime, manga, cartoon, glossy, neon, high saturation, text, letters, Korean text, hangul, Chinese characters, calligraphy, signature, watermark, seal stamp, logo, modern objects, Joseon dynasty gat hat, black horsehair hat, topknot with netted headband, firearms, cannons, western armor, generic fantasy armor, detailed realistic face, facial expression, cluttered scene, dark gloomy lighting, Buddhist temple, pagoda, lotus ornament, Buddha statue
 ```
-**고증 주의**: 창고(부경 계열) 형태는 확인 필요: 높은 마루 창고를 단순한 실루엣으로. 복식은 단순한 저고리·바지로.
+**고증 주의**: disputed 카드(D46): 판정에서 제외되어 해설용으로만 쓴다. 창고(부경 계열) 형태는 확인 필요: 높은 마루 창고를 단순한 실루엣으로. 복식은 단순한 저고리·바지로.
+
+### goguryeo-founding-04 — 황조가
+
+`event` · 건국기 · 파일 `assets/art/cards/goguryeo-founding-04.png` · Status: Needed
+
+**Prompt**
+```
+A silhouette of a king seen from behind sitting under a large tree, a pair of orioles perched together on a branch above him, a small distant silhouette of a woman walking away along a far path, quiet and lonely mood, flat 2D illustration, ink outlines (sumi-e brush line) with muted mineral pigment colors, aged Hanji paper texture with visible fibers, soft ink-wash bleed at the edges, generous empty margin around the subject, simple silhouette composition, limited palette of warm paper beige, ink brown, muted vermilion, muted indigo, muted gold and muted jade green, calm and quiet mood, 4:3 composition, no text
+```
+**Negative**
+```
+photorealistic, 3D render, anime, manga, cartoon, glossy, neon, high saturation, text, letters, Korean text, hangul, Chinese characters, calligraphy, signature, watermark, seal stamp, logo, modern objects, Joseon dynasty gat hat, black horsehair hat, topknot with netted headband, firearms, cannons, western armor, generic fantasy armor, detailed realistic face, facial expression, cluttered scene, dark gloomy lighting, Buddhist temple, pagoda, lotus ornament, Buddha statue, poem text, calligraphy scroll, two queens arguing, crowd, palace with curved Joseon roofs
+```
+**고증 주의**: 왕과 두 왕비(화희·치희)의 얼굴 금지: 왕은 뒷모습, 떠나는 여인은 먼 실루엣으로. 노래 가사는 글자로 넣지 않는다. 꾀꼬리 한 쌍이 핵심 소재. 궁궐·나무 아래 장면의 건축 세부는 확인 필요: 건물은 그리지 않거나 원경 윤곽만. 창작 시기에 이견이 있어 연도를 암시하는 표지는 넣지 않는다.
 
 ### goguryeo-peak-01 — 평양 천도
 
@@ -652,3 +666,24 @@ A lone musician silhouette carrying a long string instrument across a mountain p
 photorealistic, 3D render, anime, manga, cartoon, glossy, neon, high saturation, text, letters, Korean text, hangul, Chinese characters, calligraphy, signature, watermark, seal stamp, logo, modern objects, Joseon dynasty gat hat, black horsehair hat, topknot with netted headband, firearms, cannons, western armor, generic fantasy armor, detailed realistic face, facial expression, cluttered scene, dark gloomy lighting, sheet music, notation, characters
 ```
 **고증 주의**: 가야금 형태는 확인 필요. 우륵의 얼굴 금지, 뒷모습 실루엣으로.
+
+
+---
+
+## 튜토리얼 (본 덱 아님)
+
+`assets/data/cards/tutorial.json`의 연습 카드. 본 덱의 도감과 판정에 들어가지 않고 첫 실행 튜토리얼에서만 쓴다. 이미지는 본 덱과 같은 규격이다.
+
+### tutorial-goguryeo-founding-01 — 엄리대수 건너기
+
+`myth` · 건국기 · 튜토리얼 · 파일 `assets/art/cards/tutorial-goguryeo-founding-01.png` · Status: Needed
+
+**Prompt**
+```
+A lone traveler seen from behind standing at the edge of a wide river at dusk, long reeds laid across the water forming a path and a large turtle rising from the water beneath them, small silhouettes of pursuers far behind on the bank, mythic and calm mood, flat 2D illustration, ink outlines (sumi-e brush line) with muted mineral pigment colors, aged Hanji paper texture with visible fibers, soft ink-wash bleed at the edges, generous empty margin around the subject, simple silhouette composition, limited palette of warm paper beige, ink brown, muted vermilion, muted indigo, muted gold and muted jade green, calm and quiet mood, 4:3 composition, no text
+```
+**Negative**
+```
+photorealistic, 3D render, anime, manga, cartoon, glossy, neon, high saturation, text, letters, Korean text, hangul, Chinese characters, calligraphy, signature, watermark, seal stamp, logo, modern objects, Joseon dynasty gat hat, black horsehair hat, topknot with netted headband, firearms, cannons, western armor, generic fantasy armor, detailed realistic face, facial expression, cluttered scene, dark gloomy lighting, Buddhist temple, pagoda, lotus ornament, Buddha statue, fish, crocodile, bridge made of planks
+```
+**고증 주의**: 튜토리얼 전용 연습 카드(본 덱 아님). 비문 기준의 장면(갈대가 이어지고 거북이 떠오름)으로 그린다. 삼국사기는 물고기·자라가 다리를 놓았다고 적어 기록이 다르므로 물고기·자라 표현을 쓰지 않는다(원문 대조 필요). 인물은 뒷모습 실루엣, 주몽의 얼굴 금지. 강 이름(엄리대수)을 글자로 넣지 않는다. 거북의 형상과 갈대 다리의 모양은 확인 필요: 상징적으로 단순화한다. 신화 연출이며 건국기 카드라 불교 요소 금지.
