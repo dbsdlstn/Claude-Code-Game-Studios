@@ -1,0 +1,74 @@
+{
+  "schema": "m1-draft",
+  "nation": "goguryeo",
+  "nation_label": "고구려",
+  "note": "M1 개발용 임시 샘플. 스키마 v2와 콘텐츠 세션의 고구려 12장이 오면 교체한다. 전부 verified: false. 사료 지문은 원문을 근거로 이 세션이 풀어 쓴 문장이며 번역문을 옮긴 것이 아니다.",
+  "anchors": [
+    { "id": "gg-a-founding", "title": "고구려 건국", "order": -37, "year_label": "전승 기원전 37년", "reign": "동명성왕",
+      "explanation": "주몽(동명성왕)이 졸본에서 나라를 세웠다는 건국 전승. 연대는 삼국사기 전승 기준." },
+    { "id": "gg-a-nangnang", "title": "낙랑군 축출", "order": 313, "year_label": "313년", "reign": "미천왕",
+      "explanation": "미천왕이 낙랑군을 몰아내 대동강 유역을 차지했다." },
+    { "id": "gg-a-stele", "title": "광개토왕릉비 건립", "order": 414, "year_label": "414년", "reign": "장수왕",
+      "explanation": "장수왕이 아버지 광개토왕의 업적을 새겨 세운 비석." },
+    { "id": "gg-a-salsu", "title": "살수 대첩", "order": 612, "year_label": "612년", "reign": "영양왕",
+      "explanation": "을지문덕이 수나라 별동대를 살수에서 크게 무찔렀다." },
+    { "id": "gg-a-fall", "title": "평양성 함락", "order": 668, "year_label": "668년", "reign": "보장왕",
+      "explanation": "나당 연합군에 평양성이 함락되어 고구려가 멸망했다." }
+  ],
+  "cards": [
+    { "id": "gg-c-gungnae", "title": "국내성 천도", "order": 3, "year_label": "3년(유리왕 22년)", "reign": "유리왕",
+      "source_text": "왕이 도읍을 국내로 옮기고 위나암성을 쌓았다.",
+      "source": { "name": "삼국사기 고구려본기", "ref": "유리명왕 22년 10월" },
+      "clues": [
+        { "level": 1, "kind": "relation", "text": "[낙랑군 축출]보다 먼저 일어났다.", "refs": ["gg-a-nangnang"] },
+        { "level": 2, "kind": "direct", "text": "건국한 왕의 아들 대의 일이다." }
+      ],
+      "explanation": "유리왕이 졸본에서 국내성으로 도읍을 옮겼다. 고구려 초기의 일이다.",
+      "verified": false },
+    { "id": "gg-c-jindae", "title": "진대법 실시", "order": 194, "year_label": "194년(고국천왕 16년)", "reign": "고국천왕",
+      "source_text": "사냥 나간 왕이 길에서 우는 백성을 보고, 해마다 봄 3월부터 7월까지 관곡을 식구 수에 따라 빌려주고 겨울 10월에 갚게 하라고 명했다.",
+      "source": { "name": "삼국사기 고구려본기", "ref": "고국천왕 16년" },
+      "clues": [
+        { "level": 1, "kind": "relation", "text": "[낙랑군 축출]보다 먼저 일어났다.", "refs": ["gg-a-nangnang"] },
+        { "level": 2, "kind": "direct", "text": "을파소를 국상으로 등용한 왕 때다." }
+      ],
+      "explanation": "고국천왕이 을파소의 건의로 실시한 빈민 구제 제도. 2세기 말의 일이다.",
+      "verified": false },
+    { "id": "gg-c-taehak", "title": "태학 설립", "order": 372, "year_label": "372년(소수림왕 2년)", "reign": "소수림왕",
+      "source_text": "나라에 처음으로 최고 교육 기관을 세워 귀족 자제를 가르쳤다. 같은 해 북쪽 왕조에서 승려가 불상과 경문을 가지고 왔다.",
+      "source": { "name": "삼국사기 고구려본기", "ref": "소수림왕 2년" },
+      "clues": [
+        { "level": 1, "kind": "relation", "text": "[광개토왕릉비 건립]보다 먼저 일어났다.", "refs": ["gg-a-stele"] },
+        { "level": 2, "kind": "direct", "text": "이듬해 율령을 반포한 왕 때다." }
+      ],
+      "explanation": "소수림왕이 태학을 세우고 불교를 받아들였다(372). 이듬해 율령을 반포해 국가 체제를 정비했다.",
+      "verified": false },
+    { "id": "gg-c-pyeongyang", "title": "평양 천도", "order": 427, "year_label": "427년(장수왕 15년)", "reign": "장수왕",
+      "source_text": "왕이 도읍을 국내성에서 평양으로 옮겼다.",
+      "source": { "name": "삼국사기 고구려본기", "ref": "장수왕 15년" },
+      "clues": [
+        { "level": 1, "kind": "relation", "text": "[광개토왕릉비 건립]보다 나중에 일어났다.", "refs": ["gg-a-stele"] },
+        { "level": 2, "kind": "direct", "text": "비석을 세운 바로 그 왕 때다." }
+      ],
+      "explanation": "장수왕이 평양으로 도읍을 옮겨 남진 정책을 본격화했다.",
+      "verified": false },
+    { "id": "gg-c-hanseong", "title": "한성 함락", "order": 475, "year_label": "475년(장수왕 63년)", "reign": "장수왕",
+      "source_text": "왕이 군사 3만을 거느리고 남쪽 나라를 쳐서 그 도읍을 함락하고 그 왕을 죽였다.",
+      "source": { "name": "삼국사기 고구려본기", "ref": "장수왕 63년 9월" },
+      "clues": [
+        { "level": 1, "kind": "relation", "text": "[광개토왕릉비 건립]보다 나중에 일어났다.", "refs": ["gg-a-stele"] },
+        { "level": 2, "kind": "direct", "text": "도읍을 평양으로 옮긴 왕의 재위 후반이다." }
+      ],
+      "explanation": "장수왕이 백제의 도읍 한성을 함락하고 개로왕을 죽였다. 고구려가 한강 유역을 차지했다.",
+      "verified": false },
+    { "id": "gg-c-ansi", "title": "안시성 전투", "order": 645, "year_label": "645년(보장왕 4년)", "reign": "보장왕",
+      "source_text": "중국 황제가 직접 이끈 대군이 성을 여러 달 에워싸고 흙산까지 쌓았으나 끝내 함락하지 못하고 돌아갔다.",
+      "source": { "name": "삼국사기 고구려본기", "ref": "보장왕 4년" },
+      "clues": [
+        { "level": 1, "kind": "relation", "text": "[살수 대첩]보다 나중에 일어났다.", "refs": ["gg-a-salsu"] },
+        { "level": 2, "kind": "direct", "text": "고구려의 마지막 왕 때, 당 태종의 침공이다." }
+      ],
+      "explanation": "당 태종의 침공을 안시성에서 막아 냈다(645). 고구려 멸망 23년 전이다.",
+      "verified": false }
+  ]
+}
