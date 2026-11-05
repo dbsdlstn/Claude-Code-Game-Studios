@@ -140,3 +140,5 @@ button { font: inherit; color: inherit; }
   .top { padding: 12px 28px; }
 }
 @media (prefers-reduced-motion: reduce) { .row-new { animation: none; } }
+.data-warn { color: var(--wrong); font-weight: 700; display: block; margin-top: 2px; }
+.result-note { font-size: 14px; background: var(--paper-2); border-left: 3px solid var(--gold); padding: 6px 10px; margin: 6px 0; word-break: keep-all; }

@@ -6,7 +6,7 @@
 export const CONFIG = Object.freeze({
   /** 앞에서부터 처음 읽히는 파일을 쓴다. `?data=경로`로 덮어쓸 수 있다. 경로는 index.html 기준. */
   dataUrls: Object.freeze([
-    '../../assets/data/m1/goguryeo.json',
+    '../../assets/data/cards/v2-draft/goguryeo-m1.json', // 콘텐츠 세션 초안(D58). 형식 변환은 js/data.js
     'data/sample.json',
   ]),
   /** 한 세션의 카드 수(짧은 세션). 카드가 더 적으면 있는 만큼. */

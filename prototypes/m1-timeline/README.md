@@ -14,8 +14,9 @@ python3 -m http.server 8000
 ```
 → http://localhost:8000/prototypes/m1-timeline/ (휴대폰 세로 화면 기준, 데스크톱도 됨)
 
-- 데이터: `js/config.js`의 `dataUrls` 순서로 찾는다(`assets/data/m1/goguryeo.json` → `data/sample.json`). `?data=경로`로 고정, `?seed=7`로 카드 순서 고정.
-- `data/sample.json`은 개발용 임시 고구려 6장 + 기준 5장(전부 `verified: false`). 콘텐츠 세션의 12장이 오면 교체.
+- 데이터: `js/config.js`의 `dataUrls` 순서로 찾는다. 기본은 콘텐츠 세션의 고구려 초안 `assets/data/cards/v2-draft/goguryeo-m1.json`(사료 카드 12장, 왕 즉위 기준 카드 5장, D58), 없으면 `data/sample.json`(이 세션의 임시 6장, 테스트용). `?data=경로`로 고정, `?seed=7`로 카드 순서 고정.
+- 형식 차이는 `js/data.js`(로더) 한 곳에서 흡수한다. 스키마 v2가 확정되면 여기만 고친다.
+- 지금 데이터는 전부 사실 확인 전이다. 화면 아래에 "사실 확인 전 카드입니다"를 늘 표시한다.
 
 ## 조작
 - 위: 사료 카드(이름 숨김). **단서 보기**를 누를수록 이번 정답의 승급 폭이 준다(+2 → +1 → 0, 화면에 표시).
@@ -38,7 +39,7 @@ python3 -m http.server 8000
 
 ## 테스트
 ```sh
-node --test prototypes/m1-timeline/tests/rules.test.js   # 규칙 단위(판정, 단서 비용, 상자, 세션 구성, 저장)
+node --test prototypes/m1-timeline/tests/rules.test.js   # 규칙 단위(판정, 단서 비용, 상자, 세션 구성, 저장, 데이터 로더)
 node --test prototypes/m1-timeline/tests/e2e.test.mjs    # Playwright: 모바일 390×844(터치), 데스크톱 1280×720
 node prototypes/m1-timeline/tests/screenshots.mjs        # → production/qa/evidence/m1/
 ```

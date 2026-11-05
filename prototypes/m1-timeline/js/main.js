@@ -5,6 +5,7 @@
  */
 import { CONFIG } from './config.js';
 import { createStore } from './storage.js';
+import { loadRaw, normalizeDeck } from './data.js';
 import {
   validateDeck, gapBounds, promotionFor, createSession, currentId, revealClue, placeCurrent, sessionTimeline,
   isSessionDone, sessionSummary, masteryCounts, mastery, dueCount, restoreProgress, restoreSession, dataFingerprint,
@@ -130,7 +131,8 @@ function renderResult(box) {
     el('p', { class: 'result-meta' }, `${card.year_label} · ${card.reign ?? ''}`),
     r.correct ? null : el('p', { class: 'result-where', id: 'result-where' }, '놓은 자리: ', el('s', {}, r.placedText), el('br'), '맞는 자리: ', el('b', {}, r.rightText)),
     el('p', { class: 'result-exp' }, card.explanation),
-    el('p', { class: 'result-source' }, `출처: ${card.source?.name ?? ''}${card.source?.ref ? ' ' + card.source.ref : ''}`),
+    card.exam_note ? el('p', { class: 'result-note', id: 'result-note' }, el('b', {}, '수험 정리 '), card.exam_note) : null,
+    el('p', { class: 'result-source', id: 'result-source' }, `출처: ${card.source?.name ?? ''}${card.source?.ref ? ' ' + card.source.ref : ''}`),
     el('p', { class: 'result-box', id: 'result-box', dataset: { from: String(r.boxFrom ?? ''), to: String(r.boxTo) } },
       boxLine, ` · ${wait <= 1 ? '다음 세션에 다시' : `${wait}세션 뒤 복습`}`),
     el('button', { type: 'button', id: 'btn-next', class: 'btn btn-primary', onclick: onNext }, isLast ? '세션 결과 보기' : '다음 카드'),
@@ -355,31 +357,21 @@ function setupRefs() {
 
 /* ------------------------------------------------------------------ 시작 */
 
-async function loadDeck(urls) {
-  const tried = [];
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) { tried.push(`${url} (HTTP ${res.status})`); continue; }
-      return { url, deck: await res.json() };
-    } catch (e) { tried.push(`${url} (${e.message})`); }
-  }
-  throw new Error(`데이터를 읽지 못했다: ${tried.join(', ')}`);
-}
-
 async function init() {
   const params = new URLSearchParams(location.search);
   const seed = Number.parseInt(params.get('seed') ?? '', 10);
   app.seedParam = Number.isFinite(seed) ? seed >>> 0 : null;
   let loaded;
   try {
-    loaded = await loadDeck(params.get('data') ? [params.get('data')] : CONFIG.dataUrls);
+    const { url, raw } = await loadRaw(params.get('data') ? [params.get('data')] : CONFIG.dataUrls);
+    const norm = normalizeDeck(raw);
+    loaded = { url, deck: norm.deck, format: norm.format, convErrors: norm.errors };
   } catch (e) {
     $('card').replaceChildren(el('p', {}, String(e.message)));
     document.body.dataset.ready = 'error';
     return;
   }
-  const errs = validateDeck(loaded.deck);
+  const errs = [...loaded.convErrors, ...(loaded.deck ? validateDeck(loaded.deck) : [])];
   if (errs.length) {
     $('card').replaceChildren(el('p', {}, `데이터 오류 ${errs.length}건`), el('ul', {}, errs.slice(0, 10).map((x) => el('li', {}, x))));
     document.body.dataset.ready = 'error';
@@ -390,7 +382,9 @@ async function init() {
   app.cardsById = new Map(app.deck.cards.map((c) => [c.id, c]));
   app.anchorsById = new Map(app.deck.anchors.map((a) => [a.id, a]));
   app.dataId = dataFingerprint(loaded.url, app.deck);
-  $('data-info').textContent = `데이터: ${app.dataFile} · 카드 ${app.deck.cards.length}장 · 기준 ${app.deck.anchors.length}장 · M1 프로토타입(사실 확인 전)`;
+  const unverified = app.deck.cards.some((c) => !c.verified);
+  $('data-info').textContent = `데이터: ${app.dataFile} · 카드 ${app.deck.cards.length}장 · 기준 ${app.deck.anchors.length}장 · M1 프로토타입`;
+  $('data-warn').textContent = unverified ? '사실 확인 전 카드입니다. 공부 자료로 믿지 마세요.' : '';
 
   const saved = app.store.load();
   const same = saved?.dataId === app.dataId;
