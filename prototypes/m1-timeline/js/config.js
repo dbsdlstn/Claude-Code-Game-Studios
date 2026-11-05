@@ -55,7 +55,7 @@ export const CONFIG = Object.freeze({
    * 나라 인장(art-bible §4.2, D135): 색만이 아니라 글자로도 구분한다. 신라는 금색에 먹 글자, 나머지는 흰 글자.
    * 발해 색은 보류(D183)라 회색 임시.
    */
-  /** 나라별 앵커 상한(D63·D85 기본 12, D191 고려 13 → D174 충렬왕 추가로 14). 콘텐츠 검증기 MAX_ANCHORS_BY_NATION 이상이어야 한다. */
+  /** 나라별 앵커 상한(D63·D85 기본 12, D191·D174 고려 14). 콘텐츠 검증기 MAX_ANCHORS_BY_NATION과 같은 값. */
   maxAnchors: 12,
   maxAnchorsByNation: Object.freeze({ goryeo: 14 }),
   nationSeals: Object.freeze({
