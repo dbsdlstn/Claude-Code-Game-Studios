@@ -1100,14 +1100,6 @@
 - **D167**: 새 필드 불필요 확인. 일반 모드 인출 줄에 `card_id`·`correct`·`clue_used`·`box_before`·`ts_ms`·`practice`·`relearn`(같은 세션 다시 풀기 표시)·`day_index`·`clue_open_ms`가 있어 m2-plan 7b의 첫 만남 결과별 다음 정답률과 단서 연 시점 분포를 계산할 수 있다. 7b의 "같은 세션 두 번째 줄 제외"는 `relearn: true`로 바로 거를 수 있다.
 - 단위 90, e2e 63 통과. 결과 화면 스크린샷(`*-05-summary`, `*-05b-summary-bottom`) 재촬영.
 
-
-## 2026-11-05 D110. 통일신라(usilla) 지원, 휴식권 용어(D186), 손상 저장 백업 내보내기, 접근성 점검표, 증거 재촬영 (웹 빌드 세션)
-- **통일신라**: `NATION_LABEL`에 usilla '통일신라'·balhae '발해'(gaya 이름 삭제, 인장 정의는 남김). 나라 인장 `CONFIG.nationSeals`(art-bible §4.2, D135: 고 #A23B2A·백 #2F5D7C·신 #C79A2E·통 #5C3399·발 #5B5B5B, 글자 흰색/신라만 #2B2118)를 타이틀 나라 목록·도감 칩·연표 제목에 표시(`aria-hidden`, 이름이 옆에 있음, 사람 테스트 모드 제외). `staging/usilla-m3-b1·b2.json`을 픽스처 매니페스트로 읽으면 기준 12장·카드 22장으로 정상화되는 것을 e2e로 확인. 콘텐츠 세션이 `promote_staging`으로 매니페스트에 올리면 코드 변경 없이 목록에 나온다.
-- **D186 용어**: 화면 문구 "보호권" → "휴식권"(타이틀, 결과 블록). 상한 안내 문구는 D109의 "오늘 경험치는 다 모았어요 (하루 24장까지)"로 대조표 차이 항목을 채운다. 지문 변형 런타임은 구현하지 않았다(M2-A 밖).
-- **저장 손상(F11 보강)**: 손상 감지 시 타이틀에 [이전 기록 내보내기] 버튼, `:broken` 원문을 JSON 파일로 내려받는다(e2e).
-- **접근성(F9)**: `production/qa/a11y-m2.md` 점검표. e2e "접근성" 테스트(`tests/a11y.mjs`)가 타이틀·질문·오답 공개·결과·도감 4탭의 WCAG AA 대비 위반 0, 나라 목록 radiogroup 방향키(로빙 tabindex), 결과 dialog 포커스·progressbar·낭독 영역을 매번 확인. 실제 스크린리더·실기기는 M2-B 몫으로 미확인 표기.
-- **증거**: `production/qa/evidence/m2/` 390·1280 전 화면 61장 재촬영. 단위 90, e2e 61 통과.
-
 ## 2026-11-05 D210. 통일신라 덱 manifest 등록 (콘텐츠 세션)
 - 웹 usilla 지원(53bce91) 뒤 `python3 tools/promote_staging.py usilla 통일신라 usilla-m3-b1.json usilla-m3-b2.json --apply`로 등록: staging 두 파일을 `assets/data/cards/v2/`로 옮기고 manifest에 usilla(통일신라) 추가, 사건 목록 planned 22건 → owned.
 - 검증: 기본 실행 PASS(파일 12, 앵커 47, 원문 120, 0/0). E·V 변형 테스트, mark_verified 테스트, validator parity 39/39, 웹 rules(59)·m2(11)·e2e-m2(25) 통과.
@@ -1135,12 +1127,6 @@
 - **저장 손상 스크린샷**: `*-27-corrupt-save`(390·1280, 안내 문구 + [이전 기록 내려받기]).
 - **PC 실행 안내**: `prototypes/m1-timeline/README.md` 실행 절을 PC 사용자용으로 다시 썼다. Windows `py -m http.server 8000`(대안 `python`), macOS·Linux `python3`, 저장소 맨 위에서 띄워야 하는 이유, 자주 막히는 것(하위 폴더에서 띄운 404, `file://`, `py` 없음, 포트, 초기화, 같은 Wi-Fi 휴대폰, 공개 배포 금지), `?nation=`, 묶음의 Windows 명령. 하위 폴더에서 띄우면 실제로 "데이터를 읽지 못했다 … 404"가 나오는 것을 확인했다.
 - 단위 93, e2e 63 통과. 스크린샷 67장.
-
-
-## 2026-11-05 D112. 통일신라 등록(D210) 뒤 실제 4개 나라로 e2e·스크린샷 갱신 (웹 빌드 세션)
-- integration 병합(콘텐츠 D210: usilla 매니페스트 등록, staging 파일 이동). 통일신라 e2e와 "나라 4개" e2e를 실제 매니페스트로 돌리고 임시 픽스처 `manifest-usilla.json`은 지웠다.
-- 스크린샷 `*-25-usilla-title`, `*-26-usilla-timeline`(390·1280) 추가, 전 화면 65장 재촬영. 코드 변경 없음(D110 그대로 동작).
-- 단위 91, e2e 63 통과.
 
 ## 2026-11-05 D211. 고려 묶음 1 (콘텐츠 세션, D190 시행, staging)
 - nation enum에 `goryeo` 추가(검증기 V2, 스키마 문서).
@@ -1178,20 +1164,12 @@
 - **결정**: 고려에 한해 앵커 상한을 13으로 올리고 공양왕(1389~1392)을 추가한다. 과전법은 공양왕 칸으로 옮긴다(창왕 1388~1389는 앵커 없이 우왕 칸에 포함, 해설에 명시).
 - **구현**: 콘텐츠가 앵커 추가·정답 칸 재계산·검증기 상한(나라별 설정)을, 웹이 13앵커 390px 확인을 한다.
 
-
-
 ## 2026-11-05 D114. 고려 인장 확정값(D235)과 13앵커 연표 확인(D191) (웹 빌드 세션)
 - **인장**: `CONFIG.nationSeals.goryeo` = '려', `#7FB5A3`, 먹 글자 `#2B2118`, 둘레 선 `#8A6D3B` 1px 테두리(D113 임시값 대체). `seal()`이 `border`를 받고 `.seal`은 `box-sizing: border-box`(지름 그대로).
 - **미리 확인**: 테스트 매니페스트 `tests/fixtures/manifest-goryeo.json` = 고구려 + 고려(staging b1·b2 + 13번째 앵커 공양왕 고정 데이터 `goryeo-anchor13.json`, 콘텐츠 b1에 공양왕이 들어오면 지운다. 같은 id가 다르면 mergeV2가 거부하므로 그때 픽스처를 빼야 한다). 카드 20장·기준 13장 정상.
 - **e2e**: 390px 인장(색·먹 글자·1px 테두리), 압축 연표 13앵커(줄 ≤48px, "+" 13개 모두 44px, 연표 2창 이하, 가로 스크롤 없음), 오답 뒤 ✕ + "맞는 칸"이 맞는 앵커 아래에, 정답 뒤 ○가 맞는 앵커 아래에. 스크린샷 `*-28-goryeo-title`, `*-29-goryeo-timeline`.
 - PC 실행 안내(README, Windows `py`)는 D113에서 끝났다.
 - 단위 93, e2e 64 통과. 스크린샷 71장.
-## 2026-11-05 D113. 고려(goryeo) 준비, 저장 손상 스크린샷, PC 실행 안내 (웹 빌드 세션, D190 후속)
-- **고려 준비**: `NATION_LABEL`에 goryeo '고려', 인장 **임시값** '려' #1F6F64(흰 글자 5.97:1). '고'는 고구려와 겹쳐 쓰지 않았다. 설계가 art-bible에서 인장·색(CVD 포함, goryeo-scope §인장)을 정하면 `CONFIG.nationSeals.goryeo`만 바꾼다. 콘텐츠가 매니페스트에 goryeo를 올리면 코드 변경 없이 나라 목록에 나온다. 단위 테스트: 인장 글자 중복 없음, 모든 인장 대비 4.5:1 이상, `nation: goryeo` 덱 이름 "고려".
-- **저장 손상 스크린샷**: `*-27-corrupt-save`(390·1280, 안내 문구 + [이전 기록 내려받기]).
-- **PC 실행 안내**: `prototypes/m1-timeline/README.md` 실행 절을 PC 사용자용으로 다시 썼다. Windows `py -m http.server 8000`(대안 `python`), macOS·Linux `python3`, 저장소 맨 위에서 띄워야 하는 이유, 자주 막히는 것(하위 폴더에서 띄운 404, `file://`, `py` 없음, 포트, 초기화, 같은 Wi-Fi 휴대폰, 공개 배포 금지), `?nation=`, 묶음의 Windows 명령. 하위 폴더에서 띄우면 실제로 "데이터를 읽지 못했다 … 404"가 나오는 것을 확인했다.
-- 단위 93, e2e 63 통과. 스크린샷 67장.
-
 ## 2026-11-05 D213. 고려 앵커 13(공양왕) 시행 (콘텐츠 세션, D191 시행)
 - 검증기: 앵커 상한을 나라별 설정(`MAX_ANCHORS_BY_NATION = {"goryeo": 13}`, 나머지 12)으로 바꿨다(V4a).
 - `goryeo-m5-b1.json`에 공양왕 앵커(order 13, 1389~1392; 1389년 11월 창왕 폐위 뒤 즉위, 1392년 7월 폐위, thewiki·RFA·서울신문 요약) 추가. 창왕(1388~1389)은 앵커 없이 우왕 칸, 위화도 회군 카드 해설에 명시.
@@ -1203,13 +1181,6 @@
 - 근거: `design/fact-check-report-goryeo-b1.md`(일치 12). 권 번호 확인분만 기입: src-02·03 → 2·3, 서희 src-04 → 94, 이자겸 src-07 → 127, 무신정변 src-09 → 19. 후보(강감찬 94, 묘청 127/129, 망이 19/20, 강화 천도 23, 쌍성 39)는 note에만. 노비안검법 src-01은 volume null 유지, 형법지 가능성을 note에.
 - src-09 해설: "무신정변을 일으킨 무신들이 정변 직후 의종을 내쫓고 명종을 추대한 일"로 순서를 밝혔다. note 보강: src-06 신기군·신보군·항마군(통설, 지문 제외 유지), src-10 정월, src-02 쌍기 956 도래(설문우 수행). 원종 앵커 note에 1260 즉위 메모.
 - 두 묶음 PASS(0/0). 안내서 재생성.
-
-## 2026-11-05 D114. 고려 인장 확정값(D235)과 13앵커 연표 확인(D191) (웹 빌드 세션)
-- **인장**: `CONFIG.nationSeals.goryeo` = '려', `#7FB5A3`, 먹 글자 `#2B2118`, 둘레 선 `#8A6D3B` 1px 테두리(D113 임시값 대체). `seal()`이 `border`를 받고 `.seal`은 `box-sizing: border-box`(지름 그대로).
-- **미리 확인**: 테스트 매니페스트 `tests/fixtures/manifest-goryeo.json` = 고구려 + 고려(staging b1·b2 + 13번째 앵커 공양왕 고정 데이터 `goryeo-anchor13.json`, 콘텐츠 b1에 공양왕이 들어오면 지운다. 같은 id가 다르면 mergeV2가 거부하므로 그때 픽스처를 빼야 한다). 카드 20장·기준 13장 정상.
-- **e2e**: 390px 인장(색·먹 글자·1px 테두리), 압축 연표 13앵커(줄 ≤48px, "+" 13개 모두 44px, 연표 2창 이하, 가로 스크롤 없음), 오답 뒤 ✕ + "맞는 칸"이 맞는 앵커 아래에, 정답 뒤 ○가 맞는 앵커 아래에. 스크린샷 `*-28-goryeo-title`, `*-29-goryeo-timeline`.
-- PC 실행 안내(README, Windows `py`)는 D113에서 끝났다.
-- 단위 93, e2e 64 통과. 스크린샷 71장.
 
 ## 2026-11-05 D115. 나라별 앵커 상한(D191) 테스트, 공양왕 고정 데이터 제거 (웹 빌드 세션)
 - `CONFIG.maxAnchors` 12 + `maxAnchorsByNation` { goryeo: 13 }(검증기 `MAX_ANCHORS_BY_NATION`과 같은 값). `rules.test.js`·`m2.test.js`의 "앵커 상한 12" 단언을 나라별 값으로 바꿨고, 두 값이 `tools/validate_cards_v2.py`와 어긋나면 실패하는 단위 테스트를 더했다.
