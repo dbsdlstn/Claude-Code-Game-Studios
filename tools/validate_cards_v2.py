@@ -4,7 +4,9 @@
 Usage:
     python3 tools/validate_cards_v2.py [path ...] [--release]
 
-    path       v2 card JSON file(s). Default: every assets/data/cards/v2/*.json
+    path       v2 card JSON file(s). Default: the files listed in
+               assets/data/cards/v2/manifest.json, validated nation by nation
+               (anchors and ids still checked across all listed files).
     --release  also apply the release gate (R1-R3 below).
 
 Exit code 0 = all checks passed, 1 = rule violations, 2 = file/JSON error.
@@ -57,6 +59,12 @@ RELEASE (--release, D56 item 8 quality gate):
       (applies to anchors too).
   R3  a source card with exam_tags has verification.exam_notation_checked.
 
+MANIFEST (default run, D85): assets/data/cards/v2/manifest.json is
+  {"nations": [{"id", "label", "files": [path relative to the manifest]}]}.
+  M1  every listed file exists and every v2/*.json card file (other than the
+      manifest) is listed exactly once;
+  M2  every card in a file listed under nation X has nation X.
+
 OBSERVATIONS (printed, never errors): cards per gap, candidate gaps left after
 the level-1 relation clue, gap length in years.
 """
@@ -68,7 +76,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_GLOB = str(ROOT / "assets/data/cards/v2/*.json")
+V2_DIR = ROOT / "assets/data/cards/v2"
+MANIFEST = V2_DIR / "manifest.json"
 V1_FILES = [ROOT / "assets/data/cards/samguk.json", ROOT / "assets/data/cards/tutorial.json"]
 
 NATIONS = {"goguryeo", "baekje", "silla", "gaya"}
@@ -403,9 +412,43 @@ def observations(anchors, sources):
     return lines
 
 
+def read_manifest():
+    """Return (paths, file->nation, errors) from the manifest."""
+    try:
+        m = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        return None, None, [f"ERROR reading {MANIFEST}: {e}"]
+    errs, paths, owner = [], [], {}
+    if not (isinstance(m, dict) and isinstance(m.get("nations"), list)):
+        return None, None, [f"ERROR {MANIFEST}: top level must be {{\"nations\": [...]}}"]
+    for n in m["nations"]:
+        if not (isinstance(n, dict) and n.get("id") in NATIONS and isinstance(n.get("files"), list)):
+            errs.append(f"[M1] manifest: bad nation entry {n!r}")
+            continue
+        for f in n["files"]:
+            p = (MANIFEST.parent / f).resolve()
+            if p in owner:
+                errs.append(f"[M1] manifest: {f} listed more than once")
+            if not p.exists():
+                errs.append(f"[M1] manifest: {f} does not exist")
+            owner[p] = n["id"]
+            paths.append(str(p))
+    for f in sorted(glob.glob(str(V2_DIR / "*.json"))):
+        p = Path(f).resolve()
+        if p != MANIFEST.resolve() and p not in owner:
+            errs.append(f"[M1] manifest: {p.name} is not listed")
+    return paths, owner, errs
+
+
 def main(argv):
     release = "--release" in argv
-    paths = [a for a in argv if not a.startswith("--")] or sorted(glob.glob(DEFAULT_GLOB))
+    paths = [a for a in argv if not a.startswith("--")]
+    owner, manifest_errors = {}, []
+    if not paths:
+        paths, owner, manifest_errors = read_manifest()
+        if paths is None:
+            print(manifest_errors[0])
+            return 2
     if not paths:
         print("ERROR: no v2 card files found")
         return 2
@@ -419,9 +462,14 @@ def main(argv):
         if not (isinstance(data, dict) and data.get("schema") == 2 and isinstance(data.get("cards"), list)):
             print(f"ERROR {p}: top level must be {{\"schema\": 2, \"cards\": [...]}}")
             return 2
+        nation = owner.get(Path(p).resolve()) if owner else None
+        for c in data["cards"]:
+            if nation and isinstance(c, dict) and c.get("nation") != nation:
+                manifest_errors.append(f"[M2] {c.get('id')}: nation '{c.get('nation')}' but listed under {nation} in the manifest")
         cards.extend(data["cards"])
     errors, warnings, anchors, sources = validate(cards, release)
-    print(f"files: {len(paths)}, anchors: {len(anchors)}, source cards: {len(sources)}"
+    errors = manifest_errors + errors
+    print(f"files: {len(paths)}{' (from manifest)' if owner else ''}, anchors: {len(anchors)}, source cards: {len(sources)}"
           + (" (release mode)" if release else ""))
     for line in observations(anchors, sources):
         print("OBS   " + line)
