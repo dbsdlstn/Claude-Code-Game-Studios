@@ -1,0 +1,490 @@
+{
+ "schema": 2,
+ "_note": "PROTOTYPE 테스트 고정 데이터(D100): 나라가 둘일 때 화면·저장 분리를 미리 확인하려는 가상의 백제 덱. 사실 확인 대상 아님.",
+ "cards": [
+  {
+   "id": "fixture-bj-reign-onjo",
+   "kind": "anchor",
+   "nation": "baekje",
+   "title": "온조왕",
+   "order": 1,
+   "reign": {
+    "start": -18,
+    "end": 28,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "온조왕(테스트 고정 데이터).",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 13,
+    "entry": "시조 동명성왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "삼국사기 기년(전승). 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "fixture-bj-reign-goi",
+   "kind": "anchor",
+   "nation": "baekje",
+   "title": "고이왕",
+   "order": 2,
+   "reign": {
+    "start": 234,
+    "end": 286,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "고이왕(테스트 고정 데이터).",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 13,
+    "entry": "시조 동명성왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "삼국사기 기년(전승). 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "fixture-bj-reign-geunchogo",
+   "kind": "anchor",
+   "nation": "baekje",
+   "title": "근초고왕",
+   "order": 3,
+   "reign": {
+    "start": 346,
+    "end": 375,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "근초고왕(테스트 고정 데이터).",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 13,
+    "entry": "시조 동명성왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "삼국사기 기년(전승). 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "fixture-bj-reign-muryeong",
+   "kind": "anchor",
+   "nation": "baekje",
+   "title": "무령왕",
+   "order": 4,
+   "reign": {
+    "start": 501,
+    "end": 523,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "무령왕(테스트 고정 데이터).",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 13,
+    "entry": "시조 동명성왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "삼국사기 기년(전승). 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "fixture-bj-reign-seong",
+   "kind": "anchor",
+   "nation": "baekje",
+   "title": "성왕",
+   "order": 5,
+   "reign": {
+    "start": 523,
+    "end": 554,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "성왕(테스트 고정 데이터).",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 13,
+    "entry": "시조 동명성왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "삼국사기 기년(전승). 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "fixture-bj-reign-uija",
+   "kind": "anchor",
+   "nation": "baekje",
+   "title": "의자왕",
+   "order": 6,
+   "reign": {
+    "start": 641,
+    "end": 660,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "의자왕(테스트 고정 데이터).",
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 13,
+    "entry": "시조 동명성왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "삼국사기 기년(전승). 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  },
+  {
+   "id": "fixture-bj-src-01",
+   "kind": "source",
+   "nation": "baekje",
+   "title": "관등 정비",
+   "year": 260,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "고이왕",
+   "source_text": "(테스트 고정 지문 1) 왕이 나라의 일을 새로 정하였다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "fixture-bj-reign-goi"
+      }
+     ],
+     "text": "[고이왕]이 즉위한 뒤의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "고이왕 때, 260년."
+    }
+   ],
+   "answer": {
+    "after": "fixture-bj-reign-goi",
+    "before": "fixture-bj-reign-geunchogo"
+   },
+   "explanation": "관등 정비(테스트 고정 데이터, 사실 확인 대상 아님).",
+   "exam_tags": [
+    "war"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 15,
+    "entry": "태조대왕 4년 7월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "56년은 삼국사기 기년. 정복 주체를 계루부와 여러 나부의 연합으로 보는 연구도 있다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "fixture-bj-src-02",
+   "kind": "source",
+   "nation": "baekje",
+   "title": "평양성 공격",
+   "year": 371,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "근초고왕",
+   "source_text": "(테스트 고정 지문 2) 왕이 나라의 일을 새로 정하였다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "fixture-bj-reign-geunchogo"
+      }
+     ],
+     "text": "[근초고왕]이 즉위한 뒤의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "근초고왕 때, 371년."
+    }
+   ],
+   "answer": {
+    "after": "fixture-bj-reign-geunchogo",
+    "before": "fixture-bj-reign-muryeong"
+   },
+   "explanation": "평양성 공격(테스트 고정 데이터, 사실 확인 대상 아님).",
+   "exam_tags": [
+    "war"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 15,
+    "entry": "태조대왕 4년 7월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "56년은 삼국사기 기년. 정복 주체를 계루부와 여러 나부의 연합으로 보는 연구도 있다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "fixture-bj-src-03",
+   "kind": "source",
+   "nation": "baekje",
+   "title": "사비 천도",
+   "year": 538,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "성왕",
+   "source_text": "(테스트 고정 지문 3) 왕이 나라의 일을 새로 정하였다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "fixture-bj-reign-seong"
+      }
+     ],
+     "text": "[성왕]이 즉위한 뒤의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "성왕 때, 538년."
+    }
+   ],
+   "answer": {
+    "after": "fixture-bj-reign-seong",
+    "before": "fixture-bj-reign-uija"
+   },
+   "explanation": "사비 천도(테스트 고정 데이터, 사실 확인 대상 아님).",
+   "exam_tags": [
+    "war"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 15,
+    "entry": "태조대왕 4년 7월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "56년은 삼국사기 기년. 정복 주체를 계루부와 여러 나부의 연합으로 보는 연구도 있다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  },
+  {
+   "id": "fixture-bj-src-04",
+   "kind": "source",
+   "nation": "baekje",
+   "title": "황산벌 전투",
+   "year": 660,
+   "year_alt": [],
+   "year_basis": "chronicle",
+   "year_note": null,
+   "reign_label": "의자왕",
+   "source_text": "(테스트 고정 지문 4) 왕이 나라의 일을 새로 정하였다.",
+   "text_basis": "own_paraphrase_from_original",
+   "clues": [
+    {
+     "level": 1,
+     "kind": "relation",
+     "relations": [
+      {
+       "op": "after",
+       "ref": "fixture-bj-reign-uija"
+      }
+     ],
+     "text": "[의자왕]이 즉위한 뒤의 일이다."
+    },
+    {
+     "level": 2,
+     "kind": "direct",
+     "text": "의자왕 때, 660년."
+    }
+   ],
+   "answer": {
+    "after": "fixture-bj-reign-uija",
+    "before": null
+   },
+   "explanation": "황산벌 전투(테스트 고정 데이터, 사실 확인 대상 아님).",
+   "exam_tags": [
+    "war"
+   ],
+   "source_ref": {
+    "work": "삼국사기",
+    "section": "고구려본기",
+    "volume": 15,
+    "entry": "태조대왕 4년 7월조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "56년은 삼국사기 기년. 정복 주체를 계루부와 여러 나부의 연합으로 보는 연구도 있다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전"
+   },
+   "disputed": false,
+   "disputed_note": null,
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null,
+   "tags": [
+    "고구려",
+    "M1"
+   ]
+  }
+ ]
+}

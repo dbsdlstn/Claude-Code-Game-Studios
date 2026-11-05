@@ -1,0 +1,29 @@
+{
+ "_note": "테스트용 덱 목록(D100): 고구려 = 실제 파일, 백제 = 고정 데이터.",
+ "nations": [
+  {
+   "id": "goguryeo",
+   "label": "고구려",
+   "files": [
+    "../../../../assets/data/cards/v2/goguryeo-m1.json"
+   ]
+  },
+  {
+   "id": "baekje",
+   "label": "백제",
+   "files": [
+    "baekje-fixture.json"
+   ]
+  },
+  {
+   "id": "silla",
+   "label": "신라",
+   "files": []
+  },
+  {
+   "id": "gaya",
+   "label": "가야",
+   "files": []
+  }
+ ]
+}
