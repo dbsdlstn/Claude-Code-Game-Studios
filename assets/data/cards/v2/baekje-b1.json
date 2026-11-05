@@ -1,0 +1,1243 @@
+{
+  "schema": 2,
+  "cards": [
+    {
+      "id": "baekje-reign-onjo",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "온조왕",
+      "order": 1,
+      "reign": {
+        "start": -18,
+        "end": 28,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제1대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 23,
+        "entry": "온조왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "전승 연대. 재위 기원전 18~서기 28은 위키백과 백제 왕계 표로 확인. 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-reign-goi",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "고이왕",
+      "order": 2,
+      "reign": {
+        "start": 234,
+        "end": 286,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제8대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 24,
+        "entry": "고이왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "즉위 234는 검색 확인, 끝 연도 286은 확인 못 함(원문 대조 필요). 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-reign-geunchogo",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "근초고왕",
+      "order": 3,
+      "reign": {
+        "start": 346,
+        "end": 375,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제13대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 24,
+        "entry": "근초고왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 346~375는 itwiki·위키백과로 확인. 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-reign-chimnyu",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "침류왕",
+      "order": 4,
+      "reign": {
+        "start": 384,
+        "end": 385,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제15대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 24,
+        "entry": "침류왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 384~385는 위키백과·itwiki로 확인. 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-reign-gaero",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "개로왕",
+      "order": 5,
+      "reign": {
+        "start": 455,
+        "end": 475,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제21대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 25,
+        "entry": "개로왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "475년이 재위 21년이라는 기사로 계산(455 즉위). 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-reign-munju",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "문주왕",
+      "order": 6,
+      "reign": {
+        "start": 475,
+        "end": 477,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제22대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "문주왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 475~477은 한국민족문화대백과·공주시 자료로 확인. 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-reign-dongseong",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "동성왕",
+      "order": 7,
+      "reign": {
+        "start": 479,
+        "end": 501,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제24대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "동성왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "479 즉위, 501 백가에게 살해는 itwiki 동성왕으로 확인. 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-reign-muryeong",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "무령왕",
+      "order": 8,
+      "reign": {
+        "start": 501,
+        "end": 523,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제25대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "무령왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "동성왕 사후 501 즉위, 523 사망(지석)은 v1 대조와 검색으로 확인. 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-reign-seong",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "성왕",
+      "order": 9,
+      "reign": {
+        "start": 523,
+        "end": 554,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제26대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "성왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "538이 16년이라는 기사로 523 즉위 계산, 554 관산성 전사 확인. 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-reign-mu",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "무왕",
+      "order": 10,
+      "reign": {
+        "start": 600,
+        "end": 641,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제30대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 27,
+        "entry": "무왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 600~641은 위키백과로 확인. 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-reign-uija",
+      "kind": "anchor",
+      "nation": "baekje",
+      "title": "의자왕",
+      "order": 11,
+      "reign": {
+        "start": 641,
+        "end": 660,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "백제 제31대 왕.",
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 28,
+        "entry": "의자왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "660이 재위 20년이라는 기사로 641 즉위 계산. 권 번호는 원문 대조 필요. D93에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
+      "id": "baekje-src-01",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "평양성 공격",
+      "year": 371,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "근초고왕 26년",
+      "source_text": "왕이 태자와 함께 정예 군사 3만을 이끌고 북쪽 이웃 나라의 큰 성을 쳤다. 그 나라 왕이 막아 싸우다 날아온 화살에 맞아 죽었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-onjo"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-chimnyu"
+            }
+          ],
+          "text": "[온조왕]이 즉위한 뒤, [침류왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "근초고왕 26년(371년). 고구려 평양성, 고국원왕 전사."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-geunchogo",
+        "before": "baekje-reign-chimnyu"
+      },
+      "explanation": "근초고왕 26년(371년)의 일. 근초고왕이 태자 근구수와 함께 고구려 평양성을 공격해 고국원왕을 전사시킨 일. 백제 전성기의 대표 사건이다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 24,
+        "entry": "근초고왕 26년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "태자 근구수, 정예병 3만, 고국원왕이 화살에 맞아 전사는 한국민족문화대백과 고국원왕 요약으로 확인. 기출: 47회(근초고왕·광개토왕 순서), 70회 정리 자료(검색 요약 기준, 문항 수준 미확인이라 추정 회차). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": "baekje-peak-01",
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-02",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "서기 편찬",
+      "year": 375,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "근초고왕 30년",
+      "source_text": "옛 기록에 따르면 나라를 연 뒤로 글로 일을 적어 둔 적이 없었는데, 이때 박사를 얻어 비로소 나라의 기록을 갖게 되었다고 한다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-goi"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-gaero"
+            }
+          ],
+          "text": "[고이왕]이 즉위한 뒤, [개로왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "근초고왕 30년(375년). 박사 고흥, 『서기』."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-geunchogo",
+        "before": "baekje-reign-chimnyu"
+      },
+      "explanation": "근초고왕 30년(375년)의 일. 근초고왕 때 박사 고흥이 역사서 『서기』를 편찬한 일. 고구려 『유기』, 신라 『국사』와 함께 삼국의 역사서 편찬으로 묶어 나온다.",
+      "exam_tags": [
+        "culture"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 24,
+        "entry": "근초고왕 30년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "375년 고흥의 서기 편찬은 기출 해설 페이지 검색 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-03",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "불교 수용",
+      "year": 384,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "침류왕 원년",
+      "source_text": "가을에 바다 건너 남쪽 왕조에서 이국의 승려가 오자, 왕은 교외에 나가 맞아 궁 안에 머물게 하고 예를 다해 공경하였다. 이듬해 봄에는 절을 세우고 승려 열 명을 두었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-chimnyu"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-dongseong"
+            }
+          ],
+          "text": "[침류왕]이 즉위한 뒤, [동성왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "침류왕 원년(384년). 동진의 마라난타."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-chimnyu",
+        "before": "baekje-reign-gaero"
+      },
+      "explanation": "침류왕 원년(384년)의 일. 침류왕이 동진에서 온 인도 승려 마라난타를 맞아 불교를 받아들인 일. 고구려(372, 전진 순도)보다 12년 늦다.",
+      "exam_tags": [
+        "culture"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 24,
+        "entry": "침류왕 원년 9월·2년 2월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "384년 9월 마라난타 도착, 궁중 예우, 이듬해 2월 한산에 절과 승려 10명은 itwiki 침류왕 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-04",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "북위에 보낸 국서",
+      "year": 472,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "개로왕 18년",
+      "source_text": "왕이 북쪽 왕조에 사신을 보내 글을 올렸다. 이웃 나라에게 핍박을 받은 지 서른 해가 넘었다고 호소하며, 군사를 보내 함께 치자고 청하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-chimnyu"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-dongseong"
+            }
+          ],
+          "text": "[침류왕]이 즉위한 뒤, [동성왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "개로왕 18년(472년). 북위에 보낸 국서."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-gaero",
+        "before": "baekje-reign-munju"
+      },
+      "explanation": "개로왕 18년(472년)의 일. 개로왕이 북위에 고구려 공격을 요청한 일. 북위는 응하지 않았고 3년 뒤 장수왕의 공격으로 한성이 함락된다. 국서에는 근초고왕 때 고국원왕의 목을 베었다는 과장된 주장도 있다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 25,
+        "entry": "개로왕 18년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "472년 북위 국서와 '30여 년 핍박' 서술은 한국민족문화대백과 고국원왕 요약과 언론 칼럼으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-05",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "한성 함락과 개로왕 전사",
+      "year": 475,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": "같은 해 문주왕 즉위 전의 일",
+      "reign_label": "개로왕 21년",
+      "source_text": "북쪽 이웃 나라 왕이 군사 3만을 이끌고 와서 도성을 에워쌌다. 성이 무너지자 왕은 몇 기병과 함께 빠져나가 달아나다 붙잡혀 죽었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-gaero"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-dongseong"
+            }
+          ],
+          "text": "[개로왕]이 즉위한 뒤, [동성왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "개로왕 21년(475년) 9월. 고구려 장수왕."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-gaero",
+        "before": "baekje-reign-munju",
+        "same_year": "before_next_accession"
+      },
+      "explanation": "개로왕 21년(475년)의 일. 장수왕의 공격으로 한성이 함락되고 개로왕이 죽은 일. 같은 해 문주왕이 즉위해 웅진으로 도읍을 옮긴다. 앞서 고구려 승려 도림이 개로왕에게 접근해 토목 공사를 부추겼다는 기사가 있다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 25,
+        "entry": "개로왕 21년 9월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "한성 함락과 개로왕 살해는 고구려 쪽 카드(장수왕 63년)와 같은 사건이다. 같은 해 문주왕 즉위 전의 일이라 same_year로 개로왕 칸에 둔다(D91). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-06",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "웅진 천도",
+      "year": 475,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": "문주왕 즉위 뒤의 일",
+      "reign_label": "문주왕 원년",
+      "source_text": "도성이 무너지고 선왕이 죽은 뒤 자리에 오른 왕이, 겨울에 남쪽 큰 강가의 고을로 도읍을 옮겼다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-gaero"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-muryeong"
+            }
+          ],
+          "text": "[개로왕]이 즉위한 뒤, [무령왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "문주왕 원년(475년) 10월. 한성에서 웅진(공주)으로."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-munju",
+        "before": "baekje-reign-dongseong"
+      },
+      "explanation": "문주왕 원년(475년)의 일. 한성 함락 뒤 즉위한 문주왕이 웅진으로 도읍을 옮긴 일. 고구려에 밀려 급히 옮긴 천도라 이후 정국이 혼란했다(해구의 문주왕 살해 477).",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "문주왕 원년 10월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "475년 웅진 천도, 천도 후 혼란, 해구의 문주왕 살해(477)는 학술 논문 요약·한국민족문화대백과 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-07",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "신라와 결혼 동맹",
+      "year": 493,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "동성왕 15년",
+      "source_text": "왕이 동쪽 이웃 나라에 사신을 보내 혼인을 청하자, 그 나라 왕이 높은 관등에 있는 신하의 딸을 보내왔다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-munju"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-seong"
+            }
+          ],
+          "text": "[문주왕]이 즉위한 뒤, [성왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "동성왕 15년(493년) 3월. 신라 소지 마립간, 이찬 비지의 딸."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-dongseong",
+        "before": "baekje-reign-muryeong"
+      },
+      "explanation": "동성왕 15년(493년)의 일. 동성왕이 신라와 혼인으로 동맹을 굳힌 일(나제 동맹 강화). 이듬해와 그다음 해 고구려의 공격을 받을 때 서로 군대를 보내 도왔다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "동성왕 15년 3월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "493년 3월 청혼과 이찬 비지의 딸, 494·495년 상호 구원은 itwiki 동성왕 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-08",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "양에 보낸 표문",
+      "year": 521,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "무령왕 21년",
+      "source_text": "왕이 남쪽 왕조에 사신을 보내 글을 올려, 여러 차례 북쪽 이웃을 깨뜨려 나라가 다시 강해졌다고 알렸다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-munju"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-seong"
+            }
+          ],
+          "text": "[문주왕]이 즉위한 뒤, [성왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "무령왕 21년(521년). 양, '다시 강국이 되었다'."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-muryeong",
+        "before": "baekje-reign-seong"
+      },
+      "explanation": "무령왕 21년(521년)의 일. 무령왕이 양에 사신을 보내 백제가 다시 강국이 되었다고 알린 일. 양서 백제전에는 22담로에 왕족을 보내 다스렸다는 기록도 있다. 무령왕릉(벽돌무덤)도 양과의 교류를 보여 준다.",
+      "exam_tags": [
+        "war",
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "무령왕 21년 11월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "521년 양에 보낸 국서의 '누파구려 갱위강국(累破句麗 更爲强國)'은 v1 2차 대조에서 2차 자료 여럿으로 확인(양서 백제전). 22담로는 itwiki 무령왕 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-09",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "사비 천도",
+      "year": 538,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "성왕 16년",
+      "source_text": "봄에 왕이 도읍을 넓은 들과 큰 강을 낀 새 땅으로 옮기고, 나라 이름을 고쳐 옛 뿌리를 드러냈다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-seong"
+            }
+          ],
+          "text": "[성왕]이 즉위한 뒤의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "성왕 16년(538년). 웅진에서 사비(부여)로, 국호 남부여."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-seong",
+        "before": "baekje-reign-mu"
+      },
+      "explanation": "성왕 16년(538년)의 일. 성왕이 사비로 도읍을 옮기고 국호를 남부여로 고친 일. 웅진 천도와 달리 미리 계획한 천도였고, 중앙 22부와 지방 5방 체제를 갖추었다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "성왕 16년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "538년 사비 천도와 남부여, 계획 천도, 22부·5부 5방은 itwiki 성왕 요약과 기출 해설 페이지로 확인. 기출: 70회 정리 자료, 78회(관산성 전투 인물의 업적)는 검색 요약 기준이라 추정 회차. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": "baekje-peak-03",
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-10",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "관산성 전투와 성왕 전사",
+      "year": 554,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "성왕 32년",
+      "source_text": "태자가 이웃 나라의 성을 치자 왕이 이를 돕고자 몇 안 되는 보병과 기병을 이끌고 밤길을 가다가, 숨어 있던 적군에게 붙잡혀 죽었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-dongseong"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-mu"
+            }
+          ],
+          "text": "[동성왕]이 즉위한 뒤, [무왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "성왕 32년(554년) 7월. 관산성(충북 옥천), 신라 김무력."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-seong",
+        "before": "baekje-reign-mu"
+      },
+      "explanation": "성왕 32년(554년)의 일. 성왕이 관산성 전투에서 신라 복병에게 죽은 일. 앞서 신라가 백제가 되찾은 한강 하류를 차지했고(553), 이 전투로 나제 동맹이 완전히 깨졌다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "성왕 32년 7월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "554년 태자 창의 관산성 공격, 성왕이 밤에 소수 병력으로 가다 복병에 전사, 신라 김무력은 itwiki 성왕·관산성 전투 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-11",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "미륵사 사리 봉안",
+      "year": 639,
+      "year_alt": [],
+      "year_basis": "inscription",
+      "year_note": "사리를 봉안한 해(기해년)",
+      "reign_label": "무왕 40년(기해년)",
+      "source_text": "석탑을 해체해 고치던 중 나온 금판 기록에는, 왕후가 재물을 내어 절을 세우고 기해년에 사리를 모셨다고 새겨져 있었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-seong"
+            }
+          ],
+          "text": "[성왕]이 즉위한 뒤의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "무왕 때, 기해년(639년). 익산 미륵사지 석탑 사리봉영기(2009년 발견)."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-mu",
+        "before": "baekje-reign-uija"
+      },
+      "explanation": "무왕 40년(기해년)(639년)의 일. 무왕 대 익산 미륵사 서탑에 사리를 봉안한 일. 2009년 해체 수리 중 사리봉영기가 나왔고, 왕후(사택적덕의 딸)가 절을 세웠다고 적혀 선화공주 설화와 다른 기록으로 주목받았다.",
+      "exam_tags": [
+        "culture"
+      ],
+      "source_ref": {
+        "work": "익산 미륵사지 석탑 사리봉영기",
+        "section": "명문",
+        "volume": null,
+        "entry": "기해년 기사",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "639년 왕후의 창건과 2009년 발견은 itwiki 성왕/무왕 요약과 학술 자료 제목으로 확인. 왕후가 사택씨라는 내용은 이번 검색 결과에서 직접 확인하지 못해 해설에만 두고 원문 대조 필요로 남긴다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    },
+    {
+      "id": "baekje-src-12",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "대야성 공격",
+      "year": 642,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "의자왕 2년",
+      "source_text": "왕이 즉위 이듬해 몸소 군사를 이끌고 이웃 나라 서쪽 성 40여 개를 빼앗았다. 이어 장군을 보내 요충지의 큰 성을 쳐서 함락하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-seong"
+            }
+          ],
+          "text": "[성왕]이 즉위한 뒤의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "의자왕 2년(642년). 신라 대야성, 장군 윤충, 성주 김품석(김춘추의 사위)."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-uija",
+        "before": null
+      },
+      "explanation": "의자왕 2년(642년)의 일. 의자왕이 신라 서쪽 40여 성을 빼앗고 윤충을 보내 대야성을 함락한 일. 이 일로 김춘추가 고구려와 당에 도움을 청하게 된다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 28,
+        "entry": "의자왕 2년 7월·8월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "7월 40여 성(의자왕 직접), 8월 대야성(윤충)은 한국민족문화대백과 대야성 전투 요약으로 확인(v1 대조). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D93)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": "baekje-ending-01",
+      "tags": [
+        "백제",
+        "B-B1"
+      ]
+    }
+  ]
+}
