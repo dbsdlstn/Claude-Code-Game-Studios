@@ -1,0 +1,42 @@
+{
+ "schema": 2,
+ "_note": "PROTOTYPE 테스트 고정 데이터(D114): 고려 13번째 앵커 공양왕(D191). 콘텐츠 b1에 공양왕이 들어오면 지운다.",
+ "cards": [
+  {
+   "id": "goryeo-reign-gongyang",
+   "kind": "anchor",
+   "nation": "goryeo",
+   "title": "공양왕",
+   "order": 13,
+   "reign": {
+    "start": 1389,
+    "end": 1392,
+    "basis": "chronicle"
+   },
+   "reign_alt": [],
+   "summary": "고려 제34대 왕. (테스트 고정 데이터, D191 13앵커 확인용, 사실 확인 대상 아님)",
+   "source_ref": {
+    "work": "고려사",
+    "section": "열전(신우전)",
+    "volume": null,
+    "entry": "우왕 즉위조",
+    "url": null,
+    "db_id": null,
+    "exam_rounds": [],
+    "note": "테스트 고정 데이터(D114). 실제 공양왕 앵커는 콘텐츠가 추가한다."
+   },
+   "verification": {
+    "verified": false,
+    "verified_by": [],
+    "verified_at": null,
+    "original_checked": false,
+    "exam_notation_checked": false,
+    "content_hash": null
+   },
+   "image": null,
+   "image_source": null,
+   "image_license": null,
+   "v1_id": null
+  }
+ ]
+}

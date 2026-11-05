@@ -706,7 +706,7 @@ function nextSession() {
 function seal(nationId) {
   const S = CONFIG.nationSeals[nationId];
   if (!S) return null;
-  return el('span', { class: 'seal', 'aria-hidden': 'true', dataset: { seal: nationId }, style: `background:${S.bg};color:${S.fg}` }, S.ch);
+  return el('span', { class: 'seal', 'aria-hidden': 'true', dataset: { seal: nationId }, style: `background:${S.bg};color:${S.fg}${S.border ? `;border:1px solid ${S.border}` : ''}` }, S.ch);
 }
 
 /* 도감(design/ux/dogam.md): 프로필 줄 + 탭 4개(카드·업적·칭호·오답 노트). 열 때마다 카드 탭. */

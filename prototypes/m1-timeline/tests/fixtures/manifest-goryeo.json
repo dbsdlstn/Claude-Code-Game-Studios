@@ -1,0 +1,21 @@
+{
+ "_note": "테스트용 덱 목록(D114): 고구려 실제 + 고려(staging b1·b2 + 13번째 앵커 고정 데이터).",
+ "nations": [
+  {
+   "id": "goguryeo",
+   "label": "고구려",
+   "files": [
+    "../../../../assets/data/cards/v2/goguryeo-m1.json"
+   ]
+  },
+  {
+   "id": "goryeo",
+   "label": "고려",
+   "files": [
+    "../../../../assets/data/cards/v2/staging/goryeo-m5-b1.json",
+    "../../../../assets/data/cards/v2/staging/goryeo-m5-b2.json",
+    "goryeo-anchor13.json"
+   ]
+  }
+ ]
+}
