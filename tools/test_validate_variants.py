@@ -95,6 +95,21 @@ class VariantRules(unittest.TestCase):
         self.assertEqual(v.content_hash(card), h)
 
 
+class CrossCardTerms(unittest.TestCase):
+    """D180 observation: a variant using another same-deck card's key term is printed."""
+
+    def test_current_data_has_no_cross_card_terms(self):
+        sources = [c for c in BASE if c.get("kind") == "source"]
+        self.assertEqual(v.variant_crossref_obs(sources), [])
+
+    def test_other_card_title_in_variant_is_reported(self):
+        cards = copy.deepcopy(BASE)
+        card = next(c for c in cards if c["id"] == CID)
+        card["variants"][0]["text"] = "도읍을 옮긴 뒤 살수대첩 같은 큰 싸움을 치를 힘을 길렀다는 이야기이다."
+        sources = [c for c in cards if c.get("kind") == "source"]
+        self.assertTrue(any("goguryeo-src-11" in l for l in v.variant_crossref_obs(sources)))
+
+
 class VolumeRange(unittest.TestCase):
     """V13a (D154): 삼국사기 권 number must fit the section."""
 

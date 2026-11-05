@@ -472,7 +472,7 @@
         {
           "id": "v2",
           "angle": "actor",
-          "text": "태자가 아버지 왕과 함께 정예 군사를 이끌고 북쪽 큰 나라의 성을 공격하였다. 이 싸움에서 그 나라 왕이 목숨을 잃었고, 이 나라는 전성기를 맞았다.",
+          "text": "태자가 아버지 왕과 함께 정예 군사를 이끌고 북쪽 큰 나라의 성을 공격하였다. 성을 지키던 그 나라 왕은 싸움 중에 화살을 맞고 숨졌다.",
           "text_basis": "own_paraphrase_from_original",
           "verification": {
             "verified": false,
@@ -864,8 +864,8 @@
       "variants": [
         {
           "id": "v2",
-          "angle": "result",
-          "text": "도읍이 적에게 무너지자 새로 즉위한 왕은 남쪽 큰 강가의 고을로 서둘러 도읍을 옮겼다. 급히 이루어진 이 일 뒤로 한동안 나라 안이 어지러웠다.",
+          "angle": "actor",
+          "text": "선왕이 적에게 죽고 도성마저 잃자, 뒤를 이은 왕은 그해 겨울 남쪽의 강가 고을로 도읍을 옮겼다.",
           "text_basis": "own_paraphrase_from_original",
           "verification": {
             "verified": false,
@@ -1094,7 +1094,7 @@
         {
           "id": "v2",
           "angle": "result",
-          "text": "도읍을 새 땅으로 옮기면서 중앙의 관청을 정비하고 지방을 다섯 구역으로 나누어 다스렸다. 나라 이름에는 북쪽 옛 나라의 이름을 붙였다.",
+          "text": "왕이 도읍을 새 땅으로 옮기고, 나라 이름에 북쪽 옛 나라의 이름을 붙였다.",
           "text_basis": "own_paraphrase_from_original",
           "verification": {
             "verified": false,
@@ -1183,7 +1183,7 @@
         {
           "id": "v2",
           "angle": "scene",
-          "text": "가야와 왜의 군사와 함께 이웃 나라와 싸우던 중, 왕이 적은 군사만 거느리고 밤길을 가다 숨어 있던 적군에게 죽임을 당하였다. 이로써 두 나라 사이의 동맹은 완전히 깨졌다.",
+          "text": "왕이 이웃 나라를 치려고 적은 군사만 거느리고 밤길을 가다가, 숨어 있던 적군을 만나 싸우던 중 목숨을 잃었다.",
           "text_basis": "own_paraphrase_from_original",
           "verification": {
             "verified": false,
