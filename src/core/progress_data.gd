@@ -64,7 +64,7 @@ func record_round(cleared: bool) -> void:
 ## 끝난 라운드의 요약(RoundSession.summary())을 플레이 기록에 더하고 진행 중 라운드를 비운다.
 ## new_ids: 이번 라운드에 새로 도감에 들어간 카드 id.
 func record_round_result(summary: Dictionary, new_ids: Array = []) -> void:
-	var cleared := typeof(summary.get("cleared")) == TYPE_BOOL and summary["cleared"]
+	var cleared: bool = typeof(summary.get("cleared")) == TYPE_BOOL and summary["cleared"]
 	record_round(cleared)
 	var levels: Array = []
 	var raw_levels: Variant = summary.get("clue_levels")
@@ -142,9 +142,9 @@ static func version_of(d: Dictionary) -> int:
 ## 지금 카드 묶음에 없는 id도 지우지 않는다(출시 모드에서 잠시 빠진 카드일 수 있다).
 static func from_dict(d: Dictionary) -> ProgressData:
 	var p := ProgressData.new()
-	var ids: Variant = d.get("collected")
-	if ids is Array:
-		for v: Variant in ids:
+	var raw_collected: Variant = d.get("collected")
+	if raw_collected is Array:
+		for v: Variant in raw_collected:
 			if v is String:
 				p.collect(v)
 	p.rounds_played = _count(d.get("rounds_played"))

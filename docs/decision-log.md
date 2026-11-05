@@ -326,6 +326,14 @@
 - **검증 확장**: `tools/validate_cards.py --candidates FILE [--deck DECK]`(C1~C3: 배열 형식, 본 덱과 함께 카드 규칙 검사·규칙 8 제외, 제목 비중복). 기존 사용법과 출력은 그대로.
 - id는 덱 번호 규칙(`nation-era-04/05`)으로 미리 정해, 채택하면 그대로 옮긴다.
 
+## 2026-11-05 D52. GitHub Actions로 Godot 테스트 실행 (Godot MVP)
+- **이유**: 클라우드 세션은 내려받은 Godot 실행이 막혀 있다. Actions 러너에서 처음으로 실제 실행한다.
+- **워크플로**: `.github/workflows/ci.yml`. 트리거는 `claude/**` push와 `workflow_dispatch`. 잡 둘: `data-and-web`(Python 검증 3종 + 이식 도구 동등성 + Node 단위·동등성 테스트), `godot`(Godot 4.7.2 공식 zip → import 2회까지 → gdUnit4 6.2.2 → 리포트 artifact, 실패해도 업로드).
+- **버전 고정**: actions/checkout v4.2.2, setup-python v5.6.0, setup-node v4.4.0, upload-artifact v4.6.2, Godot 4.7.2-stable, gdUnit4 6.2.2(engine-reference가 4.7.2 동작을 확인한 버전). 이 세션은 godotengine·gdUnit4 저장소의 릴리스 목록을 볼 수 없어 gdUnit4 태그 이름(`v6.2.2`/`6.2.2`)은 둘 다 시도한다.
+- **웹 E2E 제외**: Playwright 브라우저 설치가 무거워 CI에서 뺐다. 필요하면 별도 잡으로 더한다.
+- **gdUnit4 플러그인**: CI 체크아웃에서만 `project.godot`에 `[editor_plugins]`를 붙인다. 저장소의 `project.godot`은 바꾸지 않는다(로컬 설치는 사용자 몫).
+- **결과**(2026-11-05): 3회차에서 Godot 4.7.2 + gdUnit4 6.2.2로 175/175 통과(파싱 오류 0, 고아 노드 0). 앞의 두 회차에서 실제 파싱 오류 2개를 고쳤다(`docs/reviews/godot-ci-runs.md`). "남은 문제"의 "Godot 미실행"과 "gdUnit4 4.7 호환 미확인"은 테스트 범위에서 해소됐다. 화면 확인과 스크린샷 증거는 여전히 남았다.
+
 ## 남은 문제
 - 카드 44장 전부 `verified: false`. 사람의 사실 확인 전에는 출시 빌드에 넣을 카드가 없다(`validate_cards.py --release` 실패가 정상).
 - 같은 사료(삼국사기 전승)에 기댄 건국기 카드가 많다. 플레이에서 건국기 칸이 단서 3단계 의존으로 쏠리는지 볼 것.

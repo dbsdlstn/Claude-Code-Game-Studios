@@ -65,7 +65,7 @@ func _ready() -> void:
 	_rng.randomize()
 
 	_build_screens()
-	var first_run := not _progress.tutorial_done and _progress.rounds_played == 0 and not _progress.has_current_round()
+	var first_run: bool = not _progress.tutorial_done and _progress.rounds_played == 0 and not _progress.has_current_round()
 	if first_run and _tutorial != null:
 		_open_tutorial()
 	else:
@@ -249,10 +249,10 @@ func _on_placement(nation: String, era: String) -> void:
 	if not r["accepted"]:
 		return
 	var card: CardData = r["card"]
-	var was_complete := _progress.is_complete(_playable_ids())
+	var was_complete: bool = _progress.is_complete(_playable_ids())
 	if r["correct"] and _progress.collect(card.id):
 		_session.note_new_collected(card.id)
-	var completed_now := not was_complete and _progress.is_complete(_playable_ids())
+	var completed_now: bool = not was_complete and _progress.is_complete(_playable_ids())
 	_game.show_placement(r, nation, era)
 	_last_message = "[%s] %s" % [card.title, "정답" if r["correct"] else "오답"]
 
@@ -300,7 +300,7 @@ func _save() -> void:
 
 func _show_card_errors(cards_path: String, release_mode: bool) -> void:
 	var rules := CardValidator.rules_of(_cards.errors)
-	var only_coverage := not rules.is_empty()
+	var only_coverage: bool = not rules.is_empty()
 	for r in rules:
 		if r != CardValidator.RULE_CELL_COVERAGE:
 			only_coverage = false
