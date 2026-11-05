@@ -9,6 +9,10 @@ import { CONFIG } from '../js/config.js';
 import { normalizeDeck } from '../js/data.js';
 import { readFileSync } from 'node:fs';
 
+/** 일반 모드 첫 세션 장수(명세 기본값, D95). */
+const G = CONFIG.leitnerGeneral;
+const FIRST = Math.max(G.new_min, Math.floor(G.session_size * G.new_max_ratio));
+
 let server;
 let browser;
 before(async () => { server = await startServer(); browser = await chromium.launch(); });
@@ -35,17 +39,18 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     await openProto(page, server.base, { data: null, intro: null, title: null });
     await page.waitForSelector('#title:not([hidden])');
     assert.equal(await page.isVisible('#timeline'), false, '타이틀에서는 학습 화면이 안 보인다');
-    // D93: 처음에는 새 카드 6장(M1 설정), 시작 버튼 위에 오늘 할 일
+    // D93·D95: 처음에는 새 카드 FIRST장(명세 기본값), 시작 버튼 위에 오늘 할 일
     assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'new');
     assert.equal(await page.innerText('#title-play'), '새 카드 시작');
-    const L = CONFIG.leitner;
-    assert.equal(await page.innerText('#title-today'), `오늘 복습 0장 · 새 카드 ${L.session_size}장 · 약 ${Math.ceil((L.session_size * CONFIG.secondsPerCard) / 60)}분`);
+    assert.equal(await page.innerText('#title-today'), `오늘 복습 0장 · 새 카드 ${FIRST}장 · 약 ${Math.ceil((FIRST * CONFIG.secondsPerCard) / 60)}분`);
     assert.ok(await page.evaluate(() => document.querySelector('#title-today').getBoundingClientRect().bottom <= document.querySelector('#title-play').getBoundingClientRect().top), '오늘 할 일은 시작 버튼 위');
     assert.equal(await page.locator('#title-meta').count(), 1, '레벨·XP·연속일 한 줄');
     assert.match(await page.innerText('#title-meta'), new RegExp(`레벨 1[\\s\\S]*0 / ${CONFIG.rewards.level.base} XP · 연속 0일`));
     assert.equal(await page.innerText('#title-name-line'), '입문자');
     // 파일이 있는 나라만 활성(백제는 D93부터 활성), 나머지는 "준비 중"
-    assert.deepEqual(await page.locator('#title-nations .nation').evaluateAll((b) => b.map((x) => [x.dataset.nation, x.disabled])), NATIONS.map((n) => [n.id, !n.files.length]));
+    // 파일이 있는 나라는 모두 고를 수 있다(3개 이상이면 세로 목록, 2개 이하면 칩)
+    const shown = await page.locator('#title-nations [data-nation]').evaluateAll((b) => b.map((x) => [x.dataset.nation, x.disabled]));
+    assert.deepEqual(shown.filter(([, d]) => !d).map(([id]) => id).sort(), NATIONS.filter((n) => n.files.length).map((n) => n.id).sort());
     assert.match(await page.innerText('#title-progress'), new RegExp(`고구려 카드 ${FULL.cards.length}장 중 0장 학습`));
     assert.match(await page.innerText('#title-stats'), /레벨 1/);
     assert.ok(await noOverflow(page));
@@ -61,8 +66,8 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     await tap(page, '#btn-home');
     await page.waitForSelector('#title:not([hidden])');
     assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'continue');
-    assert.match(await page.innerText('#title-play'), /이어하기 · 5장 남음/);
-    assert.match(await page.innerText('#title-today'), /이어서 5장 남음 · 약 \d+분/);
+    assert.match(await page.innerText('#title-play'), new RegExp(`이어하기 · ${FIRST - 1}장 남음`));
+    assert.match(await page.innerText('#title-today'), new RegExp(`이어서 ${FIRST - 1}장 남음 · 약 \\d+분`));
     assert.match(await page.innerText('#title-progress'), /1장 학습/);
     // 하는 방법 = 처음 안내 다시 보기, 숙련 도감
     await tap(page, '#title-howto');
@@ -73,7 +78,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     await tap(page, '#dogam-close');
     // 이어하기: 같은 세션의 다음 카드
     await tap(page, '#title-play');
-    assert.match(await page.innerText('#progress'), /카드 2 \/ 6/);
+    assert.match(await page.innerText('#progress'), new RegExp(`카드 2 / ${FIRST}`));
     // 다시 열면 타이틀부터, 안내는 다시 안 나옴
     await page.reload();
     await page.waitForSelector('#title:not([hidden])');
@@ -100,19 +105,17 @@ test('보상 정산(session-result.md): 결과 요약 → 카드별 → 하루 �
   await playOneSession(page);
   const X = CONFIG.rewards.xp;
   assert.equal(await page.innerText('#summary-title'), '오늘의 세션 · 고구려');
-  assert.match(await page.innerText('#stage-summary'), /정답 5 \/ 6\s+깨끗한 정답 5 · 단서를 쓴 정답 0 · 오답 1\s+다시 풀기 1장 중 1장 성공/);
+  assert.match(await page.innerText('#stage-summary'), new RegExp(`정답 ${FIRST - 1} / ${FIRST}\\s+깨끗한 정답 ${FIRST - 1} · 단서를 쓴 정답 0 · 오답 1\\s+다시 풀기 1장 중 1장 성공`));
   assert.doesNotMatch(await page.innerText('#stage-summary'), /XP/, '1단계에는 XP가 없다');
   assert.deepEqual(await page.locator('#summary-body .stage').evaluateAll((n) => n.map((x) => x.dataset.stage)), ['summary', 'cards', 'goal', 'level', 'ach', 'next']);
   // 카드별: 깨끗한 정답 +10, 상자 승급 +5, 오답 +0과 재학습 안내
   const lines = await page.locator('#settle-list .settle').evaluateAll((n) => n.map((x) => [x.dataset.kind, x.dataset.xp, x.innerText]));
-  assert.equal(lines.length, 5, '처음 5장, 나머지는 더 보기');
-  await page.click('#settle-more');
-  const all = await page.locator('#settle-list .settle').evaluateAll((n) => n.map((x) => [x.dataset.kind, x.innerText]));
-  assert.equal(all.length, 6);
+  const all = lines.map(([k, , t]) => [k, t]);
+  assert.equal(all.length, FIRST);
   const wrong = all.find(([k]) => k === 'wrong');
   assert.match(wrong[1], /해설을 읽어 보세요\s*\+0[\s\S]*다음에 두 번 연속 맞히면 올라가요/);
   assert.ok(all.filter(([k]) => k === 'clean').every(([, t]) => /깨끗한 정답\s*\+10[\s\S]*상자 1 → 2 · \+5/.test(t)));
-  const xp = 5 * (X.clean + X.box_up) + X.daily_goal;
+  const xp = (FIRST - 1) * (X.clean + X.box_up) + X.daily_goal;
   assert.equal(await page.getAttribute('#summary-xp', 'data-xp'), String(xp));
   assert.match(await page.innerText('#summary-goal'), new RegExp(`오늘 목표 달성 · \\+${X.daily_goal}`));
   assert.match(await page.innerText('#summary-streak'), /연속 1일째예요/);
@@ -160,7 +163,7 @@ test('하루 세 번째 세션: 인출 XP 0과 안내, 승급 보너스는 그�
   await page.waitForSelector('body[data-ready="true"]');
   await playOneSession(page);
   const X = CONFIG.rewards.xp;
-  assert.equal(await page.getAttribute('#summary-xp', 'data-xp'), String(5 * X.box_up), '승급만');
+  assert.equal(await page.getAttribute('#summary-xp', 'data-xp'), String((FIRST - 1) * X.box_up), '승급만');
   assert.match(await page.innerText('#stage-next'), /경험치는 하루 두 세션까지예요/);
   assert.match(await page.innerText('#stage-next'), /오늘은 충분히 했어요/);
   assert.equal(await page.locator('#stage-goal').count(), 0, '목표는 이미 달성');
@@ -189,10 +192,10 @@ test('M1 저장(최상위 completed_sessions·cards)을 읽어 진행을 잇는�
   assert.ok(ids.length >= 0);
 }));
 
-const EMPTY = NATIONS.find((n) => !n.files.length);
-test(`카드가 없는 나라(?nation=${EMPTY?.id})는 고를 수 없어 고구려로 연다`, { skip: (!FULL || !EMPTY) && '해당 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
-  await openProto(page, server.base, { data: null, nation: EMPTY.id });
-  assert.ok((await page.innerText('#data-info')).includes(FULL_INFO));
+// 카드가 없는 나라("준비 중")는 실제 manifest에 없으므로(D96) 고정 데이터 목록으로 확인한다
+test('카드가 없는 나라(?nation=gaya, 고정 데이터 목록)는 고를 수 없어 기본 나라로 연다', () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, nation: 'gaya', manifest: 'tests/fixtures/manifest-two-nations.json' });
+  assert.match(await page.innerText('#data-info'), /^데이터: 고구려 goguryeo-m1\.json/);
 }));
 
 test('테스트 모드(방식 A·B)에는 타이틀·보상·"처음" 버튼이 없다', { skip: !REAL && '실제 데이터 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
@@ -271,7 +274,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) for (const C of CASES) {
     await tap(page, '#switch-confirm');
     await page.waitForURL(/nation=baekje/);
     await page.waitForSelector('#title:not([hidden])');
-    assert.equal(await page.getAttribute('#title-nations [data-nation="baekje"]', 'aria-pressed'), 'true');
+    assert.equal((await page.locator('#title-nations [data-nation="baekje"]').evaluate((b) => b.getAttribute('aria-checked') ?? b.getAttribute('aria-pressed'))), 'true');
     assert.match(await page.innerText('#title-progress'), new RegExp(`백제 카드 ${BJ.cards.length}장 중 0장 학습`));
     assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'new', '백제는 처음');
     assert.match(await page.innerText('#title-stats'), /레벨 1/);
@@ -291,7 +294,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) for (const C of CASES) {
     // 1장 이상 한 세션은 §5대로 끝난 것으로 처리되고 다음 세션 2가 된다).
     await page.goto(page.url().replace(/&?nation=baekje/, ''));
     await page.waitForSelector('#title:not([hidden])');
-    assert.equal(await page.getAttribute('#title-nations [data-nation="baekje"]', 'aria-pressed'), 'true');
+    assert.equal((await page.locator('#title-nations [data-nation="baekje"]').evaluate((b) => b.getAttribute('aria-checked') ?? b.getAttribute('aria-pressed'))), 'true');
     await tap(page, '#title-nations [data-nation="goguryeo"]');
     await page.waitForURL(/nation=goguryeo/);
     await page.waitForSelector('#title:not([hidden])');
@@ -457,4 +460,34 @@ test('390px 나라 3개: 세로 목록(행 56px 이상, radiogroup, 행마다 �
   await page.waitForURL(/nation=silla/);
   await page.waitForSelector('#title:not([hidden])');
   assert.equal(await page.getAttribute('#title-nations [data-nation="silla"]', 'aria-checked'), 'true');
+}));
+
+// D95: 일반 모드는 명세 기본값(new_min 2). 세션 1의 오답이 다음 세션(다음 날)에 복습으로 돌아온다(실제 고구려 36장).
+test('D95 실제 덱: 세션 1 오답 카드가 다음 세션 복습으로 나온다(같은 날은 D94로 다음 날)', { skip: !FULL && '실제 데이터 없음' }, () => withPage(VIEWPORTS.desktop, async (page) => {
+  await openProto(page, server.base, { data: null });
+  let wrongId = null;
+  while (await page.getAttribute('#card', 'data-card-id')) {
+    const card = await currentCard(page, FULL_BY_ID);
+    const g = await gapsFor(page, card);
+    const first = !wrongId && !(await page.locator('#retry-badge').count());
+    if (first) wrongId = card.id;
+    await pressGap(page, first ? g.wrong : g.right, false);
+    await page.click('#btn-next');
+  }
+  await page.waitForSelector('#summary:not([hidden])');
+  await editSave(page, (s) => {
+    const y = new Date(Date.now() - 36 * 3600 * 1000).toISOString();
+    for (const e of Object.values(s.cards)) if (e.last_played_at) e.last_played_at = y;
+    return s;
+  });
+  assert.match(await page.innerText('#session-no'), /세션 2/);
+  const ids = [];
+  while (await page.getAttribute('#card', 'data-card-id')) {
+    const card = await currentCard(page, FULL_BY_ID);
+    if (!ids.includes(card.id)) ids.push(card.id);
+    await pressGap(page, (await gapsFor(page, card)).right, false);
+    await page.click('#btn-next');
+  }
+  assert.ok(ids.includes(wrongId), `세션 2에 오답 카드 ${wrongId}가 복습으로 나와야 한다: ${ids}`);
+  assert.ok(ids.length > 1, '복습 + 새 카드');
 }));

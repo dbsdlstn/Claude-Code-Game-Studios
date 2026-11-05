@@ -80,6 +80,11 @@ export const CONFIG = Object.freeze({
    * 끄려면 intake_guard_late: 0, same_day_block: false.
    */
   leitnerNormal: Object.freeze({ intake_guard_late: 8, same_day_block: true }),
+  /**
+   * 일반 학습 모드의 Leitner 전체 설정(D95): 명세 기본값(leitner-spec §8: 세션 8장, new_min 2, new_max_ratio 0.5) + 칸 규칙 + D94.
+   * M1 덮어쓰기(세션 6장, 첫 세션 6장 모두 새 카드)는 테스트 모드(`leitner`)에만. 일반 모드에 두면 안 본 카드가 많을 때 복습 자리가 없었다(D102).
+   */
+  leitnerGeneral: Object.freeze({ ...LEITNER_DEFAULT, slotBeforeFirst: false, placedJoinTimeline: false, intake_guard_late: 8, same_day_block: true }),
   /** 사람 테스트 모드(`?study=1`, m1-plan §4·§5·§11, D72). 참가자마다 저장 키가 따로다. */
   study: Object.freeze({
     /** 테스트 모드는 M1 데이터 파일 하나로 고정(덱이 늘어도 참가자 기록이 흔들리지 않게). */

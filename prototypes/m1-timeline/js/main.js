@@ -17,7 +17,7 @@ import {
 } from './rules.js';
 import { armStoreAdapter, splitHalves, armIds } from './study.js';
 
-/** Leitner 설정: 테스트 모드는 CONFIG.leitner(M1), 일반 모드는 여기에 leitnerNormal(D94)을 얹는다(init). */
+/** Leitner 설정: 테스트 모드는 CONFIG.leitner(M1 덮어쓰기), 일반 모드는 CONFIG.leitnerGeneral(명세 기본값 + D94, D95). init에서 고른다. */
 let L = CONFIG.leitner;
 const $ = (id) => document.getElementById(id);
 /** replaceChildren은 null을 "null" 글자로 넣는다(B3). 자식 중 null·undefined·false를 거르고 넣는다. */
@@ -974,7 +974,7 @@ async function init() {
     app.study = { participant: pid, cap: CONFIG.study.sessionsPerArm, menuUrl, studyStore };
     app.store = armStoreAdapter(studyStore, 'A', CONFIG.study.sessionsPerArm);
   }
-  if (!app.study) L = Object.freeze({ ...CONFIG.leitner, ...CONFIG.leitnerNormal });
+  if (!app.study) L = CONFIG.leitnerGeneral;
   const seed = Number.parseInt(params.get('seed') ?? '', 10);
   app.seedParam = Number.isFinite(seed) ? seed >>> 0 : 0;
   if (params.get('confirm') === '1') app.confirmMode = 'always';

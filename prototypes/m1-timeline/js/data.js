@@ -9,7 +9,7 @@
  * order(즉위 연도), year_label, reign(왕 이름), reign_range, explanation.
  */
 
-const NATION_LABEL = { goguryeo: '고구려', baekje: '백제', silla: '신라', gaya: '가야' };
+const NATION_LABEL = { goguryeo: '고구려', baekje: '백제', silla: '신라' }; // 가야는 삼국 덱에 흡수(D96)
 const TAG_LABEL = { institution: '제도·정치', person: '인물', war: '전쟁·대외', culture: '문화·종교·사회' };
 
 /** 연도 표기: 음수는 기원전. */
