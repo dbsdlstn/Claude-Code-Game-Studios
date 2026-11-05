@@ -1208,6 +1208,17 @@
       "note": "usilla-src-07 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
     },
     {
+      "key": "782-paegang-jin",
+      "year": 782,
+      "title": "패강진 설치",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-22 작성됨(staging). manifest 등록 때 owned로 바꾼다(D205)."
+    },
+    {
       "key": "788-dokseo-sampumgwa",
       "year": 788,
       "title": "독서삼품과",
