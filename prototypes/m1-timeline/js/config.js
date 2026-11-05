@@ -45,10 +45,32 @@ export const CONFIG = Object.freeze({
   confirmPlacement: 'coarse',
   /** 저장 형식이 leitner-spec §2로 바뀌어 키를 올렸다(이전 저장은 읽지 않는다). */
   storageKey: 'hanyang-m1:save:v2',
+  /** 덱 목록(M2, D82). 앞에서부터 처음 읽히는 것을 쓴다. 일반 모드만(테스트 모드는 dataUrls의 M1 파일로 고정). */
+  manifestUrls: Object.freeze([
+    '../../assets/data/cards/v2/manifest.json', // 콘텐츠가 만들면 이것
+    'data/decks.json',
+  ]),
+  defaultNation: 'goguryeo',
+  /**
+   * 보상(M2 골격, D79-3·D82). design/rewards-spec.md가 오기 전의 임시 수치. 원칙: 학습 신호와 같은 방향
+   * (단서 없는 정답 > 단서 정답 > 오답 = 0), 승급·등급에 큰 보상, 재도전·연습·세션 길이로는 보상 없음, 연속일이 끊겨도 벌 없음.
+   * 테스트 모드(`?study=1`)에서는 끈다.
+   */
+  rewards: Object.freeze({
+    enabled: true,
+    xp: Object.freeze({ clean: 10, clue_relation: 5, clue_direct: 3, wrong: 0, box_up: 5, grade_up: Object.freeze([0, 20, 40, 80]), session_done: 10, daily_goal: 20 }),
+    /** 레벨 n → n+1에 필요한 XP = base + step × (n − 1). */
+    level: Object.freeze({ base: 100, step: 50 }),
+    daily_goal_sessions: 1,
+    /** 업적 기준값(이름과 판정은 js/rewards.js). */
+    achievements: Object.freeze({ sessions: 1, streak: 7, bronze: 1, silver: 1, gold: 1, level: 5 }),
+  }),
   /** 처음 실행 안내(D74-5): 일반 학습 모드에서 한 번, 건너뛰기 가능. 테스트 모드는 진행자 대본이 대신한다. `?intro=0|1`로 강제. */
   introKey: 'hanyang-m1:intro:v1',
   /** 사람 테스트 모드(`?study=1`, m1-plan §4·§5·§11, D72). 참가자마다 저장 키가 따로다. */
   study: Object.freeze({
+    /** 테스트 모드는 M1 데이터 파일 하나로 고정(덱이 늘어도 참가자 기록이 흔들리지 않게). */
+    dataUrls: Object.freeze(['../../assets/data/cards/v2/goguryeo-m1.json', 'data/sample.json']),
     storagePrefix: 'hanyang-m1:study:v1:',
     /**
      * 진행자 메뉴 잠금(D74-4, B5): 메뉴를 열 때마다 이 코드를 묻는다(참가자가 "진행자"를 눌러도 반 구성을 못 보게).

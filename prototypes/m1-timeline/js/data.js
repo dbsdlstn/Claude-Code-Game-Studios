@@ -87,3 +87,51 @@ export async function loadRaw(urls, fetchFn = (u) => fetch(u, { cache: 'no-store
   }
   throw new Error(`데이터를 읽지 못했다: ${tried.join(', ')}`);
 }
+
+/* ------------------------------------------------------------------ 여러 덱(M2, D82) */
+
+/**
+ * 스키마 v2 파일 여러 개를 하나로 합친다. 같은 id의 기준 카드(앵커)는 한 번만(내용이 다르면 오류),
+ * 같은 id의 사료 카드가 두 파일에 있으면 오류. 저장은 카드 id 기준이라 파일이 늘어도 진행이 유지된다.
+ * @returns {{raw: object|null, errors: string[]}}
+ */
+export function mergeV2(raws) {
+  const errors = [];
+  const byId = new Map();
+  for (const r of raws) {
+    if (formatOf(r) !== 'v2') { errors.push('스키마 v2가 아닌 파일'); continue; }
+    for (const c of r.cards) {
+      const prev = byId.get(c?.id);
+      if (!prev) { byId.set(c.id, c); continue; }
+      if (c.kind === 'anchor' && prev.kind === 'anchor') {
+        if (JSON.stringify(prev) !== JSON.stringify(c)) errors.push(`${c.id}: 기준 카드가 파일마다 다르다`);
+      } else errors.push(`${c.id}: 카드 id가 두 번 나온다`);
+    }
+  }
+  return { raw: errors.length ? null : { schema: 2, cards: [...byId.values()] }, errors };
+}
+
+/**
+ * 덱 목록(manifest)을 읽는다. 형식: `{ nations: [{ id, label, files: [경로, ...] }] }`, 경로는 manifest 파일 기준.
+ * 앞에서부터 처음 읽히는 manifest를 쓴다.
+ */
+export async function loadManifest(urls, fetchFn = (u) => fetch(u, { cache: 'no-store' }), base = globalThis.location?.href ?? 'http://localhost/') {
+  const { url, raw } = await loadRaw(urls, fetchFn);
+  if (!Array.isArray(raw?.nations)) throw new Error(`덱 목록 형식이 아니다: ${url}`);
+  const abs = new URL(url, base);
+  const nations = raw.nations.map((n) => ({
+    id: String(n.id), label: String(n.label ?? n.id),
+    files: (n.files ?? []).map((f) => new URL(f, abs).href),
+  }));
+  return { url, nations };
+}
+
+/** 한 나라의 파일을 모두 읽어 합치고 정규화한다. */
+export async function loadNationDeck(nation, fetchFn = (u) => fetch(u, { cache: 'no-store' })) {
+  if (!nation.files.length) throw new Error(`${nation.label}: 아직 카드가 없다`);
+  const raws = [];
+  for (const f of nation.files) raws.push((await loadRaw([f], fetchFn)).raw);
+  const merged = mergeV2(raws);
+  if (!merged.raw) return { format: 'v2', deck: null, errors: merged.errors };
+  return normalizeDeck(merged.raw);
+}

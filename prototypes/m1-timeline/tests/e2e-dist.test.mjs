@@ -14,7 +14,8 @@ const DIST = path.join(REPO_ROOT, 'dist', 'm1');
 test('dist/m1만으로 실제 초안을 읽고 모바일에서 한 장 꽂기, 실패한 요청 없음', { skip: !REAL && '초안 없음' }, async () => {
   const r = spawnSync('python3', [path.join(PROTO_ROOT, 'build.py')], { encoding: 'utf8' });
   assert.equal(r.status, 0, r.stdout + r.stderr);
-  assert.ok(existsSync(path.join(DIST, 'data', 'goguryeo-m1.json')));
+  assert.ok(existsSync(path.join(DIST, 'data', 'cards', 'goguryeo-m1.json')));
+  assert.ok(existsSync(path.join(DIST, 'data', 'decks.json')));
   assert.equal(existsSync(path.join(DIST, 'tests')), false);
   assert.doesNotMatch(readFileSync(path.join(DIST, 'js', 'config.js'), 'utf8'), /\.\.\/\.\.\/assets/);
 
@@ -29,7 +30,7 @@ test('dist/m1만으로 실제 초안을 읽고 모바일에서 한 장 꽂기, �
     const errors = [];
     page.on('response', (res) => { if (res.status() >= 400) failed.push(`${res.status()} ${res.url()}`); });
     page.on('pageerror', (e) => errors.push(String(e)));
-    await page.goto(`http://127.0.0.1:${port}/index.html?seed=11&intro=0`);
+    await page.goto(`http://127.0.0.1:${port}/index.html?seed=11&intro=0&title=0`);
     await page.waitForSelector('body[data-ready="true"]');
     assert.match(await page.innerText('#data-info'), /goguryeo-m1\.json · 카드 12장/);
     assert.match(await page.innerText('#data-warn'), /사실 확인 전/);
@@ -37,6 +38,11 @@ test('dist/m1만으로 실제 초안을 읽고 모바일에서 한 장 꽂기, �
     const card = await currentCard(page, REAL_BY_ID);
     await pressGap(page, (await gapsFor(page, card)).right, true);
     assert.equal(await page.getAttribute('#result', 'data-result'), 'correct');
+    // M2: 타이틀 화면과 덱 목록(data/decks.json)도 묶음만으로
+    await page.goto(`http://127.0.0.1:${port}/index.html?intro=0`);
+    await page.waitForSelector('#title:not([hidden])');
+    assert.equal(await page.getAttribute('#title-nations [data-nation="goguryeo"]', 'aria-pressed'), 'true');
+    assert.match(await page.innerText('#title-play'), /이어하기/);
     assert.deepEqual(failed, []);
     // 사람 테스트 모드도 묶음만으로 돈다: 참가자 만들기 → pre 한 장 → 방식 B 화면.
     await page.goto(`http://127.0.0.1:${port}/index.html?study=1&participant=P1`);
