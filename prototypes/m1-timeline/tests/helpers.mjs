@@ -33,6 +33,18 @@ export const REAL_BY_ID = new Map(REAL ? [...REAL.cards, ...REAL.anchors].map((c
 const MANIFEST_PATH = existsSync(path.join(path.dirname(V2_PATH), 'manifest.json'))
   ? path.join(path.dirname(V2_PATH), 'manifest.json') : path.join(PROTO_ROOT, 'data', 'decks.json');
 const MANIFEST = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8'));
+export const NATIONS = MANIFEST.nations;
+/** 실제 manifest의 나라별 덱(파일이 있는 나라만). {deck, byId, info} */
+export function nationDeck(id) {
+  const n = MANIFEST.nations.find((x) => x.id === id);
+  const files = (n?.files ?? []).map((f) => path.resolve(path.dirname(MANIFEST_PATH), f));
+  if (!files.length || !files.every((f) => existsSync(f))) return null;
+  const deck = normalizeDeck(mergeV2(files.map((f) => JSON.parse(readFileSync(f, 'utf8')))).raw).deck;
+  return {
+    deck, byId: new Map([...deck.cards, ...deck.anchors].map((c) => [c.id, c])),
+    info: `${n.label} ${files.map((f) => path.basename(f)).join(', ')} · 카드 ${deck.cards.length}장 · 기준 ${deck.anchors.length}장`,
+  };
+}
 export const FULL_NATION = MANIFEST.nations.find((n) => n.id === 'goguryeo');
 const FULL_FILES = (FULL_NATION?.files ?? []).map((f) => path.resolve(path.dirname(MANIFEST_PATH), f));
 export const FULL = FULL_FILES.length && FULL_FILES.every((f) => existsSync(f))

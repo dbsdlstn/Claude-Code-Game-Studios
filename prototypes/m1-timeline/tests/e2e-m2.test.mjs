@@ -3,7 +3,7 @@
 // node --test prototypes/m1-timeline/tests/e2e-m2.test.mjs
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { chromium, startServer, openProto, currentCard as cardOf, gapsFor, pressGap, VIEWPORTS, REAL, REAL_BY_ID, FULL, FULL_BY_ID, FULL_INFO } from './helpers.mjs';
+import { chromium, startServer, openProto, currentCard as cardOf, gapsFor, pressGap, VIEWPORTS, REAL, REAL_BY_ID, FULL, FULL_BY_ID, FULL_INFO, NATIONS, nationDeck } from './helpers.mjs';
 import { studyUrl, ready } from './study-driver.mjs';
 import { CONFIG } from '../js/config.js';
 import { normalizeDeck } from '../js/data.js';
@@ -37,7 +37,8 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     assert.equal(await page.isVisible('#timeline'), false, '타이틀에서는 학습 화면이 안 보인다');
     assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'start');
     assert.equal(await page.innerText('#title-play'), '시작하기');
-    assert.deepEqual(await page.locator('#title-nations .nation').evaluateAll((b) => b.map((x) => [x.dataset.nation, x.disabled])), [['goguryeo', false], ['baekje', true], ['silla', true], ['gaya', true]]);
+    // 파일이 있는 나라만 활성(백제는 D93부터 활성), 나머지는 "준비 중"
+    assert.deepEqual(await page.locator('#title-nations .nation').evaluateAll((b) => b.map((x) => [x.dataset.nation, x.disabled])), NATIONS.map((n) => [n.id, !n.files.length]));
     assert.match(await page.innerText('#title-progress'), new RegExp(`고구려 카드 ${FULL.cards.length}장 중 0장 학습`));
     assert.match(await page.innerText('#title-stats'), /레벨 1/);
     assert.ok(await noOverflow(page));
@@ -118,8 +119,9 @@ test('M1 저장(최상위 completed_sessions·cards)을 읽어 진행을 잇는�
   assert.ok(ids.length >= 0);
 }));
 
-test('없는 나라(?nation=baekje)는 고를 수 없어 고구려로 연다', { skip: !FULL && '실제 데이터 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
-  await openProto(page, server.base, { data: null, nation: 'baekje' });
+const EMPTY = NATIONS.find((n) => !n.files.length);
+test(`카드가 없는 나라(?nation=${EMPTY?.id})는 고를 수 없어 고구려로 연다`, { skip: (!FULL || !EMPTY) && '해당 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, nation: EMPTY.id });
   assert.ok((await page.innerText('#data-info')).includes(FULL_INFO));
 }));
 
@@ -167,19 +169,29 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
 }
 
 // D100: 백제 카드가 manifest에 들어오기 전에, 고정 데이터로 나라가 둘일 때를 미리 확인한다.
-const TWO = 'tests/fixtures/manifest-two-nations.json';
-const BJ = normalizeDeck(JSON.parse(readFileSync(new URL('./fixtures/baekje-fixture.json', import.meta.url), 'utf8'))).deck;
-const BJ_BY_ID = new Map(BJ.cards.map((c) => [c.id, c]));
-for (const [name, opts] of Object.entries(VIEWPORTS)) {
+// D100·D101: 나라가 둘일 때. 실제 백제 덱(D93)과, 고정 데이터 목록(manifest 바꿔 끼우기) 두 가지로 돈다.
+const FIX_BJ = normalizeDeck(JSON.parse(readFileSync(new URL('./fixtures/baekje-fixture.json', import.meta.url), 'utf8'))).deck;
+const REAL_BJ = nationDeck('baekje');
+const CASES = [
+  ...(REAL_BJ ? [{ label: '실제 백제', manifest: null, bj: REAL_BJ.deck }] : []),
+  { label: '고정 데이터', manifest: 'tests/fixtures/manifest-two-nations.json', bj: FIX_BJ },
+];
+for (const [name, opts] of Object.entries(VIEWPORTS)) for (const C of CASES) {
+  const TWO = C.manifest;
+  const BJ = C.bj;
+  const BJ_BY_ID = new Map(BJ.cards.map((c) => [c.id, c]));
   const mobile = name === 'mobile';
   const tap = (page, sel) => (mobile ? page.locator(sel).tap() : page.click(sel));
-  test(`${name}: 나라가 둘이면 백제가 활성, 나라별 연표·세션은 따로, 카드 진행은 한 저장에`, { skip: !REAL && '실제 데이터 없음' }, () => withPage(opts, async (page) => {
+  test(`${name} · ${C.label}: 나라가 둘이면 백제가 활성, 나라별 연표·세션은 따로, 카드 진행은 한 저장에`, { skip: !REAL && '실제 데이터 없음' }, () => withPage(opts, async (page) => {
     await openProto(page, server.base, { data: null, title: null, manifest: TWO });
     await page.waitForSelector('#title:not([hidden])');
-    assert.deepEqual(await page.locator('#title-nations .nation').evaluateAll((b) => b.map((x) => [x.dataset.nation, x.disabled])), [['goguryeo', false], ['baekje', false], ['silla', true], ['gaya', true]]);
+    assert.equal(await page.isDisabled('#title-nations [data-nation="baekje"]'), false);
+    assert.equal(await page.isDisabled('#title-nations [data-nation="goguryeo"]'), false);
+    // 타이틀 진행 표시는 나라별(고구려 덱 수)
+    assert.match(await page.innerText('#title-progress'), /^고구려 카드 \d+장 중 0장 학습/);
     // 고구려 한 장
     await tap(page, '#title-play');
-    const g1 = await currentCard(page, REAL_BY_ID);
+    const g1 = await currentCard(page, FULL_BY_ID);
     await pressGap(page, (await gapsFor(page, g1)).right, mobile);
     await tap(page, '#btn-next');
     await tap(page, '#btn-home');
