@@ -248,3 +248,27 @@ html { background-color: var(--paper); min-height: 100%; }
 body { min-height: 100vh; background-attachment: fixed; }
 .kings { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 @media (min-width: 700px) { .kings { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+
+/* D93(M2 평가): 연표 칸 압축 — 앵커 한 줄(약 44px), 틈 줄 없이 앵커 경계 오른쪽에 44px "+"(= 이 왕 즉위 이후 ~ 다음 왕 즉위 이전). 테스트 모드는 M1 화면 그대로. */
+.timeline.compact { padding-bottom: 28px; }
+.timeline.compact .row { margin: 0 0 6px; }
+.timeline.compact .row-compact { grid-template-columns: 96px 1fr; gap: 10px; min-height: 44px; padding: 0 56px 0 10px; }
+.timeline.compact .row-compact .row-year { white-space: nowrap; font-size: 12px; text-align: left; }
+.timeline.compact .row-placed { padding-right: 56px; }
+.timeline.compact .gap.gap-compact {
+  position: absolute; right: 6px; bottom: -25px; z-index: 2; width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 0;
+  justify-content: center; border-radius: 50%; overflow: visible;
+}
+.timeline.compact:not(.asking) .gap.gap-compact { visibility: hidden; }
+.timeline.compact.asking .gap.gap-compact { border: 1.5px dashed var(--line); background: var(--paper-2); color: var(--gold); cursor: pointer; }
+.timeline.compact.asking .gap.gap-compact:hover, .timeline.compact .gap.gap-compact.over { border-style: solid; border-color: var(--gold); background: #fbeec4; }
+.timeline.compact .gap-compact .gap-plus { width: 30px; height: 30px; font-size: 18px; }
+.timeline.compact .gap.gap-compact.gap-selected { border: 2px solid var(--gold) !important; background: #fbeec4 !important; }
+.timeline.compact .row-compact.gap-pending { box-shadow: inset 0 0 0 2px var(--gold); background: #f6e7bd; }
+.timeline.compact .gap-pending { scroll-margin-bottom: 150px; }
+/* D93: 타이틀 — 오늘 할 일을 시작 버튼 바로 위에, 레벨·XP·연속일 한 줄, "준비 중" 칩 작게 */
+.title-today { margin: 4px 0 0; font-weight: 700; color: var(--ink); text-align: center; }
+.title-stats .level { grid-template-columns: auto minmax(60px, 1fr) auto; }
+.chip.nation[disabled] { font-size: 12.5px; padding: 2px 9px; min-height: 30px; opacity: .5; }
+.chip.nation[disabled] .nation-soon { font-size: 11px; }
+.timeline.compact .row-compact .row-year { white-space: normal; word-break: keep-all; line-height: 1.25; }

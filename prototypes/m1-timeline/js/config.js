@@ -51,6 +51,8 @@ export const CONFIG = Object.freeze({
     'data/decks.json',
   ]),
   defaultNation: 'goguryeo',
+  /** 타이틀의 "약 k분"(D93·D102): 카드 한 장에 드는 시간 추정(초). M1 관찰 전 임시값. */
+  secondsPerCard: 40,
   /**
    * 보상(M2 골격, D79-3·D82). design/rewards-spec.md가 오기 전의 임시 수치. 원칙: 학습 신호와 같은 방향
    * (단서 없는 정답 > 단서 정답 > 오답 = 0), 승급·등급에 큰 보상, 재도전·연습·세션 길이로는 보상 없음, 연속일이 끊겨도 벌 없음.

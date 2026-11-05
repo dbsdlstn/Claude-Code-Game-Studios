@@ -3,7 +3,7 @@
 // node --test prototypes/m1-timeline/tests/e2e-m2.test.mjs
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { chromium, startServer, openProto, currentCard as cardOf, gapsFor, pressGap, VIEWPORTS, REAL, REAL_BY_ID, FULL, FULL_BY_ID, FULL_INFO, NATIONS, nationDeck } from './helpers.mjs';
+import { chromium, startServer, openProto, currentCard as cardOf, gapsFor, pressGap, editSave, VIEWPORTS, REAL, REAL_BY_ID, FULL, FULL_BY_ID, FULL_INFO, NATIONS, nationDeck } from './helpers.mjs';
 import { studyUrl, ready } from './study-driver.mjs';
 import { CONFIG } from '../js/config.js';
 import { normalizeDeck } from '../js/data.js';
@@ -35,8 +35,14 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     await openProto(page, server.base, { data: null, intro: null, title: null });
     await page.waitForSelector('#title:not([hidden])');
     assert.equal(await page.isVisible('#timeline'), false, '타이틀에서는 학습 화면이 안 보인다');
-    assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'start');
-    assert.equal(await page.innerText('#title-play'), '시작하기');
+    // D93: 처음에는 새 카드 6장(M1 설정), 시작 버튼 위에 오늘 할 일
+    assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'new');
+    assert.equal(await page.innerText('#title-play'), '새 카드 시작');
+    const L = CONFIG.leitner;
+    assert.equal(await page.innerText('#title-today'), `오늘 복습 0장 · 새 카드 ${L.session_size}장 · 약 ${Math.ceil((L.session_size * CONFIG.secondsPerCard) / 60)}분`);
+    assert.ok(await page.evaluate(() => document.querySelector('#title-today').getBoundingClientRect().bottom <= document.querySelector('#title-play').getBoundingClientRect().top), '오늘 할 일은 시작 버튼 위');
+    assert.equal(await page.locator('#title-meta').count(), 1, '레벨·XP·연속일 한 줄');
+    assert.match(await page.innerText('#title-meta'), /레벨 1.*0 \/ 100 XP · 연속 0일/s);
     // 파일이 있는 나라만 활성(백제는 D93부터 활성), 나머지는 "준비 중"
     assert.deepEqual(await page.locator('#title-nations .nation').evaluateAll((b) => b.map((x) => [x.dataset.nation, x.disabled])), NATIONS.map((n) => [n.id, !n.files.length]));
     assert.match(await page.innerText('#title-progress'), new RegExp(`고구려 카드 ${FULL.cards.length}장 중 0장 학습`));
@@ -54,7 +60,8 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     await tap(page, '#btn-home');
     await page.waitForSelector('#title:not([hidden])');
     assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'continue');
-    assert.match(await page.innerText('#title-play'), /이어하기 · 세션 1/);
+    assert.match(await page.innerText('#title-play'), /이어하기 · 5장 남음/);
+    assert.match(await page.innerText('#title-today'), /이어서 5장 남음 · 약 \d+분/);
     assert.match(await page.innerText('#title-progress'), /1장 학습/);
     // 하는 방법 = 처음 안내 다시 보기, 숙련 도감
     await tap(page, '#title-howto');
@@ -201,7 +208,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) for (const C of CASES) {
     await page.waitForSelector('#title:not([hidden])');
     assert.equal(await page.getAttribute('#title-nations [data-nation="baekje"]', 'aria-pressed'), 'true');
     assert.match(await page.innerText('#title-progress'), new RegExp(`백제 카드 ${BJ.cards.length}장 중 0장 학습`));
-    assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'start', '백제는 처음');
+    assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'new', '백제는 처음');
     assert.match(await page.innerText('#title-stats'), /레벨 1/);
     await tap(page, '#title-play');
     assert.match(await page.innerText('#timeline-title'), /백제 왕대 연표/);
@@ -223,7 +230,8 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) for (const C of CASES) {
     await tap(page, '#title-nations [data-nation="goguryeo"]');
     await page.waitForURL(/nation=goguryeo/);
     await page.waitForSelector('#title:not([hidden])');
-    assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'continue');
+    // 고구려 세션 1은 나라 전환(페이지 다시 열기)으로 끝났으므로 다음 세션의 복습(오답 카드가 없으면 새 카드)
+    assert.match(await page.getAttribute('#title-play', 'data-mode'), /^(review|new)$/);
     await tap(page, '#title-play');
     assert.match(await page.innerText('#timeline-title'), /고구려 왕대 연표/);
     assert.match(await page.innerText('#session-no'), /세션 2/);
@@ -234,3 +242,60 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) for (const C of CASES) {
     assert.ok(await noOverflow(page));
   }));
 }
+
+// D93·D102: 연표 칸 압축(일반 모드), 테스트 모드는 M1 화면 그대로, 숙련 카드 해설 접기
+test('390px: 칸 압축 — 앵커 한 줄(≤48px), "+"는 44px, 틈 줄 없음, 연표 높이 2창 이하', { skip: !FULL && '실제 데이터 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null });
+  assert.equal(await page.locator('#timeline.compact').count(), 1);
+  assert.equal(await page.locator('#timeline .gap-row').count(), 0, '틈 줄 없음');
+  assert.equal(await page.locator('#timeline .gap').count(), FULL.anchors.length);
+  const rows = await page.locator('#timeline .row-anchor').evaluateAll((r) => r.map((x) => x.getBoundingClientRect().height));
+  assert.ok(rows.every((h) => h <= 48), `앵커 줄 높이 ${rows}`);
+  const btn = await page.locator('#timeline .gap').first().evaluate((b) => { const r = b.getBoundingClientRect(); return [r.width, r.height]; });
+  assert.deepEqual(btn.map(Math.round), [44, 44], '터치 타깃 44px');
+  const ratio = await page.evaluate(() => document.querySelector('.timeline-wrap').getBoundingClientRect().height / innerHeight);
+  assert.ok(ratio <= 2.0, `연표 ${ratio.toFixed(2)}창`);
+  assert.ok(await noOverflow(page));
+  // 마지막 앵커의 +도 누를 수 있고 확정 막대에 가리지 않는다
+  const last = page.locator(`#timeline .gap[data-gap="${FULL.anchors.length}"]`);
+  await last.scrollIntoViewIfNeeded();
+  await last.tap();
+  const onTop = await page.evaluate(() => { const n = document.querySelector('.gap-pending .gap'); const r = n.getBoundingClientRect(); const t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.bottom <= innerHeight && (t === n || n.contains(t)); });
+  assert.ok(onTop);
+}));
+
+test('테스트 모드(방식 A)의 연표는 M1 화면 그대로(틈 줄, 압축 없음)', { skip: !REAL && '실제 데이터 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  await page.goto(studyUrl(server.base, { participant: 'C1' }));
+  await ready(page);
+  await page.locator('#study-create').tap();
+  await page.goto(studyUrl(server.base, { participant: 'C1', stage: 'learn-A' }));
+  await page.waitForSelector('#card[data-card-id]');
+  assert.equal(await page.locator('#timeline.compact').count(), 0);
+  assert.equal(await page.locator('#timeline .gap-row').count(), REAL.anchors.length);
+}));
+
+test('숙련 카드(은 이상)를 맞히면 해설은 접혀 있고, 그 밖에는 펼쳐 있다', () => withPage(VIEWPORTS.desktop, async (page) => {
+  await openProto(page, server.base);
+  const first = await currentCard(page);
+  await pressGap(page, (await gapsFor(page, first)).right, false);
+  assert.equal(await page.locator('#result-details').count(), 0, '새 카드는 펼침');
+  assert.ok(await page.isVisible('.result-exp'));
+  await editSave(page, (s) => {
+    for (const n of Object.values(s.nations)) n.current = null;
+    for (const id of Object.keys(s.cards)) delete s.cards[id];
+    return s;
+  });
+  await editSave(page, (s) => {
+    const ids = ['gg-c-gungnae', 'gg-c-jindae', 'gg-c-nangnang', 'gg-c-taehak', 'gg-c-pyeongyang', 'gg-c-hanseong', 'gg-c-salsu', 'gg-c-ansi'];
+    for (const id of ids) s.cards[id] = { box: 4, introduced: true, due_session: 1, last_session: 0, clean_streak: 2, lapses: 0, best_grade: 2, last_played_at: null, probation: false, probation_clean: 0 };
+    for (const n of Object.values(s.nations)) { n.current = null; n.completed_sessions = 0; }
+    return s;
+  });
+  const c = await currentCard(page);
+  await pressGap(page, (await gapsFor(page, c)).right, false);
+  assert.equal(await page.locator('#result-details').count(), 1);
+  assert.equal(await page.getAttribute('#result-details', 'open'), null, '기본은 접힘');
+  assert.equal(await page.isVisible('.result-exp'), false);
+  await page.click('#result-details summary');
+  assert.ok(await page.isVisible('.result-exp'));
+}));
