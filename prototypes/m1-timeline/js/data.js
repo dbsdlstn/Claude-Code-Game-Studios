@@ -1,6 +1,7 @@
 // PROTOTYPE - NOT FOR PRODUCTION (M1, decision-log D56)
 /**
  * 데이터 로더. 형식 차이는 이 파일 한 곳에서 흡수해 화면과 규칙에는 같은 모양({nation, anchors, cards})을 넘긴다.
+ * 재위 기간 표(reigns): { [기준 카드 id]: { king, range } } — 연표 줄 표시용, 판정에 쓰지 않는다.
  * 지원 형식:
  *   - 'm1-draft'           : data/sample.json(이 세션의 임시 샘플)
  *   - 'v2-draft-content'   : assets/data/cards/v2-draft/goguryeo-m1.json(콘텐츠 세션, D58). `_format`으로 구분
@@ -22,13 +23,16 @@ export function formatOf(raw) {
  * (예: 고국원왕 전사 371은 소수림왕 즉위 371보다 앞).
  * @returns {{format: string, deck: object, errors: string[]}}
  */
-export function normalizeDeck(raw) {
+export function normalizeDeck(raw, reigns = {}) {
   const format = formatOf(raw);
   if (format === 'm1-draft') return { format, deck: raw, errors: [] };
   if (format !== 'v2-draft-content') return { format, deck: null, errors: ['알 수 없는 데이터 형식'] };
   const errors = [];
+  // 기준 카드는 왕(즉위) 단위(D61). 재위 기간은 데이터에 있으면 그것, 없으면 표시용 표(data/reigns.json).
   const anchors = (raw.anchors ?? []).map((a) => ({
-    id: a.id, title: a.title, order: a.year, year_label: a.year_label, reign: a.reign ?? null,
+    id: a.id, title: a.title, order: a.year, year_label: a.year_label,
+    reign: a.reign ?? reigns[a.id]?.king ?? a.title.replace(/\s*즉위$/, ''),
+    reign_range: a.reign_range ?? reigns[a.id]?.range ?? null,
     explanation: a.explanation ?? '', source_ref: a.source_ref ?? '', verified: a.verified === true,
   }));
   const anchorById = new Map(anchors.map((a) => [a.id, a]));

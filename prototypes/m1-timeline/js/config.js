@@ -9,6 +9,8 @@ export const CONFIG = Object.freeze({
     '../../assets/data/cards/v2-draft/goguryeo-m1.json', // 콘텐츠 세션 초안(D58). 형식 변환은 js/data.js
     'data/sample.json',
   ]),
+  /** 기준 카드(왕) 재위 기간 표시용 표. 없으면 즉위 연도만 보인다. */
+  reignsUrl: 'data/reigns.json',
   /** 한 세션의 카드 수(짧은 세션). 카드가 더 적으면 있는 만큼. */
   sessionSize: 8,
   /** Leitner 상자 수. 1이 가장 자주, 마지막이 가장 드물게 나온다. */
@@ -25,5 +27,9 @@ export const CONFIG = Object.freeze({
   mastery: Object.freeze({ bronze: 2, silver: 4, gold: 5 }),
   /** true면 이번 세션에 놓은 카드도 연표에 들어가 이후 틈이 잘게 나뉜다(Timeline 방식). */
   placedJoinTimeline: true,
+  /** true면 세션 안에서 틀린 카드를 세션 끝에 한 번 더 낸다(인출 연습). 상자는 바꾸지 않는다(D61). */
+  retryWrongInSession: true,
+  /** 틈을 누른 뒤 "이 자리에 꽂기" 확인을 받을지: 'coarse'(터치 화면만), 'always', 'never'. `?confirm=1|0`으로 덮어쓴다. */
+  confirmPlacement: 'coarse',
   storageKey: 'hanyang-m1:save:v1',
 });

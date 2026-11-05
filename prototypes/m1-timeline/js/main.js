@@ -7,7 +7,7 @@ import { CONFIG } from './config.js';
 import { createStore } from './storage.js';
 import { loadRaw, normalizeDeck } from './data.js';
 import {
-  validateDeck, gapBounds, promotionFor, createSession, currentId, revealClue, placeCurrent, sessionTimeline,
+  validateDeck, gapBounds, promotionFor, createSession, currentId, revealClue, placeCurrent, sessionTimeline, isRetry,
   isSessionDone, sessionSummary, masteryCounts, mastery, dueCount, restoreProgress, restoreSession, dataFingerprint,
 } from './rules.js';
 
@@ -31,8 +31,15 @@ const app = {
   store: createStore(CONFIG.storageKey),
   deck: null, cardsById: new Map(), anchorsById: new Map(), dataId: '', dataFile: '',
   sessionNo: 1, progress: Object.freeze({}), state: null, log: [],
-  lastResult: null, seedParam: null,
+  lastResult: null, seedParam: null, pendingGap: null, confirmMode: CONFIG.confirmPlacement,
 };
+
+/** 틈을 누른 뒤 확인을 받을지(D61: 모바일 오탭 방지). */
+function needsConfirm() {
+  if (app.confirmMode === 'always') return true;
+  if (app.confirmMode === 'never') return false;
+  try { return matchMedia('(pointer: coarse)').matches; } catch { return false; }
+}
 
 function persist() {
   app.store.save({ dataId: app.dataId, sessionNo: app.sessionNo, progress: app.progress, current: app.state, log: app.log });
@@ -45,7 +52,7 @@ function announce(text) {
 }
 
 const byOrder = (id) => app.cardsById.get(id) ?? app.anchorsById.get(id);
-const label = (item) => (item ? `${item.title}(${item.year_label})` : null);
+const label = (item) => (item ? `${item.title}(${item.year_label.split('(')[0].trim()})` : null);
 function gapText(bounds) {
   const b = label(bounds.before && byOrder(bounds.before.id));
   const a = label(bounds.after && byOrder(bounds.after.id));
@@ -101,7 +108,9 @@ function renderQuestion(box, card) {
   box.className = 'card card-question';
   box.dataset.cardId = card.id; // E2E가 정답을 데이터에서 찾을 때 쓴다(화면에는 보이지 않음).
   box.replaceChildren(...[
-    el('div', { class: 'card-head' }, el('span', { class: 'badge' }, '사료'), el('span', { class: 'card-title' }, '이 사건은 언제일까?')),
+    el('div', { class: 'card-head' }, el('span', { class: 'badge' }, '사료'), el('span', { class: 'card-title' }, '이 사건은 언제일까?'),
+      isRetry(app.state) ? el('span', { class: 'badge badge-retry', id: 'retry-badge' }, '다시 풀기') : null),
+    isRetry(app.state) ? el('p', { class: 'source-note' }, '앞에서 틀린 카드입니다. 상자는 바뀌지 않는 연습입니다.') : null,
     el('blockquote', { class: 'source-text', id: 'source-text' }, card.source_text),
     el('p', { class: 'source-note' }, '출처는 정답 뒤에 공개합니다.'),
     card.clues.slice(0, app.state.clues).length
@@ -119,7 +128,9 @@ function renderResult(box) {
   const wait = entry.due - app.state.session;
   box.className = `card card-result ${r.correct ? 'is-right' : 'is-wrong'}`;
   delete box.dataset.cardId;
-  const boxLine = r.correct
+  const boxLine = r.retry
+    ? `다시 풀기 ${r.correct ? '성공' : '실패'} · 상자 ${r.boxTo}는 그대로(다음 세션에 복습)`
+    : r.correct
     ? `상자 ${r.boxFrom ?? '새 카드'} → ${r.boxTo}${r.promoted > 0 ? ` (+${r.promoted})` : ' (단서를 봐서 그대로)'}`
     : `상자 ${r.boxFrom ?? '새 카드'} → ${r.boxTo} (다시 복습)`;
   const isLast = isSessionDone(app.state);
@@ -134,7 +145,7 @@ function renderResult(box) {
     card.exam_note ? el('p', { class: 'result-note', id: 'result-note' }, el('b', {}, '수험 정리 '), card.exam_note) : null,
     el('p', { class: 'result-source', id: 'result-source' }, `출처: ${card.source?.name ?? ''}${card.source?.ref ? ' ' + card.source.ref : ''}`),
     el('p', { class: 'result-box', id: 'result-box', dataset: { from: String(r.boxFrom ?? ''), to: String(r.boxTo) } },
-      boxLine, ` · ${wait <= 1 ? '다음 세션에 다시' : `${wait}세션 뒤 복습`}`),
+      boxLine, r.retry ? '' : ` · ${wait <= 1 ? '다음 세션에 다시' : `${wait}세션 뒤 복습`}${!r.correct && CONFIG.retryWrongInSession ? ' · 이번 세션 끝에 한 번 더' : ''}`),
     el('button', { type: 'button', id: 'btn-next', class: 'btn btn-primary', onclick: onNext }, isLast ? '세션 결과 보기' : '다음 카드'),
   ].filter(Boolean));
 }
@@ -154,30 +165,49 @@ function renderTimeline() {
   const nodes = [];
   const gap = (k) => {
     const bounds = gapBounds(items, k);
-    return el('li', { class: 'gap-row' }, el('button', {
-      type: 'button', class: 'gap', dataset: { gap: String(k) }, disabled: !asking,
-      'aria-label': `${gapText(bounds)}에 꽂기`,
-      onclick: () => place(k),
-    }, el('span', { class: 'gap-plus', 'aria-hidden': 'true' }, '＋'), el('span', { class: 'gap-label' }, '여기에 꽂기')));
+    const pending = asking && app.pendingGap === k;
+    const row = el('li', { class: 'gap-row' + (pending ? ' gap-pending' : '') }, el('button', {
+      type: 'button', class: 'gap' + (pending ? ' gap-selected' : ''), dataset: { gap: String(k) }, disabled: !asking,
+      'aria-label': `${gapText(bounds)}에 꽂기`, 'aria-pressed': pending ? 'true' : null,
+      onclick: () => onGap(k),
+    }, el('span', { class: 'gap-plus', 'aria-hidden': 'true' }, pending ? '✓' : '＋'), el('span', { class: 'gap-label' }, pending ? '이 자리를 골랐습니다' : '여기에 꽂기')));
+    if (pending) {
+      row.append(el('div', { class: 'confirm-bar' },
+        el('span', { class: 'confirm-text' }, gapText(bounds)),
+        el('button', { type: 'button', id: 'cancel-place', class: 'btn btn-small', onclick: () => { app.pendingGap = null; renderTimeline(); } }, '취소'),
+        el('button', { type: 'button', id: 'confirm-place', class: 'btn btn-primary btn-small', onclick: () => place(k) }, '이 자리에 꽂기')));
+    }
+    return row;
   };
   items.forEach((it, i) => {
     nodes.push(gap(i));
     const c = byOrder(it.id);
     const fresh = app.lastResult && app.lastResult.id === it.id;
-    const cls = it.kind === 'anchor' ? 'row row-anchor' : `row row-placed ${it.correct ? 'row-right' : 'row-wrong'}`;
+    if (it.kind === 'anchor') {
+      // 기준 카드는 왕 단위: "소수림왕 371~384"(D61)
+      nodes.push(el('li', { class: 'row row-anchor' + (fresh ? ' row-new' : ''), dataset: { id: it.id, order: String(it.order) } },
+        el('span', { class: 'row-year' }, c.reign_range ?? c.year_label.split('(')[0].trim()),
+        el('span', { class: 'row-main' },
+          el('span', { class: 'row-title' }, c.reign ?? c.title),
+          el('span', { class: 'row-reign' }, `즉위 ${c.year_label.split('(')[0].trim()}`),
+          el('span', { class: 'row-tag' }, '기준'))));
+      return;
+    }
+    const cls = `row row-placed ${it.correct ? 'row-right' : 'row-wrong'}`;
     nodes.push(el('li', { class: cls + (fresh ? ' row-new' : ''), dataset: { id: it.id, order: String(it.order) } },
       el('span', { class: 'row-year' }, c.year_label.split('(')[0].trim()),
       el('span', { class: 'row-main' },
-        el('span', { class: 'row-title' }, it.kind === 'placed' ? (it.correct ? '○ ' : '✕ ') : '', c.title),
+        el('span', { class: 'row-title' }, it.correct ? '○ ' : '✕ ', c.title),
         el('span', { class: 'row-reign' }, c.reign ? `${c.reign}` : ''),
-        it.kind === 'anchor' ? el('span', { class: 'row-tag' }, '기준') : null,
         fresh && !it.correct ? el('span', { class: 'row-tag row-tag-wrong' }, '맞는 자리') : null)));
   });
   nodes.push(gap(items.length));
   list.replaceChildren(...nodes);
   list.classList.toggle('asking', asking);
   $('timeline-title').textContent = `${app.deck.nation_label ?? ''} 왕대 연표`;
-  $('timeline-help').textContent = asking ? '사건이 들어갈 틈(＋)을 누르세요. 데스크톱은 카드를 끌어 놓아도 됩니다.' : '';
+  $('timeline-help').textContent = asking
+    ? (needsConfirm() ? '사건이 들어갈 틈(＋)을 고른 뒤 "이 자리에 꽂기"를 누르세요.' : '사건이 들어갈 틈(＋)을 누르세요. 카드를 끌어 놓아도 됩니다.')
+    : '';
 }
 
 function render() {
@@ -188,7 +218,16 @@ function render() {
 
 /* ------------------------------------------------------------------ 동작 */
 
+/** 틈을 눌렀을 때: 확인이 필요하면 고르기만, 아니면 바로 꽂기. */
+function onGap(k) {
+  if (!needsConfirm()) { place(k); return; }
+  app.pendingGap = k;
+  renderTimeline();
+  $('confirm-place')?.focus();
+}
+
 function place(k) {
+  app.pendingGap = null;
   const before = sessionTimeline(app.state, app.deck.anchors, CONFIG);
   const { state, progress, result } = placeCurrent(app.state, k, app.cardsById, app.deck.anchors, app.progress, CONFIG);
   if (!result) return;
@@ -226,6 +265,7 @@ function showSummary() {
       el('dt', {}, '정답'), el('dd', {}, `${s.right} / ${s.total}`),
       el('dt', {}, '단서 없이 정답'), el('dd', {}, `${s.noClueRight}장`),
       el('dt', {}, '연 단서'), el('dd', {}, `${s.clues}개`),
+      el('dt', {}, '다시 풀기'), el('dd', { id: 'summary-retry' }, s.retried ? `${s.retryRight} / ${s.retried} 성공` : '없음'),
       el('dt', {}, '다음 세션 복습'), el('dd', { id: 'summary-due' }, `${nextDue}장`)),
     el('ol', { class: 'summary-list' }, app.state.placed.map((p) => {
       const c = app.cardsById.get(p.id);
@@ -361,10 +401,14 @@ async function init() {
   const params = new URLSearchParams(location.search);
   const seed = Number.parseInt(params.get('seed') ?? '', 10);
   app.seedParam = Number.isFinite(seed) ? seed >>> 0 : null;
+  if (params.get('confirm') === '1') app.confirmMode = 'always';
+  if (params.get('confirm') === '0') app.confirmMode = 'never';
   let loaded;
   try {
     const { url, raw } = await loadRaw(params.get('data') ? [params.get('data')] : CONFIG.dataUrls);
-    const norm = normalizeDeck(raw);
+    let reigns = {};
+    try { const r = await fetch(CONFIG.reignsUrl, { cache: 'no-store' }); if (r.ok) reigns = await r.json(); } catch { /* 재위 표 없음: 즉위 연도만 */ }
+    const norm = normalizeDeck(raw, reigns);
     loaded = { url, deck: norm.deck, format: norm.format, convErrors: norm.errors };
   } catch (e) {
     $('card').replaceChildren(el('p', {}, String(e.message)));

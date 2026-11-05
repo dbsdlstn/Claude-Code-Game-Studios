@@ -162,10 +162,20 @@ export function buildSession(cards, progress, session, cfg, rng) {
 
 /* ------------------------------------------------------------------ 세션 진행 */
 
-/** 새 세션 상태. */
+/**
+ * 새 세션 상태. queue의 앞 base장이 이번 세션 카드이고, 그 뒤는 세션 안에서 틀린 카드의 다시 풀기(한 번씩)다.
+ */
 export function createSession(cards, progress, session, cfg, seed) {
   const pick = buildSession(cards, progress, session, cfg, createRng(seed));
-  return Object.freeze({ session, seed, queue: Object.freeze(pick.ids), index: 0, clues: 0, placed: Object.freeze([]), mix: { due: pick.due, fresh: pick.fresh, early: pick.early } });
+  return Object.freeze({
+    session, seed, queue: Object.freeze(pick.ids), base: pick.ids.length, index: 0, clues: 0,
+    placed: Object.freeze([]), retryResults: Object.freeze([]), mix: { due: pick.due, fresh: pick.fresh, early: pick.early },
+  });
+}
+
+/** 지금 카드가 세션 끝의 다시 풀기인가. */
+export function isRetry(state) {
+  return state.index >= state.base && state.index < state.queue.length;
 }
 
 export function currentId(state) {
@@ -182,9 +192,14 @@ export function revealClue(state, maxClues) {
   return Object.freeze({ ...state, clues: state.clues + 1 });
 }
 
-/** 지금 연표(기준 카드 + 설정에 따라 이번 세션에 놓인 카드). */
+/**
+ * 지금 연표(기준 카드 + 설정에 따라 이번 세션에 놓인 카드).
+ * 다시 풀기 중에는 그 카드의 첫 자리(오답 후 공개된 자리)를 빼서 답이 보이지 않게 한다.
+ */
 export function sessionTimeline(state, anchors, cfg) {
-  return buildTimeline(anchors, cfg.placedJoinTimeline ? state.placed : []);
+  if (!cfg.placedJoinTimeline) return buildTimeline(anchors, []);
+  const hide = isRetry(state) ? currentId(state) : null;
+  return buildTimeline(anchors, state.placed.filter((p) => p.id !== hide));
 }
 
 /**
@@ -200,15 +215,29 @@ export function placeCurrent(state, k, cardsById, anchors, progress, cfg) {
   if (!Number.isInteger(k) || k < 0 || k > items.length) return { state, progress, result: null };
   const correct = isCorrectGap(items, k, card.order);
   const before = progress[id];
+  if (isRetry(state)) {
+    // 다시 풀기는 인출 연습이다. 상자는 바꾸지 않는다(다음 세션 기준, D61).
+    const result = {
+      id, correct, gap: k, correctGaps: correctGaps(items, card.order), cluesUsed: state.clues,
+      boxFrom: before?.box ?? null, boxTo: before?.box ?? null, promoted: 0, isNew: false, retry: true,
+    };
+    const next = Object.freeze({
+      ...state, index: state.index + 1, clues: 0,
+      retryResults: Object.freeze([...state.retryResults, Object.freeze({ id, correct, gap: k, cluesUsed: state.clues })]),
+    });
+    return { state: next, progress, result };
+  }
   const entry = applyResult(before, { correct, cluesUsed: state.clues, session: state.session }, cfg);
   const result = {
     id, correct, gap: k, correctGaps: correctGaps(items, card.order), cluesUsed: state.clues,
     boxFrom: before?.box ?? null, boxTo: entry.box, promoted: entry.box - (before?.box ?? cfg.startBox), isNew: !before,
   };
+  const requeue = !correct && cfg.retryWrongInSession;
   const next = Object.freeze({
     ...state,
     index: state.index + 1,
     clues: 0,
+    queue: requeue ? Object.freeze([...state.queue, id]) : state.queue,
     placed: Object.freeze([...state.placed, Object.freeze({ id, order: card.order, correct, gap: k, cluesUsed: state.clues, boxFrom: result.boxFrom, boxTo: entry.box })]),
   });
   return { state: next, progress: Object.freeze({ ...progress, [id]: entry }), result };
@@ -224,6 +253,8 @@ export function sessionSummary(state) {
     noClueRight: p.filter((x) => x.correct && x.cluesUsed === 0).length,
     up: p.filter((x) => x.boxTo > (x.boxFrom ?? 1)).length,
     down: p.filter((x) => x.boxFrom !== null && x.boxTo < x.boxFrom).length,
+    retried: (state.retryResults ?? []).length,
+    retryRight: (state.retryResults ?? []).filter((x) => x.correct).length,
   };
 }
 
@@ -261,17 +292,26 @@ export function restoreProgress(saved, cards, cfg) {
   return Object.freeze(out);
 }
 
-/** 저장된 세션 상태를 검사해 복원. 맞지 않으면 null. */
+/** 저장된 세션 상태를 검사해 복원. 맞지 않으면 null. (base가 없는 옛 저장은 다시 풀기 없음으로 본다.) */
 export function restoreSession(saved, cards) {
   if (!saved || !Array.isArray(saved.queue) || !Array.isArray(saved.placed)) return null;
   const ids = new Set(cards.map((c) => c.id));
-  if (!saved.queue.every((id) => ids.has(id)) || new Set(saved.queue).size !== saved.queue.length) return null;
+  const base = Number.isInteger(saved.base) ? saved.base : saved.queue.length;
+  const retryResults = Array.isArray(saved.retryResults) ? saved.retryResults : [];
+  if (base < 0 || base > saved.queue.length || !saved.queue.every((id) => ids.has(id))) return null;
+  const head = saved.queue.slice(0, base);
+  const tail = saved.queue.slice(base);
+  if (new Set(head).size !== head.length || new Set(tail).size !== tail.length) return null;
   if (!Number.isInteger(saved.index) || saved.index < 0 || saved.index > saved.queue.length) return null;
-  if (saved.placed.length !== saved.index || saved.placed.some((p, i) => p?.id !== saved.queue[i])) return null;
+  if (saved.placed.length !== Math.min(saved.index, base) || saved.placed.some((p, i) => p?.id !== head[i])) return null;
+  const wrongFirst = new Set(saved.placed.filter((p) => !p.correct).map((p) => p.id));
+  if (!tail.every((id) => wrongFirst.has(id))) return null;
+  if (retryResults.length !== Math.max(0, saved.index - base) || retryResults.some((r, i) => r?.id !== tail[i])) return null;
   if (!Number.isInteger(saved.session) || saved.session < 1) return null;
   return Object.freeze({
-    session: saved.session, seed: saved.seed, queue: Object.freeze(saved.queue.slice()), index: saved.index,
+    session: saved.session, seed: saved.seed, queue: Object.freeze(saved.queue.slice()), base, index: saved.index,
     clues: Number.isInteger(saved.clues) ? Math.max(0, saved.clues) : 0,
-    placed: Object.freeze(saved.placed.map((p) => Object.freeze({ ...p }))), mix: saved.mix ?? null,
+    placed: Object.freeze(saved.placed.map((p) => Object.freeze({ ...p }))),
+    retryResults: Object.freeze(retryResults.map((r) => Object.freeze({ ...r }))), mix: saved.mix ?? null,
   });
 }

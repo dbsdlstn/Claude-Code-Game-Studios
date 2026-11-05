@@ -73,10 +73,15 @@ export async function gapsFor(page, card) {
   return { right, wrong };
 }
 
-/** 틈 누르기: 모바일은 tap, 데스크톱은 click. */
+/** 틈 누르기: 모바일은 tap 후 "이 자리에 꽂기" 확인(D61), 데스크톱은 click 한 번. */
 export async function pressGap(page, k, mobile) {
   const g = page.locator(`#timeline .gap[data-gap="${k}"]`);
   await g.scrollIntoViewIfNeeded();
-  if (mobile) await g.tap(); else await g.click();
+  if (mobile) {
+    await g.tap();
+    await page.locator('#confirm-place').tap();
+  } else {
+    await g.click();
+  }
   await page.waitForSelector('#result');
 }

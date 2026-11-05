@@ -1,7 +1,7 @@
 # 한양 도감: 결과 요약
 
 > 메인 디렉터(총괄 세션)가 30분마다 갱신한다. 자세한 기록은 `docs/decision-log.md`, `docs/orchestration-log.md`.
-> 마지막 갱신: 2026-11-05 01:33 UTC
+> 마지막 갱신: 2026-11-05 01:40 UTC
 
 ## 지금 상태
 - **방향 전환(D56)**: 목표를 한능검 1급 수험생으로. 사료를 읽고 왕대 연표 사이에 사건을 꽂는 카드 게임 + 간격 반복 복습으로 재설계한다.
@@ -26,7 +26,9 @@ cd Claude-Code-Game-Studios
 git checkout claude/integration
 python3 -m http.server 8000
 ```
-브라우저에서 http://localhost:8000/web/ (M1 프로토타입이 나오면 여기에 주소 추가)
+브라우저에서 http://localhost:8000/web/ (기존 v0)
+
+**M1 프로토타입(초기, 샘플 카드 6장)**: 같은 서버에서 http://localhost:8000/prototypes/m1-timeline/ (휴대폰 세로 화면 기준). 화면 미리보기: `production/qa/evidence/m1/`
 
 ## 사용자가 할 일 (사람만 가능한 것)
 - **네트워크 허용 (1분)**: 사료 원문 대조에 필요한 `db.history.go.kr`(한국사데이터베이스)와 `ko.wikisource.org`(위키문헌)가 막혀 있음. 세션 제목 줄의 클라우드 환경 메뉴 → Edit → Network access에서 이 두 도메인을 Allowed domains에 추가(안내: https://code.claude.com/docs/en/cloud-environments#network-access). 허용 뒤 새로 시작하는 세션부터 원문 대조 가능.
@@ -36,4 +38,4 @@ python3 -m http.server 8000
 ## 다음 작업
 - 설계: 브리프 v3, 카드 스키마 v2, 간격 반복 명세, M1 테스트 계획, 로드맵 갱신
 - 콘텐츠: 고구려 사료 카드 12장 초안 완료 → 독립 대조(일치 12·수정 2·불확실 3) 반영 중
-- 웹: M1 프로토타입 엔진과 모바일 화면(`prototypes/m1-timeline/`)
+- 웹: M1 엔진·모바일 화면 1차 완료(테스트 42개 통과) → 실제 고구려 카드 연결, 왕 단위 기준 카드, 오탭 방지, 틀린 카드 세션 내 재출제
