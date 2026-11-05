@@ -41,6 +41,8 @@ const GRADE_KEY = ['none', 'bronze', 'silver', 'gold'];
 
 const app = {
   store: createStore(CONFIG.storageKey),
+  /** 나라 어댑터로 감싸기 전의 저장(손상 여부 확인용). */
+  baseStore: null,
   deck: null, cardsById: new Map(), anchorsById: new Map(), dataId: '', dataFile: '', deckHash: 0,
   completed: 0, progress: Object.freeze({}), state: null, log: [], participant: '-',
   lastResult: null, seedParam: 0, pendingGap: null, confirmMode: CONFIG.confirmPlacement,
@@ -497,7 +499,7 @@ const GRADE_LINE = ['', '동 등급이 되었어요', '은 등급', '금 등급'
  * 세션 결과(한 화면, rewards-spec §6·session-result.md D128): A 결과 요약 → B 다음 복습 + [다음 세션] → C 이번 세션 XP →
  * D 바뀐 카드만 → E 하루 목표·연속 → F 레벨 → G 업적. 사건이 없는 블록은 빠진다. 블록은 data-stage.
  */
-function settleLine(l, capped, hintState) {
+function settleLine(l, hintState) {
   const c = app.cardsById.get(l.id);
   const subs = [];
   const from = l.boxFrom ?? 1;
@@ -507,7 +509,7 @@ function settleLine(l, capped, hintState) {
   if (l.newProbation) subs.push(el('span', { class: 'settle-hint' }, '다음에 두 번 연속 맞히면 올라가요'));
   if ((l.kind === 'relation' || l.kind === 'direct') && !hintState.shown) { hintState.shown = true; subs.push(el('span', { class: 'settle-hint', id: 'settle-clue-hint' }, `깨끗하게 맞히면 +${R.xp.clean}`)); }
   return el('li', { class: 'settle', dataset: { id: l.id, kind: l.kind, xp: String(l.total), changed: l.changed ? '1' : '0' } },
-    el('span', { class: 'settle-main' }, `${c?.title ?? l.id} · ${KIND_TEXT[l.kind]}`), capped ? el('span') : el('b', { class: 'settle-xp' }, `+${l.xp}`), ...subs);
+    el('span', { class: 'settle-main' }, `${c?.title ?? l.id} · ${KIND_TEXT[l.kind]}`), l.capped ? el('span') : el('b', { class: 'settle-xp' }, `+${l.xp}`), ...subs);
 }
 
 function rewardBlocks() {
@@ -518,20 +520,21 @@ function rewardBlocks() {
   // C 이번 세션 XP
   const bonus = g.lines.reduce((n, l) => n + l.bonus, 0);
   blocks.push(el('section', { class: 'stage', dataset: { stage: 'xp' }, id: 'stage-xp' },
-    g.capped
-      ? el('p', { id: 'summary-xp', dataset: { xp: String(g.sessionXp) } }, '오늘 경험치는 다 모았어요 (하루 두 세션까지)', bonus ? el('br') : null, bonus ? `승급·등급 보너스 +${bonus} XP` : null)
-      : el('p', { class: 'settle-total', id: 'summary-xp', dataset: { xp: String(g.sessionXp) } }, `이번 세션 +${g.sessionXp} XP`)));
+    g.cappedAll
+      ? el('p', { id: 'summary-xp', dataset: { xp: String(g.sessionXp) } }, `오늘 경험치는 다 모았어요 (하루 ${R.xp_cards_per_day}장까지)`, bonus ? el('br') : null, bonus ? `승급·등급 보너스 +${bonus} XP` : null)
+      : el('p', { class: 'settle-total', id: 'summary-xp', dataset: { xp: String(g.sessionXp) } }, `이번 세션 +${g.sessionXp} XP`,
+        g.capped ? el('small', { class: 'settle-hint', id: 'summary-cap' }, ` · 그날 ${R.xp_cards_per_day}장을 넘긴 카드부터는 경험치가 없어요`) : null)));
   // D 바뀐 카드만
   const hint = { shown: false };
   const changed = g.lines.filter((l) => l.changed);
   const same = g.lines.filter((l) => !l.changed);
-  const list = el('ul', { class: 'settle-list', id: 'settle-list' }, changed.slice(0, changed.length > 6 ? 5 : 6).map((l) => settleLine(l, g.capped, hint)));
+  const list = el('ul', { class: 'settle-list', id: 'settle-list' }, changed.slice(0, changed.length > 6 ? 5 : 6).map((l) => settleLine(l, hint)));
   const moreChanged = changed.length > 6 ? changed.slice(5) : [];
-  const full = el('ul', { class: 'settle-list', id: 'settle-full', hidden: true }, g.lines.map((l) => settleLine(l, g.capped, { shown: true })));
+  const full = el('ul', { class: 'settle-list', id: 'settle-full', hidden: true }, g.lines.map((l) => settleLine(l, { shown: true })));
   blocks.push(el('section', { class: 'stage', dataset: { stage: 'cards' }, id: 'stage-cards', 'aria-label': '바뀐 카드' },
     el('h3', {}, changed.length ? '바뀐 카드' : '이번 세션의 카드'),
     changed.length ? list : null,
-    moreChanged.length ? el('button', { type: 'button', class: 'btn btn-small btn-quiet', id: 'settle-more', onclick: (e) => { list.append(...moreChanged.map((l) => settleLine(l, g.capped, hint))); e.target.remove(); } }, `더 보기 (${moreChanged.length}장)`) : null,
+    moreChanged.length ? el('button', { type: 'button', class: 'btn btn-small btn-quiet', id: 'settle-more', onclick: (e) => { list.append(...moreChanged.map((l) => settleLine(l, hint))); e.target.remove(); } }, `더 보기 (${moreChanged.length}장)`) : null,
     same.length ? el('p', { class: 'source-note', id: 'settle-same' }, `그 밖에 ${same.length}장은 변화 없어요 `,
       el('button', { type: 'button', class: 'btn btn-small btn-quiet', id: 'settle-all', 'aria-expanded': 'false', onclick: (e) => { full.hidden = !full.hidden; e.target.setAttribute('aria-expanded', full.hidden ? 'false' : 'true'); e.target.textContent = full.hidden ? '전체 보기' : '접기'; } }, '전체 보기')) : null,
     full));
@@ -1047,6 +1050,7 @@ function closeIntro() {
 
 async function init() {
   const params = new URLSearchParams(location.search);
+  app.baseStore = app.store;
   // 사람 테스트 모드: 방식 A 학습만 이 화면을 쓰고, 나머지(진행자 설정·방식 B·테스트)는 study-ui.js.
   if (params.get('study') === '1') {
     if (params.get('stage') !== 'learn-A') { (await import('./study-ui.js')).start(params); return; }
@@ -1111,6 +1115,10 @@ async function init() {
   } else app.rewards = null;
   app.participant = app.study ? app.study.participant : (params.get('participant') || saved?.participant || '-').slice(0, 20);
   const restored = restoreSession(saved?.current, app.deck.cards);
+  // M2 F11: 저장 손상 안내(조용히 사라지지 않게). 원문은 storage.js가 따로 보관한다.
+  if (!app.study && (app.baseStore.corrupt || app.rewardsStore.corrupt)) {
+    app.notice = '저장된 기록을 읽지 못해 새로 시작했어요. 이전 기록은 이 기기에 따로 보관했어요.';
+  }
   if (!app.study) {
     ev.openAt = performance.now();
     document.addEventListener('pointerdown', () => { ev.taps += 1; }, { capture: true });
@@ -1369,6 +1377,7 @@ function showTitle() {
   const extra = [];
   if (plan.guarded && plan.unintroduced) extra.push(`아직 열리지 않은 카드 ${plan.unintroduced}장 · 복습을 먼저 마치면 열려요`);
   if (app.rewards && app.rewards.day.key === dayOpts().today && app.rewards.day.sessions >= R.daily_session_soft_cap) extra.push('오늘은 충분히 했어요. 내일 이어서 해요');
+  if (app.notice && !app.started) extra.push(app.notice);
   fill($('title-today'), today, ...extra.map((t) => [el('br'), el('small', { class: 'title-note' }, t)]));
   Object.assign($('title-today').dataset, { mode: plan.mode, due: String(plan.due), fresh: String(plan.fresh), left: String(plan.left), minutes: String(mins) });
   $('title-play').textContent = label;

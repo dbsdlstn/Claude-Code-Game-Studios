@@ -55,13 +55,14 @@ export const CONFIG = Object.freeze({
   secondsPerCard: 40,
   /**
    * 보상 기본값 = design/rewards-spec.md §9(D120, D103). 원칙: 학습 신호와 같은 방향, 승급·등급에 큰 보상,
-   * 인출 XP·하루 목표는 하루 2세션까지, 세션 완료 보너스 없음, 연속일이 끊겨도 벌 없음(휴식권). 테스트 모드(`?study=1`)에서는 끈다.
+   * 인출 XP·하루 목표는 하루 24장까지(D184), 세션 완료 보너스 없음, 연속일이 끊겨도 벌 없음(휴식권). 테스트 모드(`?study=1`)에서는 끈다.
    */
   rewards: Object.freeze({
     enabled: true,
     /** box_up은 상자 box_up_min_box 이상에서 오를 때만(D164), 재학습 해제 만회 probation_release(D166). */
     xp: Object.freeze({ clean: 10, clue_relation: 5, clue_direct: 3, wrong: 0, box_up: 5, box_up_min_box: 2, probation_release: 5, grade_up: Object.freeze([0, 20, 40, 80]), daily_goal: 20 }),
-    xp_sessions_per_day: 2,
+    /** 인출 XP와 하루 목표는 하루 처음 24장까지(D184, 세션 수가 아니라 장수). */
+    xp_cards_per_day: 24,
     level: Object.freeze({ base: 25, step: 30 }),
     daily_goal_sessions: 1,
     goal_min_cards: 3,

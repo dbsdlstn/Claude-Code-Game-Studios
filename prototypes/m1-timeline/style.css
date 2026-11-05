@@ -332,3 +332,9 @@ body { min-height: 100vh; background-attachment: fixed; }
 @media (prefers-reduced-motion: reduce) { #summary-body.reveal .stage { animation: none; } }
 .stage-next { gap: 8px; }
 .stage-next #summary-next { width: 100%; }
+/* D109: 숙련 등급 색(art-bible §4.6, D123) — 고리(장식) + 글자(뜻, AA). 한지 바탕 위에 칠하지 않는다. */
+:root { --grade-bronze-ring: #B5733C; --grade-bronze-ink: #7A4A22; --grade-silver-ring: #8E897E; --grade-silver-ink: #5E5A52; --grade-gold-ring: #C79A2E; --grade-gold-ink: #7D5A12; --grade-none-ring: #8A6D3B; --grade-none-ink: #5B4A35; }
+.medal-gold .medal { border: 2px solid var(--grade-gold-ring); background: transparent; color: var(--grade-gold-ink); }
+.medal-silver .medal { border: 2px solid var(--grade-silver-ring); background: transparent; color: var(--grade-silver-ink); }
+.medal-bronze .medal { border: 2px solid var(--grade-bronze-ring); background: transparent; color: var(--grade-bronze-ink); }
+.medal-none .medal { border: 2px dotted var(--grade-none-ring); background: transparent; color: var(--grade-none-ink); }

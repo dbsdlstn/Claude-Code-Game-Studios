@@ -13,8 +13,8 @@ export function newRewards() {
     xp: 0, level: 1, sessions_done: 0, streak: 0, best_streak: 0, rest_passes: 0,
     last_goal_date: null, goal_days_total: 0,
     achievements: {}, title: null, title_pinned: null,
-    /** 그날의 세션 수와 목표(§1.3 하루 2세션 상한, §3.2). */
-    day: { key: null, sessions: 0, goal_met: false },
+    /** 그날의 세션 수·본 인출 장수(§1.3 하루 24장 상한, D184)와 목표(§3.2). */
+    day: { key: null, sessions: 0, cards: 0, goal_met: false },
     /** 정산한 세션 id(멱등, 최근 것만). */
     settled: [],
   };
@@ -32,7 +32,7 @@ export function restoreRewards(saved) {
     r.last_goal_date = typeof saved.last_goal_date === 'string' ? saved.last_goal_date : null;
     r.goal_days_total = num(saved.goal_days_total);
     r.title_pinned = typeof saved.title_pinned === 'string' ? saved.title_pinned : null;
-    if (saved.day && typeof saved.day === 'object') r.day = { key: saved.day.key ?? null, sessions: num(saved.day.sessions), goal_met: !!saved.day.goal_met };
+    if (saved.day && typeof saved.day === 'object') r.day = { key: saved.day.key ?? null, sessions: num(saved.day.sessions), cards: num(saved.day.cards), goal_met: !!saved.day.goal_met };
     if (Array.isArray(saved.settled)) r.settled = saved.settled.filter((x) => typeof x === 'string').slice(-50);
   } else if (saved.streak && typeof saved.streak === 'object') {
     // 골격(D82): { streak: {current, best, last_day}, daily, achievements: {first_session…} }
@@ -204,19 +204,24 @@ export function achievementStats({ cards, progress, gradeOf, slotOf, rewards, se
 export function settleSession(rw, { sessionId, records, base }, statsFor, now, cfg, defs = achievementDefs()) {
   if (rw.settled.includes(sessionId) || !records.length) return { rewards: rw, report: null };
   const today = dayKey(now, cfg.streak.day_rollover_hour);
-  const day = rw.day.key === today ? { ...rw.day } : { key: today, sessions: 0, goal_met: false };
+  const day = rw.day.key === today ? { cards: 0, ...rw.day } : { key: today, sessions: 0, cards: 0, goal_met: false };
   day.sessions += 1;
-  const xpAllowed = day.sessions <= cfg.xp_sessions_per_day;
-  const lines = records.map((r) => {
+  // D184: 인출 XP와 하루 목표는 그날 처음 xp_cards_per_day장(24)까지. 세션 중간에 넘기면 그 장부터 0. 승급·등급·만회는 항상.
+  const cap = cfg.xp_cards_per_day ?? Infinity;
+  const startCards = day.cards;
+  const lines = records.map((r, i) => {
     const kind = answerKind(r);
     const b = bonusXp(r, cfg);
-    const ax = xpAllowed ? answerXp(r, cfg) : 0;
+    const within = startCards + i < cap;
+    const ax = within ? answerXp(r, cfg) : 0;
     return {
       id: r.id, kind, xp: ax, boxUp: b.boxUp, boxFrom: r.boxFrom ?? null, boxTo: r.boxTo ?? null, boxXp: b.boxXp, grades: b.grades, gradeXp: b.gradeXp,
       released: b.released, releaseXp: b.releaseXp, newProbation: b.newProbation, changed: b.changed, probation: !!r.probation,
-      bonus: b.boxXp + b.gradeXp + b.releaseXp, total: ax + b.boxXp + b.gradeXp + b.releaseXp,
+      bonus: b.boxXp + b.gradeXp + b.releaseXp, total: ax + b.boxXp + b.gradeXp + b.releaseXp, capped: !within,
     };
   });
+  day.cards = startCards + records.length;
+  const xpAllowed = startCards < cap; // 목표 보너스: 이 세션이 시작될 때 아직 상한 안이면
   // 하루 목표(§3.2): 본 인출이 goal_min_cards장 이상, 또는 세션 카드가 그보다 적으면 그 전부
   const need = Math.min(cfg.goal_min_cards, Math.max(1, base));
   const goalNow = records.length >= need;
@@ -255,7 +260,7 @@ export function settleSession(rw, { sessionId, records, base }, statsFor, now, c
   return {
     rewards: next,
     report: {
-      sessionId, lines, sessionXp, capped: !xpAllowed, goal, daySessions: day.sessions,
+      sessionId, lines, sessionXp, capped: lines.some((l) => l.capped), cappedAll: lines.every((l) => l.capped), goal, daySessions: day.sessions, dayCards: day.cards,
       level: { from: lvFrom, to: lv.level, into: lv.into, need: lv.need }, title: { from: titleFrom, to: next.title },
       achievements: newAchievements,
     },
