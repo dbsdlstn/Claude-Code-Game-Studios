@@ -109,7 +109,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       await page.waitForSelector('#summary:not([hidden])');
       assert.equal(await page.getAttribute('#summary-stats', 'data-right'), String(6 - wrongIds.length));
       assert.doesNotMatch(await page.innerText('#summary-body'), /null/, 'B3: 세션 결과에 "null"이 찍히면 안 된다');
-      assert.match(await page.innerText('#summary-retry'), new RegExp(`${wrongIds.length} / ${wrongIds.length} 성공`));
+      assert.match(await page.innerText('#summary-retry'), new RegExp(`다시 풀기 ${wrongIds.length}장 중 ${wrongIds.length}장 성공`));
       await page.click('#summary-next');
       assert.match(await page.innerText('#session-no'), /세션 2/);
       const r2 = await playSession(page);
@@ -298,7 +298,7 @@ describe('실제 콘텐츠(덱 목록의 고구려 전체)', { skip: !FULL && '�
         }
         assert.equal(first, 6);
         await page.waitForSelector('#summary:not([hidden])');
-        assert.match(await page.innerText('#summary-retry'), /1 \/ 1 성공/);
+        assert.match(await page.innerText('#summary-retry'), /다시 풀기 1장 중 1장 성공/);
         assert.deepEqual(errors, []);
       } finally { await ctx.close(); }
     });

@@ -7,7 +7,8 @@ import { CONFIG } from './config.js';
 import { createStore } from './storage.js';
 import { loadRaw, normalizeDeck, loadManifest, loadNationDeck } from './data.js';
 import { nationStoreAdapter, lastNation } from './save.js';
-import { dayKey, newRewards, restoreRewards, xpForAnswer, addXp, levelOf, finishSessionRewards } from './rewards.js';
+import { dayKey, newRewards, restoreRewards, levelOf, settleSession, achievementDefs, achievementStats, currentTitle } from './rewards.js';
+import { buildTimeline, correctGaps, slotAnchorId } from './rules.js';
 import {
   validateDeck, gapBounds, selectableGaps, buildSession, createSessionState, currentId, revealClue, placeCurrent,
   sessionTimeline, isRetry, isSessionDone, attemptsOf, completedAfter, sessionSummary, gradeCounts, gradeOf, GRADE_NAME,
@@ -45,9 +46,11 @@ const app = {
   /** 사람 테스트 모드의 방식 A 학습(`?study=1&stage=learn-A`)이면 {participant, cap, menuUrl}. */
   study: null,
   /** M2: 나라와 덱 목록, 보상(테스트 모드에서는 null). */
-  nation: CONFIG.defaultNation, nations: [], rewards: null, sessionXp: 0, lastReward: null, started: false, titleOn: false,
+  nation: CONFIG.defaultNation, nations: [], rewards: null, lastReward: null, started: false, titleOn: false,
+  rewardsStore: createStore(CONFIG.rewardsKey), slotOfCard: new Map(),
 };
-const R = CONFIG.rewards;
+/** 보상 수치: config 기본값 위에 assets/data/config/rewards.json(init에서 읽음). */
+let R = CONFIG.rewards;
 const rewardsOn = () => !!app.rewards;
 
 const sessionIndex = () => app.completed + 1;
@@ -58,11 +61,17 @@ function needsConfirm() {
   try { return matchMedia('(pointer: coarse)').matches; } catch { return false; }
 }
 
+/** 보상은 학습 저장과 다른 키(rewards-spec §8·§10). */
+function saveRewards() {
+  if (app.rewards) app.rewardsStore.save(app.rewards);
+}
+
 function persist() {
   app.store.save({
     format: 'hanyang-dogam-mastery', dataId: app.dataId, completed_sessions: app.completed, cards: app.progress,
-    current: app.state, log: app.log, participant: app.participant, rewards: app.rewards,
+    current: app.state, log: app.log, participant: app.participant,
   });
+  saveRewards();
 }
 
 function announce(text) {
@@ -88,7 +97,6 @@ function slotText(items, k) {
 function startLearnSession() {
   if (app.study && app.completed >= app.study.cap) { app.state = null; render(); renderStudyDone(); return; }
   const s = sessionIndex();
-  app.sessionXp = 0;
   const pick = buildSession(app.deck.cards, app.progress, s, L, sessionSeed(app.deckHash, s, app.seedParam));
   app.state = createSessionState(s, pick.ids, { kind: 'learn', mix: { due: pick.due, fresh: pick.fresh } });
   app.lastResult = null;
@@ -126,9 +134,15 @@ function finishSession() {
 function sessionRewards(st) {
   app.lastReward = null;
   if (!rewardsOn() || !st || st.practice) return;
-  const r = finishSessionRewards(app.rewards, { attempts: attemptsOf(st), grades: gradeCounts(app.deck.cards, app.progress, L) }, new Date(), R);
-  app.rewards = r.rewards;
-  app.lastReward = { ...r, sessionXp: app.sessionXp + r.gained.xp };
+  const defs = achievementDefs(app.nation, app.deck.nation_label);
+  const statsFor = (rw, sess) => achievementStats({
+    cards: app.deck.cards, progress: app.progress, gradeOf: (e) => gradeOf(e, L), slotOf: (c) => app.slotOfCard.get(c.id),
+    rewards: rw, session: sess, comeback: sess.comeback,
+  });
+  const { rewards, report } = settleSession(app.rewards, { sessionId: `${app.nation}:${st.session}`, records: st.placed, base: st.base }, statsFor, new Date(), R, defs);
+  app.rewards = rewards;
+  app.lastReward = report;
+  saveRewards();
 }
 
 /* ------------------------------------------------------------------ 렌더 */
@@ -230,7 +244,6 @@ function renderResult(box) {
     r.correct ? null : el('p', { class: 'result-where', id: 'result-where' }, '고른 칸: ', el('s', {}, r.placedText), el('br'), '맞는 칸: ', el('b', {}, r.rightText)),
     el('p', { class: 'result-box', id: 'result-box', dataset: { from: String(r.boxFrom ?? ''), to: String(r.boxTo ?? '') } },
       boxLine, !r.practice && !r.retry && grade ? ` · 등급 ${GRADE_NAME[grade]}` : ''),
-    r.xp && r.xp.xp > 0 ? el('p', { class: 'result-xp', id: 'result-xp', dataset: { xp: String(r.xp.xp) } }, `+${r.xp.xp} XP`, el('span', { class: 'xp-parts' }, ` (${r.xp.parts.map(([n, v]) => `${n} ${v}`).join(' · ')})`)) : null,
     explainBlock(card, !app.study && r.correct && grade >= 2),
     el('button', { type: 'button', id: 'btn-next', class: 'btn btn-primary', onclick: onNext }, isLast ? (app.state.practice ? '연습 끝내기' : '세션 결과 보기') : '다음 카드'),
   ].filter(Boolean));
@@ -383,16 +396,9 @@ function place(k) {
   const { state, progress, result } = placeCurrent(app.state, k, app.cardsById, app.deck.anchors, app.progress, L, now.toISOString());
   if (!result) return;
   app.log = [...app.log, logLine({ ts: now.getTime(), participant: app.participant, result, session: app.state.session, msOnCard: Math.round(performance.now() - app.cardShownAt) })];
-  const bestBefore = app.progress[result.id]?.best_grade ?? 0;
   app.state = state;
   app.progress = progress;
-  let xp = null;
-  if (rewardsOn()) {
-    xp = xpForAnswer(result, bestBefore, progress[result.id]?.best_grade ?? 0, R);
-    app.rewards = addXp(app.rewards, xp.xp);
-    app.sessionXp += xp.xp;
-  }
-  app.lastResult = { ...result, xp, placedText: slotText(items, k), rightText: slotText(items, result.correctGaps[0]) };
+  app.lastResult = { ...result, placedText: slotText(items, k), rightText: slotText(items, result.correctGaps[0]) };
   persist();
   render();
   const card = app.cardsById.get(result.id);
@@ -429,17 +435,68 @@ function skipSession() {
   startLearnSession();
 }
 
-/** 세션 결과의 보상 자리(M2 골격): 이번 세션 XP, 레벨, 연속일, 오늘 목표, 새 업적. */
-function rewardBox(st) {
-  if (!rewardsOn() || st.practice) return null;
-  const rw = app.rewards;
-  const lv = levelOf(rw.xp, R);
+const KIND_TEXT = { clean: '깨끗한 정답', relation: '단서를 보고 맞힘', direct: '직접 힌트를 보고 맞힘', wrong: '해설을 읽어 보세요' };
+const GRADE_LINE = ['', '동 등급이 되었어요', '은 등급', '금 등급'];
+
+/**
+ * 세션 결과의 보상 정산(design/ux/session-result.md, rewards-spec §6): 2 카드별 정산 → 3 하루 목표·연속일 → 4 레벨 →
+ * 5 업적 → 6 다음 복습. 1(결과 요약)은 showSummary가 그린다. 사건이 없는 단계는 빠진다. 각 단계는 data-stage.
+ */
+function rewardStages(st) {
   const g = app.lastReward;
-  return el('section', { class: 'rewards', id: 'summary-rewards', dataset: { xp: String(g?.sessionXp ?? 0), level: String(lv.level) }, 'aria-label': '보상' },
-    el('p', { class: 'rewards-xp' }, el('b', {}, `+${g?.sessionXp ?? 0} XP`), g?.gained.parts.length ? ` (그중 ${g.gained.parts.map(([n, v]) => `${n} ${v}`).join(' · ')})` : ''),
-    levelBar(rw),
-    el('p', { class: 'rewards-line', id: 'summary-streak' }, `연속 ${rw.streak.current}일 (최고 ${rw.streak.best}일) · 오늘 ${rw.daily.goal_met ? '목표 달성' : `목표 세션 ${R.daily_goal_sessions}회`}`),
-    g?.newAchievements.length ? el('p', { class: 'rewards-ach', id: 'summary-achievements' }, '새 업적: ', g.newAchievements.map((a) => a.name).join(', ')) : null);
+  const rw = app.rewards;
+  const stages = [];
+  if (g) {
+    const lines = g.lines.map((l) => {
+      const c = app.cardsById.get(l.id);
+      return el('li', { class: 'settle', dataset: { id: l.id, kind: l.kind, xp: String(l.total) } },
+        el('span', { class: 'settle-main' }, `${c?.title ?? l.id} · ${KIND_TEXT[l.kind]}`), el('b', { class: 'settle-xp' }, `+${l.xp}`),
+        l.boxUp ? el('span', { class: 'settle-sub' }, `상자 ${l.boxFrom ?? 1} → ${l.boxTo} · +${l.boxXp}`) : null,
+        ...l.grades.map((gr) => el('span', { class: 'settle-sub settle-grade' }, `${GRADE_LINE[gr]} · +${R.xp.grade_up[gr]}`)),
+        (l.kind === 'relation' || l.kind === 'direct') ? el('span', { class: 'settle-hint' }, `깨끗하게 맞히면 +${R.xp.clean}`) : null,
+        l.kind === 'wrong' && l.probation ? el('span', { class: 'settle-hint' }, '다음에 두 번 연속 맞히면 올라가요') : null);
+    });
+    const shown = lines.slice(0, 5);
+    const more = lines.slice(5);
+    const list = el('ul', { class: 'settle-list', id: 'settle-list' }, shown);
+    stages.push(el('section', { class: 'stage', dataset: { stage: 'cards' }, id: 'stage-cards', 'aria-label': '카드별 정산' },
+      el('h3', {}, '카드별 정산'), list,
+      more.length ? el('button', { type: 'button', class: 'btn btn-small btn-quiet', id: 'settle-more', onclick: (e) => { list.append(...more); e.target.remove(); } }, `더 보기 (${more.length}장)`) : null,
+      el('p', { class: 'settle-total', id: 'summary-xp', dataset: { xp: String(g.sessionXp) } }, `이번 세션 +${g.sessionXp} XP`)));
+    if (g.goal) {
+      const G = g.goal;
+      stages.push(el('section', { class: 'stage', dataset: { stage: 'goal' }, id: 'stage-goal' },
+        el('p', { id: 'summary-goal' }, `오늘 목표 달성 · +${G.xp}`),
+        el('p', { id: 'summary-streak' }, G.broken ? `다시 오셨네요. 최고 연속 ${G.broken.best}일 · 오늘부터 1일째` : `연속 ${G.streak}일째예요`),
+        G.usedPasses ? el('p', { id: 'summary-pass-used' }, `쉬는 날 보호권을 ${G.usedPasses}장 썼어요. 연속 ${G.streak}일이 이어졌어요`) : null,
+        G.earnedPass ? el('p', { id: 'summary-pass-earned' }, `쉬는 날 보호권을 얻었어요 (${R.streak.rest_pass_max}장까지 모아요)`) : null));
+    }
+    const L2 = g.level;
+    stages.push(el('section', { class: 'stage', dataset: { stage: 'level' }, id: 'stage-level' },
+      L2.to > L2.from ? el('p', { id: 'summary-levelup' }, L2.to - L2.from > 1 ? `레벨 ${L2.from} → ${L2.to}` : `레벨 ${L2.to}이 되었어요`) : null,
+      g.title.to !== g.title.from ? el('p', { id: 'summary-title-new' }, `새 칭호: ${g.title.to}`, el('br'), el('small', {}, '칭호는 도감에서 바꿀 수 있어요')) : null,
+      levelBar(rw)));
+    if (g.achievements.length) {
+      const first = g.achievements.slice(0, 3);
+      const rest = g.achievements.length - first.length;
+      stages.push(el('section', { class: 'stage', dataset: { stage: 'ach' }, id: 'summary-achievements' },
+        ...first.map((a) => el('p', { class: 'ach', dataset: { id: a.id } }, el('b', {}, `업적 · ${a.name}`), ` · ${a.desc}`)),
+        rest > 0 ? el('p', { class: 'source-note', id: 'summary-ach-more' }, `그 밖에 ${rest}개 · 도감에서 확인해요`) : null));
+    }
+  }
+  return stages;
+}
+
+/** 6단계 다음 복습(항상). */
+function nextStage(st) {
+  const plan = todayPlan();
+  const g = app.lastReward;
+  const lines = [];
+  if (plan.mode === 'done') lines.push('오늘 할 카드를 모두 했어요');
+  else lines.push(plan.due ? `다음 세션 복습 ${plan.due}장` : '다음 세션에는 새 카드부터 시작해요');
+  if (g?.capped) lines.push('경험치는 하루 두 세션까지예요. 학습은 그대로 쌓여요');
+  if (rewardsOn() && app.rewards.day.goal_met && app.rewards.day.sessions >= R.daily_session_soft_cap) lines.push('오늘은 충분히 했어요. 내일 이어서 해요');
+  return { plan, node: el('section', { class: 'stage', dataset: { stage: 'next' }, id: 'stage-next' }, ...lines.map((t) => el('p', {}, t))) };
 }
 
 function levelBar(rw, extra = '', id = null) {
@@ -452,6 +509,7 @@ function levelBar(rw, extra = '', id = null) {
 }
 
 function showSummary(st) {
+  if (rewardsOn() && !st.practice) { showRewardSummary(st); return; }
   const s = sessionSummary(st);
   const counts = gradeCounts(app.deck.cards, app.progress, L);
   const nextDue = dueCount(app.deck.cards, app.progress, app.completed + 1);
@@ -471,14 +529,62 @@ function showSummary(st) {
       return el('li', { dataset: { id: p.id } }, el('span', { class: p.correct ? 'ok' : 'bad' }, p.correct ? '○' : '✕'),
         ` ${c.title}${clue}${st.practice ? '' : ` · 상자 ${p.boxFrom ?? '새'}→${p.boxTo}`}`);
     })),
-    el('p', { class: 'medals' }, `숙련(현재): 금 ${counts.gold} · 은 ${counts.silver} · 동 ${counts.bronze}`),
-    rewardBox(st));
+    el('p', { class: 'medals' }, `숙련(현재): 금 ${counts.gold} · 은 ${counts.silver} · 동 ${counts.bronze}`));
   const studyEnd = app.study && app.completed >= app.study.cap;
   $('summary-next').textContent = studyEnd ? '학습 단계 끝 · 진행자 메뉴로' : '다음 세션';
   $('summary-next').dataset.end = studyEnd ? '1' : '0';
   $('summary-dogam').hidden = !!app.study;
+  for (const id of ['summary-skip', 'summary-step', 'summary-home']) $(id).hidden = true;
+  $('summary-next').hidden = false;
+  $('summary-next').disabled = false;
   $('summary').hidden = false;
   $('summary-next').focus();
+}
+
+/** 일반 모드의 세션 결과: 1 결과 요약 → 보상 단계들 → 다음 복습. 탭(계속)으로 한 단계씩, 건너뛰기로 끝까지. */
+function showRewardSummary(st) {
+  const s = sessionSummary(st);
+  const clued = s.right - s.clean;
+  $('summary-title').textContent = `오늘의 세션 · ${app.deck.nation_label ?? ''}`;
+  const head = el('section', { class: 'stage stage-head', dataset: { stage: 'summary' }, id: 'stage-summary' },
+    el('p', { class: 'big-score', id: 'summary-stats', dataset: { right: String(s.right), total: String(s.total) } }, `정답 ${s.right} / ${s.total}`),
+    el('p', { id: 'summary-breakdown' }, `깨끗한 정답 ${s.clean} · 단서를 쓴 정답 ${clued} · 오답 ${s.total - s.right}`),
+    s.retried ? el('p', { id: 'summary-retry' }, `다시 풀기 ${s.retried}장 중 ${s.retryRight}장 성공`) : null);
+  const next = nextStage(st);
+  const stages = [head, ...rewardStages(st), next.node];
+  fill($('summary-body'), stages);
+  const reduce = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } })();
+  let shown = reduce ? stages.length : 1;
+  const finalButtons = () => {
+    $('summary-skip').hidden = true;
+    $('summary-step').hidden = true;
+    $('summary-next').hidden = false;
+    $('summary-home').hidden = false;
+    $('summary-dogam').hidden = false;
+    const done = next.plan.mode === 'done';
+    $('summary-next').textContent = done ? '오늘은 여기까지' : '다음 세션';
+    $('summary-next').disabled = done;
+    $('summary-next').dataset.end = '0';
+    (done ? $('summary-home') : $('summary-next')).focus();
+  };
+  const update = () => {
+    stages.forEach((n, i) => { n.hidden = i >= shown; });
+    $('summary-body').dataset.shown = String(shown);
+    $('summary-body').dataset.total = String(stages.length);
+    if (shown >= stages.length) finalButtons();
+    else {
+      for (const id of ['summary-next', 'summary-home', 'summary-dogam']) $(id).hidden = true;
+      $('summary-skip').hidden = false;
+      $('summary-step').hidden = false;
+    }
+    const last = stages[shown - 1];
+    if (shown > 1) { last.scrollIntoView?.({ block: 'nearest' }); announce(last.innerText.split('\n').slice(0, 2).join(' ')); }
+  };
+  $('summary-step').onclick = () => { shown = Math.min(stages.length, shown + 1); update(); if (shown < stages.length) $('summary-step').focus(); };
+  $('summary-skip').onclick = () => { shown = stages.length; update(); announce('정산을 모두 보였어요.'); };
+  $('summary').hidden = false;
+  update();
+  if (shown < stages.length) $('summary-skip').focus();
 }
 
 function nextSession() {
@@ -560,7 +666,7 @@ function doReset() {
   app.progress = Object.freeze({});
   app.log = [];
   app.completed = 0;
-  if (app.rewards) app.rewards = newRewards();
+  if (app.rewards) { app.rewards = newRewards(); app.rewardsStore.clear(); }
   closeModal();
   $('dogam').hidden = true;
   startLearnSession();
@@ -712,7 +818,14 @@ async function init() {
   app.progress = restoreProgress(saved?.cards, app.deck.cards, L);
   app.completed = Number.isInteger(saved?.completed_sessions) && saved.completed_sessions >= 0 ? saved.completed_sessions : 0;
   app.log = Array.isArray(saved?.log) ? saved.log : [];
-  app.rewards = !app.study && R.enabled ? restoreRewards(saved?.rewards) : null;
+  if (!app.study && R.enabled) {
+    R = await loadRewardsConfig();
+    // 보상은 별도 키. 없으면 골격(D82) 때 학습 저장 안에 있던 rewards를 옮긴다.
+    const own = app.rewardsStore.load();
+    app.rewards = restoreRewards(own ?? saved?.rewards ?? null);
+    const t = buildTimeline(app.deck.anchors, []);
+    app.slotOfCard = new Map(app.deck.cards.map((c) => [c.id, slotAnchorId(t, correctGaps(t, c.order)[0])]));
+  } else app.rewards = null;
   app.participant = app.study ? app.study.participant : (params.get('participant') || saved?.participant || '-').slice(0, 20);
   const restored = restoreSession(saved?.current, app.deck.cards);
 
@@ -735,6 +848,7 @@ async function init() {
   $('participant').addEventListener('change', (e) => { app.participant = (e.target.value.trim() || '-').slice(0, 20); persist(); });
   $('summary-next').addEventListener('click', nextSession);
   $('summary-dogam').addEventListener('click', () => { $('summary').hidden = true; openDogam(); });
+  $('summary-home').addEventListener('click', () => { $('summary').hidden = true; showTitle(); });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('intro').hidden) closeIntro();
@@ -774,6 +888,19 @@ function enterLearning() {
   } else {
     render();
   }
+}
+
+/** rewards.json(rewards-spec §9)을 config 기본값 위에 얹는다. 없거나 읽지 못하면 기본값. */
+async function loadRewardsConfig() {
+  try {
+    const { raw } = await loadRaw(CONFIG.rewardsUrls);
+    const merged = { ...CONFIG.rewards };
+    for (const [k, v] of Object.entries(raw ?? {})) {
+      if (k.startsWith('_') || !(k in CONFIG.rewards)) continue;
+      merged[k] = v && typeof v === 'object' && !Array.isArray(v) ? { ...CONFIG.rewards[k], ...v } : v;
+    }
+    return merged;
+  } catch { return CONFIG.rewards; }
 }
 
 /* ------------------------------------------------------------------ 덱 읽기(M2) */
@@ -878,10 +1005,10 @@ function showTitle() {
   $('title-play').dataset.mode = plan.mode;
   $('title-play').classList.toggle('btn-primary', plan.mode !== 'done');
   const rw = app.rewards;
-  const todayKey = dayKey(new Date());
   fill($('title-stats'),
     el('p', { id: 'title-progress' }, `${app.deck.nation_label ?? ''} 카드 ${app.deck.cards.length}장 중 ${learned}장 학습 · 금 ${counts.gold} · 은 ${counts.silver} · 동 ${counts.bronze}`),
-    rw ? levelBar(rw, ` · 연속 ${rw.streak.current}일${rw.daily.goal_met && rw.daily.day === todayKey ? ' · 오늘 목표 달성' : ''}`, 'title-meta') : null);
+    rw ? el('p', { id: 'title-name-line', class: 'title-honor' }, currentTitle(rw, R)) : null,
+    rw ? levelBar(rw, ` · 연속 ${rw.streak}일${rw.day.goal_met && rw.day.key === dayKey(new Date(), R.streak.day_rollover_hour) ? ' · 오늘 목표 달성' : ''}`, 'title-meta') : null);
   $('title-play').focus();
 }
 

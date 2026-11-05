@@ -42,7 +42,8 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     assert.equal(await page.innerText('#title-today'), `오늘 복습 0장 · 새 카드 ${L.session_size}장 · 약 ${Math.ceil((L.session_size * CONFIG.secondsPerCard) / 60)}분`);
     assert.ok(await page.evaluate(() => document.querySelector('#title-today').getBoundingClientRect().bottom <= document.querySelector('#title-play').getBoundingClientRect().top), '오늘 할 일은 시작 버튼 위');
     assert.equal(await page.locator('#title-meta').count(), 1, '레벨·XP·연속일 한 줄');
-    assert.match(await page.innerText('#title-meta'), /레벨 1.*0 \/ 100 XP · 연속 0일/s);
+    assert.match(await page.innerText('#title-meta'), new RegExp(`레벨 1[\\s\\S]*0 / ${CONFIG.rewards.level.base} XP · 연속 0일`));
+    assert.equal(await page.innerText('#title-name-line'), '입문자');
     // 파일이 있는 나라만 활성(백제는 D93부터 활성), 나머지는 "준비 중"
     assert.deepEqual(await page.locator('#title-nations .nation').evaluateAll((b) => b.map((x) => [x.dataset.nation, x.disabled])), NATIONS.map((n) => [n.id, !n.files.length]));
     assert.match(await page.innerText('#title-progress'), new RegExp(`고구려 카드 ${FULL.cards.length}장 중 0장 학습`));
@@ -54,8 +55,8 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     assert.equal(await page.isVisible('#title'), false);
     const card = await currentCard(page, FULL_BY_ID);
     await pressGap(page, (await gapsFor(page, card)).right, mobile);
-    // 보상 자리: 정답 XP(단서 없이 정답 + 상자 승급)
-    assert.equal(await page.getAttribute('#result-xp', 'data-xp'), String(CONFIG.rewards.xp.clean + CONFIG.rewards.xp.box_up));
+    // 보상은 세션 결과에서 정산한다(학습 결과를 가리지 않게, rewards-spec §6). 정답 카드에는 XP를 띄우지 않는다.
+    assert.equal(await page.locator('#result-xp').count(), 0);
     await tap(page, '#btn-next');
     await tap(page, '#btn-home');
     await page.waitForSelector('#title:not([hidden])');
@@ -81,30 +82,88 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
   }));
 }
 
-test('보상: 세션 결과에 이번 세션 XP·레벨·연속일·오늘 목표·새 업적, 다시 열어도 유지', () => withPage(VIEWPORTS.desktop, async (page) => {
-  await openProto(page, server.base);
+/** 한 세션을 끝까지(첫 카드는 오답, 나머지 정답, 재도전은 정답). */
+async function playOneSession(page, mobile = false) {
   let first = true;
   while (await page.getAttribute('#card', 'data-card-id')) {
     const card = await currentCard(page);
     const g = await gapsFor(page, card);
-    await pressGap(page, first ? g.wrong : g.right, false);
-    if (first) assert.equal(await page.locator('#result-xp').count(), 0, '오답은 XP 없음');
+    await pressGap(page, first ? g.wrong : g.right, mobile);
     first = false;
     await page.click('#btn-next');
   }
   await page.waitForSelector('#summary:not([hidden])');
-  const xp = Number(await page.getAttribute('#summary-rewards', 'data-xp'));
+}
+
+test('보상 정산(session-result.md): 결과 요약 → 카드별 → 하루 목표·연속 → 레벨 → 업적 → 다음 복습, 별도 저장 키', () => withPage(VIEWPORTS.desktop, async (page) => {
+  await openProto(page, server.base);
+  await playOneSession(page);
   const X = CONFIG.rewards.xp;
-  // 6장 중 5장 깨끗한 정답(+상자 승급), 재도전 0, 세션 완료 + 오늘 목표
-  assert.equal(xp, 5 * (X.clean + X.box_up) + X.session_done + X.daily_goal);
-  assert.match(await page.innerText('#summary-streak'), /연속 1일 \(최고 1일\) · 오늘 목표 달성/);
-  assert.match(await page.innerText('#summary-achievements'), /첫 세션/);
+  assert.equal(await page.innerText('#summary-title'), '오늘의 세션 · 고구려');
+  assert.match(await page.innerText('#stage-summary'), /정답 5 \/ 6\s+깨끗한 정답 5 · 단서를 쓴 정답 0 · 오답 1\s+다시 풀기 1장 중 1장 성공/);
+  assert.doesNotMatch(await page.innerText('#stage-summary'), /XP/, '1단계에는 XP가 없다');
+  assert.deepEqual(await page.locator('#summary-body .stage').evaluateAll((n) => n.map((x) => x.dataset.stage)), ['summary', 'cards', 'goal', 'level', 'ach', 'next']);
+  // 카드별: 깨끗한 정답 +10, 상자 승급 +5, 오답 +0과 재학습 안내
+  const lines = await page.locator('#settle-list .settle').evaluateAll((n) => n.map((x) => [x.dataset.kind, x.dataset.xp, x.innerText]));
+  assert.equal(lines.length, 5, '처음 5장, 나머지는 더 보기');
+  await page.click('#settle-more');
+  const all = await page.locator('#settle-list .settle').evaluateAll((n) => n.map((x) => [x.dataset.kind, x.innerText]));
+  assert.equal(all.length, 6);
+  const wrong = all.find(([k]) => k === 'wrong');
+  assert.match(wrong[1], /해설을 읽어 보세요\s*\+0[\s\S]*다음에 두 번 연속 맞히면 올라가요/);
+  assert.ok(all.filter(([k]) => k === 'clean').every(([, t]) => /깨끗한 정답\s*\+10[\s\S]*상자 1 → 2 · \+5/.test(t)));
+  const xp = 5 * (X.clean + X.box_up) + X.daily_goal;
+  assert.equal(await page.getAttribute('#summary-xp', 'data-xp'), String(xp));
+  assert.match(await page.innerText('#summary-goal'), new RegExp(`오늘 목표 달성 · \\+${X.daily_goal}`));
+  assert.match(await page.innerText('#summary-streak'), /연속 1일째예요/);
+  assert.match(await page.innerText('#summary-levelup'), /레벨 \d → \d|레벨 \d이 되었어요/);
+  assert.match(await page.innerText('#summary-achievements'), /업적 · 첫 걸음 · 첫 세션을 마쳤어요/);
+  assert.match(await page.innerText('#stage-next'), /다음 세션 복습 1장|다음 세션에는 새 카드부터/);
+  assert.equal(await page.isVisible('#summary-next'), true);
+  assert.equal(await page.isVisible('#summary-home'), true);
   assert.doesNotMatch(await page.innerText('#summary-body'), /null|undefined|NaN/);
   await page.reload();
   await page.waitForSelector('body[data-ready="true"]');
-  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:save:v2')).rewards);
-  assert.equal(saved.xp, xp);
-  assert.ok(saved.achievements.first_session);
+  const rw = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:rewards:v1')));
+  assert.equal(rw.xp, xp);
+  assert.ok(rw.achievements['first-step']);
+  assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:save:v2')).rewards), undefined, '학습 저장과 분리');
+}));
+
+test('보상 정산은 탭으로 한 단계씩, 건너뛰기로 끝까지(동작 줄이기 꺼짐)', () => withPage({ ...VIEWPORTS.mobile, reducedMotion: 'no-preference' }, async (page) => {
+  await openProto(page, server.base);
+  await playOneSession(page, true);
+  const shown = () => page.locator('#summary-body .stage:not([hidden])').count();
+  assert.equal(await shown(), 1, '처음에는 결과 요약만');
+  assert.equal(await page.isVisible('#summary-next'), false);
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'summary-skip');
+  await page.locator('#summary-step').tap();
+  assert.equal(await shown(), 2);
+  await page.keyboard.press('Escape');
+  assert.equal(await page.isVisible('#summary'), true, 'Esc로 닫히지 않는다');
+  await page.locator('#summary-skip').tap();
+  assert.equal(await shown(), Number(await page.getAttribute('#summary-body', 'data-total')));
+  assert.equal(await page.isVisible('#summary-next'), true);
+  await page.locator('#summary-home').tap();
+  await page.waitForSelector('#title:not([hidden])');
+}));
+
+test('하루 세 번째 세션: 인출 XP 0과 안내, 승급 보너스는 그대로', () => withPage(VIEWPORTS.desktop, async (page) => {
+  await openProto(page, server.base);
+  await page.evaluate(() => {
+    const d = new Date(Date.now() - 3 * 3600000);
+    const p = (x) => String(x).padStart(2, '0');
+    const key = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    localStorage.setItem('hanyang-m1:rewards:v1', JSON.stringify({ version: 1, format: 'hanyang-dogam-rewards', xp: 0, sessions_done: 2, streak: 1, best_streak: 1, rest_passes: 0, last_goal_date: key, goal_days_total: 1, achievements: {}, day: { key, sessions: 2, goal_met: true }, settled: [] }));
+  });
+  await page.reload();
+  await page.waitForSelector('body[data-ready="true"]');
+  await playOneSession(page);
+  const X = CONFIG.rewards.xp;
+  assert.equal(await page.getAttribute('#summary-xp', 'data-xp'), String(5 * X.box_up), '승급만');
+  assert.match(await page.innerText('#stage-next'), /경험치는 하루 두 세션까지예요/);
+  assert.match(await page.innerText('#stage-next'), /오늘은 충분히 했어요/);
+  assert.equal(await page.locator('#stage-goal').count(), 0, '목표는 이미 달성');
 }));
 
 test('M1 저장(최상위 completed_sessions·cards)을 읽어 진행을 잇는다', () => withPage(VIEWPORTS.desktop, async (page) => {
@@ -221,7 +280,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) for (const C of CASES) {
     assert.deepEqual(Object.keys(save.nations).sort(), ['baekje', 'goguryeo']);
     assert.ok(save.cards[g1.id]?.introduced && save.cards[b1.id]?.introduced, '두 나라 카드 진행이 한 저장에');
     assert.equal(save.last_nation, 'baekje');
-    assert.ok(save.rewards.xp > 0, '보상은 나라 공통');
+    assert.equal(save.rewards, undefined, '보상은 학습 저장과 다른 키(나라 공통)');
     // 다시 열면 마지막 나라(백제). 고구려로 돌아가면 고구려 세션 번호를 잇는다(나라를 바꾸면 페이지를 다시 여므로
     // 1장 이상 한 세션은 §5대로 끝난 것으로 처리되고 다음 세션 2가 된다).
     await page.goto(page.url().replace(/&?nation=baekje/, ''));

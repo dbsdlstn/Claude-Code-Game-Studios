@@ -53,10 +53,10 @@ export const FULL_BY_ID = new Map(FULL ? [...FULL.cards, ...FULL.anchors].map((c
 /** 화면 아래 데이터 줄의 기대값: "고구려 a.json, b.json · 카드 n장 · 기준 m장". */
 export const FULL_INFO = FULL ? `${FULL_NATION.label} ${FULL_FILES.map((f) => path.basename(f)).join(', ')} · 카드 ${FULL.cards.length}장 · 기준 ${FULL.anchors.length}장` : '';
 
-/** 모바일 세로 390×844(터치)와 데스크톱 1280×720. */
+/** 모바일 세로 390×844(터치)와 데스크톱 1280×720. 동작 줄이기(reduce): 세션 결과 정산이 한 번에 보인다(단계 진행은 e2e-m2에서 따로). */
 export const VIEWPORTS = {
-  mobile: { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1 },
-  desktop: { viewport: { width: 1280, height: 720 } },
+  mobile: { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, reducedMotion: 'reduce' },
+  desktop: { viewport: { width: 1280, height: 720 }, reducedMotion: 'reduce' },
 };
 
 function freePort() {
