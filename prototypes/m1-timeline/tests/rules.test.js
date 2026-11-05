@@ -364,7 +364,8 @@ describe('데이터 로더(js/data.js)', () => {
     assert.deepEqual(validateDeck(n.deck), []);
     assert.equal(n.deck.anchors.length, raw.cards.filter((x) => x.kind === 'anchor').length);
     assert.equal(n.deck.cards.length, raw.cards.filter((x) => x.kind === 'source').length);
-    assert.ok(n.deck.anchors.length <= 12, '나라별 앵커 상한 12(D85)');
+    const cap = CONFIG.maxAnchorsByNation[n.deck.nation] ?? CONFIG.maxAnchors;
+    assert.ok(n.deck.anchors.length <= cap, `나라별 앵커 상한 ${cap}(D85, D191)`);
     assert.ok(n.deck.anchors.every((a) => a.reign_range), '앵커 reign_range가 데이터에 있어야 한다(reigns.json 삭제, D66)');
     const t = buildTimeline(n.deck.anchors);
     for (const c of raw.cards.filter((x) => x.kind === 'source' && !x.disputed)) {

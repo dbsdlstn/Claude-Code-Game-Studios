@@ -97,7 +97,7 @@ describe('실제 덱 목록(assets/data/cards/v2/manifest.json): 파일이 있�
   const dir = path.dirname(V2_PATH);
   const man = JSON.parse(readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
   for (const nation of man.nations.filter((n) => n.files.length)) {
-    test(`${nation.label}: 파일을 모두 합치면 오류 없음, 사료 id 겹침 없음, 앵커 12 이하, 모든 카드가 한 칸에서만 정답`, async () => {
+    test(`${nation.label}: 파일을 모두 합치면 오류 없음, 사료 id 겹침 없음, 앵커 나라별 상한(12, 고려 13) 이하, 모든 카드가 한 칸에서만 정답`, async () => {
       const raws = nation.files.map((f) => JSON.parse(readFileSync(path.join(dir, f), 'utf8')));
       const m = mergeV2(raws);
       assert.deepEqual(m.errors, []);
@@ -107,7 +107,8 @@ describe('실제 덱 목록(assets/data/cards/v2/manifest.json): 파일이 있�
       assert.deepEqual(n.errors, []);
       assert.deepEqual(validateDeck(n.deck), []);
       assert.equal(n.deck.nation, nation.id);
-      assert.ok(n.deck.anchors.length <= 12, '나라별 앵커 상한 12(D85)');
+      const cap = CONFIG.maxAnchorsByNation[nation.id] ?? CONFIG.maxAnchors;
+      assert.ok(n.deck.anchors.length <= cap, `나라별 앵커 상한 ${cap}(D85, D191)`);
       const t = buildTimeline(n.deck.anchors);
       for (const c of n.deck.cards) assert.equal(correctGaps(t, c.order).length, 1, c.id);
     });
@@ -123,7 +124,8 @@ describe('나라 인장·이름(D110·D113)', () => {
     const seals = Object.entries(CONFIG.nationSeals);
     assert.equal(new Set(seals.map(([, s]) => s.ch)).size, seals.length);
     for (const [id, s] of seals) assert.ok(ratio(s.bg, s.fg) >= 4.5, `${id} ${ratio(s.bg, s.fg).toFixed(2)}`);
-    assert.equal(CONFIG.nationSeals.goryeo.ch, '려');
+    assert.deepEqual({ ...CONFIG.nationSeals.goryeo }, { ch: '려', bg: '#7FB5A3', fg: '#2B2118', border: '#8A6D3B' }, 'D235 확정값');
+    assert.ok(ratio('#7FB5A3', '#2B2118') >= 6.7, '먹 글자 대비 6.8(D235)');
   });
   test('nation: goryeo 덱은 "고려"로 표시된다', () => {
     const raw = JSON.parse(readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures/silla-fixture.json'), 'utf8'));
@@ -131,4 +133,12 @@ describe('나라 인장·이름(D110·D113)', () => {
     assert.equal(deck.nation, 'goryeo');
     assert.equal(deck.nation_label, '고려');
   });
+});
+
+test('나라별 앵커 상한은 콘텐츠 검증기와 같다(D191)', () => {
+  const py = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '../../../tools/validate_cards_v2.py'), 'utf8');
+  assert.match(py, /^MAX_ANCHORS = 12\b/m);
+  assert.match(py, /^MAX_ANCHORS_BY_NATION = \{"goryeo": 13\}/m);
+  assert.equal(CONFIG.maxAnchors, 12);
+  assert.deepEqual({ ...CONFIG.maxAnchorsByNation }, { goryeo: 13 });
 });

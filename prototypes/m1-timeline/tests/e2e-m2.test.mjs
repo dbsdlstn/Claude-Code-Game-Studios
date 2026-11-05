@@ -700,11 +700,11 @@ test('키보드만: 타이틀 → 학습 세션(칸 Tab+Enter) → 결과 → �
 const GORYEO = 'tests/fixtures/manifest-goryeo.json';
 const GORYEO_BY_ID = (() => {
   const fx = (f) => JSON.parse(readFileSync(new URL(f, import.meta.url), 'utf8'));
-  const files = ['../../../assets/data/cards/v2/staging/goryeo-m5-b1.json', '../../../assets/data/cards/v2/staging/goryeo-m5-b2.json', './fixtures/goryeo-anchor13.json'].map(fx);
+  const files = ['../../../assets/data/cards/v2/staging/goryeo-m5-b1.json', '../../../assets/data/cards/v2/staging/goryeo-m5-b2.json'].map(fx);
   const { deck } = normalizeDeck({ schema: 2, cards: files.flatMap((f) => f.cards) });
   return new Map([...deck.cards, ...deck.anchors].map((c) => [c.id, c]));
 })();
-test('고려(staging + 13번째 앵커): 인장 "려"(#7FB5A3, 먹 글자, 1px 테두리), 390px 압축 연표 13앵커, 정답·오답 뒤 맞는 칸 표시', () => withPage(VIEWPORTS.mobile, async (page) => {
+test('고려(staging, 앵커 13개 D191): 인장 "려"(#7FB5A3, 먹 글자, 1px 테두리), 390px 압축 연표 13앵커, 정답·오답 뒤 맞는 칸 표시', () => withPage(VIEWPORTS.mobile, async (page) => {
   await openProto(page, server.base, { data: null, title: null, manifest: GORYEO, nation: 'goryeo' });
   await page.waitForSelector('#title:not([hidden])');
   const s = await page.locator('#title-nations [data-nation="goryeo"] .seal').evaluate((n) => { const c = getComputedStyle(n); return [n.textContent, c.backgroundColor, c.color, c.borderTopWidth, c.borderTopColor, Math.round(n.getBoundingClientRect().width)]; });
