@@ -158,19 +158,19 @@ test('390px 결과 한 화면: A와 B([다음 세션])가 스크롤 없이 첫 �
   await page.waitForSelector('#title:not([hidden])');
 }));
 
-test('하루 세 번째 세션: 카드별 +0 없이 "오늘 경험치는 다 모았어요" 한 줄, 승급·등급 보너스는 따로', () => withPage(VIEWPORTS.desktop, async (page) => {
+test('그날 24장을 넘긴 뒤(D184): 카드별 +0 없이 "오늘 경험치는 다 모았어요" 한 줄, 권장 상한 안내', () => withPage(VIEWPORTS.desktop, async (page) => {
   await openProto(page, server.base);
   await page.evaluate(() => {
     const d = new Date(Date.now() - 3 * 3600000);
     const p = (x) => String(x).padStart(2, '0');
     const key = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-    localStorage.setItem('hanyang-m1:rewards:v1', JSON.stringify({ version: 1, format: 'hanyang-dogam-rewards', xp: 0, sessions_done: 2, streak: 1, best_streak: 1, rest_passes: 0, last_goal_date: key, goal_days_total: 1, achievements: {}, day: { key, sessions: 2, goal_met: true }, settled: [] }));
+    localStorage.setItem('hanyang-m1:rewards:v1', JSON.stringify({ version: 1, format: 'hanyang-dogam-rewards', xp: 0, sessions_done: 2, streak: 1, best_streak: 1, rest_passes: 0, last_goal_date: key, goal_days_total: 1, achievements: {}, day: { key, sessions: 3, cards: 24, goal_met: true }, settled: [] }));
   });
   await page.reload();
   await page.waitForSelector('body[data-ready="true"]');
   await playOneSession(page);
   assert.equal(await page.getAttribute('#summary-xp', 'data-xp'), '0', '새 카드 첫 정답이라 보너스도 없다');
-  assert.match(await page.innerText('#stage-xp'), /오늘 경험치는 다 모았어요 \(하루 두 세션까지\)/);
+  assert.match(await page.innerText('#stage-xp'), /오늘 경험치는 다 모았어요 \(하루 24장까지\)/);
   assert.equal(await page.locator('#settle-list .settle-xp').count(), 0, '카드별 +0 줄 없음');
   assert.match(await page.innerText('#stage-next'), /오늘은 충분히 했어요/);
   assert.equal(await page.locator('#stage-goal').count(), 0, '목표는 이미 달성');
@@ -573,4 +573,17 @@ test('이벤트 로그: 나라 전환 시도(확인 대화상자 취소·이동)
   await page.waitForSelector('body[data-ready="true"]');
   const log2 = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:save:v2')).log.filter((l) => l.event === 'session_end'));
   assert.ok(log2.some((l) => l.ended_by === 'closed' && l.answered_n === 1));
+}));
+
+// M2 F11(D109): 저장이 손상되면 조용히 사라지지 않고 안내하며, 원문을 따로 보관한다
+test('저장 손상: 안내 문구, 원문 보관, 새로 시작', () => withPage(VIEWPORTS.desktop, async (page) => {
+  await openProto(page, server.base, { title: null });
+  await page.evaluate(() => { localStorage.setItem('hanyang-m1:save:v2', '{broken'); localStorage.setItem('hanyang-m1:rewards:v1', 'not json'); });
+  await page.reload();
+  await page.waitForSelector('#title:not([hidden])');
+  assert.match(await page.innerText('#title-today'), /저장된 기록을 읽지 못해 새로 시작했어요/);
+  assert.equal(await page.evaluate(() => localStorage.getItem('hanyang-m1:save:v2:broken')), '{broken');
+  assert.equal(await page.evaluate(() => localStorage.getItem('hanyang-m1:rewards:v1:broken')), 'not json');
+  await page.click('#title-play');
+  assert.match(await page.innerText('#notice'), /저장된 기록을 읽지 못해/);
 }));

@@ -22,6 +22,8 @@ describe('설정(§9)', () => {
   test('assets/data/config/rewards.json = config 기본값(세션 완료 보너스 없음, 하루 2세션, 레벨 25+30)', () => {
     for (const k of Object.keys(R).filter((x) => x !== 'enabled')) assert.deepEqual(FILE[k], JSON.parse(JSON.stringify(R[k])), k);
     assert.equal('session_done' in R.xp, false);
+    assert.equal(R.xp_cards_per_day, 24);
+    assert.equal('xp_sessions_per_day' in R, false);
   });
 });
 
@@ -59,17 +61,26 @@ describe('§11 수용 기준', () => {
     assert.equal(bonusXp(rec({ bestFrom: 1, bestTo: 3 }), R).gradeXp, 40 + 80);
     assert.equal(bonusXp(rec({ bestFrom: 2, bestTo: 2 }), R).gradeXp, 0, '내려갔다 다시 올라가도 best가 같으면 없음');
   });
-  test('4. 하루 두 세션까지만 인출 XP·하루 목표, 세 번째는 0. 승급·등급은 항상. 세션 완료 보너스 없음', () => {
-    const recs = [rec({ id: 'a', boxFrom: 2, boxTo: 3 }), rec({ id: 'b', boxFrom: 2, boxTo: 3, bestTo: 1 }), rec({ id: 'c', correct: false, boxFrom: 2, boxTo: 1 })];
+  test('4. 인출 XP와 하루 목표는 그날 처음 24장까지(D184): 24번째는 받고 25번째는 0, 세션 중간에 넘기면 그 장부터, 보너스는 항상, 날짜가 바뀌면 0부터', () => {
     let rw = newRewards();
-    const s1 = settle(rw, recs, at('2026-11-05')); rw = s1.rewards;
-    assert.equal(s1.report.sessionXp, 10 + 5 + 10 + 5 + 20 + 0 + R.xp.daily_goal);
-    const s2 = settle(rw, recs, at('2026-11-05', 13)); rw = s2.rewards;
-    assert.equal(s2.report.sessionXp, 10 + 5 + 10 + 5 + 20, '두 번째: 목표는 이미 달성(하루 한 번)');
-    const s3 = settle(rw, recs, at('2026-11-05', 14));
+    const ten = Array.from({ length: 10 }, (_, i) => rec({ id: `a${i}` }));
+    const s1 = settle(rw, ten, at('2026-11-05')); rw = s1.rewards;
+    assert.equal(s1.report.sessionXp, 10 * 10 + R.xp.daily_goal);
+    const s2 = settle(rw, ten, at('2026-11-05', 13)); rw = s2.rewards;
+    assert.equal(s2.report.sessionXp, 100, '20장까지');
+    // 세 번째 세션: 21~24번째는 XP, 25번째부터 0. 승급 보너스(상자 2 → 3)는 상한과 무관
+    const mixed = Array.from({ length: 6 }, (_, i) => rec({ id: `b${i}`, boxFrom: 2, boxTo: 3 }));
+    const s3 = settle(rw, mixed, at('2026-11-05', 14)); rw = s3.rewards;
+    assert.deepEqual(s3.report.lines.map((l) => l.xp), [10, 10, 10, 10, 0, 0], '24번째까지 받고 25번째부터 0');
+    assert.ok(s3.report.lines.every((l) => l.boxXp === 5));
     assert.equal(s3.report.capped, true);
-    assert.equal(s3.report.sessionXp, 5 + 5 + 20, '세 번째: 승급·등급만');
-    assert.ok(s3.report.lines.every((l) => l.xp === 0));
+    assert.equal(s3.report.cappedAll, false);
+    assert.equal(s3.report.dayCards, 26);
+    const s4 = settle(rw, [rec({ id: 'c' })], at('2026-11-05', 15));
+    assert.equal(s4.report.cappedAll, true);
+    assert.equal(s4.report.sessionXp, 0);
+    const next = settle(s4.rewards, [rec({ id: 'd' }), rec({ id: 'e' }), rec({ id: 'f' })], at('2026-11-06'));
+    assert.equal(next.report.sessionXp, 30 + R.xp.daily_goal, '다음 날 0부터');
   });
   test('5. 레벨 경계 C(L) = 25(L−1) + 15(L−1)(L−2)', () => {
     const table = { 2: 25, 3: 80, 4: 165, 5: 280, 6: 425, 8: 805, 10: 1305, 12: 1925, 15: 3080, 20: 5605, 25: 8880, 30: 12905, 40: 23205, 50: 36505 };
@@ -214,9 +225,9 @@ describe('§7.2 시뮬레이션(방향)', () => {
     assert.ok(guess > 2 * direct);
     assert.ok(relation < honest && direct < relation);
   });
-  test('§7.2b 하루 6세션을 해도 하루 2세션 수준에서 멈춘다', () => {
-    const two = simulate('honest', { perDay: 2, seeds: 8 });
+  test('§7.2b(D184) 하루 6세션을 해도 하루 24장(3세션) 수준에서 크게 늘지 않는다', () => {
+    const three = simulate('honest', { perDay: 3, seeds: 8 });
     const six = simulate('honest', { perDay: 6, seeds: 8 });
-    assert.ok(six < two * 1.3, `6세션 ${Math.round(six)} vs 2세션 ${Math.round(two)}`);
+    assert.ok(six < three * 1.3, `6세션 ${Math.round(six)} vs 3세션 ${Math.round(three)}`);
   });
 });
