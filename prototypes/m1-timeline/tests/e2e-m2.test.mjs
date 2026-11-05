@@ -42,7 +42,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     // D93·D95: 처음에는 새 카드 FIRST장(명세 기본값), 시작 버튼 위에 오늘 할 일
     assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'new');
     assert.equal(await page.innerText('#title-play'), '새 카드 시작');
-    assert.equal(await page.innerText('#title-today'), `오늘 복습 0장 · 새 카드 ${FIRST}장 · 약 ${Math.ceil((FIRST * CONFIG.secondsPerCard) / 60)}분`);
+    assert.equal(await page.innerText('#title-today'), `이번 세션 ${FIRST}장(복습 0 · 새 ${FIRST}) · 약 ${Math.ceil((FIRST * CONFIG.secondsPerCard) / 60)}분`);
     assert.ok(await page.evaluate(() => document.querySelector('#title-today').getBoundingClientRect().bottom <= document.querySelector('#title-play').getBoundingClientRect().top), '오늘 할 일은 시작 버튼 위');
     assert.equal(await page.locator('#title-meta').count(), 1, '레벨·XP·연속일 한 줄');
     assert.match(await page.innerText('#title-meta'), new RegExp(`레벨 1[\\s\\S]*0 / ${CONFIG.rewards.level.base} XP · 연속 0일`));
@@ -779,4 +779,43 @@ test('질문 문구(D173): 일반 "연표 어디에 들어갈까?", 해설에 "�
   await page.waitForSelector('#card[data-card-id]');
   assert.equal(await page.innerText('#card .card-title'), '어느 왕 때일까?');
   assert.equal(await page.locator('#result-offlist').count(), 0);
+}));
+
+// D119(D194): M2 사람 테스트용 덱 목록(고구려·고려만)과 실행 주소
+test('사람 테스트용 덱 목록(manifest-m2test): 고구려·고려 두 나라만, 고려로 바꿔 한 장 풀기', { skip: !nationDeck('goryeo') && '고려 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, title: null, manifest: '../../assets/data/cards/v2/manifest-m2test.json' });
+  await page.waitForSelector('#title:not([hidden])');
+  assert.deepEqual(await page.locator('#title-nations [data-nation]').evaluateAll((b) => b.map((x) => x.dataset.nation)), ['goguryeo', 'goryeo']);
+  assert.match(await page.innerText('#title-today'), /^이번 세션 \d+장\(복습 0 · 새 \d+\) · 약 \d+분/);
+  await page.locator('#title-nations [data-nation="goryeo"]').tap();
+  await page.waitForURL(/nation=goryeo/);
+  assert.match(page.url(), /manifest=/, '나라를 바꿔도 사람 테스트용 목록 유지');
+  await page.waitForSelector('#title:not([hidden])');
+  assert.equal(await page.locator('#title-nations [data-nation]').count(), 2);
+  await page.locator('#title-play').tap();
+  assert.match(await page.innerText('#timeline-title'), /려\s*고려 왕대 연표/);
+  const c = await currentCard(page, nationDeck('goryeo').byId);
+  await pressGap(page, (await gapsFor(page, c)).right, true);
+  assert.equal(await page.getAttribute('#result', 'data-result'), 'correct');
+  assert.ok(await noOverflow(page));
+}));
+
+// D119(D194): 추천 정렬이 같으면 최근에 덜 한 나라 먼저(고려가 manifest 맨 뒤라 영영 추천되지 않던 문제)
+test('추천 동점: 최근에 한 나라는 뒤로(고구려 카드를 방금 봤으면 백제가 추천)', { skip: !nationDeck('goryeo') && '고려 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, title: null });
+  await page.waitForSelector('#title:not([hidden])');
+  assert.equal(await page.getAttribute('#title-nations .nation-row:first-child', 'data-nation'), 'goguryeo', '처음엔 manifest 순');
+  const gid = nationDeck('goguryeo').deck.cards[0].id;
+  await page.evaluate((id) => {
+    const k = 'hanyang-m1:save:v2';
+    const s = JSON.parse(localStorage.getItem(k)) ?? { cards: {}, nations: {} };
+    s.cards = { ...(s.cards ?? {}), [id]: { box: 1, introduced: false, due_session: 0, last_session: 0, clean_streak: 0, lapses: 0, best_grade: 0, last_played_at: new Date().toISOString(), probation: false, probation_clean: 0 } };
+    localStorage.setItem(k, JSON.stringify(s));
+  }, gid);
+  await page.reload();
+  await page.waitForSelector('#title:not([hidden])');
+  const order = await page.locator('#title-nations .nation-row').evaluateAll((r) => r.map((x) => x.dataset.nation));
+  assert.equal(order[0], 'baekje', String(order));
+  assert.equal(order.at(-1), 'goguryeo', '방금 한 나라는 동점 중 맨 뒤');
+  assert.equal(await page.locator('#title-nations [data-nation="baekje"] .nation-rec').count(), 1);
 }));

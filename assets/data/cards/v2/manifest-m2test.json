@@ -1,0 +1,24 @@
+{
+  "_note": "M2 사람 테스트용 덱 목록(D194·D119): 고구려·고려만. 실제 manifest.json과 같은 파일을 가리킨다. 실행: http://localhost:8000/prototypes/m1-timeline/?manifest=../../assets/data/cards/v2/manifest-m2test.json",
+  "nations": [
+    {
+      "id": "goguryeo",
+      "label": "고구려",
+      "files": [
+        "goguryeo-m1.json",
+        "goguryeo-m2-b2.json",
+        "goguryeo-m2-b3.json"
+      ]
+    },
+    {
+      "id": "goryeo",
+      "label": "고려",
+      "files": [
+        "goryeo-m5-b1.json",
+        "goryeo-m5-b2.json",
+        "goryeo-m5-b3.json",
+        "goryeo-m5-b4.json"
+      ]
+    }
+  ]
+}

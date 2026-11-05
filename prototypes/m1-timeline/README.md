@@ -32,6 +32,22 @@
 - **처음부터 다시**: [숙련 도감] → 오답 노트 탭 아래 [학습 기록 초기화](학습 기록과 레벨·업적을 지운다). 모든 나라 기록을 한 번에 확실히 비우려면 브라우저 개발자 도구 → Application → Local Storage → `localhost:8000`을 지운다. 기록을 남기려면 먼저 [기록 내보내기(JSONL)].
 - 휴대폰으로 보려면 PC와 같은 Wi-Fi에서 `http://PC의IP:8000/prototypes/m1-timeline/`(Windows 방화벽이 물으면 "개인 네트워크" 허용). 공개 인터넷에 올리지 않는다(프로토타입 배포 금지).
 
+### 사람 테스트용 실행(M2, 고구려·고려만)
+M2 사람 테스트는 나라를 두 개(고구려·고려)로 줄인 덱 목록 `assets/data/cards/v2/manifest-m2test.json`을 쓴다(D194). 카드 파일은 실제 `manifest.json`과 같다.
+
+1. 위 "PC에서 바로 해 보기" 1~3단계대로 **저장소 맨 위 폴더**에서 서버를 띄운다(Windows `py -m http.server 8000`, macOS·Linux `python3 -m http.server 8000`).
+2. 브라우저에서 아래 주소를 연다(한 줄).
+
+   ```
+   http://localhost:8000/prototypes/m1-timeline/?manifest=../../assets/data/cards/v2/manifest-m2test.json
+   ```
+
+3. 타이틀에 고구려·고려 두 나라만 보이면 맞다. 나라를 바꿔도 주소의 `manifest=`가 유지된다.
+4. 참가자마다 **새 브라우저 프로필**(또는 시크릿 창, 단 닫으면 기록이 사라진다)을 쓴다. 기록은 브라우저 저장소에 남고 다른 덱 목록과 공유된다. 테스트가 끝나면 [숙련 도감] → [기록 내보내기(JSONL)]로 로그를 받는다.
+5. 휴대폰 참가자: PC와 같은 Wi-Fi에서 `http://PC의IP:8000/prototypes/m1-timeline/?manifest=../../assets/data/cards/v2/manifest-m2test.json`.
+
+이 주소는 일반 학습 모드다. M1 방식 비교용 `?study=1`(아래)과는 다른 테스트다. 묶음(`build.py`)은 기본 `manifest.json`만 싣는다.
+
 ### 주소 옵션
 - `?nation=baekje`처럼 나라를 바로 고른다(goguryeo, baekje, silla, usilla, goryeo).
 - `?study=1`은 M1 사람 테스트 모드다(아래). 일반 학습과 저장이 따로다.

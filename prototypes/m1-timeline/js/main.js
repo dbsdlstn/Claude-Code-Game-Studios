@@ -1362,7 +1362,9 @@ function renderTitleNations() {
   if (active.length >= 3) {
     // D193(D237): 추천 정렬은 도래 + 새 카드(도래만 세면 새 나라가 열리지 않는다). 같으면 manifest 순서.
     const weight = (id) => plans.get(id).due + plans.get(id).fresh;
-    const order = [...active].sort((a, b) => weight(b.id) - weight(a.id) || nations.indexOf(a) - nations.indexOf(b));
+    // D194: 같으면 최근에 덜 한 나라(마지막 인출이 오래됐거나 없는 나라) 먼저, 그다음 manifest 순서.
+    const lastAt = (id) => deckOf(id).cards.reduce((m, c) => Math.max(m, Date.parse(allP[c.id]?.last_played_at ?? '') || -Infinity), -Infinity);
+    const order = [...active].sort((a, b) => weight(b.id) - weight(a.id) || lastAt(a.id) - lastAt(b.id) || nations.indexOf(a) - nations.indexOf(b));
     const rec = weight(order[0].id) > 0 ? order[0].id : null;
     app.titleNations = { recommended: rec, nations: active.map((n) => ({ nation: n.id, due_n: plans.get(n.id).due, new_n: plans.get(n.id).fresh })) };
     const cap = R.daily_card_soft_cap;
@@ -1431,8 +1433,8 @@ function showTitle() {
   const mins = Math.max(1, Math.ceil((plan.left * CONFIG.secondsPerCard) / 60));
   const today = {
     continue: `이어서 ${plan.left}장 남음 · 약 ${mins}분`,
-    review: `오늘 복습 ${plan.due}장 · 새 카드 ${plan.fresh}장 · 약 ${mins}분`,
-    new: `오늘 복습 0장 · 새 카드 ${plan.fresh}장 · 약 ${mins}분`,
+    review: `이번 세션 ${plan.due + plan.fresh}장(복습 ${plan.due} · 새 ${plan.fresh}) · 약 ${mins}분`,
+    new: `이번 세션 ${plan.fresh}장(복습 0 · 새 ${plan.fresh}) · 약 ${mins}분`,
     done: '오늘 할 카드를 모두 했습니다. 미리 복습은 연습입니다.',
   }[plan.mode];
   const label = { continue: `이어하기 · ${plan.left}장 남음`, review: '복습 시작', new: '새 카드 시작', done: '오늘 끝 · 미리 복습' }[plan.mode];
