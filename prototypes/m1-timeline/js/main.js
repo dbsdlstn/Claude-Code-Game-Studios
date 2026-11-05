@@ -231,11 +231,22 @@ function renderResult(box) {
     el('p', { class: 'result-box', id: 'result-box', dataset: { from: String(r.boxFrom ?? ''), to: String(r.boxTo ?? '') } },
       boxLine, !r.practice && !r.retry && grade ? ` · 등급 ${GRADE_NAME[grade]}` : ''),
     r.xp && r.xp.xp > 0 ? el('p', { class: 'result-xp', id: 'result-xp', dataset: { xp: String(r.xp.xp) } }, `+${r.xp.xp} XP`, el('span', { class: 'xp-parts' }, ` (${r.xp.parts.map(([n, v]) => `${n} ${v}`).join(' · ')})`)) : null,
+    explainBlock(card, !app.study && r.correct && grade >= 2),
+    el('button', { type: 'button', id: 'btn-next', class: 'btn btn-primary', onclick: onNext }, isLast ? (app.state.practice ? '연습 끝내기' : '세션 결과 보기') : '다음 카드'),
+  ].filter(Boolean));
+}
+
+/**
+ * 해설·수험 정리·출처. 숙련 카드(은 이상)를 맞혔으면 기본으로 접는다(D93: 세션 피로). 테스트 모드는 M1 그대로 펼침.
+ */
+function explainBlock(card, folded) {
+  const body = [
     el('p', { class: 'result-exp' }, card.explanation),
     card.exam_note ? el('p', { class: 'result-note', id: 'result-note' }, el('b', {}, '수험 정리 '), card.exam_note) : null,
     el('p', { class: 'result-source', id: 'result-source' }, `출처: ${card.source?.name ?? ''}${card.source?.ref ? ' ' + card.source.ref : ''}`),
-    el('button', { type: 'button', id: 'btn-next', class: 'btn btn-primary', onclick: onNext }, isLast ? (app.state.practice ? '연습 끝내기' : '세션 결과 보기') : '다음 카드'),
-  ].filter(Boolean));
+  ];
+  if (!folded) return body;
+  return el('details', { class: 'result-details', id: 'result-details' }, el('summary', {}, '해설 보기(숙련 카드)'), ...body);
 }
 
 /** 큐가 빈 세션(§5-4): 도래 카드와 새 카드를 모두 했다. */
@@ -273,14 +284,20 @@ function renderTimeline() {
   const placed = (app.state?.placed ?? []).filter((p) => p.id !== hideId);
   const nodes = [];
   let dock = null;
-  const gap = (k) => {
+  // D93(M2 평가): 일반 모드는 칸 압축(앵커 한 줄, 틈 줄 없이 앵커 경계에 44px "+"). 테스트 모드는 M1 화면 그대로.
+  const compact = !app.study;
+  const gapButton = (k, pending, text) => el('button', {
+    type: 'button', class: 'gap' + (pending ? ' gap-selected' : '') + (compact ? ' gap-compact' : ''), dataset: { gap: String(k) }, disabled: !asking,
+    'aria-label': `${text} 칸에 꽂기`, 'aria-pressed': pending ? 'true' : null, onclick: () => onGap(k),
+  }, el('span', { class: 'gap-plus', 'aria-hidden': 'true' }, pending ? '✓' : '＋'), compact ? null : el('span', { class: 'gap-label' }, pending ? '이 칸을 골랐습니다' : '이 칸에 꽂기'));
+  /** 칸 k의 버튼(압축: 앵커 줄 안에 넣을 버튼, M1: 틈 줄). */
+  const gap = (k, inline = false) => {
     if (!allowed.has(k)) return null;
+    if (compact !== inline) return null;
     const pending = asking && app.pendingGap === k;
     const text = slotText(items, k);
-    const row = el('li', { class: 'gap-row' + (pending ? ' gap-pending' : '') }, el('button', {
-      type: 'button', class: 'gap' + (pending ? ' gap-selected' : ''), dataset: { gap: String(k) }, disabled: !asking,
-      'aria-label': `${text} 칸에 꽂기`, 'aria-pressed': pending ? 'true' : null, onclick: () => onGap(k),
-    }, el('span', { class: 'gap-plus', 'aria-hidden': 'true' }, pending ? '✓' : '＋'), el('span', { class: 'gap-label' }, pending ? '이 칸을 골랐습니다' : '이 칸에 꽂기')));
+    const btn = gapButton(k, pending, text);
+    const row = compact ? btn : el('li', { class: 'gap-row' + (pending ? ' gap-pending' : '') }, btn);
     if (pending) {
       // B4: 확정 막대는 화면 아래 고정(연표 밖의 #confirm-dock, 위에 붙은 카드에 가리지 않게).
       dock = (el('div', { class: 'confirm-bar', id: 'confirm-bar' },
@@ -304,7 +321,14 @@ function renderTimeline() {
   nodes.push(gap(0));
   items.forEach((it, i) => {
     const c = byId(it.id);
-    if (it.kind === 'anchor') {
+    if (it.kind === 'anchor' && compact) {
+      const pending = asking && app.pendingGap === i + 1;
+      nodes.push(el('li', { class: 'row row-anchor row-compact' + (pending ? ' gap-pending' : ''), dataset: { id: it.id, order: String(it.order) } },
+        el('span', { class: 'row-year' }, c.reign_range ?? shortYear(c)),
+        el('span', { class: 'row-main' }, el('span', { class: 'row-title' }, c.reign ?? c.title)),
+        gap(i + 1, true)));
+      if (!L.placedJoinTimeline) nodes.push(...inSlot(it.order, items[i + 1]?.order ?? null).map(placedRow));
+    } else if (it.kind === 'anchor') {
       nodes.push(el('li', { class: 'row row-anchor', dataset: { id: it.id, order: String(it.order) } },
         el('span', { class: 'row-year' }, c.reign_range ?? shortYear(c)),
         el('span', { class: 'row-main' },
@@ -319,10 +343,13 @@ function renderTimeline() {
   });
   fill($('timeline'), ...nodes.filter(Boolean));
   $('timeline').classList.toggle('asking', asking);
+  $('timeline').classList.toggle('compact', compact);
   fill($('confirm-dock'), dock);
   $('timeline-title').textContent = `${app.deck.nation_label ?? ''} 왕대 연표`;
   $('timeline-help').textContent = asking
-    ? (needsConfirm() ? '사건이 들어갈 칸(＋)을 고른 뒤 "이 칸에 꽂기"를 누르세요.' : '사건이 들어갈 칸(＋)을 누르세요. 카드를 끌어 놓아도 됩니다.')
+    ? (compact
+      ? (needsConfirm() ? '사건이 일어난 왕 줄의 ＋를 누른 뒤 "이 칸에 꽂기"로 확정하세요. ＋는 "이 왕 즉위 이후 ~ 다음 왕 즉위 이전"입니다.' : '사건이 일어난 왕 줄의 ＋를 누르세요(이 왕 즉위 이후 ~ 다음 왕 즉위 이전). 카드를 끌어 놓아도 됩니다.')
+      : (needsConfirm() ? '사건이 들어갈 칸(＋)을 고른 뒤 "이 칸에 꽂기"를 누르세요.' : '사건이 들어갈 칸(＋)을 누르세요. 카드를 끌어 놓아도 됩니다.'))
     : '';
 }
 
@@ -415,13 +442,13 @@ function rewardBox(st) {
     g?.newAchievements.length ? el('p', { class: 'rewards-ach', id: 'summary-achievements' }, '새 업적: ', g.newAchievements.map((a) => a.name).join(', ')) : null);
 }
 
-function levelBar(rw) {
+function levelBar(rw, extra = '', id = null) {
   const lv = levelOf(rw.xp, R);
-  return el('div', { class: 'level', dataset: { level: String(lv.level) } },
+  return el('div', { class: 'level', id, dataset: { level: String(lv.level) } },
     el('span', { class: 'level-name' }, `레벨 ${lv.level}`),
     el('span', { class: 'level-track', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(lv.need), 'aria-valuenow': String(lv.into), 'aria-label': `다음 레벨까지 ${lv.need - lv.into} XP` },
       el('span', { class: 'level-fill', style: `width:${Math.round((100 * lv.into) / lv.need)}%` })),
-    el('span', { class: 'level-num' }, `${lv.into} / ${lv.need} XP`));
+    el('span', { class: 'level-num' }, `${lv.into} / ${lv.need} XP${extra}`));
 }
 
 function showSummary(st) {
@@ -815,19 +842,46 @@ function setupTitle(wantIntro, params) {
   }, n.label, n.files.length ? null : el('span', { class: 'nation-soon' }, ' 준비 중'))));
 }
 
+/**
+ * 타이틀의 오늘 할 일(D93·D102): 진행 중 세션이 있으면 남은 장수, 없으면 다음 세션 구성 미리 보기(같은 시드라 실제와 같다).
+ * @returns {{mode: 'continue'|'review'|'new'|'done', due: number, fresh: number, left: number}}
+ */
+function todayPlan() {
+  if (app.state && currentId(app.state)) {
+    const left = app.state.queue.length - app.state.index;
+    return { mode: 'continue', due: 0, fresh: 0, left };
+  }
+  const s = sessionIndex();
+  const pick = buildSession(app.deck.cards, app.progress, s, L, sessionSeed(app.deckHash, s, app.seedParam));
+  const mode = pick.due ? 'review' : pick.fresh ? 'new' : 'done';
+  return { mode, due: pick.due, fresh: pick.fresh, left: pick.due + pick.fresh };
+}
+
 function showTitle() {
   app.titleOn = true;
   document.body.classList.add('on-title');
   $('title').hidden = false;
   const learned = app.deck.cards.filter((c) => app.progress[c.id]?.introduced).length;
   const counts = gradeCounts(app.deck.cards, app.progress, L);
-  const resume = app.started || !!app.state || app.completed > 0 || learned > 0;
-  $('title-play').textContent = resume ? `이어하기 · 세션 ${app.state?.session ?? sessionIndex()}` : '시작하기';
-  $('title-play').dataset.mode = resume ? 'continue' : 'start';
+  const plan = todayPlan();
+  const mins = Math.max(1, Math.ceil((plan.left * CONFIG.secondsPerCard) / 60));
+  const today = {
+    continue: `이어서 ${plan.left}장 남음 · 약 ${mins}분`,
+    review: `오늘 복습 ${plan.due}장 · 새 카드 ${plan.fresh}장 · 약 ${mins}분`,
+    new: `오늘 복습 0장 · 새 카드 ${plan.fresh}장 · 약 ${mins}분`,
+    done: '오늘 할 카드를 모두 했습니다. 미리 복습은 연습입니다.',
+  }[plan.mode];
+  const label = { continue: `이어하기 · ${plan.left}장 남음`, review: '복습 시작', new: '새 카드 시작', done: '오늘 끝 · 미리 복습' }[plan.mode];
+  $('title-today').textContent = today;
+  Object.assign($('title-today').dataset, { mode: plan.mode, due: String(plan.due), fresh: String(plan.fresh), left: String(plan.left), minutes: String(mins) });
+  $('title-play').textContent = label;
+  $('title-play').dataset.mode = plan.mode;
+  $('title-play').classList.toggle('btn-primary', plan.mode !== 'done');
+  const rw = app.rewards;
+  const todayKey = dayKey(new Date());
   fill($('title-stats'),
     el('p', { id: 'title-progress' }, `${app.deck.nation_label ?? ''} 카드 ${app.deck.cards.length}장 중 ${learned}장 학습 · 금 ${counts.gold} · 은 ${counts.silver} · 동 ${counts.bronze}`),
-    app.rewards ? levelBar(app.rewards) : null,
-    app.rewards ? el('p', { id: 'title-streak' }, `연속 ${app.rewards.streak.current}일 · 오늘 ${app.rewards.daily.goal_met && app.rewards.daily.day === dayKey(new Date()) ? '목표 달성' : `목표 세션 ${R.daily_goal_sessions}회`}`) : null);
+    rw ? levelBar(rw, ` · 연속 ${rw.streak.current}일${rw.daily.goal_met && rw.daily.day === todayKey ? ' · 오늘 목표 달성' : ''}`, 'title-meta') : null);
   $('title-play').focus();
 }
 
