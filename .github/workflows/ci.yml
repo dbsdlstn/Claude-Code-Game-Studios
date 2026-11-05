@@ -190,6 +190,9 @@ jobs:
     name: godot-screens
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    # 증거 PNG를 production/qa/evidence/godot/ 에 커밋하므로 이 잡만 쓰기 권한(D55).
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v5.0.0
 
@@ -252,3 +255,25 @@ jobs:
             screens/
             capture.log
             import-*.log
+
+      # 세션은 artifact 저장소에 접근할 수 없어(프록시 정책) 증거를 저장소에 남긴다. 그림이 바뀐 때만 커밋한다.
+      # GITHUB_TOKEN으로 한 push는 워크플로를 다시 실행시키지 않는다.
+      - name: Commit screens as QA evidence
+        if: success() && github.ref == 'refs/heads/claude/godot-mvp'
+        run: |
+          set -euo pipefail
+          mkdir -p production/qa/evidence/godot
+          cp screens/*.png production/qa/evidence/godot/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add production/qa/evidence/godot
+          if git diff --cached --quiet; then
+            echo "screens unchanged; nothing to commit"
+            exit 0
+          fi
+          git commit -m "chore(evidence): Godot screens from CI run ${{ github.run_id }}" -m "Ref: docs/decision-log.md D55"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:claude/godot-mvp; then exit 0; fi
+            git pull --rebase origin claude/godot-mvp
+          done
+          exit 1

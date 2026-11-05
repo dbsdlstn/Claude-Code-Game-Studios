@@ -40,7 +40,8 @@ func _run() -> void:
 	await _settle(0.3)
 	await _shot("03-title")
 
-	# 2. 본게임: 단서 모두 펼침
+	# 2. 본게임: 단서 모두 펼침. 시드를 고정해 실행마다 같은 카드가 나오게 한다(증거 PNG가 같은 내용이면 커밋하지 않는다).
+	(_main.get("_rng") as RandomNumberGenerator).seed = 20261105
 	_main.call("_start_new_round")
 	await _settle(0.3)
 	await _shot("04-board-start")
