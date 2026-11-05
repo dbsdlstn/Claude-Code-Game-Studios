@@ -58,7 +58,7 @@ describe('여러 덱(manifest)', () => {
   });
   test('프로토타입 덱 목록(data/decks.json): 고구려에 M1 파일, 나머지 나라는 준비 중', () => {
     const d = JSON.parse(readFileSync(path.join(here, '..', 'data', 'decks.json'), 'utf8'));
-    assert.deepEqual(d.nations.map((n) => n.id), ['goguryeo', 'baekje', 'silla', 'gaya']);
+    assert.deepEqual(d.nations.map((n) => n.id), ['goguryeo', 'baekje', 'silla'], '가야 없음(D96)');
     const g = d.nations[0].files.map((f) => path.resolve(here, '..', 'data', f));
     assert.deepEqual(g, [V2_PATH]);
   });

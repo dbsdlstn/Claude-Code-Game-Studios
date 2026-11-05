@@ -4,9 +4,14 @@
 import { test, before, after, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { CONFIG } from '../js/config.js';
 import {
   chromium, startServer, openProto, currentCard, gapsFor, pressGap, editSave, VIEWPORTS, SAMPLE, REAL, REAL_BY_ID, expectedAnchorYears, FULL, FULL_BY_ID, FULL_INFO,
 } from './helpers.mjs';
+
+/** 일반 모드 첫 세션 장수(명세 기본값 D95: 새 카드 최대 = max(new_min, floor(S × 비율))). */
+const G = CONFIG.leitnerGeneral;
+const FIRST = Math.max(G.new_min, Math.floor(G.session_size * G.new_max_ratio));
 
 let server;
 let browser;
@@ -44,13 +49,13 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       return out;
     }
 
-    test('첫 화면: 이름 숨긴 사료, 왕 단위 연표(재위 기간), 칸 = 앵커 수, 세션 6장, 가로 넘침 없음', () => withPage(async (page) => {
+    test('첫 화면: 이름 숨긴 사료, 왕 단위 연표(재위 기간), 칸 = 앵커 수, 첫 세션 새 카드 4장(명세 기본값, D95), 가로 넘침 없음', () => withPage(async (page) => {
       const card = await currentCard(page);
       const text = await page.innerText('#card');
       assert.ok(text.includes(card.source_text));
       assert.ok(!text.includes(card.title));
       assert.doesNotMatch(text, /\bnull\b|undefined/);
-      assert.match(await page.innerText('#progress'), /카드 1 \/ 6/);
+      assert.match(await page.innerText('#progress'), new RegExp(`카드 1 / ${FIRST}$`));
       assert.deepEqual(await page.locator('#timeline .row-anchor .row-title').allInnerTexts(), [...SAMPLE.anchors].sort((a, b) => a.order - b.order).map((a) => a.reign));
       assert.deepEqual(await page.locator('#timeline .row-anchor .row-year').allInnerTexts(), expectedAnchorYears(SAMPLE));
       assert.equal(await page.locator('#timeline .gap').count(), SAMPLE.anchors.length, '첫 앵커 앞은 칸이 아니다');
@@ -103,11 +108,11 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       const r1 = await playSession(page, () => (n++ % 3 === 1 ? 'wrong' : 'right'));
       const wrongIds = r1.filter((x) => x.first && x.how === 'wrong').map((x) => x.id);
       const retries = r1.filter((x) => !x.first);
-      assert.equal(r1.filter((x) => x.first).length, 6);
+      assert.equal(r1.filter((x) => x.first).length, FIRST);
       assert.deepEqual(retries.map((x) => x.id), wrongIds, '틀린 카드만 세션 끝에 한 번 더');
       assert.ok(retries.every((x) => x.to === '1'), '재도전은 상자를 바꾸지 않는다');
       await page.waitForSelector('#summary:not([hidden])');
-      assert.equal(await page.getAttribute('#summary-stats', 'data-right'), String(6 - wrongIds.length));
+      assert.equal(await page.getAttribute('#summary-stats', 'data-right'), String(FIRST - wrongIds.length));
       assert.doesNotMatch(await page.innerText('#summary-body'), /null/, 'B3: 세션 결과에 "null"이 찍히면 안 된다');
       assert.match(await page.innerText('#summary-retry'), new RegExp(`다시 풀기 ${wrongIds.length}장 중 ${wrongIds.length}장 성공`));
       await page.click('#summary-next');
@@ -115,7 +120,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       // 같은 날 재출제 금지(D94): 오늘 이미 푼 오답 카드는 세션 2에 나오지 않고, 새 카드 예약 2장만
       const r2 = await playSession(page);
       const ids2 = r2.map((x) => x.id);
-      assert.equal(ids2.length, 2, '같은 날: 새 카드 2장만');
+      assert.equal(ids2.length, Math.min(SAMPLE.cards.length - FIRST, FIRST), '같은 날: 새 카드만');
       assert.ok(wrongIds.every((id) => !ids2.includes(id)), '오늘 푼 카드는 오늘 다시 나오지 않는다');
       // 다음 날(마지막 인출을 하루 전으로 옮김): 도래한 오답 카드가 돌아온다
       await page.waitForSelector('#summary:not([hidden])');
@@ -283,7 +288,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
 describe('실제 콘텐츠(덱 목록의 고구려 전체)', { skip: !FULL && '데이터 없음' }, () => {
   for (const [name, opts] of Object.entries(VIEWPORTS)) {
     const mobile = name === 'mobile';
-    test(`${name}: 기본 경로, "사실 확인 전", 모든 앵커 재위 기간, 세션 6장 완주(재도전 포함)`, async () => {
+    test(`${name}: 기본 경로, "사실 확인 전", 모든 앵커 재위 기간, 첫 세션 완주(재도전 포함)`, async () => {
       const ctx = await browser.newContext(opts);
       const page = await ctx.newPage();
       const errors = [];
@@ -311,7 +316,7 @@ describe('실제 콘텐츠(덱 목록의 고구려 전체)', { skip: !FULL && '�
           }
           await page.click('#btn-next');
         }
-        assert.equal(first, 6);
+        assert.equal(first, FIRST);
         await page.waitForSelector('#summary:not([hidden])');
         assert.match(await page.innerText('#summary-retry'), /다시 풀기 1장 중 1장 성공/);
         assert.deepEqual(errors, []);

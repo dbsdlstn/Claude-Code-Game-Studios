@@ -42,7 +42,7 @@ test('dist/m1만으로 실제 초안을 읽고 모바일에서 한 장 꽂기, �
     // M2: 타이틀 화면과 덱 목록(data/decks.json)도 묶음만으로
     await page.goto(`http://127.0.0.1:${port}/index.html?intro=0`);
     await page.waitForSelector('#title:not([hidden])');
-    assert.equal(await page.getAttribute('#title-nations [data-nation="goguryeo"]', 'aria-pressed'), 'true');
+    assert.equal((await page.locator('#title-nations [data-nation="goguryeo"]').evaluate((b) => b.getAttribute('aria-checked') ?? b.getAttribute('aria-pressed'))), 'true');
     assert.match(await page.innerText('#title-play'), /복습 시작|새 카드 시작|이어하기/);
     assert.match(await page.innerText('#title-today'), /오늘 복습 \d+장 · 새 카드 \d+장 · 약 \d+분|이어서/);
     assert.deepEqual(failed, []);
