@@ -1,15 +1,15 @@
 // PROTOTYPE - NOT FOR PRODUCTION (M1, decision-log D56)
-// 스크린샷: node prototypes/m1-timeline/tests/screenshots.mjs → production/qa/evidence/m1/
+// 스크린샷: node prototypes/m1-timeline/tests/screenshots.mjs → production/qa/evidence/m2/ (M1 때 것은 evidence/m1에 남김)
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { runParticipant } from './study-driver.mjs';
-import { chromium, startServer, openProto, currentCard as cc, gapsFor, pressGap, VIEWPORTS, REPO_ROOT, REAL, REAL_BY_ID, BY_ID } from './helpers.mjs';
+import { chromium, startServer, openProto, currentCard as cc, gapsFor, pressGap, VIEWPORTS, REPO_ROOT, REAL, REAL_BY_ID, BY_ID, FULL, FULL_BY_ID } from './helpers.mjs';
 
 // 실제 콘텐츠 초안이 있으면 그것으로, 없으면 샘플로 찍는다.
-const DATA = REAL ? null : 'data/sample.json';
-const currentCard = (page) => cc(page, REAL ? REAL_BY_ID : BY_ID);
+const DATA = FULL ? null : 'data/sample.json';
+const currentCard = (page) => cc(page, FULL ? FULL_BY_ID : BY_ID);
 
-const OUT = path.join(REPO_ROOT, 'production', 'qa', 'evidence', 'm1');
+const OUT = path.join(REPO_ROOT, 'production', 'qa', 'evidence', 'm2');
 mkdirSync(OUT, { recursive: true });
 const server = await startServer();
 const browser = await chromium.launch();
@@ -21,11 +21,14 @@ try {
     const shot = async (file, full = false) => {
       await page.waitForTimeout(400);
       await page.screenshot({ path: path.join(OUT, `${name}-${file}.png`), fullPage: full });
-      console.log('saved', `production/qa/evidence/m1/${name}-${file}.png`);
+      console.log('saved', `production/qa/evidence/m2/${name}-${file}.png`);
     };
     // M2 타이틀(D82)
     await openProto(page, server.base, { data: DATA, seed: 11, title: null });
     await shot('00b-title');
+    // 앵커 12개(D85 대비, 테스트 고정 데이터): 콘텐츠 반영 뒤에는 위 기본 덱 화면이 그대로 12개가 된다.
+    await openProto(page, server.base, { data: 'tests/fixtures/goguryeo-12anchors.json', seed: 11 });
+    await shot('20-twelve-anchors', true);
     // 처음 안내(D74-5)
     await openProto(page, server.base, { data: DATA, seed: 11, intro: '1' });
     await shot('00-intro');
@@ -82,7 +85,7 @@ try {
       await sp.waitForSelector('#lock-code');
       await sp.waitForTimeout(300);
       await sp.screenshot({ path: path.join(OUT, `${name}-07a-study-lock.png`) });
-      console.log('saved', `production/qa/evidence/m1/${name}-07a-study-lock.png`);
+      console.log('saved', `production/qa/evidence/m2/${name}-07a-study-lock.png`);
       const taken = new Set();
       const sshot = async (key) => {
         const file = MAP[key];
@@ -90,7 +93,7 @@ try {
         taken.add(key);
         await sp.waitForTimeout(300);
         await sp.screenshot({ path: path.join(OUT, `${name}-${file}.png`) });
-        console.log('saved', `production/qa/evidence/m1/${name}-${file}.png`);
+        console.log('saved', `production/qa/evidence/m2/${name}-${file}.png`);
       };
       await runParticipant(sp, server.base, { participant: mobile ? 'P1' : 'P2', preset: mobile ? 'P1' : 'P2', deck: REAL, byId: REAL_BY_ID, mobile, shot: sshot });
       await sctx.close();

@@ -356,13 +356,14 @@ describe('데이터 로더(js/data.js)', () => {
     assert.match(normalizeDeck(raw).errors.join(), /이후가 아니다/);
   });
 
-  test('스키마 v2 콘텐츠 파일: 변환·검증 통과, 앵커 10·사료 12, 모든 앵커에 재위 기간, 모든 카드가 answer 칸에서만 정답', () => {
+  test('스키마 v2 M1 파일: 변환·검증 통과, 사료 12, 앵커는 파일의 수 그대로(D85로 늘 수 있음), 모든 앵커에 재위 기간, 모든 카드가 answer 칸에서만 정답', () => {
     const raw = JSON.parse(readFileSync(V2_PATH, 'utf8'));
     const n = normalizeDeck(raw);
     assert.equal(n.format, 'v2');
     assert.deepEqual(n.errors, []);
     assert.deepEqual(validateDeck(n.deck), []);
-    assert.equal(n.deck.anchors.length, 10);
+    assert.equal(n.deck.anchors.length, raw.cards.filter((c) => c.kind === 'anchor').length);
+    assert.ok(n.deck.anchors.length >= 10);
     assert.equal(n.deck.cards.length, 12);
     assert.ok(n.deck.anchors.every((a) => a.reign_range), '앵커 reign_range가 데이터에 있어야 한다(reigns.json 삭제, D66)');
     const t = buildTimeline(n.deck.anchors);
