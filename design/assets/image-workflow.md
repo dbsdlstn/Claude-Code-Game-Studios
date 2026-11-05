@@ -7,10 +7,11 @@
 - 규격과 선정 기준: `design/assets/specs/cards-assets.md` §1, §2.4
 - 카드 데이터: `assets/data/cards/samguk.json`
 - 검증 스크립트: `python3 tools/validate_cards.py` (저장소 루트에서)
+- 프롬프트 문서와 카드 id가 맞는지 보는 검사: `python3 tools/check_prompts.py` (저장소 루트에서). 카드가 늘거나 `disputed`·`anchor`가 바뀌면 `cards-prompts.md`를 고치고 다시 돌린다.
 
 ## 절차
 
-1. **카드 고르기**: `cards-prompts.md`에서 카드 `id`를 찾는다. 처음에는 기준 카드 4장(`*-anchor`)부터 만든다.
+1. **카드 고르기**: `cards-prompts.md`에서 카드 `id`를 찾는다. 처음에는 기준 카드 4장(`*-anchor`)부터 만든다. 튜토리얼 연습 카드는 `tutorial-` 접두의 id이며 `assets/data/cards/tutorial.json`의 `image`·`image_source`·`image_license`를 같은 방식으로 채운다.
 2. **프롬프트 복사**: 해당 카드의 **Prompt**와 **Negative**를 각각 복사한다. 화풍 고정 문구가 이미 들어 있으니 고치지 않는다. "고증 주의"에 `확인 필요`가 있으면 그 표현을 프롬프트에 더하지 않는다.
 3. **생성**: 이미지 도구에서 4:3 비율, 가로 1024px 이상으로 만든다. 여러 장 만들어 가장 나은 한 장을 고른다. 아래 중 하나라도 해당하면 버린다(`cards-assets.md` §2.4).
    - 이미지 안에 글자, 서명, 워터마크가 있다
