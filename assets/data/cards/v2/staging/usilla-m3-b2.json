@@ -661,6 +661,78 @@
         "통일신라",
         "U-B2"
       ]
+    },
+    {
+      "id": "usilla-src-22",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "패강진 설치",
+      "year": 782,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "선덕왕 3년",
+      "source_text": "북쪽 국경 지대에 군사 거점을 두고, 그곳을 다스릴 우두머리 벼슬을 새로 마련하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-seondeok"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-heungdeok"
+            }
+          ],
+          "text": "[선덕왕]이 즉위한 뒤, [흥덕왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "선덕왕 3년(782년). 패강진, 두상대감."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-seondeok",
+        "before": "usilla-reign-wonseong"
+      },
+      "explanation": "선덕왕 3년(782년)의 일. 선덕왕이 황해도 평산 일대에 패강진을 두고 장관 두상대감을 둔 일. 예성강 이북을 군정 방식으로 다스려 북쪽 변경을 개척했다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "잡지(직관지)",
+        "volume": 40,
+        "entry": "패강진전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "782(선덕왕 3) 패강진 설치(대곡성 설치 작업의 마무리, 평산 일대)와 두상대감 설치는 encykorea 요약으로 확인. 신라본기 선덕왕 3년조 기사 내용은 이번 검색으로 확인하지 못해 출처를 직관지로 두었다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D205)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "782-paegang-jin",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
     }
   ]
 }
