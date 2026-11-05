@@ -100,3 +100,21 @@ func test_cell_lines_keep_their_own_result_color() -> void:
 	assert_int(labels.size()).is_equal(2)
 	assert_str((labels[0] as Label).get_theme_color("font_color").to_html(false)).is_equal(HanjiTheme.CORRECT_TEXT.to_html(false))
 	assert_str((labels[1] as Label).get_theme_color("font_color").to_html(false)).is_equal(HanjiTheme.WRONG_TEXT.to_html(false))
+
+
+func test_definition_wraps_only_at_spaces() -> void:
+	# CI 화면 S2·S3: "전/쟁기"처럼 낱말 중간에서 끊기지 않는다.
+	assert_str(BoardView.wrap_at_spaces("멸망·통일로 이어지는 마지막 전쟁기", 14)).is_equal("멸망·통일로 이어지는\n마지막 전쟁기")
+	assert_str(BoardView.wrap_at_spaces("영토와 세력이 커지고 번영", 14)).is_equal("영토와 세력이 커지고 번영")
+	assert_str(BoardView.wrap_at_spaces("건국 전승과 초창기", 14)).is_equal("건국 전승과 초창기")
+
+
+func test_cell_with_many_lines_does_not_grow_taller_than_rows() -> void:
+	# CI 화면 S3: 자동 줄바꿈 Label이 칸을 세로로 늘려 아래 행을 덮던 문제. 줄 Label은 줄바꿈을 끈다.
+	var board := _board()
+	board.show_placed("silla", "ending", "아주 긴 이름의 카드 제목이 여기 있다", true)
+	board.show_placed("silla", "ending", "또 다른 긴 이름의 카드 제목", false)
+	for n: Node in board.cell("silla", "ending").find_children("*", "Label", true, false):
+		var l := n as Label
+		if l.text.begins_with("○") or l.text.begins_with("×"):
+			assert_int(l.autowrap_mode).is_equal(TextServer.AUTOWRAP_OFF)
