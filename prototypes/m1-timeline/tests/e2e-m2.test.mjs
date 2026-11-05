@@ -171,9 +171,9 @@ test('그날 24장을 넘긴 뒤(D184): 카드별 +0 없이 "오늘 경험치는
   assert.equal(await page.locator('#settle-list .settle-xp').count(), 0, '카드별 +0 줄 없음');
   assert.match(await page.innerText('#stage-next'), /오늘은 충분히 했어요/);
   assert.equal(await page.locator('#stage-goal').count(), 0, '목표는 이미 달성');
-  // 권장 상한(하루 3세션, D94): 막지 않고 타이틀에도 안내만
+  // 권장 상한(하루 24장, D172): 막지 않고 타이틀에도 안내만
   await page.click('#summary-home');
-  assert.match(await page.innerText('#title-today'), /오늘은 충분히 했어요. 내일 이어서 해요/);
+  assert.match(await page.innerText('#title-today'), /오늘은 충분히 했어요. 남은 복습은 내일로 미뤄도 돼요/);
   assert.equal(await page.isDisabled('#title-play'), false);
 }));
 
@@ -434,17 +434,18 @@ test('도감: 프로필 줄, 탭 4개(방향키), 안 만난 카드는 ?, 카드
 }));
 
 const THREE = 'tests/fixtures/manifest-three-nations.json';
-test('390px 나라 3개: 세로 목록(행 56px 이상, radiogroup, 행마다 오늘 할 일, 합계, 준비 중 접기), 진행 중 세션이면 전환 확인', { skip: !nationDeck('baekje') && '백제 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+test('390px 나라 3개: 세로 목록(한 줄 행 44~56px, radiogroup, 행마다 "복습 n · 새 m", 합계, 준비 중 접기), 진행 중 세션이면 전환 확인', { skip: !nationDeck('baekje') && '백제 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
   await openProto(page, server.base, { data: null, title: null, manifest: THREE });
   await page.waitForSelector('#title:not([hidden])');
   const rows = page.locator('#title-nations .nation-row');
   assert.equal(await rows.count(), 3);
   assert.equal(await page.locator('#title-nations [role="radiogroup"]').count(), 1);
   const hs = await rows.evaluateAll((r) => r.map((x) => x.getBoundingClientRect().height));
-  assert.ok(hs.every((h) => h >= 56), String(hs));
+  assert.ok(hs.every((h) => h >= 44 && h <= 56), `한 줄 행(D171) ${hs}`);
+  assert.match(await page.innerText('#title-nations [data-nation="baekje"]'), /백제\s*복습 \d+ · 새 \d+$/);
   assert.equal(await page.getAttribute('#title-nations [data-nation="goguryeo"]', 'aria-checked'), 'true');
   assert.match(await page.getAttribute('#title-nations [data-nation="baekje"]', 'aria-label'), /백제, \d+장 중 0장 학습, 오늘 복습 0장 새 카드 \d+장/);
-  assert.match(await page.innerText('#title-nation-total'), /오늘 복습 모두 \d+장 · 새 카드 \d+장/);
+  assert.match(await page.innerText('#title-nation-total'), /^오늘 복습 모두 \d+장$/);
   assert.match(await page.innerText('#title-nations .nation-soon-list summary'), /준비 중 1개/);
   assert.ok(await noOverflow(page));
   // 한 장 풀고 타이틀로 → 신라로 바꾸려 하면 확인, 취소하면 그대로
@@ -645,7 +646,7 @@ test('통일신라(usilla, 실제 매니페스트 D210): 나라 버튼과 연표
 }));
 
 // D111·D116: 실제 나라 5개(통일신라 D210, 고려 등록)도 390px 세로 목록에 모두 보이고 행마다 인장이 있다
-test('390px 실제 나라 5개(통일신라·고려 포함): 세로 목록 5행(56px 이상, 인장 고·백·신·통·려), 가로 스크롤 없음', { skip: !nationDeck('goryeo') && '고려 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+test('390px 실제 나라 5개(통일신라·고려 포함): 세로 목록 5행(한 줄 44~56px, 인장 고·백·신·통·려), [시작]이 첫 화면(664px) 안(D171), 가로 스크롤 없음', { skip: !nationDeck('goryeo') && '고려 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
   await openProto(page, server.base, { data: null, title: null });
   await page.waitForSelector('#title:not([hidden])');
   const rows = page.locator('#title-nations .nation-row');
@@ -653,7 +654,9 @@ test('390px 실제 나라 5개(통일신라·고려 포함): 세로 목록 5행(
   const info = await rows.evaluateAll((r) => r.map((x) => { const b = x.getBoundingClientRect(); return [x.dataset.nation, x.querySelector('.seal')?.textContent, b.height, b.left]; }));
   assert.deepEqual(info.map((x) => x[0]), ['goguryeo', 'baekje', 'silla', 'usilla', 'goryeo']);
   assert.deepEqual(info.map((x) => x[1]), ['고', '백', '신', '통', '려']);
-  assert.ok(info.every((x) => x[2] >= 56), String(info.map((x) => x[2])));
+  assert.ok(info.every((x) => x[2] >= 44 && x[2] <= 56), String(info.map((x) => x[2])));
+  const play = await page.locator('#title-play').evaluate((b) => b.getBoundingClientRect().bottom);
+  assert.ok(play <= 664, `[시작] 아래 끝 ${play}px`);
   assert.equal(new Set(info.map((x) => Math.round(x[3]))).size, 1, '한 줄에 하나씩(세로)');
   assert.ok(await noOverflow(page));
 }));
@@ -735,4 +738,32 @@ test('고려(실제 매니페스트, 앵커 14개 D191·D174): 인장 "려"(#7FB
     await page.locator('#btn-next').tap();
     await page.waitForSelector('#card[data-card-id]');
   }
+}));
+
+// D173(D192): 일반 모드 질문은 "연표 어디에 들어갈까?", 앵커 없는 왕 때 사건은 해설 첫 줄에 "실제로는 ○○ 때". 테스트 모드는 그대로.
+test('질문 문구(D173): 일반 "연표 어디에 들어갈까?", 무신정변은 "실제로는 의종 때", 앵커 왕 카드는 그 줄 없음, ?study=1은 "어느 왕 때일까?"', () => withPage(VIEWPORTS.desktop, async (page) => {
+  const raw = JSON.parse(readFileSync(new URL('./fixtures/goryeo-offlist.json', import.meta.url), 'utf8'));
+  const { deck } = normalizeDeck(raw);
+  const byId = new Map([...deck.cards, ...deck.anchors].map((c) => [c.id, c]));
+  await openProto(page, server.base, { data: 'tests/fixtures/goryeo-offlist.json' });
+  await page.waitForSelector('#card[data-card-id]');
+  assert.equal(await page.innerText('#card .card-title'), '연표 어디에 들어갈까?');
+  const seen = {};
+  while (await page.getAttribute('#card', 'data-card-id')) {
+    const c = byId.get(await page.getAttribute('#card', 'data-card-id'));
+    await pressGap(page, (await gapsFor(page, c)).right, false);
+    seen[c.title] = (await page.locator('#result-offlist').count()) ? await page.innerText('#result-offlist') : null;
+    await page.locator('#btn-next').click();
+  }
+  assert.match(seen['무신정변'], /^실제로는 의종 때\(연표 목록에 없는 왕\)예요/);
+  const other = Object.entries(seen).find(([t]) => t !== '무신정변');
+  assert.ok(other && other[1] === null, '앵커 왕(광종) 카드는 줄 없음');
+  // 사람 테스트 모드(방식 A)는 M1 문구 그대로
+  await page.goto(studyUrl(server.base, { participant: 'Q1' }));
+  await ready(page);
+  await page.locator('#study-create').click();
+  await page.goto(studyUrl(server.base, { participant: 'Q1', stage: 'learn-A' }));
+  await page.waitForSelector('#card[data-card-id]');
+  assert.equal(await page.innerText('#card .card-title'), '어느 왕 때일까?');
+  assert.equal(await page.locator('#result-offlist').count(), 0);
 }));
