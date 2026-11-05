@@ -436,7 +436,23 @@
         "백제",
         "B-B2"
       ],
-      "event_key": "433-naje-alliance"
+      "event_key": "433-naje-alliance",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "result",
+          "text": "북쪽 큰 나라가 남쪽으로 세력을 넓혀 오자, 이 나라는 동쪽 이웃 나라와 손을 잡았다. 사신이 오가며 선물을 주고받았고, 두 나라의 화친은 뒷날 혼인으로 더 굳어졌다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
+      ]
     },
     {
       "id": "baekje-src-19",
