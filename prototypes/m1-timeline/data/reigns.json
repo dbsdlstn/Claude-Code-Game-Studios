@@ -1,9 +1,46 @@
 {
-  "_note": "왕대 연표 줄에 보일 재위 기간. 콘텐츠 데이터에 재위 끝 연도가 없어서 프로토타입이 표시용으로만 둔다(판정에 쓰지 않음). 삼국사기 기년, 광개토왕만 수험 표준 표기(비문 기년, D60). 사실 확인 전.",
+  "_note": "왕대 연표 줄에 보일 재위 기간. 콘텐츠 데이터에 재위 끝 연도가 없어서 프로토타입이 표시용으로만 둔다(판정에 쓰지 않음). 삼국사기 기년, 광개토왕만 수험 표준 표기(비문 기년, D60). 끝 연도는 자료마다 1년 차이가 있는 경우가 있어 alt에 적었다. 웹 검색(2차 자료) 기준이며 원문 대조 전. 사실 확인 전.",
   "verified": false,
-  "goguryeo-anchor-dongmyeong": { "king": "동명성왕", "range": "기원전 37~기원전 19" },
-  "goguryeo-anchor-sosurim": { "king": "소수림왕", "range": "371~384" },
-  "goguryeo-anchor-gwanggaeto": { "king": "광개토왕", "range": "391~412" },
-  "goguryeo-anchor-jangsu": { "king": "장수왕", "range": "413~491" },
-  "goguryeo-anchor-bojang": { "king": "보장왕", "range": "642~668" }
+  "goguryeo-anchor-dongmyeong": {
+    "king": "동명성왕",
+    "range": "기원전 37~기원전 19"
+  },
+  "goguryeo-anchor-taejo": {
+    "king": "태조왕",
+    "range": "53~146",
+    "alt": "끝 연도를 145년으로 적는 자료도 있다(146년 차대왕에게 선위)."
+  },
+  "goguryeo-anchor-gogukcheon": {
+    "king": "고국천왕",
+    "range": "179~197"
+  },
+  "goguryeo-anchor-dongcheon": {
+    "king": "동천왕",
+    "range": "227~248"
+  },
+  "goguryeo-anchor-micheon": {
+    "king": "미천왕",
+    "range": "300~331",
+    "alt": "끝 연도를 330 또는 332로 적는 자료도 있다."
+  },
+  "goguryeo-anchor-sosurim": {
+    "king": "소수림왕",
+    "range": "371~384"
+  },
+  "goguryeo-anchor-gwanggaeto": {
+    "king": "광개토왕",
+    "range": "391~412"
+  },
+  "goguryeo-anchor-jangsu": {
+    "king": "장수왕",
+    "range": "413~491"
+  },
+  "goguryeo-anchor-yeongyang": {
+    "king": "영양왕",
+    "range": "590~618"
+  },
+  "goguryeo-anchor-bojang": {
+    "king": "보장왕",
+    "range": "642~668"
+  }
 }
