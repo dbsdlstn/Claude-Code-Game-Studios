@@ -18,7 +18,7 @@ and unchanged.
 RULES (numbers follow the schema doc; a headless test should use the same):
   V1  `id` unique across all v2 files and not used by v1 data
       (assets/data/cards/samguk.json, tutorial.json).
-  V2  nation in {goguryeo, baekje, silla, gaya, usilla, balhae} (usilla, balhae: D183).
+  V2  nation in {goguryeo, baekje, silla, gaya, usilla, balhae, goryeo} (usilla, balhae: D183; goryeo: D190).
   V3  kind in {anchor, source} and the kind's required fields are present.
   V4  Per nation, anchors have order 1..n without gaps; reign.start strictly
       increases with order; start <= end; previous end <= next start;
@@ -133,7 +133,7 @@ EVENT_STATUS = {"owned", "planned", "perspective_pair", "absorbed"}
 KEY_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 V1_FILES = [ROOT / "assets/data/cards/samguk.json", ROOT / "assets/data/cards/tutorial.json"]
 
-NATIONS = {"goguryeo", "baekje", "silla", "gaya", "usilla", "balhae"}
+NATIONS = {"goguryeo", "baekje", "silla", "gaya", "usilla", "balhae", "goryeo"}
 KINDS = {"anchor", "source"}
 REIGN_BASIS = {"chronicle", "inscription", "consensus"}
 YEAR_BASIS = {"chronicle", "inscription", "consensus", "disputed"}
