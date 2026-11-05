@@ -22,7 +22,7 @@
    | Windows | `py -m http.server 8000` (안 되면 `python -m http.server 8000`) |
    | macOS·Linux | `python3 -m http.server 8000` |
 
-4. 브라우저에서 **http://localhost:8000/prototypes/m1-timeline/** 를 연다. 타이틀에서 나라(고구려·백제·신라·통일신라)를 고르고 [새 카드 시작]을 누르면 일반 학습 모드다. 기록·레벨·도감은 이 브라우저에 저장되어 다음에 열면 이어진다.
+4. 브라우저에서 **http://localhost:8000/prototypes/m1-timeline/** 를 연다. 타이틀에서 나라(고구려·백제·신라·통일신라·고려)를 고르고 [새 카드 시작]을 누르면 일반 학습 모드다. 기록·레벨·도감은 이 브라우저에 저장되어 다음에 열면 이어진다.
 5. 끝낼 때는 터미널에서 Ctrl+C.
 
 자주 막히는 것:
@@ -33,7 +33,7 @@
 - 휴대폰으로 보려면 PC와 같은 Wi-Fi에서 `http://PC의IP:8000/prototypes/m1-timeline/`(Windows 방화벽이 물으면 "개인 네트워크" 허용). 공개 인터넷에 올리지 않는다(프로토타입 배포 금지).
 
 ### 주소 옵션
-- `?nation=baekje`처럼 나라를 바로 고른다(goguryeo, baekje, silla, usilla).
+- `?nation=baekje`처럼 나라를 바로 고른다(goguryeo, baekje, silla, usilla, goryeo).
 - `?study=1`은 M1 사람 테스트 모드다(아래). 일반 학습과 저장이 따로다.
 
 - 데이터: `js/config.js`의 `dataUrls` 순서로 찾는다. 스키마 v2 `assets/data/cards/v2/goguryeo-m1.json`(앵커 10 + 사료 12) → `data/sample.json`(테스트용 8장, 왕 앵커 5개). `?data=경로`로 고정, `?seed=7`로 섞기 고정. 임시 형식(D58) 변환은 v2로 옮겨 지웠다(D72).

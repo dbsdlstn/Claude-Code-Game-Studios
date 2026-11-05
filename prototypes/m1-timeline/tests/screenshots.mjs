@@ -47,8 +47,8 @@ try {
     await page.click('#title-play');
     await shot('26-usilla-timeline', true);
     await page.evaluate(() => localStorage.clear());
-    // 고려(staging 미리 보기, D114·D191 13앵커·D235 인장): 타이틀과 압축 연표
-    await openProto(page, server.base, { data: null, title: null, manifest: 'tests/fixtures/manifest-goryeo.json', nation: 'goryeo' });
+    // 고려(실제 매니페스트 D116, 나라 5개 세로 목록, D191 13앵커·D235 인장): 타이틀과 압축 연표
+    await openProto(page, server.base, { data: null, title: null, nation: 'goryeo' });
     await shot('28-goryeo-title');
     await page.click('#title-play');
     await shot('29-goryeo-timeline', true);

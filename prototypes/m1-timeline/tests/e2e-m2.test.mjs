@@ -644,15 +644,15 @@ test('통일신라(usilla, 실제 매니페스트 D210): 나라 버튼과 연표
   assert.ok(await noOverflow(page));
 }));
 
-// D111: 실제 나라 4개(통일신라 등록 D210)도 390px 세로 목록에 모두 보이고 행마다 인장이 있다
-test('390px 실제 나라 4개(통일신라 포함): 세로 목록 4행(56px 이상, 인장 고·백·신·통), 가로 스크롤 없음', { skip: !nationDeck('usilla') && '통일신라 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+// D111·D116: 실제 나라 5개(통일신라 D210, 고려 등록)도 390px 세로 목록에 모두 보이고 행마다 인장이 있다
+test('390px 실제 나라 5개(통일신라·고려 포함): 세로 목록 5행(56px 이상, 인장 고·백·신·통·려), 가로 스크롤 없음', { skip: !nationDeck('goryeo') && '고려 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
   await openProto(page, server.base, { data: null, title: null });
   await page.waitForSelector('#title:not([hidden])');
   const rows = page.locator('#title-nations .nation-row');
-  assert.equal(await rows.count(), 4);
+  assert.equal(await rows.count(), 5);
   const info = await rows.evaluateAll((r) => r.map((x) => { const b = x.getBoundingClientRect(); return [x.dataset.nation, x.querySelector('.seal')?.textContent, b.height, b.left]; }));
-  assert.deepEqual(info.map((x) => x[0]), ['goguryeo', 'baekje', 'silla', 'usilla']);
-  assert.deepEqual(info.map((x) => x[1]), ['고', '백', '신', '통']);
+  assert.deepEqual(info.map((x) => x[0]), ['goguryeo', 'baekje', 'silla', 'usilla', 'goryeo']);
+  assert.deepEqual(info.map((x) => x[1]), ['고', '백', '신', '통', '려']);
   assert.ok(info.every((x) => x[2] >= 56), String(info.map((x) => x[2])));
   assert.equal(new Set(info.map((x) => Math.round(x[3]))).size, 1, '한 줄에 하나씩(세로)');
   assert.ok(await noOverflow(page));
@@ -696,19 +696,13 @@ test('키보드만: 타이틀 → 학습 세션(칸 Tab+Enter) → 결과 → �
   assert.equal(after[1], 'true', '방향키로 탭이 바뀜');
 }));
 
-// D114: 고려(staging 미리 확인, D191 앵커 13개, D235 인장). 390px 압축 연표에서 13앵커·44px "+"·정답 칸 표시.
-const GORYEO = 'tests/fixtures/manifest-goryeo.json';
-const GORYEO_BY_ID = (() => {
-  const fx = (f) => JSON.parse(readFileSync(new URL(f, import.meta.url), 'utf8'));
-  const files = ['../../../assets/data/cards/v2/staging/goryeo-m5-b1.json', '../../../assets/data/cards/v2/staging/goryeo-m5-b2.json'].map(fx);
-  const { deck } = normalizeDeck({ schema: 2, cards: files.flatMap((f) => f.cards) });
-  return new Map([...deck.cards, ...deck.anchors].map((c) => [c.id, c]));
-})();
-test('고려(staging, 앵커 13개 D191): 인장 "려"(#7FB5A3, 먹 글자, 1px 테두리), 390px 압축 연표 13앵커, 정답·오답 뒤 맞는 칸 표시', () => withPage(VIEWPORTS.mobile, async (page) => {
-  await openProto(page, server.base, { data: null, title: null, manifest: GORYEO, nation: 'goryeo' });
+// D114·D116: 고려(실제 매니페스트, D191 앵커 13개, D235 인장). 390px 압축 연표에서 13앵커·44px "+"·정답 칸 표시.
+const GORYEO_BY_ID = nationDeck('goryeo')?.byId ?? new Map();
+test('고려(실제 매니페스트, 앵커 13개 D191): 인장 "려"(#7FB5A3, 먹 글자, 1px 테두리), 390px 압축 연표 13앵커, 정답·오답 뒤 맞는 칸 표시', { skip: !nationDeck('goryeo') && '고려 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, title: null, nation: 'goryeo' });
   await page.waitForSelector('#title:not([hidden])');
   const s = await page.locator('#title-nations [data-nation="goryeo"] .seal').evaluate((n) => { const c = getComputedStyle(n); return [n.textContent, c.backgroundColor, c.color, c.borderTopWidth, c.borderTopColor, Math.round(n.getBoundingClientRect().width)]; });
-  assert.deepEqual(s, ['려', 'rgb(127, 181, 163)', 'rgb(43, 33, 24)', '1px', 'rgb(138, 109, 59)', 22]);
+  assert.deepEqual(s, ['려', 'rgb(127, 181, 163)', 'rgb(43, 33, 24)', '1px', 'rgb(138, 109, 59)', 28]);
   await page.locator('#title-play').tap();
   await page.waitForSelector('#card[data-card-id]');
   assert.match(await page.innerText('#timeline-title'), /려\s*고려 왕대 연표/);
