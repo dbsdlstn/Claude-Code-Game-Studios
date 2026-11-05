@@ -627,9 +627,8 @@ test('접근성: 타이틀·질문·공개·결과·도감 4탭·나라 목록�
   assert.ok(await noOverflow(page));
 }));
 
-const USILLA = 'tests/fixtures/manifest-usilla.json';
-test('통일신라(usilla, staging 고정 목록): 나라 버튼과 연표 제목에 인장 "통"(#5C3399, 흰 글자), 연표가 열린다', () => withPage(VIEWPORTS.mobile, async (page) => {
-  await openProto(page, server.base, { data: null, title: null, manifest: USILLA });
+test('통일신라(usilla, 실제 매니페스트 D210): 나라 버튼과 연표 제목에 인장 "통"(#5C3399, 흰 글자), 연표가 열린다', { skip: !nationDeck('usilla') && '통일신라 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, title: null });
   await page.waitForSelector('#title:not([hidden])');
   const chip = page.locator('#title-nations [data-nation="usilla"]');
   assert.match(await chip.innerText(), /통\s*통일신라/);
@@ -645,9 +644,9 @@ test('통일신라(usilla, staging 고정 목록): 나라 버튼과 연표 제�
   assert.ok(await noOverflow(page));
 }));
 
-// D111: 나라 4개(실제 3 + 통일신라)도 390px 세로 목록에 모두 보이고 행마다 인장이 있다
-test('390px 나라 4개(통일신라 포함): 세로 목록 4행(56px 이상, 인장 고·백·신·통), 가로 스크롤 없음', { skip: !nationDeck('silla') && '신라 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
-  await openProto(page, server.base, { data: null, title: null, manifest: USILLA });
+// D111: 실제 나라 4개(통일신라 등록 D210)도 390px 세로 목록에 모두 보이고 행마다 인장이 있다
+test('390px 실제 나라 4개(통일신라 포함): 세로 목록 4행(56px 이상, 인장 고·백·신·통), 가로 스크롤 없음', { skip: !nationDeck('usilla') && '통일신라 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, title: null });
   await page.waitForSelector('#title:not([hidden])');
   const rows = page.locator('#title-nations .nation-row');
   assert.equal(await rows.count(), 4);
