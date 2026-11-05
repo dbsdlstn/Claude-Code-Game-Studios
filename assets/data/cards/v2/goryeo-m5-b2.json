@@ -169,10 +169,10 @@
             },
             {
               "op": "before",
-              "ref": "goryeo-reign-u"
+              "ref": "goryeo-reign-gongmin"
             }
           ],
-          "text": "[원종]이 즉위한 뒤, [우왕]이 즉위하기 전의 일이다."
+          "text": "[원종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -182,7 +182,7 @@
       ],
       "answer": {
         "after": "goryeo-reign-wonjong",
-        "before": "goryeo-reign-gongmin"
+        "before": "goryeo-reign-chungnyeol"
       },
       "explanation": "원종 11년(1270년)의 일. 개경 환도에 반발한 삼별초가 배중손의 지휘로 승화후 온을 왕으로 세우고 진도로 옮겨 항쟁한 일. 1271년 진도가 함락되자 제주로 옮겼다.",
       "exam_tags": [
@@ -241,10 +241,10 @@
             },
             {
               "op": "before",
-              "ref": "goryeo-reign-gongmin"
+              "ref": "goryeo-reign-chungnyeol"
             }
           ],
-          "text": "[명종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
+          "text": "[명종]이 즉위한 뒤, [충렬왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -254,7 +254,7 @@
       ],
       "answer": {
         "after": "goryeo-reign-wonjong",
-        "before": "goryeo-reign-gongmin"
+        "before": "goryeo-reign-chungnyeol"
       },
       "explanation": "원종 14년(1273년)의 일. 김통정이 이끈 삼별초가 제주 항파두리성에서 여몽 연합군에게 진압된 일. 이후 원은 제주에 탐라총관부를 두었다.",
       "exam_tags": [

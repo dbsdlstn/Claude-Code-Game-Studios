@@ -362,11 +362,47 @@
       "v1_id": null
     },
     {
+      "id": "goryeo-reign-chungnyeol",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "충렬왕",
+      "order": 11,
+      "reign": {
+        "start": 1274,
+        "end": 1308,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제25대 왕.",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "충렬왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1274~1298, 1298 충선왕에게 양위했다가 같은 해 복위해 1308까지(itwiki 충렬왕·나무위키 계열). 앵커 끝은 1308로 둔다(1298 양위 구간은 칸 판정에 영향 없음). D174로 추가(원 간섭기 칸 분리). 권 번호는 원문 대조 필요. D218. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
       "id": "goryeo-reign-gongmin",
       "kind": "anchor",
       "nation": "goryeo",
       "title": "공민왕",
-      "order": 11,
+      "order": 12,
       "reign": {
         "start": 1351,
         "end": 1374,
@@ -408,7 +444,7 @@
       "kind": "anchor",
       "nation": "goryeo",
       "title": "우왕",
-      "order": 12,
+      "order": 13,
       "reign": {
         "start": 1374,
         "end": 1388,
@@ -444,7 +480,7 @@
       "kind": "anchor",
       "nation": "goryeo",
       "title": "공양왕",
-      "order": 13,
+      "order": 14,
       "reign": {
         "start": 1389,
         "end": 1392,
@@ -1096,7 +1132,7 @@
         "before": "goryeo-reign-myeongjong",
         "same_year": "before_next_accession"
       },
-      "explanation": "의종 24년(1170년)의 일. 무신정변을 일으킨 무신들이 정변 직후 의종을 내쫓고 명종을 추대한 일. 이후 약 100년 동안 무신이 권력을 잡았다.",
+      "explanation": "의종 24년(1170년)의 일. 실제로는 의종 때의 일이다(연표에서는 [인종] 칸에 놓인다). 무신정변을 일으킨 무신들이 정변 직후 의종을 내쫓고 명종을 추대한 일. 이후 약 100년 동안 무신이 권력을 잡았다.",
       "exam_tags": [
         "war",
         "institution"
@@ -1226,10 +1262,10 @@
             },
             {
               "op": "before",
-              "ref": "goryeo-reign-gongmin"
+              "ref": "goryeo-reign-chungnyeol"
             }
           ],
-          "text": "[명종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
+          "text": "[명종]이 즉위한 뒤, [충렬왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,

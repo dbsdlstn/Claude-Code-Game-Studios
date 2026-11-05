@@ -23,7 +23,7 @@ RULES (numbers follow the schema doc; a headless test should use the same):
   V4  Per nation, anchors have order 1..n without gaps; reign.start strictly
       increases with order; start <= end; previous end <= next start;
       reign.basis in {chronicle, inscription, consensus}.
-      V4a (D63, D85): at most 12 anchors per nation; goryeo 13 (D191,
+      V4a (D63, D85): at most 12 anchors per nation; goryeo 14 (D191, D174,
       MAX_ANCHORS_BY_NATION).
   V5  answer.after is an anchor of the same nation; answer.before is the anchor
       with the next order, or null only when after is the last anchor.
@@ -81,6 +81,9 @@ VARIANTS (design/card-variants-spec.md, D121; optional `variants` list):
       explanation.
   V24 OBS: a variant sharing 10+ consecutive characters with another
       same-deck card's source_text (common phrases cause false positives).
+  OBS (D173) reign_label names a king other than the answer anchor (an
+      un-anchored king) and the explanation's opening line (first two
+      sentences) lacks "실제로는".
   V21 the card content_hash ignores variants (content_hash() never reads them).
   R4 is a runtime rule (unverified variants are skipped), not a release error.
 
@@ -142,7 +145,7 @@ EXAM_TAGS = {"institution", "person", "war", "culture"}
 MAX_ANCHORS = 12
 # per-nation exceptions (D191: Goryeo adds King Gongyang so that the 1391 land law
 # does not sit in King U's gap)
-MAX_ANCHORS_BY_NATION = {"goryeo": 13}
+MAX_ANCHORS_BY_NATION = {"goryeo": 14}  # D191 Gongyang, D174 Chungnyeol
 YEAR_RE = re.compile(r"\d{3,4}\s*년|기원전|서기")
 
 COMMON_REQ = ["id", "kind", "nation", "title", "source_ref", "verification"]
@@ -715,6 +718,31 @@ def variant_boundary(sources):
     return errs, obs
 
 
+def king_core(label):
+    """Rough king name of a reign label or anchor title (D173 observation)."""
+    name = re.split(r"\s*(?:\d|원년|즉위년|영락)", label or "")[0].replace(" ", "")
+    for suf in ("마립간", "이사금", "여왕", "대왕", "왕"):
+        if name.endswith(suf) and len(name) > len(suf):
+            return name[: -len(suf)]
+    return name
+
+
+def actual_king_obs(sources, anchors):
+    """D173: a card whose reign_label names a king other than its answer anchor
+    should say so in the opening line of the explanation ("실제로는 …")."""
+    by_id = {a.get("id"): a for a in anchors}
+    lines = []
+    for c in sources:
+        a = by_id.get((c.get("answer") or {}).get("after"))
+        if a is None or king_core(c.get("reign_label")) == king_core(a.get("title")):
+            continue
+        head = ". ".join((c.get("explanation") or "").split(". ")[:2])  # the opening line
+        if "실제로는" not in head:
+            lines.append(f"[D173] {c.get('id')}: reign_label '{c.get('reign_label')}' is not the answer anchor "
+                         f"'{a.get('title')}', and the explanation's opening line lacks '실제로는'")
+    return lines
+
+
 def read_manifest():
     """Return (paths, file->nation, errors) from the manifest."""
     try:
@@ -812,7 +840,7 @@ def main(argv):
           + (" (release mode)" if release else ""))
     for line in observations(anchors, sources):
         print("OBS   " + line)
-    for line in event_obs + VARIANT_OBS + variant_crossref_obs(sources) + boundary_obs:
+    for line in event_obs + VARIANT_OBS + variant_crossref_obs(sources) + boundary_obs + actual_king_obs(sources, anchors):
         print("OBS   " + line)
     for w in warnings:
         print("WARN  " + w)

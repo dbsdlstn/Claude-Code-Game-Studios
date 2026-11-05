@@ -160,6 +160,29 @@ class YearAltGap(unittest.TestCase):
         self.assertNotIn("V6a", self.check("silla-src-06", 527))
 
 
+class ActualKingLine(unittest.TestCase):
+    """D173: a card in an un-anchored king's reign says so in the opening line."""
+
+    def obs(self, mutate):
+        cards = copy.deepcopy(BASE)
+        mutate({c["id"]: c for c in cards})
+        return v.actual_king_obs([c for c in cards if c.get("kind") == "source"],
+                                 [c for c in cards if c.get("kind") == "anchor"])
+
+    def test_current_data_has_no_d173(self):
+        self.assertEqual(self.obs(lambda c: None), [])
+
+    def test_missing_actual_king_line_is_reported(self):
+        def m(c):
+            c["baekje-src-25"]["explanation"] = "아신왕 6년(397년)의 일. 태자 전지를 왜에 볼모로 보낸 일."
+        self.assertTrue(any("baekje-src-25" in o for o in self.obs(m)))
+
+    def test_anchored_king_needs_no_line(self):
+        def m(c):
+            c["goguryeo-src-09"]["explanation"] = "장수왕 15년(427년)의 일. 평양으로 도읍을 옮긴 일."
+        self.assertFalse(any("goguryeo-src-09" in o for o in self.obs(m)))
+
+
 class VolumeRange(unittest.TestCase):
     """V13a (D154): 삼국사기 권 number must fit the section."""
 
