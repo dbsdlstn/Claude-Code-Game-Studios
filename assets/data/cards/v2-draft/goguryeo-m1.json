@@ -16,6 +16,62 @@
       "year_alt": []
     },
     {
+      "id": "goguryeo-anchor-taejo",
+      "title": "태조왕 즉위",
+      "anchor": true,
+      "nation": "goguryeo",
+      "year": 53,
+      "year_label": "53년",
+      "year_basis": "수험 표준 표기(삼국사기 기년)",
+      "source_ref": "삼국사기 권15 고구려본기 제3 태조대왕 즉위조",
+      "verified": false,
+      "verified_by": null,
+      "year_alt": [],
+      "source_note": "즉위 연도는 연표·백과 미러 검색 결과로 확인(2차 자료). 미천왕 300년은 한 자료에 기대므로 원문 대조 필요. D62에서 추가."
+    },
+    {
+      "id": "goguryeo-anchor-gogukcheon",
+      "title": "고국천왕 즉위",
+      "anchor": true,
+      "nation": "goguryeo",
+      "year": 179,
+      "year_label": "179년",
+      "year_basis": "수험 표준 표기(삼국사기 기년)",
+      "source_ref": "삼국사기 권16 고구려본기 제4 고국천왕 즉위조",
+      "verified": false,
+      "verified_by": null,
+      "year_alt": [],
+      "source_note": "즉위 연도는 연표·백과 미러 검색 결과로 확인(2차 자료). 미천왕 300년은 한 자료에 기대므로 원문 대조 필요. D62에서 추가."
+    },
+    {
+      "id": "goguryeo-anchor-dongcheon",
+      "title": "동천왕 즉위",
+      "anchor": true,
+      "nation": "goguryeo",
+      "year": 227,
+      "year_label": "227년",
+      "year_basis": "수험 표준 표기(삼국사기 기년)",
+      "source_ref": "삼국사기 권17 고구려본기 제5 동천왕 즉위조",
+      "verified": false,
+      "verified_by": null,
+      "year_alt": [],
+      "source_note": "즉위 연도는 연표·백과 미러 검색 결과로 확인(2차 자료). 미천왕 300년은 한 자료에 기대므로 원문 대조 필요. D62에서 추가."
+    },
+    {
+      "id": "goguryeo-anchor-micheon",
+      "title": "미천왕 즉위",
+      "anchor": true,
+      "nation": "goguryeo",
+      "year": 300,
+      "year_label": "300년",
+      "year_basis": "수험 표준 표기(삼국사기 기년)",
+      "source_ref": "삼국사기 권17 고구려본기 제5 미천왕 즉위조",
+      "verified": false,
+      "verified_by": null,
+      "year_alt": [],
+      "source_note": "즉위 연도는 연표·백과 미러 검색 결과로 확인(2차 자료). 미천왕 300년은 한 자료에 기대므로 원문 대조 필요. D62에서 추가."
+    },
+    {
       "id": "goguryeo-anchor-sosurim",
       "title": "소수림왕 즉위",
       "anchor": true,
@@ -92,18 +148,17 @@
       "year_basis": "삼국사기 기년",
       "reign": "태조왕",
       "timeline": {
-        "after": "goguryeo-anchor-dongmyeong",
-        "before": "goguryeo-anchor-sosurim"
+        "after": "goguryeo-anchor-taejo",
+        "before": "goguryeo-anchor-gogukcheon"
       },
       "front": "왕이 동쪽 바닷가의 옥저를 쳐서 그 땅을 빼앗아 고을로 삼았다. 이로써 나라의 경계가 동쪽으로는 큰 바다에, 남쪽으로는 살수에 닿게 되었다.",
       "clues": [
         {
           "level": 1,
           "kind": "relation",
-          "text": "[동명성왕 즉위]보다 나중, [소수림왕 즉위]보다 먼저.",
+          "text": "[고국천왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-dongmyeong",
-            "goguryeo-anchor-sosurim"
+            "goguryeo-anchor-gogukcheon"
           ]
         },
         {
@@ -132,18 +187,17 @@
       "year_basis": "삼국사기 기년",
       "reign": "고국천왕",
       "timeline": {
-        "after": "goguryeo-anchor-dongmyeong",
-        "before": "goguryeo-anchor-sosurim"
+        "after": "goguryeo-anchor-gogukcheon",
+        "before": "goguryeo-anchor-dongcheon"
       },
       "front": "사냥 나간 왕이 길가에서 우는 사람을 보고 까닭을 물으니, 흉년이 들어 품을 팔 데가 없어 어머니를 봉양할 수 없다고 했다. 왕은 그에게 옷과 먹을 것을 내주고, 관청에 명하여 해마다 봄에서 가을 사이에 나라 곡식을 집집의 식구 수에 맞추어 빌려주고 겨울에 거두어들이게 하였다.",
       "clues": [
         {
           "level": 1,
           "kind": "relation",
-          "text": "[동명성왕 즉위]보다 나중, [소수림왕 즉위]보다 먼저.",
+          "text": "[동천왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-dongmyeong",
-            "goguryeo-anchor-sosurim"
+            "goguryeo-anchor-dongcheon"
           ]
         },
         {
@@ -172,18 +226,17 @@
       "year_basis": "삼국사기 기년",
       "reign": "동천왕",
       "timeline": {
-        "after": "goguryeo-anchor-dongmyeong",
-        "before": "goguryeo-anchor-sosurim"
+        "after": "goguryeo-anchor-dongcheon",
+        "before": "goguryeo-anchor-micheon"
       },
       "front": "왕이 장수를 보내 요동의 서안평을 습격하여 깨뜨렸다.",
       "clues": [
         {
           "level": 1,
           "kind": "relation",
-          "text": "[동명성왕 즉위]보다 나중, [소수림왕 즉위]보다 먼저.",
+          "text": "[미천왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-dongmyeong",
-            "goguryeo-anchor-sosurim"
+            "goguryeo-anchor-micheon"
           ]
         },
         {
@@ -212,7 +265,7 @@
       "year_basis": "삼국사기 기년",
       "reign": "미천왕",
       "timeline": {
-        "after": "goguryeo-anchor-dongmyeong",
+        "after": "goguryeo-anchor-micheon",
         "before": "goguryeo-anchor-sosurim"
       },
       "front": "왕이 낙랑군을 쳐서 남녀 2천여 명을 사로잡아 왔다.",
@@ -220,9 +273,8 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[동명성왕 즉위]보다 나중, [소수림왕 즉위]보다 먼저.",
+          "text": "[소수림왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-dongmyeong",
             "goguryeo-anchor-sosurim"
           ]
         },
@@ -252,7 +304,7 @@
       "year_basis": "삼국사기 기년",
       "reign": "고국원왕",
       "timeline": {
-        "after": "goguryeo-anchor-dongmyeong",
+        "after": "goguryeo-anchor-micheon",
         "before": "goguryeo-anchor-sosurim"
       },
       "front": "겨울에 남쪽 이웃 나라의 왕이 군사 3만을 이끌고 평양성을 쳐 왔다. 왕이 군사를 내어 막다가 날아온 화살에 맞았고, 그달에 세상을 떠났다.",
@@ -260,9 +312,8 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[동명성왕 즉위]보다 나중, [소수림왕 즉위]보다 먼저.",
+          "text": "[소수림왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-dongmyeong",
             "goguryeo-anchor-sosurim"
           ]
         },
@@ -300,9 +351,8 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[소수림왕 즉위]보다 나중, [광개토왕 즉위]보다 먼저.",
+          "text": "[광개토왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-sosurim",
             "goguryeo-anchor-gwanggaeto"
           ]
         },
@@ -340,9 +390,8 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[소수림왕 즉위]보다 나중, [광개토왕 즉위]보다 먼저.",
+          "text": "[광개토왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-sosurim",
             "goguryeo-anchor-gwanggaeto"
           ]
         },
@@ -380,9 +429,8 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[광개토왕 즉위]보다 나중, [장수왕 즉위]보다 먼저.",
+          "text": "[장수왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-gwanggaeto",
             "goguryeo-anchor-jangsu"
           ]
         },
@@ -420,9 +468,8 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[장수왕 즉위]보다 나중, [보장왕 즉위]보다 먼저.",
+          "text": "[보장왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-jangsu",
             "goguryeo-anchor-bojang"
           ]
         },
@@ -460,9 +507,8 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[장수왕 즉위]보다 나중, [보장왕 즉위]보다 먼저.",
+          "text": "[보장왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-jangsu",
             "goguryeo-anchor-bojang"
           ]
         },
@@ -500,9 +546,8 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[장수왕 즉위]보다 나중, [보장왕 즉위]보다 먼저.",
+          "text": "[보장왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-jangsu",
             "goguryeo-anchor-bojang"
           ]
         },
@@ -561,5 +606,6 @@
       "difficulty": 2
     }
   ],
-  "_anchor_rule": "앵커 연도는 수험서·교과서에서 널리 쓰는 표기 하나로 정하고, 다른 기년은 year_alt에 병기한다(D60). 광개토왕(391, 비문)과 장수왕(413, 삼국사기)은 수험 표기 자체가 기년 기준이 다르다."
+  "_anchor_rule": "앵커 연도는 수험서·교과서에서 널리 쓰는 표기 하나로 정하고, 다른 기년은 year_alt에 병기한다(D60). 광개토왕(391, 비문)과 장수왕(413, 삼국사기)은 수험 표기 자체가 기년 기준이 다르다.",
+  "_clue_rule": "단서 순서: 앞면 사료 지문(무료) → 관계 단서(앞뒤 기준 카드 중 한쪽만) → 직접 단서(왕·연도). 관계 단서는 기본적으로 뒤쪽(다음 왕 즉위)을 말해, 자기 왕의 즉위를 바로 알려 주지 않는다(D62)."
 }

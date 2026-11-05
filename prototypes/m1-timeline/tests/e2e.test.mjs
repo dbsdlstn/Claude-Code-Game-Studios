@@ -203,7 +203,7 @@ describe('실제 콘텐츠 초안(assets/data/cards/v2-draft/goguryeo-m1.json)',
       page.on('pageerror', (e) => errors.push(String(e)));
       try {
         await openProto(page, server.base, { data: null, seed: 11 });
-        assert.match(await page.innerText('#data-info'), /goguryeo-m1\.json · 카드 12장 · 기준 5장/);
+        assert.match(await page.innerText('#data-info'), new RegExp(`goguryeo-m1\\.json · 카드 ${REAL.cards.length}장 · 기준 ${REAL.anchors.length}장`));
         assert.match(await page.innerText('#data-warn'), /사실 확인 전/);
         assert.match(await page.innerText('#progress'), /카드 1 \/ 8/);
         const anchorTitles = await page.locator('#timeline .row-anchor .row-title').allInnerTexts();

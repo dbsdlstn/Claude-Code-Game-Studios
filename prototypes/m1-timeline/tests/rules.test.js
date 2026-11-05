@@ -226,13 +226,14 @@ describe('데이터 로더(js/data.js)', async () => {
     assert.deepEqual(normalizeDeck({ foo: 1 }).errors, ['알 수 없는 데이터 형식']);
   });
 
-  test('콘텐츠 초안: 변환 후 검증 오류 없음, 앵커 5·카드 12, 앞면은 사료 지문', { skip: !raw && '초안 없음' }, () => {
+  test('콘텐츠 초안: 변환 후 검증 오류 없음, 앵커·카드 수가 원본과 같음, 앞면은 사료 지문', { skip: !raw && '초안 없음' }, () => {
     const n = normalizeDeck(raw);
     assert.equal(n.format, 'v2-draft-content');
     assert.deepEqual(n.errors, []);
     assert.deepEqual(validateDeck(n.deck), []);
-    assert.equal(n.deck.anchors.length, 5);
-    assert.equal(n.deck.cards.length, 12);
+    assert.equal(n.deck.anchors.length, raw.anchors.length);
+    assert.equal(n.deck.cards.length, raw.cards.length);
+    assert.ok(raw.anchors.length <= 9, '기준 카드는 최대 9장(D62)');
     assert.equal(n.deck.cards[0].source_text, raw.cards[0].front);
   });
 
