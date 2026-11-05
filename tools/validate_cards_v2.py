@@ -18,7 +18,7 @@ and unchanged.
 RULES (numbers follow the schema doc; a headless test should use the same):
   V1  `id` unique across all v2 files and not used by v1 data
       (assets/data/cards/samguk.json, tutorial.json).
-  V2  nation in {goguryeo, baekje, silla, gaya}.
+  V2  nation in {goguryeo, baekje, silla, gaya, usilla, balhae} (usilla, balhae: D183).
   V3  kind in {anchor, source} and the kind's required fields are present.
   V4  Per nation, anchors have order 1..n without gaps; reign.start strictly
       increases with order; start <= end; previous end <= next start;
@@ -30,6 +30,9 @@ RULES (numbers follow the schema doc; a headless test should use the same):
       when before exists. Exception (D67): year == before.reign.start is
       allowed when answer.same_year == "before_next_accession" (the event
       happened in the accession year but before the accession).
+      V6a (D185): every year_alt lies in the same gap as the answer (same
+      rule as V6, including the same-year exception); an alternative year in
+      another king's gap belongs in the explanation.
   V7  year_basis == disputed -> disputed true; disputed -> disputed_note.
   V8  source_text does not contain the card title, the answer.after anchor
       title, or a year expression (\\d{3,4}\\s*년, 기원전, 서기).
@@ -130,7 +133,7 @@ EVENT_STATUS = {"owned", "planned", "perspective_pair", "absorbed"}
 KEY_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 V1_FILES = [ROOT / "assets/data/cards/samguk.json", ROOT / "assets/data/cards/tutorial.json"]
 
-NATIONS = {"goguryeo", "baekje", "silla", "gaya"}
+NATIONS = {"goguryeo", "baekje", "silla", "gaya", "usilla", "balhae"}
 KINDS = {"anchor", "source"}
 REIGN_BASIS = {"chronicle", "inscription", "consensus"}
 YEAR_BASIS = {"chronicle", "inscription", "consensus", "disputed"}
@@ -313,6 +316,19 @@ def validate(cards, release=False):
                 ok = year < start(before) or (same_year and year == start(before))
                 if not ok:
                     err(cid, "V6", f"year {year} is not before {before.get('title')} ({start(before)})")
+        # V6a (D185): every year_alt falls in the same gap as the answer.
+        if after is not None and start(after) is not None:
+            for alt in c.get("year_alt") or []:
+                ay = alt.get("year") if isinstance(alt, dict) else None
+                if not isinstance(ay, int) or isinstance(ay, bool):
+                    err(cid, "V6a", f"year_alt entry {alt!r} needs an int year")
+                    continue
+                in_gap = start(after) <= ay and (before is None or start(before) is None or ay < start(before)
+                                                 or (same_year and ay == start(before)))
+                if not in_gap:
+                    err(cid, "V6a", f"year_alt {ay} falls outside the answer gap "
+                                    f"({after.get('title')}~{before.get('title') if before else 'end'}); "
+                                    "put it in the explanation instead")
         if ans.get("same_year") not in (None, "before_next_accession"):
             err(cid, "V6", f"answer.same_year '{ans.get('same_year')}' invalid")
         # V7

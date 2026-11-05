@@ -1,0 +1,733 @@
+{
+  "schema": 2,
+  "cards": [
+    {
+      "id": "usilla-src-13",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "불국사와 석굴 창건",
+      "year": 751,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "경덕왕 10년",
+      "source_text": "재상을 지낸 귀족이 도읍 동쪽 산에 큰 절을 짓고, 산 위에는 돌을 다듬어 쌓은 굴 법당을 짓기 시작하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-seongdeok"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-hyegong"
+            }
+          ],
+          "text": "[성덕왕]이 즉위한 뒤, [혜공왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "경덕왕 10년(751년). 김대성, 불국사, 석굴암(석불사)."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-gyeongdeok",
+        "before": "usilla-reign-hyegong"
+      },
+      "explanation": "경덕왕 10년(751년)의 일. 김대성이 불국사와 석굴암(처음 이름 석불사)을 짓기 시작한 일. 석굴암은 혜공왕 때(774) 완공되었다고 본다.",
+      "exam_tags": [
+        "culture",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국유사",
+        "section": "효선",
+        "volume": 5,
+        "entry": "대성효이세부모",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "751 김대성 창건 시작, 774 완공, 석불사는 문화체육관광부 자료·itwiki 요약으로 확인. 불국사 528 창건·경덕왕 대 중창설, 742 무렵 착공설(석가탑 중수기), 석굴암 706~711 조성설이 있다. 연도는 통설(751)이다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D204)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "751-bulguksa-seokguram",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
+    },
+    {
+      "id": "usilla-src-14",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "군현 이름 개정",
+      "year": 757,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "경덕왕 16년",
+      "source_text": "왕이 전국의 주와 군, 현의 이름을 한자식으로 고쳐 지었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-seongdeok"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-seondeok"
+            }
+          ],
+          "text": "[성덕왕]이 즉위한 뒤, [선덕왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "경덕왕 16년(757년). 9주 군현 명칭 개정, 한화 정책."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-gyeongdeok",
+        "before": "usilla-reign-hyegong"
+      },
+      "explanation": "경덕왕 16년(757년)의 일. 경덕왕이 9주와 군현의 이름을 중국식으로 고친 일(한화 정책). 같은 해 녹읍이 되살아났다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 9,
+        "entry": "경덕왕 16년 12월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "757년 12월 9주·군현 개편과 지명 한화(예: 웅천주→웅주)는 학술 논문 초록·thewiki 요약으로 확인. 관호 한식 개정(759)은 이번 검색으로 확인하지 못해 쓰지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D204)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "757-place-name-reform",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
+    },
+    {
+      "id": "usilla-src-15",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "대공의 난",
+      "year": 768,
+      "year_alt": [
+        {
+          "year": 767,
+          "note": "삼국유사 기년(정미년)"
+        }
+      ],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "혜공왕 4년",
+      "source_text": "높은 귀족 형제가 무리를 모아 한 달 넘게 왕궁을 에워쌌다가 토벌되었다. 이에 호응하여 서울과 지방의 귀족들이 서로 싸웠다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-hyegong"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-wonseong"
+            }
+          ],
+          "text": "[혜공왕]이 즉위한 뒤, [원성왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "혜공왕 4년(768년). 대공·대렴 형제, 96각간의 싸움."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-hyegong",
+        "before": "usilla-reign-seondeok"
+      },
+      "explanation": "혜공왕 4년(768년)의 일. 일길찬 대공이 아우 대렴과 33일 동안 왕궁을 포위했다가 토벌된 반란과, 이에 호응한 96각간의 상쟁. 혜공왕 대 잇단 반란의 시작이다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 9,
+        "entry": "혜공왕 4년 7월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "768년 7월 대공·대렴의 반란, 33일 포위, 96각간의 상쟁, 10월 종결은 encykorea 요약으로 확인. 삼국유사는 혜공왕 2년 정미년(767)으로 적는다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D204)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "768-daegong-revolt",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
+    },
+    {
+      "id": "usilla-src-16",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "큰 종의 완성",
+      "year": 771,
+      "year_alt": [],
+      "year_basis": "inscription",
+      "year_note": null,
+      "reign_label": "혜공왕 7년",
+      "source_text": "앞선 왕이 아버지 왕의 덕을 기리려고 만들기 시작한 큰 종을, 그 아들인 왕 때에 이르러 완성하여 절에 걸었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-gyeongdeok"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-seondeok"
+            }
+          ],
+          "text": "[경덕왕]이 즉위한 뒤, [선덕왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "혜공왕 7년(771년). 성덕대왕신종, 봉덕사."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-hyegong",
+        "before": "usilla-reign-seondeok"
+      },
+      "explanation": "혜공왕 7년(771년)의 일. 경덕왕이 아버지 성덕왕을 기리려고 만들기 시작한 성덕대왕신종을 혜공왕이 완성해 봉덕사에 단 일. 에밀레종이라고도 부른다.",
+      "exam_tags": [
+        "culture"
+      ],
+      "source_ref": {
+        "work": "성덕대왕신종 명문",
+        "section": "명문",
+        "volume": null,
+        "entry": "종 명문",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "771년 12월 완성과 봉덕사 안치는 언론 보도 요약으로 확인. 주조 시작 연도는 자료마다 다르다. 에밀레 설화는 20세기 이전 기록에 없다는 지적이 있다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D204)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "771-seongdeok-bell",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
+    },
+    {
+      "id": "usilla-src-17",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "장보고 피살",
+      "year": 846,
+      "year_alt": [
+        {
+          "year": 841,
+          "note": "속일본후기 기년"
+        }
+      ],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "문성왕 8년",
+      "source_text": "바다의 진을 지키던 사람이 딸을 왕비로 들이려다 귀족들의 반대로 뜻을 이루지 못하자 원망하였다. 조정은 거짓으로 그에게 투항한 장수를 보내 그를 죽였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-munseong"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-hyogong"
+            }
+          ],
+          "text": "[문성왕]이 즉위한 뒤, [효공왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "문성왕 8년(846년). 장보고, 염장."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-munseong",
+        "before": "usilla-reign-jinseong"
+      },
+      "explanation": "문성왕 8년(846년)의 일. 장보고가 딸의 왕비 책봉 문제로 조정과 맞서다 염장에게 암살된 일. 5년 뒤 청해진이 폐지되었다.",
+      "exam_tags": [
+        "person",
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 11,
+        "entry": "문성왕 8년 봄조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "846 장보고 암살(염장), 딸의 왕비 책봉 반대는 itwiki·encykorea 요약으로 확인. 속일본후기는 841년 11월 사망으로 적는다(국사편찬위원회가 841로 본다는 위키 서술은 확인 못 함). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D204)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "846-jang-bogo-death",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
+    },
+    {
+      "id": "usilla-src-18",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "청해진 폐지",
+      "year": 851,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "문성왕 13년",
+      "source_text": "바다의 진을 없애고 그곳 사람들을 내륙의 고을로 옮겼다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-heondeok"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-jinseong"
+            }
+          ],
+          "text": "[헌덕왕]이 즉위한 뒤, [진성여왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "문성왕 13년(851년). 청해진, 벽골군(김제)."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-munseong",
+        "before": "usilla-reign-jinseong"
+      },
+      "explanation": "문성왕 13년(851년)의 일. 청해진을 없애고 주민을 벽골군(김제)으로 옮긴 일. 장보고 피살(846) 뒤의 조치로, 청해진은 해상 거점 기능을 잃었다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 11,
+        "entry": "문성왕 13년 2월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "851년 2월 청해진 폐지와 벽골군 이주는 encykorea·itwiki 요약으로 확인. 851년 2월 기사 자체는 검색으로 직접 확인하지 못했다(usilla b2 대조, D206). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D204)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "851-cheonghaejin-abolition",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
+    },
+    {
+      "id": "usilla-src-19",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "후백제 건국",
+      "year": 900,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "효공왕 4년",
+      "source_text": "군인 출신 장수가 세력을 모아 서남쪽 큰 고을에 도읍을 정하고, 옛 나라의 이름을 되살려 왕을 칭하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-hyogong"
+            }
+          ],
+          "text": "[효공왕]이 즉위한 뒤의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "효공왕 4년(900년). 견훤, 완산주(전주)."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-hyogong",
+        "before": "usilla-reign-gyeongsun"
+      },
+      "explanation": "효공왕 4년(900년)의 일. 견훤이 완산주에 도읍을 정하고 후백제를 세운 일. 다른 견해로 892년(무진주에서 왕을 칭함)을 건국으로 보기도 하나 시험은 900년 기준이다. 이듬해 궁예가 후고구려를 세워 후삼국 시대가 열렸다.",
+      "exam_tags": [
+        "person",
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "열전",
+        "volume": 50,
+        "entry": "견훤전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "900 완산주 도읍·후백제 칭호, 892 무진주 칭왕은 jjan·itwiki 요약으로 확인. 열전 권50은 견훤·궁예전. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D204). 892는 다른 칸(진성여왕)이라 D185에 따라 year_alt에서 빼고 해설로 옮겼다(D206)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "900-hubaekje-founding",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
+    },
+    {
+      "id": "usilla-src-20",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "후고구려 건국",
+      "year": 901,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "효공왕 5년",
+      "source_text": "북쪽 지방에서 세력을 키운 장수가 스스로 왕을 칭하고, 옛 고구려를 잇는다는 나라를 세웠다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-munseong"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-gyeongsun"
+            }
+          ],
+          "text": "[문성왕]이 즉위한 뒤, [경순왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "효공왕 5년(901년). 궁예."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-hyogong",
+        "before": "usilla-reign-gyeongsun"
+      },
+      "explanation": "효공왕 5년(901년)의 일. 궁예가 후고구려를 세운 일. 904년 마진, 911년 태봉으로 나라 이름을 바꾸었고 918년 정변으로 쫓겨났다.",
+      "exam_tags": [
+        "person",
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "열전",
+        "volume": 50,
+        "entry": "궁예전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "901 후고구려, 904 마진, 911 태봉, 918 축출은 itwiki 요약으로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D204)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "901-hugoguryeo-founding",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
+    },
+    {
+      "id": "usilla-src-21",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "고려에 나라를 넘김",
+      "year": 935,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "경순왕 9년",
+      "source_text": "나라를 지킬 힘이 다하자 왕이 신하들과 함께 새 왕조에 나라를 넘겼다. 새 왕조는 그를 옛 도읍의 일을 맡는 관리로 삼았다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-jinseong"
+            }
+          ],
+          "text": "[진성여왕]이 즉위한 뒤의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "경순왕 9년(935년). 고려 태조, 경주 사심관."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-gyeongsun",
+        "before": null
+      },
+      "explanation": "경순왕 9년(935년)의 일. 경순왕이 고려에 항복해 신라가 끝난 일. 고려는 그를 경주의 사심관으로 삼았는데, 이것이 사심관 제도의 시작으로 설명된다.",
+      "exam_tags": [
+        "person",
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 12,
+        "entry": "경순왕 9년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "935년 12월(양력 936년 1월) 귀부와 경주 사심관은 itwiki 경순왕 요약으로 확인. 월은 원문 대조 필요. 해설의 경주 사심관·사심관 제도의 시작은 이번 검색으로 확인하지 못했다(고려사 등 대조 대상, usilla b2 대조, D206). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D204)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "935-silla-surrender",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
+    },
+    {
+      "id": "usilla-src-22",
+      "kind": "source",
+      "nation": "usilla",
+      "title": "패강진 설치",
+      "year": 782,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "선덕왕 3년",
+      "source_text": "북쪽 국경 지대에 군사 거점을 두고, 그곳을 다스릴 우두머리 벼슬을 새로 마련하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "usilla-reign-seondeok"
+            },
+            {
+              "op": "before",
+              "ref": "usilla-reign-heungdeok"
+            }
+          ],
+          "text": "[선덕왕]이 즉위한 뒤, [흥덕왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "선덕왕 3년(782년). 패강진, 두상대감."
+        }
+      ],
+      "answer": {
+        "after": "usilla-reign-seondeok",
+        "before": "usilla-reign-wonseong"
+      },
+      "explanation": "선덕왕 3년(782년)의 일. 선덕왕이 황해도 평산 일대에 패강진을 두고 장관 두상대감을 둔 일. 예성강 이북을 군정 방식으로 다스려 북쪽 변경을 개척했다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "잡지(직관지)",
+        "volume": 40,
+        "entry": "패강진전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "782(선덕왕 3) 패강진 설치(대곡성 설치 작업의 마무리, 평산 일대)와 두상대감 설치는 encykorea 요약으로 확인. 신라본기 선덕왕 3년조 기사 내용은 이번 검색으로 확인하지 못해 출처를 직관지로 두었다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D205)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "782-paegang-jin",
+      "tags": [
+        "통일신라",
+        "U-B2"
+      ]
+    }
+  ]
+}

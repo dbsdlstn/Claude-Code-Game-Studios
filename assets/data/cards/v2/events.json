@@ -1085,6 +1085,248 @@
       ],
       "status": "owned",
       "note": ""
+    },
+    {
+      "key": "682-gukhak",
+      "year": 682,
+      "title": "국학 설치",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-01 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "685-nine-ju-five-sogyeong",
+      "year": 685,
+      "title": "9주 5소경 완성",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-02 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "687-gwallyojeon",
+      "year": 687,
+      "title": "관료전 지급",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-03 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "689-nogeup-abolition",
+      "year": 689,
+      "title": "녹읍 폐지",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-04 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "722-jeongjeon",
+      "year": 722,
+      "title": "정전 지급",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-05 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "751-bulguksa-seokguram",
+      "year": 751,
+      "title": "불국사와 석굴 창건",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-13 작성됨(staging). manifest 등록 때 owned로 바꾼다(D204)."
+    },
+    {
+      "key": "757-nogeup-restoration",
+      "year": 757,
+      "title": "녹읍 부활",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-06 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "757-place-name-reform",
+      "year": 757,
+      "title": "군현 이름 개정",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-14 작성됨(staging). manifest 등록 때 owned로 바꾼다(D204)."
+    },
+    {
+      "key": "768-daegong-revolt",
+      "year": 768,
+      "title": "대공의 난",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-15 작성됨(staging). manifest 등록 때 owned로 바꾼다(D204)."
+    },
+    {
+      "key": "771-seongdeok-bell",
+      "year": 771,
+      "title": "큰 종의 완성",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-16 작성됨(staging). manifest 등록 때 owned로 바꾼다(D204)."
+    },
+    {
+      "key": "780-hyegong-death",
+      "year": 780,
+      "title": "혜공왕의 죽음",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-07 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "782-paegang-jin",
+      "year": 782,
+      "title": "패강진 설치",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-22 작성됨(staging). manifest 등록 때 owned로 바꾼다(D205)."
+    },
+    {
+      "key": "788-dokseo-sampumgwa",
+      "year": 788,
+      "title": "독서삼품과",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-08 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "822-kim-heonchang-revolt",
+      "year": 822,
+      "title": "김헌창의 난",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-09 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "828-cheonghaejin",
+      "year": 828,
+      "title": "청해진 설치",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-10 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "846-jang-bogo-death",
+      "year": 846,
+      "title": "장보고 피살",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-17 작성됨(staging). manifest 등록 때 owned로 바꾼다(D204)."
+    },
+    {
+      "key": "851-cheonghaejin-abolition",
+      "year": 851,
+      "title": "청해진 폐지",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-18 작성됨(staging). manifest 등록 때 owned로 바꾼다(D204)."
+    },
+    {
+      "key": "889-wonjong-aeno-revolt",
+      "year": 889,
+      "title": "원종·애노의 난",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-11 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "894-choi-chiwon-reform",
+      "year": 894,
+      "title": "시무 10여 조",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-12 작성됨(staging). manifest 등록 때 owned로 바꾼다(D203)."
+    },
+    {
+      "key": "900-hubaekje-founding",
+      "year": 900,
+      "title": "후백제 건국",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-19 작성됨(staging). manifest 등록 때 owned로 바꾼다(D204)."
+    },
+    {
+      "key": "901-hugoguryeo-founding",
+      "year": 901,
+      "title": "후고구려 건국",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-20 작성됨(staging). manifest 등록 때 owned로 바꾼다(D204)."
+    },
+    {
+      "key": "935-silla-surrender",
+      "year": 935,
+      "title": "고려에 나라를 넘김",
+      "owner_card": null,
+      "participants": [
+        "usilla"
+      ],
+      "status": "planned",
+      "note": "usilla-src-21 작성됨(staging). manifest 등록 때 owned로 바꾼다(D204)."
     }
   ],
   "distinct_pairs": [
