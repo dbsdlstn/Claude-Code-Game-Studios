@@ -111,7 +111,7 @@
         "after": "goryeo-reign-sukjong",
         "before": "goryeo-reign-injong"
       },
-      "explanation": "예종 2년(1107년)의 일. 윤관이 별무반을 이끌고 여진을 정벌해 동북 9성을 쌓은 일. 여진의 요구와 유지 비용 때문에 1109년 9성을 돌려주었다. 9성의 위치는 함흥평야설과 두만강 너머설이 맞선다.",
+      "explanation": "예종 2년(1107년)의 일. 실제로는 예종 때의 일이다(연표에서는 [숙종] 칸에 놓인다). 윤관이 별무반을 이끌고 여진을 정벌해 동북 9성을 쌓은 일. 여진의 요구와 유지 비용 때문에 1109년 9성을 돌려주었다. 9성의 위치는 함흥평야설과 두만강 너머설이 맞선다.",
       "exam_tags": [
         "war",
         "person"
@@ -169,10 +169,10 @@
             },
             {
               "op": "before",
-              "ref": "goryeo-reign-gongmin"
+              "ref": "goryeo-reign-chungnyeol"
             }
           ],
-          "text": "[명종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
+          "text": "[명종]이 즉위한 뒤, [충렬왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -257,7 +257,7 @@
         "after": "goryeo-reign-myeongjong",
         "before": "goryeo-reign-gojong"
       },
-      "explanation": "신종 원년(1198년)의 일. 최충헌의 사노비 만적이 개경 북산에서 노비들을 모아 봉기를 꾀한 일. 발각되어 실패했다. 무신 집권기 신분 질서의 동요를 보여 준다.",
+      "explanation": "신종 원년(1198년)의 일. 실제로는 신종 때의 일이다(연표에서는 [명종] 칸에 놓인다). 최충헌의 사노비 만적이 개경 북산에서 노비들을 모아 봉기를 꾀한 일. 발각되어 실패했다. 무신 집권기 신분 질서의 동요를 보여 준다.",
       "exam_tags": [
         "war",
         "person"
@@ -315,10 +315,10 @@
             },
             {
               "op": "before",
-              "ref": "goryeo-reign-gongmin"
+              "ref": "goryeo-reign-chungnyeol"
             }
           ],
-          "text": "[고종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
+          "text": "[고종]이 즉위한 뒤, [충렬왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -388,10 +388,10 @@
             },
             {
               "op": "before",
-              "ref": "goryeo-reign-gongmin"
+              "ref": "goryeo-reign-chungnyeol"
             }
           ],
-          "text": "[고종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
+          "text": "[고종]이 즉위한 뒤, [충렬왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -456,14 +456,14 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goryeo-reign-wonjong"
+              "ref": "goryeo-reign-chungnyeol"
             },
             {
               "op": "before",
               "ref": "goryeo-reign-u"
             }
           ],
-          "text": "[원종]이 즉위한 뒤, [우왕]이 즉위하기 전의 일이다."
+          "text": "[충렬왕]이 즉위한 뒤, [우왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -505,6 +505,296 @@
       "image_license": null,
       "v1_id": null,
       "event_key": "1366-jeonmin-byeonjeong",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    },
+    {
+      "id": "goryeo-src-28",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "김보당의 난",
+      "year": 1173,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "명종 3년",
+      "source_text": "변방의 군사를 맡은 문신이 무신 집권자들을 치고 쫓겨난 옛 왕을 다시 세우려고 군사를 일으켰으나, 붙잡혀 죽었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-myeongjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-chungnyeol"
+            }
+          ],
+          "text": "[명종]이 즉위한 뒤, [충렬왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "명종 3년(1173년). 김보당, 정중부·이의방, 의종 복위 시도."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-myeongjong",
+        "before": "goryeo-reign-gojong"
+      },
+      "explanation": "명종 3년(1173년)의 일. 동북면병마사 김보당이 정중부·이의방 등 무신 집권자를 치고 거제에 쫓겨나 있던 의종을 다시 세우려 한 반란. 실패했고 같은 해 이의민이 의종을 죽였다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "명종 3년 8월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1173 김보당의 난(동계에서 거병, 의종 복위 시도, 처형), 이의민의 의종 시해는 itwiki 김보당의 난 요약으로 확인. 월은 원문 확인 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D218)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1173-kim-bodang-revolt",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    },
+    {
+      "id": "goryeo-src-29",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "최씨 정권의 몰락",
+      "year": 1258,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "고종 45년",
+      "source_text": "어리고 민심을 잃은 무신 집권자를 다른 무신과 문신이 함께 죽이니, 4대에 걸친 한 집안의 권력이 끝났다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-myeongjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-chungnyeol"
+            }
+          ],
+          "text": "[명종]이 즉위한 뒤, [충렬왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "고종 45년(1258년). 최의, 김준·유경, 최씨 정권 붕괴."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-gojong",
+        "before": "goryeo-reign-wonjong"
+      },
+      "explanation": "고종 45년(1258년)의 일. 김준·유경 등이 최의를 죽여 최충헌 이래 4대 60여 년의 최씨 정권이 끝난 일. 이후 김준·임연·임유무가 권력을 이었고 1270년 무신 정권이 끝났다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "고종 45년 3월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1258 김준·유경의 최의 제거와 최씨 정권 종식, 이후 김준·임연·임유무, 1270 무신 정권 종식은 itwiki 최씨 무신 정권 요약으로 확인. '4대'(최충헌·최우·최항·최의)는 통설(원문 확인 필요). 월은 원문 확인 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D218)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1258-choe-regime-fall",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    },
+    {
+      "id": "goryeo-src-30",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "1차 일본 원정",
+      "year": 1274,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "충렬왕 즉위년",
+      "source_text": "큰 나라의 요구로 배를 만들고 군사를 내어 그 나라 군대와 함께 바다 건너 섬나라를 쳤으나, 큰 바람을 만나 실패하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-gojong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-gongmin"
+            }
+          ],
+          "text": "[고종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "충렬왕 즉위년(1274년). 여원 연합군, 김방경, 일본 원정."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-chungnyeol",
+        "before": "goryeo-reign-gongmin"
+      },
+      "explanation": "충렬왕 즉위년(1274년)의 일. 김방경이 이끈 고려군이 원군과 함께 일본 원정에 나섰으나 태풍으로 실패한 일. 1281년 2차 원정도 실패했고 준비 부담으로 고려 재정이 크게 어려워졌다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "충렬왕 즉위년 10월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1274·1281 두 차례 원정, 김방경, 태풍 실패, 재정 부담은 itwiki 충렬왕 요약으로 확인. 1274년 원종 사망(6월)·충렬왕 즉위 뒤의 일로 본다(월은 원문 확인 필요). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D218)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1274-first-japan-expedition",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    },
+    {
+      "id": "goryeo-src-31",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "정동행성 설치",
+      "year": 1280,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "충렬왕 6년",
+      "source_text": "큰 나라가 바다 건너 섬나라를 다시 치려고 이 나라에 원정을 맡을 관청을 두고, 왕에게 그 우두머리를 겸하게 하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-wonjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-u"
+            }
+          ],
+          "text": "[원종]이 즉위한 뒤, [우왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "충렬왕 6년(1280년). 정동행성, 2차 일본 원정."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-chungnyeol",
+        "before": "goryeo-reign-gongmin"
+      },
+      "explanation": "충렬왕 6년(1280년)의 일. 원이 일본 원정을 위해 정동행성을 두고 충렬왕이 승상을 겸한 일. 원정 뒤에도 남아 원이 고려 내정에 간섭하는 통로가 되었다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "충렬왕 6년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1280 정동행성 설치와 충렬왕의 승상 겸임은 itwiki 충렬왕 요약으로 확인. '원정 뒤에도 남아 내정 간섭 통로'는 통설(원문 확인 필요). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D218)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1280-jeongdong-haengseong",
       "tags": [
         "고려",
         "G-B3"

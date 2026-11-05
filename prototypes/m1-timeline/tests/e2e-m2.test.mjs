@@ -701,7 +701,7 @@ test('키보드만: 타이틀 → 학습 세션(칸 Tab+Enter) → 결과 → �
 
 // D114·D116: 고려(실제 매니페스트, D191 앵커 13개, D235 인장). 390px 압축 연표에서 13앵커·44px "+"·정답 칸 표시.
 const GORYEO_BY_ID = nationDeck('goryeo')?.byId ?? new Map();
-test('고려(실제 매니페스트, 앵커 13개 D191): 인장 "려"(#7FB5A3, 먹 글자, 1px 테두리), 390px 압축 연표 13앵커, 정답·오답 뒤 맞는 칸 표시', { skip: !nationDeck('goryeo') && '고려 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+test('고려(실제 매니페스트, 앵커 14개 D191·D174): 인장 "려"(#7FB5A3, 먹 글자, 1px 테두리), 390px 압축 연표 14앵커, 정답·오답 뒤 맞는 칸 표시', { skip: !nationDeck('goryeo') && '고려 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
   await openProto(page, server.base, { data: null, title: null, nation: 'goryeo' });
   await page.waitForSelector('#title:not([hidden])');
   const s = await page.locator('#title-nations [data-nation="goryeo"] .seal').evaluate((n) => { const c = getComputedStyle(n); return [n.textContent, c.backgroundColor, c.color, c.borderTopWidth, c.borderTopColor, Math.round(n.getBoundingClientRect().width)]; });
@@ -711,10 +711,10 @@ test('고려(실제 매니페스트, 앵커 13개 D191): 인장 "려"(#7FB5A3, �
   assert.match(await page.innerText('#timeline-title'), /려\s*고려 왕대 연표/);
   assert.equal(await page.locator('#timeline.compact').count(), 1);
   const anchors = await page.locator('#timeline .row-anchor').evaluateAll((r) => r.map((x) => [x.innerText.replace(/\s+/g, ' '), x.getBoundingClientRect().height]));
-  assert.equal(anchors.length, 13);
-  assert.match(anchors[12][0], /1389~1392 공양왕/);
+  assert.equal(anchors.length, 14);
+  assert.match(anchors[13][0], /1389~1392 공양왕/);
   assert.ok(anchors.every(([, h]) => h <= 48), `앵커 줄 ${anchors.map((a) => a[1])}`);
-  assert.equal(await page.locator('#timeline .gap').count(), 13);
+  assert.equal(await page.locator('#timeline .gap').count(), 14);
   const btns = await page.locator('#timeline .gap').evaluateAll((g) => g.map((b) => [Math.round(b.getBoundingClientRect().width), Math.round(b.getBoundingClientRect().height)]));
   assert.ok(btns.every(([w, h]) => w >= 44 && h >= 44), String(btns));
   const ratio = await page.evaluate(() => document.querySelector('.timeline-wrap').getBoundingClientRect().height / innerHeight);
