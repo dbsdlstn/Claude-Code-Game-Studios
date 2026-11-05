@@ -764,7 +764,8 @@ async function loadDeck(params) {
   };
   if (app.study) return one(params.get('data') ? [params.get('data')] : CONFIG.study.dataUrls);
   try {
-    const m = await loadManifest(CONFIG.manifestUrls);
+    // `?manifest=경로`: 덱 목록을 바꿔 끼운다(나라가 늘 때의 화면을 미리 확인하는 테스트용, D100).
+    const m = await loadManifest(params.get('manifest') ? [params.get('manifest')] : CONFIG.manifestUrls);
     app.nations = m.nations;
   } catch { app.nations = []; }
   if (params.get('data')) {
