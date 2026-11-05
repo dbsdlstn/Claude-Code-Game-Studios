@@ -89,6 +89,15 @@ python3 tools/gd_card_validator_port.py --parity                  # GDScript 검
 python3 tools/gd_card_validator_port.py assets/data/cards/samguk.json   # 0 errors, anchors 4, playable 36, disputed 5
 ```
 
+## 4-1. GitHub Actions에서 실행 (D52)
+
+`.github/workflows/ci.yml`이 `claude/**` 브랜치 push와 수동 실행(`workflow_dispatch`)에서 돈다.
+- `data-and-web`: 카드·튜토리얼 검증, 검증기 동등성, 웹 규칙 단위 테스트(Node). 웹 E2E(Playwright)는 무거워 CI에서 뺐다.
+- `godot`: Godot 4.7.2(공식 linux.x86_64 zip)로 import(크래시 대비 1회 재시도) → gdUnit4 6.2.2로 `res://tests` 실행 → `godot-test-reports` artifact(리포트, 로그) 업로드. 테스트가 실패해도 리포트는 올라간다.
+- 결과 기록: `docs/reviews/godot-ci-runs.md`.
+
+**실행이 보이지 않으면**: 포크 저장소는 Actions가 기본으로 꺼져 있다. GitHub 저장소 → **Settings → Actions → General**에서 Actions를 허용하거나, **Actions 탭**의 "I understand my workflows, go ahead and enable them"을 누른다. 그다음 Actions 탭의 `ci` → "Run workflow"로 `claude/godot-mvp`를 고르거나 브랜치에 다시 push한다.
+
 ## 5. 확인 체크리스트
 
 **시작과 타이틀**

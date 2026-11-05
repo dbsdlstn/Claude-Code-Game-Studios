@@ -1,0 +1,145 @@
+# 한양 도감 CI (decision-log D52)
+# - data-and-web: 카드 데이터 검증(Python), 검증기 동등성, 웹 규칙 단위 테스트(Node)
+# - godot: Godot 4.7.2 헤드리스로 import 후 gdUnit4 6.2.2로 res://tests 실행, 리포트 업로드
+# 버전은 모두 고정한다. 바꿀 때는 docs/engine-reference/godot/ 와 docs/run-locally.md 도 함께 고친다.
+name: ci
+
+on:
+  push:
+    branches:
+      - "claude/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: "4.7.2"
+  GDUNIT4_VERSION: "6.2.2"
+
+jobs:
+  data-and-web:
+    name: data-and-web
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: actions/setup-python@v5.6.0
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: "22"
+
+      - name: Validate deck (samguk.json)
+        run: python3 tools/validate_cards.py
+
+      - name: Validate tutorial file
+        run: python3 tools/validate_cards.py --tutorial assets/data/cards/tutorial.json
+
+      - name: Validator parity (Python)
+        run: python3 tools/validator_parity.py
+
+      - name: GDScript validator port parity
+        run: python3 tools/gd_card_validator_port.py --parity
+
+      # E2E(Playwright) 테스트는 브라우저 설치가 무거워 이 잡에서 뺀다(D52). 로컬: web/README.md
+      - name: Web unit and parity tests (Node)
+        run: node --test web/tests/rules.test.js web/tests/validator-parity.test.js
+
+  godot:
+    name: godot
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Download Godot ${{ env.GODOT_VERSION }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          echo "Downloading $url"
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot/godot.zip" "$url"
+          unzip -q "$RUNNER_TEMP/godot/godot.zip" -d "$RUNNER_TEMP/godot"
+          bin="$(find "$RUNNER_TEMP/godot" -maxdepth 1 -type f -name 'Godot_v*_linux.x86_64' | head -n 1)"
+          test -n "$bin"
+          chmod +x "$bin"
+          echo "GODOT=$bin" >> "$GITHUB_ENV"
+          "$bin" --version
+
+      - name: Install gdUnit4 ${{ env.GDUNIT4_VERSION }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gdunit"
+          ok=""
+          # 태그 이름 형식이 v6.2.2 / 6.2.2 중 어느 쪽인지 이 세션에서 확인하지 못해 둘 다 시도한다.
+          for tag in "v${GDUNIT4_VERSION}" "${GDUNIT4_VERSION}"; do
+            url="https://github.com/godot-gdunit-labs/gdUnit4/archive/refs/tags/${tag}.zip"
+            if curl -fsSL --retry 3 -o "$RUNNER_TEMP/gdunit/gdunit.zip" "$url"; then
+              echo "Downloaded $url"
+              ok="yes"
+              break
+            fi
+          done
+          test -n "$ok"
+          unzip -q "$RUNNER_TEMP/gdunit/gdunit.zip" -d "$RUNNER_TEMP/gdunit"
+          src="$(find "$RUNNER_TEMP/gdunit" -type d -path '*/addons/gdUnit4' | head -n 1)"
+          test -n "$src"
+          mkdir -p addons
+          cp -R "$src" addons/gdUnit4
+          test -f addons/gdUnit4/bin/GdUnitCmdTool.gd
+          test -f addons/gdUnit4/plugin.cfg
+
+      - name: Enable gdUnit4 plugin (CI checkout only)
+        run: |
+          set -euo pipefail
+          if ! grep -q '^\[editor_plugins\]' project.godot; then
+            printf '\n[editor_plugins]\n\nenabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")\n' >> project.godot
+          fi
+          tail -n 5 project.godot
+
+      - name: Import project (retry once)
+        run: |
+          set -uo pipefail
+          # 4.7.1/4.7.2는 새 프로젝트 첫 import가 139로 끝날 수 있다(engine-reference 관찰). 한 번 더 시도한다.
+          for attempt in 1 2; do
+            "$GODOT" --headless --path . --import 2>&1 | tee "import-$attempt.log"
+            code=${PIPESTATUS[0]}
+            echo "import attempt $attempt exit $code"
+            if [ "$code" -eq 0 ]; then break; fi
+          done
+          if grep -E "Parse Error|SCRIPT ERROR" import-*.log; then
+            echo "::error::GDScript parse errors during import"
+            exit 1
+          fi
+          test -f .godot/global_script_class_cache.cfg
+
+      - name: Run gdUnit4 tests
+        id: tests
+        run: |
+          set -uo pipefail
+          "$GODOT" --headless --path . -s -d --remote-debug tcp://127.0.0.1:0 \
+            res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a res://tests --ignoreHeadlessMode 2>&1 | tee gdunit.log
+          code=${PIPESTATUS[0]}
+          echo "gdUnit4 exit $code (0 pass, 100 fail, 101 warnings/orphans, 105 parse error)"
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit "$code"
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: godot-test-reports
+          if-no-files-found: warn
+          path: |
+            reports/
+            gdunit.log
+            import-*.log
+            .godot/global_script_class_cache.cfg
