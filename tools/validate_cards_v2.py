@@ -21,7 +21,7 @@ RULES (numbers follow the schema doc; a headless test should use the same):
   V4  Per nation, anchors have order 1..n without gaps; reign.start strictly
       increases with order; start <= end; previous end <= next start;
       reign.basis in {chronicle, inscription, consensus}.
-      V4a (D63): at most 10 anchors per nation.
+      V4a (D63, D85): at most 12 anchors per nation.
   V5  answer.after is an anchor of the same nation; answer.before is the anchor
       with the next order, or null only when after is the last anchor.
   V6  year != 0 and after.reign.start <= year, and year < before.reign.start
@@ -59,7 +59,7 @@ RELEASE (--release, D56 item 8 quality gate):
       (applies to anchors too).
   R3  a source card with exam_tags has verification.exam_notation_checked.
 
-MANIFEST (default run, D85): assets/data/cards/v2/manifest.json is
+MANIFEST (default run, D86): assets/data/cards/v2/manifest.json is
   {"nations": [{"id", "label", "files": [path relative to the manifest]}]}.
   M1  every listed file exists and every v2/*.json card file (other than the
       manifest) is listed exactly once;
@@ -85,7 +85,7 @@ KINDS = {"anchor", "source"}
 REIGN_BASIS = {"chronicle", "inscription", "consensus"}
 YEAR_BASIS = {"chronicle", "inscription", "consensus", "disputed"}
 EXAM_TAGS = {"institution", "person", "war", "culture"}
-MAX_ANCHORS = 10
+MAX_ANCHORS = 12
 YEAR_RE = re.compile(r"\d{3,4}\s*년|기원전|서기")
 
 COMMON_REQ = ["id", "kind", "nation", "title", "source_ref", "verification"]
@@ -189,7 +189,7 @@ def validate(cards, release=False):
     for nation, items in by_nation.items():
         items.sort(key=lambda a: a.get("order") if isinstance(a.get("order"), int) else 10**9)
         if len(items) > MAX_ANCHORS:
-            err(f"nation {nation}", "V4", f"{len(items)} anchors, at most {MAX_ANCHORS} (D63)")
+            err(f"nation {nation}", "V4", f"{len(items)} anchors, at most {MAX_ANCHORS} (D63, D85)")
         orders = [a.get("order") for a in items]
         if orders != list(range(1, len(items) + 1)):
             err(f"nation {nation}", "V4", f"anchor order must be 1..{len(items)} without gaps, got {orders}")
