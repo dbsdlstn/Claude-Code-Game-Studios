@@ -1,6 +1,7 @@
 # 한양 도감 CI (decision-log D52)
 # - data-and-web: 카드 데이터 검증(Python), 검증기 동등성, 웹 규칙 단위 테스트(Node)
 # - godot: Godot 4.7.2 헤드리스로 import 후 gdUnit4 6.2.2로 res://tests 실행, 리포트 업로드
+# - godot-screens: Xvfb + Mesa llvmpipe(소프트웨어 OpenGL)로 실제 창을 띄워 주요 화면을 1280×720 PNG로 저장(D55)
 # 버전은 모두 고정한다. 바꿀 때는 docs/engine-reference/godot/ 와 docs/run-locally.md 도 함께 고친다.
 name: ci
 
@@ -27,7 +28,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v5.0.0
 
       - uses: actions/setup-python@v5.6.0
         with:
@@ -58,7 +59,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v5.0.0
 
       - name: Download Godot ${{ env.GODOT_VERSION }}
         run: |
@@ -168,7 +169,7 @@ jobs:
 
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: godot-test-reports
           if-no-files-found: warn
@@ -184,3 +185,70 @@ jobs:
         run: |
           echo "::error::${{ steps.parse.outputs.bad }} script(s) failed to parse (see parse-check.log artifact)"
           exit 1
+
+  godot-screens:
+    name: godot-screens
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5.0.0
+
+      # 가상 디스플레이, 소프트웨어 OpenGL(llvmpipe), 한글 글꼴(사용자 PC의 시스템 한글 글꼴을 흉내, D18).
+      - name: Install Xvfb, Mesa and Korean fonts
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends xvfb xauth libgl1-mesa-dri libglx-mesa0 libegl1 fonts-noto-cjk
+          fc-list :lang=ko family | head -n 5
+
+      - name: Download Godot ${{ env.GODOT_VERSION }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          url="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/godot/godot.zip" "$url"
+          unzip -q "$RUNNER_TEMP/godot/godot.zip" -d "$RUNNER_TEMP/godot"
+          bin="$(find "$RUNNER_TEMP/godot" -maxdepth 1 -type f -name 'Godot_v*_linux.x86_64' | head -n 1)"
+          chmod +x "$bin"
+          echo "GODOT=$bin" >> "$GITHUB_ENV"
+
+      - name: Import project (retry once)
+        run: |
+          set +e
+          for attempt in 1 2; do
+            "$GODOT" --headless --path . --import > "import-$attempt.log" 2>&1
+            code=$?
+            echo "import attempt $attempt exit $code"
+            if [ "$code" -eq 0 ]; then break; fi
+          done
+          test -f .godot/global_script_class_cache.cfg
+
+      - name: Capture screens (Xvfb, llvmpipe)
+        run: |
+          set +e
+          set -uo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/screens"
+          LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s "-screen 0 1280x720x24" \
+            "$GODOT" --path . --rendering-driver opengl3 --resolution 1280x720 \
+            -s res://tests/screens/capture_screens.gd -- --out="$GITHUB_WORKSPACE/screens" 2>&1 | tee capture.log
+          code=${PIPESTATUS[0]}
+          echo "capture exit $code"
+          ls -la "$GITHUB_WORKSPACE/screens"
+          count=$(ls "$GITHUB_WORKSPACE/screens"/*.png 2>/dev/null | wc -l)
+          {
+            echo "### Screens"
+            echo "exit $code, $count PNG"
+            grep -E "OpenGL|Renderer|llvmpipe|saved|captured|ERROR|SCRIPT ERROR" capture.log | head -n 40
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$code" -ne 0 ] || [ "$count" -lt 8 ]; then exit 1; fi
+
+      - name: Upload screens
+        if: always()
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          name: godot-screens
+          if-no-files-found: warn
+          path: |
+            screens/
+            capture.log
+            import-*.log
