@@ -11,7 +11,7 @@ import {
   validateDeck, buildTimeline, isCorrectGap, correctGaps, selectableGaps, slotAnchorId, isNearMiss,
   nextBox, schedule, gradeOf, isDue, newEntry, buildSession, createRng, earlyReviewIds, wrongNoteIds, sessionSeed,
   createSessionState, currentId, revealClue, placeCurrent, sessionTimeline, isSessionDone, isRetry, attemptsOf,
-  completedAfter, sessionSummary, gradeCounts, logLine, restoreProgress, restoreSession, dataFingerprint, previewBox,
+  completedAfter, sessionSummary, gradeCounts, logLine, restoreProgress, restoreSession, dataFingerprint, previewBox, offListKing,
 } from '../js/rules.js';
 import { normalizeDeck, formatOf, loadRaw, yearText } from '../js/data.js';
 
@@ -624,5 +624,22 @@ describe('D94 하루 학습량(일반 모드 설정)', () => {
     const late3 = cards.filter((c) => progress[c.id]?.introduced && 61 - progress[c.id].due_session >= 3).length;
     assert.equal(late3, 0);
     assert.equal(cards.filter((c) => progress[c.id]?.introduced).length, 36);
+  });
+});
+
+// D173(D192): 앵커가 없는 왕 때의 사건은 해설 첫 줄에 "실제로는 ○○ 때"
+describe('offListKing', () => {
+  const anchors = [{ title: '인종', reign: '인종' }, { title: '명종', reign: '명종' }, { title: '태종 무열왕', reign: '태종 무열왕' }];
+  test('목록에 없는 왕 이름을 돌려준다', () => {
+    assert.equal(offListKing({ reign: '의종 24년' }, anchors), '의종');
+    assert.equal(offListKing({ reign: '위덕왕 13년(창왕 13년)' }, anchors), '위덕왕');
+    assert.equal(offListKing({ reign: '신라 문무왕 10년(고구려 멸망 2년 뒤)' }, anchors), '신라 문무왕');
+  });
+  test('앵커 왕이거나 왕 이름이 아니면 null', () => {
+    assert.equal(offListKing({ reign: '명종 26년' }, anchors), null);
+    assert.equal(offListKing({ reign: '태종 무열왕 7년' }, anchors), null);
+    assert.equal(offListKing({ reign: '인종 즉위년' }, anchors), null);
+    assert.equal(offListKing({ reign: null }, anchors), null);
+    assert.equal(offListKing({ reign: '원 간섭기' }, anchors), null);
   });
 });

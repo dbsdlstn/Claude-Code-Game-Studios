@@ -55,9 +55,9 @@ export const CONFIG = Object.freeze({
    * 나라 인장(art-bible §4.2, D135): 색만이 아니라 글자로도 구분한다. 신라는 금색에 먹 글자, 나머지는 흰 글자.
    * 발해 색은 보류(D183)라 회색 임시.
    */
-  /** 나라별 앵커 상한(D63·D85 기본 12, D191 고려 13). 콘텐츠 검증기 MAX_ANCHORS_BY_NATION과 같은 값. */
+  /** 나라별 앵커 상한(D63·D85 기본 12, D191 고려 13 → D174 충렬왕 추가로 14). 콘텐츠 검증기 MAX_ANCHORS_BY_NATION 이상이어야 한다. */
   maxAnchors: 12,
-  maxAnchorsByNation: Object.freeze({ goryeo: 13 }),
+  maxAnchorsByNation: Object.freeze({ goryeo: 14 }),
   nationSeals: Object.freeze({
     goguryeo: Object.freeze({ ch: '고', bg: '#A23B2A', fg: '#FFFFFF' }),
     baekje: Object.freeze({ ch: '백', bg: '#2F5D7C', fg: '#FFFFFF' }),
@@ -86,7 +86,7 @@ export const CONFIG = Object.freeze({
     streak: Object.freeze({ rest_pass_every: 7, rest_pass_max: 2, day_rollover_hour: 3 }),
     titles: Object.freeze([[1, '입문자'], [5, '서당 학동'], [10, '향교 유생'], [15, '성균관 유생'], [20, '진사'], [30, '급제자'], [40, '대제학']]),
     /** 하루 권장 상한(§14, D94): 넘으면 안내만 한다. */
-    daily_session_soft_cap: 3,
+    daily_card_soft_cap: 24,
   }),
   /** 보상 수치 파일(rewards-spec §9). 있으면 위 기본값을 덮어쓴다. */
   rewardsUrls: Object.freeze(['../../assets/data/config/rewards.json']),

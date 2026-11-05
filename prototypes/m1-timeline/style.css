@@ -314,7 +314,7 @@ body { min-height: 100vh; background-attachment: fixed; }
 .title-nations { display: grid; gap: 6px; width: 100%; justify-items: center; }
 .nation-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .nation-list { display: grid; gap: 6px; width: 100%; }
-.nation-row { display: grid; grid-template-columns: 22px auto 1fr; gap: 4px 10px; align-items: center; min-height: 56px; padding: 6px 12px; text-align: left; font: inherit; border: 1px solid var(--line-soft); border-radius: 8px; background: var(--paper-2); cursor: pointer; color: inherit; }
+.nation-row { display: grid; grid-template-columns: 22px auto 1fr; gap: 4px 10px; align-items: center; min-height: 48px; padding: 4px 12px; text-align: left; font: inherit; border: 1px solid var(--line-soft); border-radius: 8px; background: var(--paper-2); cursor: pointer; color: inherit; }
 .nation-row.is-on { border: 2px solid var(--seal); font-weight: 700; }
 .nation-name { font-family: var(--serif); font-size: 17px; }
 .nation-meta { font-size: 13px; color: var(--ink-soft); text-align: right; font-weight: 400; }
