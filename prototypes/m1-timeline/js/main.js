@@ -9,7 +9,7 @@ import { loadRaw, normalizeDeck, loadManifest, loadNationDeck } from './data.js'
 import { nationStoreAdapter, lastNation, migrateSave } from './save.js';
 import { dayKey, dayDiff, newRewards, restoreRewards, levelOf, settleSession, achievementDefs, achievementStats, currentTitle } from './rewards.js';
 import { titleForLevel } from './rewards.js';
-import { buildTimeline, correctGaps, slotAnchorId, offListKing } from './rules.js';
+import { buildTimeline, correctGaps, slotAnchorId, offListLine } from './rules.js';
 import {
   validateDeck, gapBounds, selectableGaps, buildSession, createSessionState, currentId, revealClue, placeCurrent,
   sessionTimeline, isRetry, isSessionDone, attemptsOf, completedAfter, sessionSummary, gradeCounts, gradeOf, GRADE_NAME,
@@ -301,7 +301,7 @@ function renderResult(box) {
     r.correct ? null : el('p', { class: 'result-where', id: 'result-where' }, '고른 칸: ', el('s', {}, r.placedText), el('br'), '맞는 칸: ', el('b', {}, r.rightText)),
     el('p', { class: 'result-box', id: 'result-box', dataset: { from: String(r.boxFrom ?? ''), to: String(r.boxTo ?? '') } },
       boxLine, !r.practice && !r.retry && grade ? ` · 등급 ${GRADE_NAME[grade]}` : ''),
-    !app.study && !String(card.explanation ?? '').includes('실제로는') && offListKing(card, app.deck.anchors) ? el('p', { class: 'result-offlist', id: 'result-offlist' }, `실제로는 ${offListKing(card, app.deck.anchors)} 때(연표 목록에 없는 왕)예요. 연표에서는 그 앞 왕의 칸에 들어가요.`) : null,
+    !app.study && offListLine(card, app.deck.anchors) ? el('p', { class: 'result-offlist', id: 'result-offlist' }, `실제로는 ${offListLine(card, app.deck.anchors)} 때(연표 목록에 없는 왕)예요. 연표에서는 그 앞 왕의 칸에 들어가요.`) : null,
     explainBlock(card, !app.study && r.correct && grade >= 2),
     el('button', { type: 'button', id: 'btn-next', class: 'btn btn-primary', onclick: onNext }, isLast ? (app.state.practice ? '연습 끝내기' : '세션 결과 보기') : '다음 카드'),
   ].filter(Boolean));
