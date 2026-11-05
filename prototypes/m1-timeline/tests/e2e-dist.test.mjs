@@ -6,7 +6,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
-import { chromium, VIEWPORTS, REPO_ROOT, PROTO_ROOT, REAL, REAL_BY_ID, currentCard, gapsFor, pressGap } from './helpers.mjs';
+import { chromium, VIEWPORTS, REPO_ROOT, PROTO_ROOT, REAL, REAL_BY_ID, currentCard, gapsFor, pressGap, expectedAnchorYears } from './helpers.mjs';
 
 const DIST = path.join(REPO_ROOT, 'dist', 'm1');
 
@@ -32,7 +32,7 @@ test('dist/m1만으로 실제 초안을 읽고 모바일에서 한 장 꽂기, �
     await page.waitForSelector('body[data-ready="true"]');
     assert.match(await page.innerText('#data-info'), /goguryeo-m1\.json · 카드 12장/);
     assert.match(await page.innerText('#data-warn'), /사실 확인 전/);
-    assert.match(await page.locator('#timeline .row-anchor .row-year').nth(1).innerText(), /371~384/);
+    assert.deepEqual(await page.locator('#timeline .row-anchor .row-year').allInnerTexts(), expectedAnchorYears(REAL));
     const card = await currentCard(page, REAL_BY_ID);
     await pressGap(page, (await gapsFor(page, card)).right, true);
     assert.equal(await page.getAttribute('#result', 'data-result'), 'correct');

@@ -2,7 +2,7 @@
 // E2E: node --test prototypes/m1-timeline/tests/e2e.test.mjs  (모바일 390×844, 데스크톱 1280×720)
 import { test, before, after, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { chromium, startServer, openProto, currentCard, gapsFor, pressGap, VIEWPORTS, SAMPLE, BY_ID, REAL, REAL_BY_ID } from './helpers.mjs';
+import { chromium, startServer, openProto, currentCard, gapsFor, pressGap, VIEWPORTS, SAMPLE, BY_ID, REAL, REAL_BY_ID, expectedAnchorYears } from './helpers.mjs';
 
 let server;
 let browser;
@@ -37,8 +37,8 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       assert.equal(await page.locator('#timeline .gap').count(), SAMPLE.anchors.length + 1);
       assert.match(await page.innerText('#progress'), /카드 1 \/ 8/);
       // 기준 카드는 왕 단위: 왕 이름 + 재위 기간
-      assert.deepEqual(await page.locator('#timeline .row-anchor .row-title').allInnerTexts(), ['동명성왕', '소수림왕', '광개토왕', '장수왕', '보장왕']);
-      assert.match(await page.locator('#timeline .row-anchor .row-year').nth(1).innerText(), /371~384/);
+      assert.deepEqual(await page.locator('#timeline .row-anchor .row-title').allInnerTexts(), [...SAMPLE.anchors].sort((a, b) => a.order - b.order).map((a) => a.reign));
+      assert.deepEqual(await page.locator('#timeline .row-anchor .row-year').allInnerTexts(), expectedAnchorYears(SAMPLE));
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       assert.ok(overflow <= 0, `가로 넘침 ${overflow}px`);
       if (mobile) {
@@ -246,9 +246,11 @@ describe('실제 콘텐츠 초안(assets/data/cards/v2-draft/goguryeo-m1.json)',
         assert.match(await page.innerText('#data-warn'), /사실 확인 전/);
         assert.match(await page.innerText('#progress'), /카드 1 \/ 8/);
         const anchorTitles = await page.locator('#timeline .row-anchor .row-title').allInnerTexts();
-        assert.deepEqual(anchorTitles, [...REAL.anchors].sort((a, b) => a.order - b.order).map((a) => a.title.replace(/\s*즉위$/, '')));
-        // 재위 기간(data/reigns.json, 표시용)
-        assert.deepEqual(await page.locator('#timeline .row-anchor .row-year').allInnerTexts(), ['기원전 37~기원전 19', '371~384', '391~412', '413~491', '642~668']);
+        assert.deepEqual(anchorTitles, [...REAL.anchors].sort((a, b) => a.order - b.order).map((a) => a.reign));
+        // 재위 기간: 데이터(앵커의 reign_range 또는 data/reigns.json)에서 기대값을 계산한다
+        const years = await page.locator('#timeline .row-anchor .row-year').allInnerTexts();
+        assert.deepEqual(years, expectedAnchorYears(REAL));
+        assert.ok(years.every((y) => y.includes('~')), `재위 기간이 빠진 기준 카드: ${years.filter((y) => !y.includes('~'))}`);
         let n = 0;
         while (await page.getAttribute('#card', 'data-card-id')) {
           const card = await currentCard(page, REAL_BY_ID);

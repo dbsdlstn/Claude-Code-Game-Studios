@@ -20,7 +20,13 @@ export const SAMPLE = JSON.parse(readFileSync(path.join(PROTO_ROOT, 'data', 'sam
 export const BY_ID = new Map([...SAMPLE.cards, ...SAMPLE.anchors].map((c) => [c.id, c]));
 const REAL_PATH = path.join(REPO_ROOT, 'assets', 'data', 'cards', 'v2-draft', 'goguryeo-m1.json');
 /** 콘텐츠 세션의 실제 고구려 초안(정규화 후). 없으면 null. */
-export const REAL = existsSync(REAL_PATH) ? normalizeDeck(JSON.parse(readFileSync(REAL_PATH, 'utf8'))).deck : null;
+/** 재위 표시용 표(data/reigns.json). */
+export const REIGNS = JSON.parse(readFileSync(path.join(PROTO_ROOT, 'data', 'reigns.json'), 'utf8'));
+export const REAL = existsSync(REAL_PATH) ? normalizeDeck(JSON.parse(readFileSync(REAL_PATH, 'utf8')), REIGNS).deck : null;
+/** 연표 기준 카드 줄의 기대 표시(재위 기간, 없으면 즉위 연도) — 데이터에서 계산한다. */
+export function expectedAnchorYears(deck) {
+  return [...deck.anchors].sort((a, b) => a.order - b.order).map((a) => a.reign_range ?? a.year_label.split('(')[0].trim());
+}
 export const REAL_BY_ID = new Map(REAL ? [...REAL.cards, ...REAL.anchors].map((c) => [c.id, c]) : []);
 
 /** 모바일 세로 390×844(터치)와 데스크톱 1280×720. */
