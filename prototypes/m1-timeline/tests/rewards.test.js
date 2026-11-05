@@ -34,12 +34,25 @@ describe('§11 수용 기준', () => {
     const r = settle(newRewards(), [], at('2026-11-05'));
     assert.equal(r.report, null);
   });
-  test('2. 승급 +5(재학습 표시 중 두 번째 깨끗한 정답의 승급 포함), 상자별 차등 없음', () => {
-    assert.equal(bonusXp(rec({ boxFrom: 1, boxTo: 2 }), R).boxXp, 5);
+  test('2. 승급 +5는 상자 2 이상에서 오를 때만(D164), 상자 1 → 2와 새 카드 첫 정답은 없음, 상자별 차등 없음', () => {
+    assert.equal(bonusXp(rec({ boxFrom: 2, boxTo: 3 }), R).boxXp, 5);
     assert.equal(bonusXp(rec({ boxFrom: 4, boxTo: 5 }), R).boxXp, 5);
-    assert.equal(bonusXp(rec({ boxFrom: 1, boxTo: 1, probation: true }), R).boxXp, 0, '표시 중 첫 깨끗한 정답은 승급 없음');
-    assert.equal(bonusXp(rec({ boxFrom: null, boxTo: 2 }), R).boxXp, 5, '새 카드 1 → 2');
+    assert.equal(bonusXp(rec({ boxFrom: 1, boxTo: 2 }), R).boxXp, 0, '상자 1 → 2');
+    assert.equal(bonusXp(rec({ boxFrom: null, boxTo: 2 }), R).boxXp, 0, '새 카드 첫 깨끗한 정답');
+    assert.equal(bonusXp(rec({ boxFrom: 1, boxTo: 1, probation: true, probationFrom: true }), R).boxXp, 0, '표시 중 첫 깨끗한 정답');
     assert.equal(bonusXp(rec({ boxFrom: 3, boxTo: 1, correct: false }), R).boxXp, 0);
+  });
+  test('2. 재학습 해제(표시가 풀리며 상자 1 → 2)에 만회 +5(D166), 오답 자체는 0', () => {
+    const r = bonusXp(rec({ boxFrom: 1, boxTo: 2, probationFrom: true, probation: false }), R);
+    assert.deepEqual([r.released, r.releaseXp, r.boxXp], [true, 5, 0]);
+    assert.equal(answerXp(rec({ correct: false }), R), 0);
+  });
+  test('바뀐 카드 판정(D 블록): 상자·등급·재학습 표시가 바뀐 카드만', () => {
+    assert.equal(bonusXp(rec({ boxFrom: 1, boxTo: 2 }), R).changed, true);
+    assert.equal(bonusXp(rec({ boxFrom: null, boxTo: 1, clueUsed: 1 }), R).changed, false, '새 카드를 단서로 맞혀 상자 1 그대로');
+    assert.equal(bonusXp(rec({ boxFrom: null, boxTo: 1, correct: false, probation: true }), R).changed, true, '재학습 표시가 새로 붙음');
+    assert.equal(bonusXp(rec({ boxFrom: 1, boxTo: 1, correct: false, probation: true, probationFrom: true }), R).changed, false);
+    assert.equal(bonusXp(rec({ boxFrom: 3, boxTo: 3, clueUsed: 1, bestFrom: 0, bestTo: 1 }), R).changed, true, '등급');
   });
   test('3. 등급 보너스는 best_grade가 오를 때만(한 번)', () => {
     assert.equal(bonusXp(rec({ bestFrom: 0, bestTo: 1 }), R).gradeXp, 20);
@@ -47,7 +60,7 @@ describe('§11 수용 기준', () => {
     assert.equal(bonusXp(rec({ bestFrom: 2, bestTo: 2 }), R).gradeXp, 0, '내려갔다 다시 올라가도 best가 같으면 없음');
   });
   test('4. 하루 두 세션까지만 인출 XP·하루 목표, 세 번째는 0. 승급·등급은 항상. 세션 완료 보너스 없음', () => {
-    const recs = [rec({ id: 'a' }), rec({ id: 'b', bestTo: 1 }), rec({ id: 'c', correct: false, boxTo: 1 })];
+    const recs = [rec({ id: 'a', boxFrom: 2, boxTo: 3 }), rec({ id: 'b', boxFrom: 2, boxTo: 3, bestTo: 1 }), rec({ id: 'c', correct: false, boxFrom: 2, boxTo: 1 })];
     let rw = newRewards();
     const s1 = settle(rw, recs, at('2026-11-05')); rw = s1.rewards;
     assert.equal(s1.report.sessionXp, 10 + 5 + 10 + 5 + 20 + 0 + R.xp.daily_goal);
@@ -173,14 +186,14 @@ function simulate(strategy, { deck = 24, daysN = 30, perDay = 1, seeds = 15 } = 
         const recs = [];
         for (const id of st.queue) {
           const k = know.get(id);
-          const clue = strategy === 'direct' ? 2 : strategy === 'relation' ? 1 : strategy === 'honest' ? (k < 0.3 ? 1 : 0) : 0;
+          const clue = strategy === 'direct' ? 2 : strategy === 'relation' ? 1 : strategy === 'honest' ? (k < 0.1 ? 2 : k < 0.35 ? 1 : 0) : 0;
           const p = clue === 2 ? 1 : clue === 1 ? k + 0.4 * (1 - k) : k + 0.1 * (1 - k);
           const correct = rng() < p;
           const before = progress[id];
           const after = schedule(before, { correct, clueUsed: clue, session }, cfg);
           progress = { ...progress, [id]: after };
           know.set(id, k + 0.3 * (1 - k));
-          recs.push({ id, correct, clueUsed: clue, boxFrom: before?.introduced ? before.box : null, boxTo: after.box, bestFrom: before?.best_grade ?? 0, bestTo: after.best_grade, probation: after.probation });
+          recs.push({ id, correct, clueUsed: clue, boxFrom: before?.introduced ? before.box : null, boxTo: after.box, bestFrom: before?.best_grade ?? 0, bestTo: after.best_grade, probation: after.probation, probationFrom: !!before?.probation });
         }
         if (recs.length) rw = settleSession(rw, { sessionId: `s${session}`, records: recs, base: recs.length }, noStats, day, R).rewards;
       }

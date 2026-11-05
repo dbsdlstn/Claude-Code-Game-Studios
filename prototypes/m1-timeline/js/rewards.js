@@ -103,12 +103,28 @@ export function answerXp(rec, cfg) {
   return { clean: cfg.xp.clean, relation: cfg.xp.clue_relation, direct: cfg.xp.clue_direct, wrong: cfg.xp.wrong }[answerKind(rec)];
 }
 
-/** 승급(+5, 상자가 오를 때)과 등급(최고 등급이 처음 오를 때) 보너스. 세션 수와 무관하게 항상(§1.3). */
+/**
+ * 보너스(§1.2, D98·D128). 세션 수와 무관하게 항상(§1.3).
+ * - 승급 +box_up: **상자 box_up_min_box(2) 이상에서** 오를 때만(상자 1 → 2, 처음 보는 카드의 첫 정답은 없음, D164).
+ * - 재학습 해제 만회 +probation_release: 재학습 표시가 풀리며 상자 1 → 2가 될 때(D166).
+ * - 등급: 최고 등급이 처음 오를 때 한 번.
+ * changed: 상자·등급·재학습 표시가 바뀐 카드(결과 화면 D 블록).
+ */
 export function bonusXp(rec, cfg) {
-  const boxUp = rec.boxTo !== null && rec.boxTo !== undefined && rec.boxTo > (rec.boxFrom ?? 1);
+  const from = rec.boxFrom ?? 1;
+  const to = rec.boxTo ?? from;
+  const up = to > from;
+  const minBox = cfg.xp.box_up_min_box ?? 1;
+  const boxUp = up && from >= minBox;
+  const released = !!rec.probationFrom && !rec.probation && up;
+  const newProbation = !!rec.probation && !rec.probationFrom;
   const grades = [];
   for (let g = (rec.bestFrom ?? 0) + 1; g <= (rec.bestTo ?? 0); g++) grades.push(g);
-  return { boxUp, boxXp: boxUp ? cfg.xp.box_up : 0, grades, gradeXp: grades.reduce((s, g) => s + (cfg.xp.grade_up[g] ?? 0), 0) };
+  return {
+    boxUp, boxXp: boxUp ? cfg.xp.box_up : 0, released, releaseXp: released ? (cfg.xp.probation_release ?? 0) : 0, newProbation,
+    grades, gradeXp: grades.reduce((s, g) => s + (cfg.xp.grade_up[g] ?? 0), 0),
+    changed: to !== from || grades.length > 0 || newProbation || released,
+  };
 }
 
 /* ------------------------------------------------------------------ 업적(§4) */
@@ -195,7 +211,11 @@ export function settleSession(rw, { sessionId, records, base }, statsFor, now, c
     const kind = answerKind(r);
     const b = bonusXp(r, cfg);
     const ax = xpAllowed ? answerXp(r, cfg) : 0;
-    return { id: r.id, kind, xp: ax, boxUp: b.boxUp, boxFrom: r.boxFrom ?? null, boxTo: r.boxTo ?? null, boxXp: b.boxXp, grades: b.grades, gradeXp: b.gradeXp, probation: !!r.probation, total: ax + b.boxXp + b.gradeXp };
+    return {
+      id: r.id, kind, xp: ax, boxUp: b.boxUp, boxFrom: r.boxFrom ?? null, boxTo: r.boxTo ?? null, boxXp: b.boxXp, grades: b.grades, gradeXp: b.gradeXp,
+      released: b.released, releaseXp: b.releaseXp, newProbation: b.newProbation, changed: b.changed, probation: !!r.probation,
+      bonus: b.boxXp + b.gradeXp + b.releaseXp, total: ax + b.boxXp + b.gradeXp + b.releaseXp,
+    };
   });
   // 하루 목표(§3.2): 본 인출이 goal_min_cards장 이상, 또는 세션 카드가 그보다 적으면 그 전부
   const need = Math.min(cfg.goal_min_cards, Math.max(1, base));

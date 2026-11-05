@@ -77,6 +77,9 @@ try {
     }
     await page.waitForSelector('#summary:not([hidden])');
     await shot('05-summary');
+    await page.evaluate(() => { const sh = document.querySelector('#summary .sheet'); sh.scrollTop = sh.scrollHeight; });
+    await shot('05b-summary-bottom');
+    await page.evaluate(() => { document.querySelector('#summary .sheet').scrollTop = 0; });
     await page.click('#summary-dogam');
     await shot('06-dogam');
     await page.click('#tab-ach');
