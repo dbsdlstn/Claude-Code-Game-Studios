@@ -7,7 +7,7 @@ import { CONFIG } from './config.js';
 import { createStore } from './storage.js';
 import { loadRaw, normalizeDeck, loadManifest, loadNationDeck } from './data.js';
 import { nationStoreAdapter, lastNation, migrateSave } from './save.js';
-import { dayKey, newRewards, restoreRewards, levelOf, settleSession, achievementDefs, achievementStats, currentTitle } from './rewards.js';
+import { dayKey, dayDiff, newRewards, restoreRewards, levelOf, settleSession, achievementDefs, achievementStats, currentTitle } from './rewards.js';
 import { titleForLevel } from './rewards.js';
 import { buildTimeline, correctGaps, slotAnchorId } from './rules.js';
 import {
@@ -72,7 +72,7 @@ function saveRewards() {
 function persist() {
   app.store.save({
     format: 'hanyang-dogam-mastery', dataId: app.dataId, completed_sessions: app.completed, cards: app.progress,
-    current: app.state, log: app.log, participant: app.participant,
+    current: app.state, log: app.log, participant: app.participant, first_day: app.firstDay ?? null,
   });
   saveRewards();
 }
@@ -97,6 +97,23 @@ function slotText(items, k) {
 
 /* ------------------------------------------------------------------ 세션 시작·끝 */
 
+/* ------------------------------------------------------------------ 이벤트 로그(m2-plan §8, D108) */
+
+/** 일반 모드만. 테스트 모드의 로그 규격(m1-plan §11)은 바꾸지 않는다. 사용자 입력 텍스트는 넣지 않는다. */
+const ev = { openAt: 0, taps: 0, firstCard: false, sessionAt: 0, result: null, clueAt: null };
+function logEvent(event, fields = {}) {
+  if (app.study) return;
+  app.log = [...app.log, { ts_ms: Date.now(), participant: app.participant, event, ...fields }];
+}
+function dayIndex() {
+  if (!app.firstDay) return 0;
+  return Math.max(0, dayDiff(app.firstDay, dayOpts().today));
+}
+function daySessionN() {
+  const rw = app.rewards;
+  return (rw && rw.day.key === dayOpts().today ? rw.day.sessions : 0) + 1;
+}
+
 function startLearnSession() {
   if (app.study && app.completed >= app.study.cap) { app.state = null; render(); renderStudyDone(); return; }
   const s = sessionIndex();
@@ -106,11 +123,15 @@ function startLearnSession() {
   app.lastResult = null;
   app.pendingGap = null;
   app.cardShownAt = performance.now();
+  ev.sessionAt = Date.now();
+  ev.clueAt = null;
+  if (pick.ids.length) logEvent('session_start', { session: s, nation: app.nation, cards_n: pick.ids.length, due_n: pick.due, new_n: pick.fresh, intake_guard: !!pick.guarded, day_sessions_n: daySessionN() });
   persist();
   render();
 }
 
 function startPractice(kind, ids) {
+  logEvent('practice_start', { kind });
   app.state = createSessionState(sessionIndex(), ids, { kind });
   app.lastResult = null;
   app.pendingGap = null;
@@ -123,9 +144,10 @@ function startPractice(kind, ids) {
 }
 
 /** 세션을 끝낸다(큐를 다 했거나 "세션 끝내기"). 학습 세션이면 §5 세션 카운트. */
-function finishSession() {
+function finishSession(endedBy = 'complete') {
   const st = app.state;
   if (!st) return;
+  if (!st.practice && attemptsOf(st)) logEvent('session_end', { session: st.session, duration_ms: ev.sessionAt ? Date.now() - ev.sessionAt : null, answered_n: attemptsOf(st), ended_by: endedBy });
   app.completed = completedAfter(app.completed, st, L);
   app.lastFinished = st.practice ? null : st.session;
   sessionRewards(st);
@@ -154,6 +176,17 @@ function sessionRewards(st) {
   app.rewards = rewards;
   app.lastReward = report;
   saveRewards();
+  if (report) {
+    const parts = {};
+    for (const l of report.lines) { parts[l.kind] = (parts[l.kind] ?? 0) + l.xp; parts.box_up = (parts.box_up ?? 0) + l.boxXp; parts.grade = (parts.grade ?? 0) + l.gradeXp; parts.release = (parts.release ?? 0) + l.releaseXp; }
+    if (report.goal) parts.daily_goal = report.goal.xp;
+    logEvent('reward_settle', {
+      session: st.session, xp_gained: report.sessionXp, xp_parts: Object.entries(parts).filter(([, v]) => v).map(([k, v]) => ({ k, v })), xp_total: rewards.xp,
+      level_before: report.level.from, level_after: report.level.to, goal_met: !!report.goal, streak: rewards.streak, rest_pass_used: report.goal?.usedPasses ?? 0,
+      achievements_new: report.achievements.map((a) => a.id), xp_capped: report.capped,
+      changed_n: report.lines.filter((l) => l.changed).length, unchanged_n: report.lines.filter((l) => !l.changed).length,
+    });
+  }
 }
 
 /* ------------------------------------------------------------------ 렌더 */
@@ -197,7 +230,7 @@ function clueBar(card, extra = null) {
   return el('div', { class: 'clue-bar' },
     el('button', {
       type: 'button', id: 'btn-clue', class: 'btn', disabled: n >= max,
-      onclick: () => { app.state = revealClue(app.state, max); persist(); renderCard(); $('btn-clue')?.focus(); },
+      onclick: () => { if (ev.clueAt === null) ev.clueAt = Math.round(performance.now() - app.cardShownAt); app.state = revealClue(app.state, max); persist(); renderCard(); $('btn-clue')?.focus(); },
     }, n >= max ? '단서를 모두 봤습니다' : `단서 보기 (${n + 1}/${max})`),
     extra,
     el('span', { class: 'cost', id: 'clue-cost', dataset: { clues: String(n) } }, costText(card)));
@@ -214,6 +247,10 @@ function refText(text, refs) {
 }
 
 function renderQuestion(box, card) {
+  if (!ev.firstCard && !app.study && !app.titleOn) {
+    ev.firstCard = true;
+    logEvent('first_card_shown', { ms_since_open: Math.round(performance.now() - ev.openAt), taps_since_open: ev.taps });
+  }
   box.className = 'card card-question';
   box.dataset.cardId = card.id; // E2E가 정답을 데이터에서 찾을 때 쓴다(화면에는 보이지 않음).
   const shown = card.clues.slice(0, app.state.clues);
@@ -408,7 +445,11 @@ function place(k) {
   const now = new Date();
   const { state, progress, result } = placeCurrent(app.state, k, app.cardsById, app.deck.anchors, app.progress, L, now.toISOString());
   if (!result) return;
-  app.log = [...app.log, logLine({ ts: now.getTime(), participant: app.participant, result, session: app.state.session, msOnCard: Math.round(performance.now() - app.cardShownAt) })];
+  const line = logLine({ ts: now.getTime(), participant: app.participant, result, session: app.state.session, msOnCard: Math.round(performance.now() - app.cardShownAt) });
+  // m2-plan §8: 일반 모드 인출 줄에 나라·날짜·그날 세션 순번·단서를 연 시점(테스트 모드 규격은 그대로)
+  if (!app.study) Object.assign(line, { nation: app.nation, day_index: dayIndex(), day_session_n: daySessionN(), clue_open_ms: ev.clueAt });
+  app.log = [...app.log, line];
+  ev.clueAt = null;
   app.state = state;
   app.progress = progress;
   app.lastResult = { ...result, placedText: slotText(items, k), rightText: slotText(items, result.correctGaps[0]) };
@@ -427,6 +468,7 @@ function onNext() {
   app.lastResult = null;
   if (isSessionDone(app.state)) { finishSession(); render(); return; }
   app.cardShownAt = performance.now();
+  ev.clueAt = null;
   render();
   $('card').focus();
   window.scrollTo?.({ top: 0 });
@@ -438,7 +480,7 @@ function confirmEnd() {
     ? `${n}장을 풀었습니다. 남은 카드는 다음 세션에 다시 나옵니다.`
     : '아직 한 장도 풀지 않아 세션 번호는 그대로입니다.')],
   [el('button', { type: 'button', class: 'btn', id: 'end-cancel', onclick: closeModal }, '계속하기'),
-    el('button', { type: 'button', class: 'btn btn-primary', id: 'end-confirm', onclick: () => { closeModal(); finishSession(); render(); } }, '끝내기')], 'end');
+    el('button', { type: 'button', class: 'btn btn-primary', id: 'end-confirm', onclick: () => { closeModal(); finishSession('end_button'); render(); } }, '끝내기')], 'end');
 }
 
 /** 큐가 빈 상태에서 다음 세션으로(하루 경과). §5 세션 카운트의 예외(D66). */
@@ -616,9 +658,23 @@ function showRewardSummary(st) {
   const sheet = $('summary').querySelector('.sheet');
   if (sheet) sheet.scrollTop = 0;
   announce(`정답 ${s.right} / ${s.total}. ${next.node.innerText.split('\n')[0]}`);
+  ev.result = { at: Date.now(), tapped: false, expanded: false };
+  $('summary').addEventListener('click', () => { if (ev.result) ev.result.tapped = true; }, { once: true });
+  $('settle-all')?.addEventListener('click', () => { if (ev.result) ev.result.expanded = true; });
+  logEvent('result_view', { session: st.session });
+  persist();
+}
+
+/** 결과 화면을 떠날 때(m2-plan §8 result_leave). */
+function leaveResult(via) {
+  if (!ev.result) return;
+  logEvent('result_leave', { dwell_ms: Date.now() - ev.result.at, tapped_to_finish: ev.result.tapped, expanded_all: ev.result.expanded, left_via: via });
+  ev.result = null;
+  persist();
 }
 
 function nextSession() {
+  leaveResult('next');
   if (app.study && app.completed >= app.study.cap) { location.assign(app.study.menuUrl); return; }
   $('summary').hidden = true;
   startLearnSession();
@@ -642,7 +698,8 @@ function activeNations() {
 const GRADE_TEXT = ['익히는 중', '동', '은', '금'];
 const md = (iso) => { const [, m, d] = String(iso).split('-').map(Number); return `${m}월 ${d}일`; };
 
-function openDogam() {
+function openDogam(from = null) {
+  logEvent('dogam_open', { from: typeof from === 'string' ? from : (app.titleOn ? 'title' : 'session') });
   app.dogam.nation = app.nation;
   app.dogam.filter = 'all';
   $('card-detail').hidden = true;
@@ -665,6 +722,7 @@ function renderDogamProfile() {
 
 const TABS = ['cards', 'ach', 'titles', 'note'];
 function selectTab(tab) {
+  if (app.dogam.tab !== tab || tab !== 'cards') logEvent('dogam_tab', { tab: { cards: 'cards', ach: 'achievements', titles: 'titles', note: 'note' }[tab] });
   app.dogam.tab = tab;
   for (const t of TABS) {
     const on = t === tab;
@@ -715,7 +773,7 @@ function renderDogamCards() {
   const FILTERS = [['all', '전체'], ['gold', '금'], ['silver', '은'], ['bronze', '동'], ['none', '익히는 중'], ['unseen', '아직 안 만남'], ['review', '복습 필요']];
   fill($('dogam-filters'), FILTERS.map(([k, label]) => el('button', {
     type: 'button', class: 'chip filter', dataset: { filter: k }, 'aria-pressed': app.dogam.filter === k ? 'true' : 'false',
-    onclick: () => { app.dogam.filter = k; renderDogamCards(); },
+    onclick: () => { app.dogam.filter = k; logEvent('dogam_filter', { filter: k }); renderDogamCards(); },
   }, label)));
   const pass = (x) => app.dogam.filter === 'all' || (app.dogam.filter === 'review' ? x.review : x.key === app.dogam.filter);
   const t = buildTimeline(deck.anchors, []);
@@ -764,6 +822,7 @@ function renderDogamCards() {
 
 function showCardDetail(nation, c, e) {
   if (!e?.introduced) return;
+  logEvent('card_detail_open', { card_id: c.id });
   const s = sessionIndex();
   const box = $('card-detail');
   fill(box,
@@ -820,7 +879,7 @@ function renderTitles() {
   const rw = app.rewards;
   if (!rw) { fill($('title-list')); return; }
   const level = levelOf(rw.xp, R).level;
-  const pick = (name) => { app.rewards = { ...app.rewards, title_pinned: name }; saveRewards(); renderDogamProfile(); renderTitles(); };
+  const pick = (name) => { app.rewards = { ...app.rewards, title_pinned: name }; logEvent('title_equip', { title: name ?? 'auto' }); saveRewards(); persist(); renderDogamProfile(); renderTitles(); };
   fill($('title-list'),
     el('li', { class: 'title-row' }, el('span', {}, `자동(가장 높은 칭호: ${titleForLevel(level, R)})`),
       el('button', { type: 'button', class: 'btn btn-small', id: 'title-auto', 'aria-pressed': rw.title_pinned ? 'false' : 'true', onclick: () => pick(null) }, rw.title_pinned ? '선택' : '사용 중')),
@@ -848,6 +907,11 @@ function renderNote() {
 
 /** 인출 로그 내보내기: 줄마다 JSON(JSONL), m1-plan §11 규격. */
 function exportLog() {
+  if (!app.study && app.rewards) {
+    const rw = app.rewards;
+    logEvent('export', { lines_n: app.log.length + 1, rewards_snapshot: { xp: rw.xp, level: levelOf(rw.xp, R).level, streak: rw.streak, achievements: Object.keys(rw.achievements), title: currentTitle(rw, R) } });
+    persist();
+  }
   const body = app.log.map((l) => JSON.stringify(l)).join('\n') + (app.log.length ? '\n' : '');
   const blob = new Blob([body], { type: 'application/x-ndjson' });
   const url = URL.createObjectURL(blob);
@@ -969,6 +1033,7 @@ function showIntro(step = 0) {
   $('intro-next').textContent = step === INTRO.length - 1 ? '시작하기' : '다음';
   $('intro').dataset.step = String(step);
   $('intro').hidden = false;
+  logEvent('intro_view', { page: step + 1 });
   $('intro-next').focus();
 }
 
@@ -1046,6 +1111,16 @@ async function init() {
   } else app.rewards = null;
   app.participant = app.study ? app.study.participant : (params.get('participant') || saved?.participant || '-').slice(0, 20);
   const restored = restoreSession(saved?.current, app.deck.cards);
+  if (!app.study) {
+    ev.openAt = performance.now();
+    document.addEventListener('pointerdown', () => { ev.taps += 1; }, { capture: true });
+    app.firstDay = saved?.first_day ?? dayOpts().today;
+    const mm = (q) => { try { return matchMedia(q).matches; } catch { return false; } };
+    logEvent('app_open', {
+      viewport_w: innerWidth, viewport_h: innerHeight, dpr: devicePixelRatio, touch: mm('(pointer: coarse)'), reduced_motion: mm('(prefers-reduced-motion: reduce)'),
+      mode: 'general', build: app.dataId, first_run: !saved, day_index: dayIndex(),
+    });
+  }
 
   setupDrag();
   setupRefs();
@@ -1060,14 +1135,14 @@ async function init() {
   $('dogam-close').addEventListener('click', closeDogam);
   $('btn-reset').addEventListener('click', confirmReset);
   $('btn-intro').addEventListener('click', () => { $('dogam').hidden = true; showIntro(0); });
-  $('intro-skip').addEventListener('click', closeIntro);
+  $('intro-skip').addEventListener('click', () => { logEvent('intro_skip', { page: introStep + 1 }); closeIntro(); persist(); });
   $('intro-next').addEventListener('click', () => (introStep >= INTRO.length - 1 ? closeIntro() : showIntro(introStep + 1)));
   $('btn-export').addEventListener('click', exportLog);
   $('btn-note-practice').addEventListener('click', () => startPractice('note', wrongNoteIds(app.deck.cards, app.progress)));
   $('participant').addEventListener('change', (e) => { app.participant = (e.target.value.trim() || '-').slice(0, 20); persist(); });
   $('summary-next').addEventListener('click', nextSession);
-  $('summary-dogam').addEventListener('click', () => { $('summary').hidden = true; openDogam(); });
-  $('summary-home').addEventListener('click', () => { $('summary').hidden = true; showTitle(); });
+  $('summary-dogam').addEventListener('click', () => { leaveResult('dogam'); $('summary').hidden = true; openDogam('result'); });
+  $('summary-home').addEventListener('click', () => { leaveResult('title'); $('summary').hidden = true; showTitle(); });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('intro').hidden) closeIntro();
@@ -1077,6 +1152,7 @@ async function init() {
 
   // §5 세션 카운트: 도중에 닫힌 학습 세션은 인출이 1장 이상이면 끝난 것으로 처리한다. 0장이면 이어서 한다. 연습은 버린다.
   if (restored && !restored.practice && attemptsOf(restored) >= L.count_session_min_answers) {
+    logEvent('session_end', { session: restored.session, duration_ms: null, answered_n: attemptsOf(restored), ended_by: 'closed' });
     app.completed = completedAfter(app.completed, restored, L);
     sessionRewards(restored);
     app.notice = `지난 세션 ${restored.session}을(를) ${attemptsOf(restored)}장으로 마쳤습니다.`;
@@ -1174,6 +1250,7 @@ let titleWantsIntro = false;
 function setupTitle(wantIntro, params) {
   titleWantsIntro = wantIntro;
   $('title-play').addEventListener('click', () => {
+    logEvent('title_play_tap', { ms_since_open: Math.round(performance.now() - ev.openAt) });
     enterLearning();
     if (titleWantsIntro) { titleWantsIntro = false; showIntro(0); }
   });
@@ -1209,12 +1286,14 @@ function switchNation(n) {
     q.delete('data');
     location.assign(`?${q}`);
   };
+  const record = (shown, choice) => { logEvent('nation_switch', { from: app.nation, to: n.id, confirm_shown: shown, choice }); persist(); };
   if (app.state && !app.state.practice && currentId(app.state) && attemptsOf(app.state) >= 1) {
     openModal(`${n.label}로 옮길까요?`, [el('p', {}, `지금 세션을 끝내고 ${n.label}로 옮길까요? 푼 카드는 저장돼요.`)],
-      [el('button', { type: 'button', class: 'btn', id: 'switch-cancel', onclick: closeModal }, '취소'),
-        el('button', { type: 'button', class: 'btn btn-primary', id: 'switch-confirm', onclick: () => { closeModal(); go(); } }, '옮기기')], 'switch');
+      [el('button', { type: 'button', class: 'btn', id: 'switch-cancel', onclick: () => { record(true, 'cancel'); closeModal(); } }, '취소'),
+        el('button', { type: 'button', class: 'btn btn-primary', id: 'switch-confirm', onclick: () => { record(true, 'move'); closeModal(); go(); } }, '옮기기')], 'switch');
     return;
   }
+  record(false, 'move');
   go();
 }
 
@@ -1285,6 +1364,8 @@ function showTitle() {
   }[plan.mode];
   const label = { continue: `이어하기 · ${plan.left}장 남음`, review: '복습 시작', new: '새 카드 시작', done: '오늘 끝 · 미리 복습' }[plan.mode];
   renderTitleNations();
+  logEvent('title_view', { resume: plan.mode === 'continue', due_n: plan.due, new_n: plan.fresh, est_min: Math.max(1, Math.ceil((plan.left * CONFIG.secondsPerCard) / 60)), nations_active_n: Math.max(1, app.nations.filter((n) => n.files.length).length) });
+  persist();
   const extra = [];
   if (plan.guarded && plan.unintroduced) extra.push(`아직 열리지 않은 카드 ${plan.unintroduced}장 · 복습을 먼저 마치면 열려요`);
   if (app.rewards && app.rewards.day.key === dayOpts().today && app.rewards.day.sessions >= R.daily_session_soft_cap) extra.push('오늘은 충분히 했어요. 내일 이어서 해요');

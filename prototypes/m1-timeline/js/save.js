@@ -31,7 +31,7 @@ export function nationStoreAdapter(store, nation, defaultNation) {
       const n = s.nations[nation] ?? {};
       return {
         dataId: n.dataId ?? null, completed_sessions: n.completed_sessions ?? 0, cards: s.cards, current: n.current ?? null,
-        log: s.log ?? [], participant: s.participant, rewards: s.rewards ?? null,
+        log: s.log ?? [], participant: s.participant, rewards: s.rewards ?? null, first_day: s.first_day ?? null,
       };
     },
     save(data) {
@@ -43,6 +43,7 @@ export function nationStoreAdapter(store, nation, defaultNation) {
       s.log = data.log;
       s.participant = data.participant;
       if (data.rewards) s.rewards = data.rewards;
+      if (data.first_day) s.first_day = data.first_day;
       return store.save(s);
     },
     clear() { store.clear(); },

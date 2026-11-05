@@ -944,6 +944,12 @@
 - **수용 기준 10과 D94의 충돌**: 같은 날 재출제 금지 때문에 같은 날 다음 세션에는 오늘 틀린 카드가 나오지 않는다. 그래서 B는 실제 다음 세션 구성을 보이고, 빠진 카드는 "오늘 푼 카드 n장은 내일 다시 나와요"로 알린다(오답 카드가 사라진 것처럼 보이지 않게). 다음 날 세션에 오답 카드가 들어가는 것은 D106 e2e로 고정.
 - **디렉터 지적**: 위에 붙은 사료 카드 아래에서 잘리던 "세션 끝내기"를 단서 버튼 줄로 옮겼다.
 
+## 2026-11-05 D108. m2-plan §8 웹 로그: 이벤트 줄과 인출 줄 추가 필드 (웹 빌드 세션)
+- **범위**: 일반 모드만. 이벤트 줄은 인출 줄과 같은 JSONL(학습 저장의 `log`, 도감의 "기록 내보내기")에 `ts_ms, participant, event` + 필드로 붙는다. **테스트 모드(`?study=1`)의 로그 규격(m1-plan §11)은 바꾸지 않았다**(e2e-study가 필드 목록을 정확히 확인).
+- **이벤트**: `app_open`(화면 크기, dpr, 터치, 동작 줄이기, mode `general`, build = 데이터 지문, first_run = 저장이 없을 때, day_index), `title_view`, `title_play_tap`, `first_card_shown`(앱 연 뒤 ms, 탭 수), `intro_view`/`intro_skip`(page), `session_start`(세션, 나라, 장수, 도래·새 카드, 백로그 보호, 그날 몇 번째), `session_end`(시간, 푼 장수, `complete`/`end_button`/`closed`; closed는 다음 실행에서 끝난 것으로 처리될 때), `reward_settle`(얻은 XP와 항목, 누적, 레벨 전후, 목표, 연속, 보호권 사용, 새 업적 id, 상한, 바뀐/그대로 장수), `result_view`/`result_leave`(머문 시간, 탭으로 끝냄, 전체 보기, `next`/`dogam`/`title`), `dogam_open`(`title`/`result`/`session`), `dogam_tab`(`cards`/`achievements`/`titles`/`note`), `dogam_filter`, `card_detail_open`, `title_equip`(`auto` 포함), `practice_start`(`card`/`note`/`early`), `nation_switch`(전후, 확인 표시, `move`/`cancel`), `export`(줄 수, 보상 요약).
+- **인출 줄 추가 필드**(일반 모드): `nation`, `day_index`(첫 앱 열기 날짜 기준, 오전 3시 경계, 저장의 `first_day`), `day_session_n`(그날 몇 번째 세션), `clue_open_ms`(카드가 보인 뒤 처음 단서를 연 시점, 안 열면 null).
+- **보류**: 로그가 수천 줄이 될 때의 "내보낸 뒤 초기화" 안내는 아직 없다(지금은 학습 기록 초기화로 함께 지워진다).
+
 ## 남은 문제
 - 카드 44장 전부 `verified: false`. 사람의 사실 확인 전에는 출시 빌드에 넣을 카드가 없다(`validate_cards.py --release` 실패가 정상).
 - 같은 사료(삼국사기 전승)에 기댄 건국기 카드가 많다. 플레이에서 건국기 칸이 단서 3단계 의존으로 쏠리는지 볼 것.

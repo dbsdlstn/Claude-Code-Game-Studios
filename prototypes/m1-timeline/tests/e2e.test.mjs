@@ -219,15 +219,20 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       await page.click('#btn-next');
       await page.click('#btn-dogam');
       assert.match(await page.inputValue('#participant'), /^P7$/);
-      assert.match(await page.innerText('#log-count'), /1줄/);
+      assert.match(await page.innerText('#log-count'), /\d+줄/);
       const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#btn-export')]);
       assert.match(dl.suggestedFilename(), /^m1-log-P7-\d{8}-\d{4}\.jsonl$/);
       const lines = readFileSync(await dl.path(), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
-      assert.equal(lines.length, 1);
-      const l = lines[0];
-      assert.deepEqual(Object.keys(l), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'king_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
+      // 인출 줄(m1-plan §11 필드 + 일반 모드는 m2-plan §8의 nation·day_index·day_session_n·clue_open_ms), 그 밖은 이벤트 줄(D108)
+      const learn = lines.filter((x) => !x.event);
+      assert.equal(learn.length, 1);
+      const l = learn[0];
+      assert.deepEqual(Object.keys(l), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'king_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text', 'nation', 'day_index', 'day_session_n', 'clue_open_ms']);
       assert.deepEqual([l.participant, l.phase, l.arm, l.session_index, l.card_id, l.correct, l.clue_used, l.box_after, l.near_miss, l.relearn], ['P7', 'learn', 'A', 1, c0.id, false, 1, 1, true, false]);
+      assert.deepEqual([l.nation, l.day_index, l.day_session_n], ['goguryeo', 0, 1]);
+      assert.ok(Number.isInteger(l.clue_open_ms) && l.clue_open_ms >= 0);
       assert.ok(l.ms_on_card >= 0 && Number.isInteger(l.ms_on_card));
+      assert.ok(lines.filter((x) => x.event).every((x) => x.participant === 'P7' && Number.isInteger(x.ts_ms)));
       assert.ok(SAMPLE.anchors.some((a) => a.id === l.slot_chosen));
     }, { query: { participant: 'P7' } }));
 

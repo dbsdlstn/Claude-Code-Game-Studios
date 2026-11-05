@@ -498,3 +498,79 @@ test('D95 실제 덱: 세션 1 오답 카드가 다음 세션 복습으로 나�
   assert.ok(ids.includes(wrongId), `세션 2에 오답 카드 ${wrongId}가 복습으로 나와야 한다: ${ids}`);
   assert.ok(ids.length > 1, '복습 + 새 카드');
 }));
+
+// D108: m2-plan §8 이벤트 로그(일반 모드). 테스트 모드 로그 규격은 그대로(e2e-study가 필드를 정확히 확인).
+test('이벤트 로그(m2-plan §8): 앱 열기부터 내보내기까지 이벤트 줄과 필드', () => withPage(VIEWPORTS.desktop, async (page) => {
+  await openProto(page, server.base, { title: null, participant: 'Q1' });
+  await page.waitForSelector('#title:not([hidden])');
+  await page.click('#title-play');
+  // 단서 하나 열고 한 장
+  const c = await currentCard(page);
+  await page.click('#btn-clue');
+  await pressGap(page, (await gapsFor(page, c)).right, false);
+  await page.click('#btn-next');
+  await playOneSession(page);
+  await page.click('#settle-all').catch(() => {});
+  await page.click('#summary-dogam');
+  await page.click('#tab-ach');
+  await page.click('#tab-titles');
+  await page.click('#title-list [data-title="입문자"] button');
+  await page.click('#tab-cards');
+  await page.click('#dogam-filters [data-filter="none"]');
+  await page.locator('#dogam-list .dogam-row:not([data-mastery="unseen"]) .dogam-card').first().click();
+  await page.click('#detail-practice');
+  const [dl] = await Promise.all([page.waitForEvent('download'), (async () => { await page.click('#btn-dogam'); await page.click('#btn-export'); })()]);
+  const lines = readFileSync(await dl.path(), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  const evs = lines.filter((l) => l.event);
+  const names = evs.map((l) => l.event);
+  for (const n of ['app_open', 'title_view', 'title_play_tap', 'first_card_shown', 'session_start', 'session_end', 'reward_settle', 'result_view', 'result_leave', 'dogam_open', 'dogam_tab', 'dogam_filter', 'card_detail_open', 'title_equip', 'practice_start', 'export']) assert.ok(names.includes(n), n);
+  const get = (n) => evs.find((l) => l.event === n);
+  assert.deepEqual(Object.keys(get('app_open')).slice(3).sort(), ['build', 'day_index', 'dpr', 'first_run', 'mode', 'reduced_motion', 'touch', 'viewport_h', 'viewport_w']);
+  assert.equal(get('app_open').first_run, true);
+  assert.equal(get('app_open').mode, 'general');
+  assert.ok(Number.isInteger(get('first_card_shown').ms_since_open) && get('first_card_shown').taps_since_open >= 1);
+  const ss = get('session_start');
+  assert.deepEqual([ss.session, ss.nation, ss.cards_n, ss.new_n, ss.day_sessions_n, ss.intake_guard], [1, 'goguryeo', FIRST, FIRST, 1, false]);
+  assert.deepEqual([get('session_end').ended_by, get('session_end').answered_n >= FIRST], ['complete', true]);
+  const rs = get('reward_settle');
+  for (const k of ['xp_gained', 'xp_parts', 'xp_total', 'level_before', 'level_after', 'goal_met', 'streak', 'rest_pass_used', 'achievements_new', 'xp_capped', 'changed_n', 'unchanged_n']) assert.ok(k in rs, k);
+  assert.ok(rs.achievements_new.includes('first-step'));
+  assert.equal(get('result_leave').left_via, 'dogam');
+  assert.equal(get('dogam_open').from, 'result');
+  assert.deepEqual(evs.filter((l) => l.event === 'dogam_tab').map((l) => l.tab), ['achievements', 'titles', 'cards']);
+  assert.equal(get('title_equip').title, '입문자');
+  assert.equal(get('practice_start').kind, 'card');
+  assert.equal(get('export').lines_n, lines.length);
+  assert.ok(Array.isArray(get('export').rewards_snapshot.achievements));
+  // 인출 줄: 일반 모드 추가 필드
+  const learn = lines.filter((l) => !l.event && !l.practice);
+  assert.ok(learn.every((l) => l.nation === 'goguryeo' && l.day_index === 0 && l.day_session_n === 1));
+  assert.ok(Number.isInteger(learn[0].clue_open_ms), '첫 카드는 단서를 열었다');
+  assert.ok(learn.slice(1).every((l) => l.clue_open_ms === null));
+  // 사용자 입력 텍스트 없음(참가자 ID 말고는)
+  assert.ok(evs.every((l) => !('reason_text' in l)));
+}));
+
+test('이벤트 로그: 나라 전환 시도(확인 대화상자 취소·이동)와 다시 열 때 끝난 세션(closed)', { skip: !nationDeck('baekje') && '백제 없음' }, () => withPage(VIEWPORTS.desktop, async (page) => {
+  await openProto(page, server.base, { data: null, title: null });
+  await page.click('#title-play');
+  const c = await currentCard(page, FULL_BY_ID);
+  await pressGap(page, (await gapsFor(page, c)).right, false);
+  await page.click('#btn-next');
+  await page.click('#btn-home');
+  await page.click('#title-nations [data-nation="baekje"]');
+  await page.click('#switch-cancel');
+  await page.click('#title-nations [data-nation="baekje"]');
+  await page.click('#switch-confirm');
+  await page.waitForURL(/nation=baekje/);
+  await page.waitForSelector('body[data-ready="true"]');
+  const log = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:save:v2')).log.filter((l) => l.event));
+  const sw = log.filter((l) => l.event === 'nation_switch').map((l) => [l.from, l.to, l.confirm_shown, l.choice]);
+  assert.deepEqual(sw, [['goguryeo', 'baekje', true, 'cancel'], ['goguryeo', 'baekje', true, 'move']]);
+  // 고구려로 돌아가면 1장 한 세션은 'closed'로 끝난다
+  await page.click('#title-nations [data-nation="goguryeo"]');
+  await page.waitForURL(/nation=goguryeo/);
+  await page.waitForSelector('body[data-ready="true"]');
+  const log2 = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:save:v2')).log.filter((l) => l.event === 'session_end'));
+  assert.ok(log2.some((l) => l.ended_by === 'closed' && l.answered_n === 1));
+}));
