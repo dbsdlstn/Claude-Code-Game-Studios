@@ -24,8 +24,7 @@ export const M1_OVERRIDE = Object.freeze({ session_size: 6, new_min: 6 });
 export const CONFIG = Object.freeze({
   /** 앞에서부터 처음 읽히는 파일을 쓴다. `?data=경로`로 덮어쓸 수 있다. 경로는 index.html 기준. */
   dataUrls: Object.freeze([
-    '../../assets/data/cards/v2/goguryeo-m1.json',       // 스키마 v2(콘텐츠가 옮기면 여기)
-    '../../assets/data/cards/v2-draft/goguryeo-m1.json', // 임시 형식(D58). 형식 변환은 js/data.js
+    '../../assets/data/cards/v2/goguryeo-m1.json',       // 스키마 v2(콘텐츠 데이터)
     'data/sample.json',
   ]),
   leitner: Object.freeze({
@@ -40,4 +39,20 @@ export const CONFIG = Object.freeze({
   confirmPlacement: 'coarse',
   /** 저장 형식이 leitner-spec §2로 바뀌어 키를 올렸다(이전 저장은 읽지 않는다). */
   storageKey: 'hanyang-m1:save:v2',
+  /** 사람 테스트 모드(`?study=1`, m1-plan §4·§5·§11, D72). 참가자마다 저장 키가 따로다. */
+  study: Object.freeze({
+    storagePrefix: 'hanyang-m1:study:v1:',
+    /** 방식마다 학습 세션 수(m1-plan §5 "세션 3회"). 다 하면 그 단계는 끝난다. */
+    sessionsPerArm: 3,
+    /** post1은 post0 뒤 24±6시간(m1-plan §5). 벗어나면 경고만 한다. */
+    post1WindowHours: Object.freeze([18, 30]),
+    /**
+     * 두 반(S1·S2). 계획서 §3.4의 카드 번호는 v2 데이터와 달라, 연대순 이웃 둘씩 짝지어 한 장씩 나누고
+     * 주제(전쟁·제도·문화)가 고르게 되도록 고정했다(D72). 덱에 이 id가 다 없으면 splitHalves의 기본 규칙(짝마다 앞→S1)을 쓴다.
+     */
+    halves: Object.freeze({
+      S1: Object.freeze(['goguryeo-src-01', 'goguryeo-src-03', 'goguryeo-src-06', 'goguryeo-src-07', 'goguryeo-src-10', 'goguryeo-src-11']),
+      S2: Object.freeze(['goguryeo-src-02', 'goguryeo-src-04', 'goguryeo-src-05', 'goguryeo-src-08', 'goguryeo-src-09', 'goguryeo-src-12']),
+    }),
+  }),
 });

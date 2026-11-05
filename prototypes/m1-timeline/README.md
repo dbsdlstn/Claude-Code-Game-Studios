@@ -1,6 +1,6 @@
 # M1 프로토타입: 사료 카드 + 왕대 연표 + 간격 반복 (PROTOTYPE - NOT FOR PRODUCTION)
 
-**상태**: 진행 중. 규칙은 `design/leitner-spec.md`(§3~§6, §10)와 M1 설정(`production/playtest/m1-plan.md`)을 따른다(D66). 결정 기록: `docs/decision-log.md` D56, D59, D61, D64, D66.
+**상태**: 진행 중. 규칙은 `design/leitner-spec.md`(§3~§6, §10)와 M1 설정(`production/playtest/m1-plan.md`)을 따른다(D66). 결정 기록: `docs/decision-log.md` D56, D59, D61, D64, D66, D72. **사람 테스트 준비 완료**: 진행자 안내는 `STUDY.md`.
 
 ## 검증할 가설
 한능검 심화 수험생에게 "이름 없는 사료 지문을 읽고 한 나라의 왕대 연표 사이에 꽂기 + 단서 비용 + Leitner 간격 반복"이
@@ -14,8 +14,8 @@ python3 -m http.server 8000
 ```
 → http://localhost:8000/prototypes/m1-timeline/ (휴대폰 세로 화면 기준, 데스크톱도 됨)
 
-- 데이터: `js/config.js`의 `dataUrls` 순서로 찾는다. 스키마 v2 `assets/data/cards/v2/goguryeo-m1.json` → 임시 형식 초안 `assets/data/cards/v2-draft/goguryeo-m1.json`(D58) → `data/sample.json`(테스트용 8장, 왕 앵커 5개). `?data=경로`로 고정, `?seed=7`로 섞기 고정.
-- 형식 차이는 `js/data.js`(로더) 한 곳에서 흡수한다. 콘텐츠가 v2로 옮기면 임시 형식 변환을 지운다.
+- 데이터: `js/config.js`의 `dataUrls` 순서로 찾는다. 스키마 v2 `assets/data/cards/v2/goguryeo-m1.json`(앵커 10 + 사료 12) → `data/sample.json`(테스트용 8장, 왕 앵커 5개). `?data=경로`로 고정, `?seed=7`로 섞기 고정. 임시 형식(D58) 변환은 v2로 옮겨 지웠다(D72).
+- **사람 테스트 모드** `?study=1`: 진행자 메뉴(참가자 ID, P1/P2 교차 배정, 단계 pre / learn-A / learn-B / post0 / post1), 방식 B 플래시카드, 테스트 화면(칸 + 근거, 단서·정답 없음), 참가자별 저장과 JSONL 내보내기. 코드: `js/study.js`(규칙), `js/study-ui.js`(화면), 방식 A는 일반 화면을 반(6장)만 걸러 쓴다. 안내: `STUDY.md`.
 - 지금 데이터는 전부 사실 확인 전이다. 화면 아래에 "사실 확인 전 카드입니다"를 늘 표시한다.
 
 ## 조작
@@ -43,13 +43,14 @@ python3 -m http.server 8000
 ```sh
 node --test prototypes/m1-timeline/tests/rules.test.js   # 규칙 단위(판정, 단서 비용, 상자, 세션 구성, 저장, 데이터 로더)
 node --test prototypes/m1-timeline/tests/e2e.test.mjs    # Playwright: 모바일 390×844(터치), 데스크톱 1280×720
-node --test prototypes/m1-timeline/tests/e2e-dist.test.mjs  # build.py로 묶은 dist/m1만으로 실행 확인
+node --test prototypes/m1-timeline/tests/e2e-dist.test.mjs  # build.py로 묶은 dist/m1만으로 실행 확인(사람 테스트 모드 포함)
+node --test prototypes/m1-timeline/tests/e2e-study.test.mjs # 사람 테스트: 한 참가자 pre → A/B → post0 → post1, 로그 규격
 node prototypes/m1-timeline/tests/screenshots.mjs        # → production/qa/evidence/m1/
 ```
 
 ## 묶음(플레이테스트용)
 ```sh
-python3 prototypes/m1-timeline/build.py                  # → dist/m1/ (git 제외). 콘텐츠 초안을 data/로 넣고 경로를 맞춘다
+python3 prototypes/m1-timeline/build.py                  # → dist/m1/ (git 제외). 콘텐츠 데이터(v2)를 data/로 넣고 경로를 맞춘다
 python3 -m http.server 8000 --directory dist/m1          # → http://localhost:8000/
 ```
 

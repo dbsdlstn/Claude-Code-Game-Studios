@@ -277,7 +277,7 @@ describe('인출 로그(m1-plan §11 규격)', () => {
     const st = sampleSession();
     const r = placeCurrent(st, wrong(st, M1, true), BY_ID, SAMPLE.anchors, {}, M1).result;
     const line = logLine({ ts: 123, participant: 'P1', result: r, session: 1, msOnCard: 4567 });
-    assert.deepEqual(Object.keys(line), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
+    assert.deepEqual(Object.keys(line), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
     assert.deepEqual([line.phase, line.arm, line.correct, line.near_miss, line.box_before, line.box_after, line.relearn], ['learn', 'A', false, true, null, 1, false]);
     assert.ok(SAMPLE.anchors.some((a) => a.id === line.slot_chosen));
   });
@@ -319,19 +319,9 @@ describe('데이터 로더(js/data.js)', () => {
     assert.ok(SAMPLE.anchors.every((a) => a.reign && a.reign_range));
   });
 
-  test('임시 형식 초안: 변환·검증 통과, 모든 앵커에 재위 기간, 모든 카드가 timeline 칸에서 정답', { skip: !draft && '초안 없음' }, () => {
-    const n = normalizeDeck(draft);
-    assert.equal(n.format, 'v2-draft-content');
-    assert.deepEqual(n.errors, []);
-    assert.deepEqual(validateDeck(n.deck), []);
-    assert.ok(n.deck.anchors.every((a) => a.reign_range), '앵커 reign_range가 데이터에 있어야 한다(reigns.json 삭제, D66)');
-    const t = buildTimeline(n.deck.anchors);
-    for (const c of draft.cards) {
-      const k = correctGaps(t, n.deck.cards.find((x) => x.id === c.id).order);
-      assert.equal(k.length, 1, c.id);
-      assert.equal(t[k[0] - 1]?.id ?? null, c.timeline.after ?? null, `${c.id} 앞`);
-      assert.equal(t[k[0]]?.id ?? null, c.timeline.before ?? null, `${c.id} 뒤`);
-    }
+  test('임시 형식 초안(D58)은 더 읽지 않는다(v2로 옮겨 변환을 지움, D72)', { skip: !draft && '초안 없음' }, () => {
+    assert.equal(formatOf(draft), 'unknown');
+    assert.equal(normalizeDeck(draft).deck, null);
   });
 
   test('스키마 v2(명세 예시 모양): 앵커 재위, 사료 카드 앞면·단서 refs·정답 칸, disputed 제외', () => {
@@ -366,15 +356,145 @@ describe('데이터 로더(js/data.js)', () => {
     assert.match(normalizeDeck(raw).errors.join(), /이후가 아니다/);
   });
 
-  test('스키마 v2 파일이 생기면 변환·검증 통과', { skip: !existsSync(V2_PATH) && 'v2 파일 아직 없음' }, () => {
-    const n = normalizeDeck(JSON.parse(readFileSync(V2_PATH, 'utf8')));
+  test('스키마 v2 콘텐츠 파일: 변환·검증 통과, 앵커 10·사료 12, 모든 앵커에 재위 기간, 모든 카드가 answer 칸에서만 정답', () => {
+    const raw = JSON.parse(readFileSync(V2_PATH, 'utf8'));
+    const n = normalizeDeck(raw);
+    assert.equal(n.format, 'v2');
     assert.deepEqual(n.errors, []);
     assert.deepEqual(validateDeck(n.deck), []);
+    assert.equal(n.deck.anchors.length, 10);
+    assert.equal(n.deck.cards.length, 12);
+    assert.ok(n.deck.anchors.every((a) => a.reign_range), '앵커 reign_range가 데이터에 있어야 한다(reigns.json 삭제, D66)');
+    const t = buildTimeline(n.deck.anchors);
+    for (const c of raw.cards.filter((x) => x.kind === 'source' && !x.disputed)) {
+      const k = correctGaps(t, n.deck.cards.find((x) => x.id === c.id).order);
+      assert.equal(k.length, 1, c.id);
+      assert.equal(t[k[0] - 1]?.id ?? null, c.answer.after ?? null, `${c.id} 앞`);
+      assert.equal(t[k[0]]?.id ?? null, c.answer.before ?? null, `${c.id} 뒤`);
+    }
   });
 
   test('연도 표기, loadRaw', async () => {
     assert.equal(yearText(-37), '기원전 37년');
     const r = await loadRaw(['a', 'b'], async (u) => ({ ok: u === 'b', status: 404, json: async () => ({}) }));
     assert.equal(r.url, 'b');
+  });
+});
+
+/* ------------------------------------------------------------------ 사람 테스트 모드(D72) */
+import {
+  ASSIGNMENTS, splitHalves, stageOrder, armIds, newStudySave, nextStage, testOrder, post1Timing, createTestState, answerTest, testDone,
+  rateCurrent, validParticipant, armStoreAdapter,
+} from '../js/study.js';
+const STUDY_CONFIG = CONFIG;
+const REAL_V2 = existsSync(V2_PATH) ? normalizeDeck(JSON.parse(readFileSync(V2_PATH, 'utf8'))).deck : null;
+
+describe('사람 테스트 모드: 배정·반·단계', () => {
+  test('m1-plan §4 교차 배정: P1은 A=S1 먼저, P2는 B=S1 먼저', () => {
+    assert.deepEqual(stageOrder(ASSIGNMENTS.P1), ['pre', 'learn-A', 'learn-B', 'post0', 'post1']);
+    assert.deepEqual(stageOrder(ASSIGNMENTS.P2), ['pre', 'learn-B', 'learn-A', 'post0', 'post1']);
+    assert.equal(ASSIGNMENTS.P1.A, 'S1'); assert.equal(ASSIGNMENTS.P1.B, 'S2');
+    assert.equal(ASSIGNMENTS.P2.B, 'S1'); assert.equal(ASSIGNMENTS.P2.A, 'S2');
+  });
+  test('반 나누기: 고정 분할이 덱과 맞으면 그대로, 아니면 연대순 짝마다 앞→S1', () => {
+    const deck = (ids, orders) => ids.map((id, i) => ({ id, order: orders[i] }));
+    const preset = { S1: ['a', 'c'], S2: ['b', 'd'] };
+    assert.equal(splitHalves(deck(['a', 'b', 'c', 'd'], [1, 2, 3, 4]), preset).rule, 'preset');
+    const fb = splitHalves(deck(['w', 'x', 'y', 'z'], [40, 10, 30, 20]), preset);
+    assert.deepEqual(fb, { S1: ['x', 'y'], S2: ['z', 'w'], rule: 'pairs' });
+  });
+  test('실제 v2 데이터: 고정 분할 6+6, 겹치지 않고 반마다 연대가 고르게(이웃 짝마다 한 장)', { skip: !REAL_V2 && 'v2 없음' }, () => {
+    const h = splitHalves(REAL_V2.cards, STUDY_CONFIG.study.halves);
+    assert.equal(h.rule, 'preset');
+    assert.equal(h.S1.length, 6); assert.equal(h.S2.length, 6);
+    assert.equal(new Set([...h.S1, ...h.S2]).size, 12);
+    const sorted = [...REAL_V2.cards].sort((a, b) => a.order - b.order).map((c) => c.id);
+    for (let i = 0; i < 12; i += 2) assert.notEqual(h.S1.includes(sorted[i]), h.S1.includes(sorted[i + 1]), `짝 ${i / 2 + 1}`);
+    assert.deepEqual(armIds(h, ASSIGNMENTS.P1, 'A'), h.S1);
+  });
+  test('다음 단계는 끝나지 않은 첫 단계, 모두 끝나면 null', () => {
+    const s = newStudySave('P2', ASSIGNMENTS.P2, 'x');
+    assert.equal(nextStage(s), 'pre');
+    s.stages.pre = { done_at: '2026-11-05T00:00:00Z' };
+    assert.equal(nextStage(s), 'learn-B');
+    for (const k of ['learn-A', 'learn-B', 'post0', 'post1']) s.stages[k] = { done_at: '2026-11-05T00:00:00Z' };
+    assert.equal(nextStage(s), null);
+  });
+  test('post1 권장 시간 18~30시간', () => {
+    const s = newStudySave('P1', ASSIGNMENTS.P1, 'x');
+    assert.equal(post1Timing(s, 0, [18, 30]), null);
+    s.stages.post0 = { done_at: '2026-11-05T00:00:00Z' };
+    const t0 = Date.parse('2026-11-05T00:00:00Z');
+    assert.equal(post1Timing(s, t0 + 17 * 3600e3, [18, 30]).ok, false);
+    assert.equal(post1Timing(s, t0 + 24 * 3600e3, [18, 30]).ok, true);
+    assert.equal(post1Timing(s, t0 + 31 * 3600e3, [18, 30]).ok, false);
+  });
+  test('참가자 ID는 영문·숫자·-·_ 1~20자', () => {
+    assert.ok(validParticipant('P1')); assert.ok(validParticipant('pilot_2'));
+    assert.ok(!validParticipant('')); assert.ok(!validParticipant('홍길동')); assert.ok(!validParticipant('a'.repeat(21)));
+  });
+});
+
+describe('사람 테스트 모드: 테스트 화면 규칙', () => {
+  const anchors = SAMPLE.anchors;
+  const card = SAMPLE.cards[0];
+  const items = buildTimeline(anchors, []);
+  const right = correctGaps(items, card.order)[0];
+  test('테스트 순서는 참가자·단계마다 고정이고 덱 전체', () => {
+    const a = testOrder(SAMPLE.cards, 'P1', 'pre');
+    assert.deepEqual(a, testOrder(SAMPLE.cards, 'P1', 'pre'));
+    assert.deepEqual([...a].sort(), SAMPLE.cards.map((c) => c.id).sort());
+    assert.notDeepEqual(a, testOrder(SAMPLE.cards, 'P1', 'post0'));
+  });
+  test('답 기록: 규격 필드, 단서 0, 상자 없음, 근거 저장. "모르겠다"는 slot null·오답', () => {
+    const st = createTestState([card.id, SAMPLE.cards[1].id]);
+    const r = answerTest(st, { k: right, reason: '  광개토왕 비문  ', card, anchors, participant: 'P1', phase: 'pre', ts: 5, msOnCard: 900 });
+    assert.deepEqual(Object.keys(r.line), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
+    assert.equal(r.line.correct, true); assert.equal(r.line.arm, '-'); assert.equal(r.line.clue_used, 0);
+    assert.equal(r.line.box_before, null); assert.equal(r.line.reason_text, '광개토왕 비문');
+    assert.equal(r.line.slot_chosen, slotAnchorId(items, right));
+    const u = answerTest(r.state, { k: null, reason: '', card: SAMPLE.cards[1], anchors, participant: 'P1', phase: 'post1', ts: 6, msOnCard: 1 });
+    assert.equal(u.line.slot_chosen, null); assert.equal(u.line.correct, false); assert.equal(u.line.near_miss, false);
+    assert.ok(testDone(u.state));
+  });
+  test('한 칸 차이 오답은 near_miss', () => {
+    const near = selectableGaps(items, CONFIG.leitner).find((k) => Math.abs(k - right) === 1);
+    const r = answerTest(createTestState([card.id]), { k: near, reason: '', card, anchors, participant: 'P1', phase: 'post0', ts: 1, msOnCard: 1 });
+    assert.equal(r.line.correct, false); assert.equal(r.line.near_miss, true);
+  });
+});
+
+describe('사람 테스트 모드: 방식 B(플래시카드)', () => {
+  const cfg = CONFIG.leitner;
+  const ids = SAMPLE.cards.slice(0, 3).map((c) => c.id);
+  test('"알았다" = 깨끗한 정답(+1), "몰랐다" = 오답(상자 1, 끝에 한 번 더). 재도전은 상자를 바꾸지 않는다', () => {
+    let st = createSessionState(1, ids);
+    let pr = Object.freeze({});
+    let r = rateCurrent(st, true, pr, cfg);
+    assert.equal(r.result.selfRating, 'knew'); assert.equal(r.result.boxTo, nextBox(1, true, 0, cfg));
+    r = rateCurrent(r.state, false, r.progress, cfg);
+    assert.equal(r.result.selfRating, 'didnt_know'); assert.equal(r.result.boxTo, cfg.wrong_box);
+    r = rateCurrent(r.state, true, r.progress, cfg);
+    assert.equal(r.state.queue.length, 4);
+    const before = r.progress[ids[1]];
+    r = rateCurrent(r.state, true, r.progress, cfg);
+    assert.equal(r.result.retry, true);
+    assert.equal(r.progress[ids[1]], before);
+    assert.ok(isSessionDone(r.state));
+    const sum = sessionSummary(r.state);
+    assert.equal(sum.total, 3); assert.equal(sum.right, 2); assert.equal(sum.retried, 1);
+    const line = logLine({ ts: 1, participant: 'P1', result: r.result, session: 1, msOnCard: 2, phase: 'learn', arm: 'B' });
+    assert.equal(line.arm, 'B'); assert.equal(line.slot_chosen, null); assert.equal(line.self_rating, 'knew'); assert.equal(line.relearn, true);
+  });
+  test('방식 A 저장 어댑터: 참가자 저장의 arms.A에 넣고, 세션 3회면 단계 끝', () => {
+    let saved = newStudySave('P1', ASSIGNMENTS.P1, 'd');
+    const store = { load: () => (saved ? JSON.parse(JSON.stringify(saved)) : null), save: (s) => { saved = s; return true; } };
+    const ad = armStoreAdapter(store, 'A', 3);
+    assert.equal(ad.load().completed_sessions, 0);
+    ad.save({ completed_sessions: 2, cards: { x: 1 }, current: null, log: [{ a: 1 }] });
+    assert.equal(saved.arms.A.completed_sessions, 2); assert.equal(saved.log.length, 1); assert.equal(saved.stages['learn-A'], undefined);
+    ad.save({ completed_sessions: 3, cards: {}, current: null, log: [] });
+    assert.ok(saved.stages['learn-A'].done_at);
+    assert.equal(saved.arms.B, null);
   });
 });

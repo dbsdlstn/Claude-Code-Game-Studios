@@ -2,6 +2,7 @@
 // 스크린샷: node prototypes/m1-timeline/tests/screenshots.mjs → production/qa/evidence/m1/
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
+import { runParticipant } from './study-driver.mjs';
 import { chromium, startServer, openProto, currentCard as cc, gapsFor, pressGap, VIEWPORTS, REPO_ROOT, REAL, REAL_BY_ID, BY_ID } from './helpers.mjs';
 
 // 실제 콘텐츠 초안이 있으면 그것으로, 없으면 샘플로 찍는다.
@@ -60,6 +61,24 @@ try {
     await page.click('#summary-dogam');
     await shot('06-dogam');
     await ctx.close();
+
+    // 사람 테스트 모드(D72): 한 참가자 전체 진행 중 화면마다 한 장.
+    if (REAL) {
+      const MAP = { 'menu-new': '07-study-create', menu: '08-study-menu', test: '09-study-test', 'learn-a': '10-study-learn-a', 'flash-front': '11-study-flash-front', 'flash-back': '12-study-flash-back', 'b-summary': '13-study-b-summary', 'menu-post1': '14-study-menu-post1', 'menu-done': '15-study-done' };
+      const sctx = await browser.newContext({ ...opts, deviceScaleFactor: 2 });
+      const sp = await sctx.newPage();
+      const taken = new Set();
+      const sshot = async (key) => {
+        const file = MAP[key];
+        if (!file || taken.has(key)) return;
+        taken.add(key);
+        await sp.waitForTimeout(300);
+        await sp.screenshot({ path: path.join(OUT, `${name}-${file}.png`) });
+        console.log('saved', `production/qa/evidence/m1/${name}-${file}.png`);
+      };
+      await runParticipant(sp, server.base, { participant: mobile ? 'P1' : 'P2', preset: mobile ? 'P1' : 'P2', byId: REAL_BY_ID, mobile, shot: sshot });
+      await sctx.close();
+    }
   }
 } finally {
   await browser.close();
