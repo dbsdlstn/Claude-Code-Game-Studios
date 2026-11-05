@@ -20,7 +20,9 @@
     {
       "id": "silla",
       "label": "신라",
-      "files": []
+      "files": [
+        "silla-m2-b1.json"
+      ]
     },
     {
       "id": "gaya",
