@@ -444,3 +444,12 @@ export function offListKing(card, anchors) {
   const same = (t) => t && (t === name || name.endsWith(` ${t}`) || t.endsWith(` ${name}`));
   return anchors.some((a) => same(a.title) || same(a.reign)) ? null : name;
 }
+
+/**
+ * D193: 자동 "실제로는 ○○ 때" 줄을 띄울 왕 이름. 해설에 이미 "실제로는 … 때"가 있으면(콘텐츠 D217이 정본) null.
+ * 다른 뜻의 "실제로는"(예: "실제로는 처음부터 강 남쪽에 도읍했다는 견해")은 막지 않는다.
+ */
+export function offListLine(card, anchors) {
+  if (/실제로는 [^.。]*?때/.test(String(card?.explanation ?? ''))) return null;
+  return offListKing(card, anchors);
+}

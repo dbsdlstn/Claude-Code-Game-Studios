@@ -11,7 +11,7 @@ import {
   validateDeck, buildTimeline, isCorrectGap, correctGaps, selectableGaps, slotAnchorId, isNearMiss,
   nextBox, schedule, gradeOf, isDue, newEntry, buildSession, createRng, earlyReviewIds, wrongNoteIds, sessionSeed,
   createSessionState, currentId, revealClue, placeCurrent, sessionTimeline, isSessionDone, isRetry, attemptsOf,
-  completedAfter, sessionSummary, gradeCounts, logLine, restoreProgress, restoreSession, dataFingerprint, previewBox, offListKing,
+  completedAfter, sessionSummary, gradeCounts, logLine, restoreProgress, restoreSession, dataFingerprint, previewBox, offListKing, offListLine,
 } from '../js/rules.js';
 import { normalizeDeck, formatOf, loadRaw, yearText } from '../js/data.js';
 
@@ -642,5 +642,16 @@ describe('offListKing', () => {
     assert.equal(offListKing({ reign: '인종 즉위년' }, anchors), null);
     assert.equal(offListKing({ reign: null }, anchors), null);
     assert.equal(offListKing({ reign: '원 간섭기' }, anchors), null);
+  });
+});
+
+describe('offListLine(D193)', () => {
+  const anchors = [{ title: '인종', reign: '인종' }];
+  test('해설에 "실제로는 … 때"가 있으면 자동 줄 없음', () => {
+    assert.equal(offListLine({ reign: '의종 24년', explanation: '의종 24년(1170년)의 일. 실제로는 의종 때의 일이다(연표에서는 [인종] 칸에 놓인다).' }, anchors), null);
+  });
+  test('다른 뜻의 "실제로는"은 막지 않는다', () => {
+    assert.equal(offListLine({ reign: '의종 24년', explanation: '실제로는 처음부터 강 남쪽에 도읍했다는 견해도 있다.' }, anchors), '의종');
+    assert.equal(offListLine({ reign: '의종 24년', explanation: '' }, anchors), '의종');
   });
 });
