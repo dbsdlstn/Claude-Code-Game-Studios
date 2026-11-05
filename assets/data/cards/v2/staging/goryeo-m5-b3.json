@@ -1,0 +1,514 @@
+{
+  "schema": 2,
+  "cards": [
+    {
+      "id": "goryeo-src-21",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "거란의 2차 침입",
+      "year": 1010,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "현종 원년",
+      "source_text": "북쪽 나라 임금이 신하가 왕을 바꾼 일을 문제 삼아 대군을 이끌고 쳐들어오자, 왕은 남쪽 멀리까지 피란하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-gwangjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-munjong"
+            }
+          ],
+          "text": "[광종]이 즉위한 뒤, [문종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "현종 원년(1010년). 거란 2차 침입, 강조의 정변, 나주 피란, 양규."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-hyeonjong",
+        "before": "goryeo-reign-munjong"
+      },
+      "explanation": "현종 원년(1010년)의 일. 강조의 정변(1009)을 구실로 거란 성종이 직접 침입한 일. 강조는 통주에서 패해 죽고 현종은 나주까지 피란했다. 흥화진의 양규가 끝까지 싸웠고, 거란은 현종의 친조 약속을 받고 물러났다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "현종 원년 11월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1010 2차 침입, 강조의 정변 명분, 통주 패전, 나주 피란, 양규(1010년 11월~1011년 1월 기록), 친조 약속은 itwiki 고려 거란 전쟁·경향 기사 요약으로 확인(D209). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D216)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1010-khitan-second-invasion",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    },
+    {
+      "id": "goryeo-src-22",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "동북 9성 축조",
+      "year": 1107,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "예종 2년",
+      "source_text": "장수가 새로 만든 군대를 이끌고 동북쪽의 여진을 쳐서 몰아내고, 그 땅에 아홉 개의 성을 쌓았다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-sukjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-myeongjong"
+            }
+          ],
+          "text": "[숙종]이 즉위한 뒤, [명종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "예종 2년(1107년). 윤관, 별무반, 동북 9성."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-sukjong",
+        "before": "goryeo-reign-injong"
+      },
+      "explanation": "예종 2년(1107년)의 일. 윤관이 별무반을 이끌고 여진을 정벌해 동북 9성을 쌓은 일. 여진의 요구와 유지 비용 때문에 1109년 9성을 돌려주었다. 9성의 위치는 함흥평야설과 두만강 너머설이 맞선다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "열전",
+        "volume": null,
+        "entry": "윤관전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1107 정벌·축성, 원수 윤관·부원수 오연총, 1109 반환, 위치 논쟁은 위키문헌 글로벌 세계 대백과·itwiki 윤관 요약으로 확인. 예종은 앵커가 아니라 숙종 칸에 놓인다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D216)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1107-dongbuk-nine-fortresses",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    },
+    {
+      "id": "goryeo-src-23",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "최충헌의 집권",
+      "year": 1196,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "명종 26년",
+      "source_text": "무신 형제가 권력을 쥐고 있던 무신을 죽이고 정권을 잡은 뒤, 왕에게 나라를 바로잡을 열 가지 방안을 올렸다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-myeongjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-gongmin"
+            }
+          ],
+          "text": "[명종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "명종 26년(1196년). 최충헌, 이의민, 봉사 10조."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-myeongjong",
+        "before": "goryeo-reign-gojong"
+      },
+      "explanation": "명종 26년(1196년)의 일. 최충헌이 동생 최충수와 함께 이의민을 죽이고 정권을 잡은 뒤 명종에게 봉사 10조를 올린 일. 토지 겸병 시정, 조세의 공평 등을 담았으나 실제로는 집권의 명분이었다. 이후 최씨 정권이 60여 년 이어졌다.",
+      "exam_tags": [
+        "person",
+        "institution"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "열전(반역)",
+        "volume": null,
+        "entry": "최충헌전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1196년 4월 이의민 제거(미타산 별장), 동생 최충수·생질 박진재, 봉사 10조 내용은 itwiki 최충헌 요약으로 확인. '최씨 정권 60여 년'은 통설(원문 확인 필요). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D216)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1196-choe-chungheon",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    },
+    {
+      "id": "goryeo-src-24",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "만적의 난",
+      "year": 1198,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "신종 원년",
+      "source_text": "한 권세가의 종이 산에서 나무하던 노비들을 모아 들고일어나기로 꾀하였으나, 일이 새어 나가 백여 명이 붙잡혀 강물에 던져졌다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-myeongjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-wonjong"
+            }
+          ],
+          "text": "[명종]이 즉위한 뒤, [원종]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "신종 원년(1198년). 만적, 개경 북산, 노비 봉기 모의."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-myeongjong",
+        "before": "goryeo-reign-gojong"
+      },
+      "explanation": "신종 원년(1198년)의 일. 최충헌의 사노비 만적이 개경 북산에서 노비들을 모아 봉기를 꾀한 일. 발각되어 실패했다. 무신 집권기 신분 질서의 동요를 보여 준다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "신종 원년 5월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1198 만적 등 6명의 북산 모의, 발각, 100여 명 투강은 itwiki 만적의 난·데일리안 요약으로 확인. 만적이 최충헌의 사노비였다는 해설 서술은 통설(원문 확인 필요). 신종은 앵커가 아니라 명종 칸. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D216)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1198-manjeok-plot",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    },
+    {
+      "id": "goryeo-src-25",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "처인성 전투",
+      "year": 1232,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "고종 19년",
+      "source_text": "다시 쳐들어온 북쪽 대군의 장수를, 한 승려가 이끄는 백성들이 작은 성에서 활로 쏘아 죽이니 적군이 물러갔다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-gojong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-gongmin"
+            }
+          ],
+          "text": "[고종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "고종 19년(1232년). 김윤후, 처인성, 살리타."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-gojong",
+        "before": "goryeo-reign-wonjong"
+      },
+      "explanation": "고종 19년(1232년)의 일. 몽골 2차 침입 때 승려 김윤후가 이끈 군민이 용인 처인성에서 적장 살리타를 쏘아 죽여 몽골군을 물러가게 한 일. 같은 해 고려는 강화도로 도읍을 옮겼다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "고종 19년 12월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1232 몽골 2차 침입, 처인성, 김윤후, 살리타 사살·퇴각은 itwiki 고려 몽골 전쟁 요약으로 확인. 월(12월)은 원문 확인 필요. 강화 천도(goryeo-src-11)와 같은 해 다른 사건. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D216)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1232-cheoinseong-battle",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    },
+    {
+      "id": "goryeo-src-26",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "팔만대장경 완성",
+      "year": 1251,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "고종 38년",
+      "source_text": "도읍을 옮긴 섬에서 임시 관청을 두고 여러 해에 걸쳐 새긴 불경 목판이 완성되었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-gojong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-gongmin"
+            }
+          ],
+          "text": "[고종]이 즉위한 뒤, [공민왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "고종 38년(1251년). 팔만대장경, 대장도감."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-gojong",
+        "before": "goryeo-reign-wonjong"
+      },
+      "explanation": "고종 38년(1251년)의 일. 몽골 침입으로 초조대장경이 불타자 강화도에서 대장도감을 두고 1236년부터 새긴 대장경이 완성된 일. 1398년 합천 해인사로 옮겨졌다.",
+      "exam_tags": [
+        "culture"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "고종 38년 9월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1232 초조대장경 소실(부인사), 대장도감, 1236~1251 판각, 1398 해인사 이전은 itwiki 팔만대장경 요약으로 확인. 월은 원문 확인 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D216)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1251-tripitaka-koreana",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    },
+    {
+      "id": "goryeo-src-27",
+      "kind": "source",
+      "nation": "goryeo",
+      "title": "전민변정도감",
+      "year": 1366,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "공민왕 15년",
+      "source_text": "왕의 신임을 받은 승려가 새 관청의 우두머리가 되어, 권세가가 빼앗은 땅을 주인에게 돌려주고 억울하게 노비가 된 사람을 풀어 주었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "goryeo-reign-wonjong"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-u"
+            }
+          ],
+          "text": "[원종]이 즉위한 뒤, [우왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "공민왕 15년(1366년). 신돈, 전민변정도감."
+        }
+      ],
+      "answer": {
+        "after": "goryeo-reign-gongmin",
+        "before": "goryeo-reign-u"
+      },
+      "explanation": "공민왕 15년(1366년)의 일. 공민왕이 신돈을 기용해 전민변정도감을 두고 권문세족이 빼앗은 토지와 노비를 바로잡은 일. 권문세족의 반발로 1371년 신돈이 처형되며 개혁이 멈추었다.",
+      "exam_tags": [
+        "institution",
+        "person"
+      ],
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "공민왕 15년 5월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "1366년 5월 개편(백과는 전민추정도감, 고려사는 전민변정도감), 1269 이후 다섯 번째 설치, 신돈 판사, 1371 처형은 encykorea·itwiki 요약으로 확인(D209). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D216)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "1366-jeonmin-byeonjeong",
+      "tags": [
+        "고려",
+        "G-B3"
+      ]
+    }
+  ]
+}
