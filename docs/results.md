@@ -1,7 +1,7 @@
 # 한양 도감: 결과 요약
 
 > 메인 디렉터(총괄 세션)가 갱신한다. 자세한 기록은 `docs/decision-log.md`, `docs/orchestration-log.md`.
-> 마지막 갱신: 2026-11-05 21:25 UTC
+> 마지막 갱신: 2026-11-05 21:30 UTC
 
 ## ✅ M1 사람 테스트 준비 완료
 고구려 사료 카드 12장으로 "이 게임이 단순 플래시카드보다 한능검 공부에 나은가"를 확인하는 테스트를 할 수 있다. 차단 항목은 모두 해소됐고(평가 세션 재확인), 남은 준비는 아래 "사용자가 할 일"의 사람만 가능한 두 가지다.
@@ -47,6 +47,7 @@ git checkout claude/integration
 py -m http.server 8000      # Mac/Linux는 python3 -m http.server 8000
 ```
 - 최신 M2(5개 나라 151장): http://localhost:8000/prototypes/m1-timeline/
+- **사람 테스트용(고구려·고려만, D194)**: http://localhost:8000/prototypes/m1-timeline/?manifest=../../assets/data/cards/v2/manifest-m2test.json
 - 자주 막히는 것(404, py 없음, 포트, 휴대폰 접속 등): `prototypes/m1-timeline/README.md`
 - 화면 미리보기: `production/qa/evidence/m2/`
 
