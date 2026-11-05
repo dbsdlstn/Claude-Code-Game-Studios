@@ -478,7 +478,7 @@ export async function start(params) {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('modal').hidden) closeModal(); });
   let loaded;
   try {
-    const { url, raw } = await loadRaw(params.get('data') ? [params.get('data')] : CONFIG.dataUrls);
+    const { url, raw } = await loadRaw(params.get('data') ? [params.get('data')] : CONFIG.study.dataUrls);
     const norm = normalizeDeck(raw);
     const errs = [...norm.errors, ...(norm.deck ? validateDeck(norm.deck) : [])];
     if (errs.length) throw new Error(`데이터 오류 ${errs.length}건: ${errs.slice(0, 3).join(' / ')}`);

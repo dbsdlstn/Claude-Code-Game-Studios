@@ -161,7 +161,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
 
     test('빈 세션: 도래·새 카드가 없으면 0장, 미리 복습은 연습, "다음 세션으로"는 세션 +1', () => withPage(async (page) => {
       await editSave(page, (s) => {
-        s.current = null;
+        for (const n of Object.values(s.nations)) n.current = null; // M2 저장: 나라별 current
         s.cards = {};
         for (const id of ['gg-c-gungnae', 'gg-c-jindae', 'gg-c-nangnang', 'gg-c-taehak', 'gg-c-pyeongyang', 'gg-c-hanseong', 'gg-c-salsu', 'gg-c-ansi']) {
           s.cards[id] = { box: 3, introduced: true, due_session: 9, last_session: 0, clean_streak: 1, lapses: 0, best_grade: 1, last_played_at: null };

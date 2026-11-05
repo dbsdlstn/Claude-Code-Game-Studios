@@ -140,7 +140,7 @@ test('참가자별 저장이 섞이지 않고 일반 학습 모드와도 따로�
     assert.equal(await page.evaluate(() => localStorage.getItem('hanyang-m1:save:v2')), null);
 
     // 일반 모드는 그대로(진행자 화면 없음, 도감 있음)
-    await page.goto(`${server.base}/prototypes/m1-timeline/index.html?seed=7&intro=0`);
+    await page.goto(`${server.base}/prototypes/m1-timeline/index.html?seed=7&intro=0&title=0`);
     await page.waitForSelector('body[data-ready="true"]');
     assert.equal(await page.locator('#study').count(), 0);
     assert.equal(await page.locator('#btn-dogam').count(), 1);
