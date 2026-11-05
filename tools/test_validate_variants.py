@@ -142,6 +142,24 @@ class ContentBoundary(unittest.TestCase):
         self.assertTrue(any(o.startswith("[V24]") and "goguryeo-src-25" in o for o in obs))
 
 
+class YearAltGap(unittest.TestCase):
+    """V6a (D185): year_alt must stay in the answer gap."""
+
+    def check(self, cid, alt):
+        cards = copy.deepcopy(BASE)
+        next(c for c in cards if c["id"] == cid)["year_alt"] = [{"year": alt, "note": "test"}]
+        return codes(v.validate(cards)[0])
+
+    def test_current_data_has_no_v6a(self):
+        self.assertNotIn("V6a", codes(v.validate(copy.deepcopy(BASE))[0]))
+
+    def test_alt_in_another_gap_is_error(self):
+        self.assertIn("V6a", self.check("baekje-src-18", 455))
+
+    def test_alt_in_same_gap_passes(self):
+        self.assertNotIn("V6a", self.check("silla-src-06", 527))
+
+
 class VolumeRange(unittest.TestCase):
     """V13a (D154): 삼국사기 권 number must fit the section."""
 
