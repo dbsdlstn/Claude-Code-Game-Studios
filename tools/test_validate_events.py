@@ -97,5 +97,32 @@ class EventRules(unittest.TestCase):
         self.assertFalse(any("may be the same event" in o for o in obs))
 
 
+class ManifestListing(unittest.TestCase):
+    """M1: alternative manifest-*.json lists are not card files; real card files must be listed."""
+
+    def run_in(self, extra):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            (d / "a.json").write_text(json.dumps({"schema": 2, "cards": []}), encoding="utf-8")
+            (d / "manifest.json").write_text(json.dumps(
+                {"nations": [{"id": "goguryeo", "label": "고구려", "files": ["a.json"]}]}), encoding="utf-8")
+            for name in extra:
+                (d / name).write_text("{}", encoding="utf-8")
+            old = (v.V2_DIR, v.MANIFEST, v.EVENTS)
+            v.V2_DIR, v.MANIFEST, v.EVENTS = d, d / "manifest.json", d / "events.json"
+            try:
+                return v.read_manifest()[2]
+            finally:
+                v.V2_DIR, v.MANIFEST, v.EVENTS = old
+
+    def test_alternative_manifest_is_ignored(self):
+        self.assertEqual(self.run_in(["manifest-m2test.json", "events.json"]), [])
+
+    def test_unlisted_card_file_is_reported(self):
+        errs = self.run_in(["b.json"])
+        self.assertTrue(any("b.json is not listed" in e for e in errs), errs)
+
+
 if __name__ == "__main__":
     unittest.main()

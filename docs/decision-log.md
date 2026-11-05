@@ -1302,6 +1302,9 @@
 - `docs/m2b-checklist.md`·`production/playtest/m2-plan.md`: 자리표시를 `http://localhost:8000/prototypes/m1-timeline/?manifest=../../assets/data/cards/v2/manifest-m2test.json`(휴대폰은 `localhost` 대신 컴퓨터 IP)로 채움. 저장소 맨 위에서 서버, `build.py` 불필요. 리허설 기록이 참가자 기록과 섞이지 않게 하라는 줄과 "참가자마다 새 브라우저 프로필"을 추가.
 - 이전 안내(`build.py` → `dist/m1`, `index.html?manifest=`)는 폐기.
 
+## 2026-11-05 D222. manifest-*.json 무시 규칙 테스트 (콘텐츠 세션)
+- 디렉터가 integration에서 검증기 M1이 `manifest-*.json`(웹 테스트용 덱 목록, 예: manifest-m2test.json)을 카드 파일로 보지 않게 고쳤다. 병합 뒤 `tools/test_validate_events.py`에 ManifestListing 테스트 2개 추가: 임시 폴더에서 manifest-m2test.json·events.json은 무시되고, 목록에 없는 카드 파일(b.json)은 여전히 "not listed"로 잡힌다. 예외를 끈 검증기에서 첫 테스트가 실패하는 것을 확인했다.
+
 ## 남은 문제
 - 카드 44장 전부 `verified: false`. 사람의 사실 확인 전에는 출시 빌드에 넣을 카드가 없다(`validate_cards.py --release` 실패가 정상).
 - 같은 사료(삼국사기 전승)에 기댄 건국기 카드가 많다. 플레이에서 건국기 칸이 단서 3단계 의존으로 쏠리는지 볼 것.
