@@ -177,6 +177,11 @@ class ActualKingLine(unittest.TestCase):
             c["baekje-src-25"]["explanation"] = "아신왕 6년(397년)의 일. 태자 전지를 왜에 볼모로 보낸 일."
         self.assertTrue(any("baekje-src-25" in o for o in self.obs(m)))
 
+    def test_unrelated_silje_ro_neun_does_not_count(self):
+        def m(c):
+            c["baekje-src-25"]["explanation"] = "아신왕 6년(397년)의 일. 실제로는 왜와 우호를 다지려는 뜻이었다."
+        self.assertTrue(any("baekje-src-25" in o for o in self.obs(m)))
+
     def test_anchored_king_needs_no_line(self):
         def m(c):
             c["goguryeo-src-09"]["explanation"] = "장수왕 15년(427년)의 일. 평양으로 도읍을 옮긴 일."

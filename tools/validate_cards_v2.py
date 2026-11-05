@@ -83,7 +83,8 @@ VARIANTS (design/card-variants-spec.md, D121; optional `variants` list):
       same-deck card's source_text (common phrases cause false positives).
   OBS (D173) reign_label names a king other than the answer anchor (an
       un-anchored king) and the explanation's opening line (first two
-      sentences) lacks "실제로는".
+      sentences) lacks the pattern "실제로는 … 때/뒤/연대" together with
+      "[<answer anchor>] 칸" (D220: the word alone is not enough).
   V21 the card content_hash ignores variants (content_hash() never reads them).
   R4 is a runtime rule (unverified variants are skipped), not a release error.
 
@@ -737,9 +738,11 @@ def actual_king_obs(sources, anchors):
         if a is None or king_core(c.get("reign_label")) == king_core(a.get("title")):
             continue
         head = ". ".join((c.get("explanation") or "").split(". ")[:2])  # the opening line
-        if "실제로는" not in head:
+        # the pattern, not just the word: "실제로는 … 때/뒤/연대 …" and "[앵커] 칸" (D220)
+        if not (re.search(r"실제로는 [^.]*(때|뒤|연대)", head) and f"[{a.get('title')}] 칸" in head):
             lines.append(f"[D173] {c.get('id')}: reign_label '{c.get('reign_label')}' is not the answer anchor "
-                         f"'{a.get('title')}', and the explanation's opening line lacks '실제로는'")
+                         f"'{a.get('title')}', and the explanation's opening line lacks "
+                         f"'실제로는 … 때' with '[{a.get('title')}] 칸'")
     return lines
 
 
