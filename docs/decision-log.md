@@ -1100,21 +1100,11 @@
 - **D167**: 새 필드 불필요 확인. 일반 모드 인출 줄에 `card_id`·`correct`·`clue_used`·`box_before`·`ts_ms`·`practice`·`relearn`(같은 세션 다시 풀기 표시)·`day_index`·`clue_open_ms`가 있어 m2-plan 7b의 첫 만남 결과별 다음 정답률과 단서 연 시점 분포를 계산할 수 있다. 7b의 "같은 세션 두 번째 줄 제외"는 `relearn: true`로 바로 거를 수 있다.
 - 단위 90, e2e 63 통과. 결과 화면 스크린샷(`*-05-summary`, `*-05b-summary-bottom`) 재촬영.
 
-
-## 2026-11-05 D110. 통일신라(usilla) 지원, 휴식권 용어(D186), 손상 저장 백업 내보내기, 접근성 점검표, 증거 재촬영 (웹 빌드 세션)
-- **통일신라**: `NATION_LABEL`에 usilla '통일신라'·balhae '발해'(gaya 이름 삭제, 인장 정의는 남김). 나라 인장 `CONFIG.nationSeals`(art-bible §4.2, D135: 고 #A23B2A·백 #2F5D7C·신 #C79A2E·통 #5C3399·발 #5B5B5B, 글자 흰색/신라만 #2B2118)를 타이틀 나라 목록·도감 칩·연표 제목에 표시(`aria-hidden`, 이름이 옆에 있음, 사람 테스트 모드 제외). `staging/usilla-m3-b1·b2.json`을 픽스처 매니페스트로 읽으면 기준 12장·카드 22장으로 정상화되는 것을 e2e로 확인. 콘텐츠 세션이 `promote_staging`으로 매니페스트에 올리면 코드 변경 없이 목록에 나온다.
-- **D186 용어**: 화면 문구 "보호권" → "휴식권"(타이틀, 결과 블록). 상한 안내 문구는 D109의 "오늘 경험치는 다 모았어요 (하루 24장까지)"로 대조표 차이 항목을 채운다. 지문 변형 런타임은 구현하지 않았다(M2-A 밖).
-- **저장 손상(F11 보강)**: 손상 감지 시 타이틀에 [이전 기록 내보내기] 버튼, `:broken` 원문을 JSON 파일로 내려받는다(e2e).
-- **접근성(F9)**: `production/qa/a11y-m2.md` 점검표. e2e "접근성" 테스트(`tests/a11y.mjs`)가 타이틀·질문·오답 공개·결과·도감 4탭의 WCAG AA 대비 위반 0, 나라 목록 radiogroup 방향키(로빙 tabindex), 결과 dialog 포커스·progressbar·낭독 영역을 매번 확인. 실제 스크린리더·실기기는 M2-B 몫으로 미확인 표기.
-- **증거**: `production/qa/evidence/m2/` 390·1280 전 화면 61장 재촬영. 단위 90, e2e 61 통과.
-
 ## 2026-11-05 D210. 통일신라 덱 manifest 등록 (콘텐츠 세션)
 - 웹 usilla 지원(53bce91) 뒤 `python3 tools/promote_staging.py usilla 통일신라 usilla-m3-b1.json usilla-m3-b2.json --apply`로 등록: staging 두 파일을 `assets/data/cards/v2/`로 옮기고 manifest에 usilla(통일신라) 추가, 사건 목록 planned 22건 → owned.
 - 검증: 기본 실행 PASS(파일 12, 앵커 47, 원문 120, 0/0). E·V 변형 테스트, mark_verified 테스트, validator parity 39/39, 웹 rules(59)·m2(11)·e2e-m2(25) 통과.
 - **웹 테스트 고정 목록 경로 수정**: `prototypes/m1-timeline/tests/fixtures/manifest-usilla.json`이 staging 경로를 가리켜 e2e-m2 1건이 실패했다(파일을 옮긴 결과). 경로만 `v2/`로 고쳐 통과시켰다(웹 소관 파일, 내용·단언 변경 없음).
 - 확인 안내서 재생성(191항목·17묶음), 덱 이름 표기를 "통일신라"로.
-
-
 
 ## 2026-11-05 D112. 통일신라 등록(D210) 뒤 실제 4개 나라로 e2e·스크린샷 갱신 (웹 빌드 세션)
 - integration 병합(콘텐츠 D210: usilla 매니페스트 등록, staging 파일 이동). 통일신라 e2e와 "나라 4개" e2e를 실제 매니페스트로 돌리고 임시 픽스처 `manifest-usilla.json`은 지웠다.
@@ -1131,11 +1121,6 @@
 - **근거**: 실제 4개 나라(고구려 36·백제 29·신라 33·통일신라 22, 원문 120·앵커 47) 데이터로 단위 91·e2e 63 전부 통과(디렉터 직접 실행, build.py 후 e2e-dist 포함), GitHub CI 성공, 검증기 PASS(0/0), 390·1280 화면 증거 80장 이상, 접근성 점검표(대비 AA 위반 0, 키보드만 조작 e2e).
 - **남은 것(완료를 막지 않음)**: 저장 손상 안내 화면 스크린샷 1장(웹), 스크린리더 실기기 확인(M2-B), 지문 변형 런타임(D186 범위 밖), 발해(D183 보류).
 - **다음**: M2-B(출시 준비)는 사람 몫 — 사실 확인(최소 고구려 36장+앵커 12, 2명), 실기기 리허설, M2 사람 테스트(`production/playtest/m2-plan.md`, `docs/m2b-checklist.md`). 모델 쪽은 M5 고려 카드 착수(D188·D189), 사람 확인 결과 대기.
-
-## 2026-11-05 D112. 통일신라 등록(D210) 뒤 실제 4개 나라로 e2e·스크린샷 갱신 (웹 빌드 세션)
-- integration 병합(콘텐츠 D210: usilla 매니페스트 등록, staging 파일 이동). 통일신라 e2e와 "나라 4개" e2e를 실제 매니페스트로 돌리고 임시 픽스처 `manifest-usilla.json`은 지웠다.
-- 스크린샷 `*-25-usilla-title`, `*-26-usilla-timeline`(390·1280) 추가, 전 화면 65장 재촬영. 코드 변경 없음(D110 그대로 동작).
-- 단위 91, e2e 63 통과.
 
 ## 2026-11-05 D211. 고려 묶음 1 (콘텐츠 세션, D190 시행, staging)
 - nation enum에 `goryeo` 추가(검증기 V2, 스키마 문서).
