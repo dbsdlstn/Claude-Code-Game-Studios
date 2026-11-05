@@ -309,10 +309,10 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goryeo-reign-wonjong"
+              "ref": "goryeo-reign-gongmin"
             }
           ],
-          "text": "[원종]이 즉위한 뒤의 일이다."
+          "text": "[공민왕]이 즉위한 뒤의 일이다."
         },
         {
           "level": 2,
@@ -322,7 +322,7 @@
       ],
       "answer": {
         "after": "goryeo-reign-u",
-        "before": null
+        "before": "goryeo-reign-gongyang"
       },
       "explanation": "우왕 3년(1377년)의 일. 청주 흥덕사에서 금속 활자로 『직지심체요절』을 찍은 일. 현존하는 세계에서 가장 오래된 금속 활자본이다. 저자 경한(백운화상)이 죽은 뒤 제자들이 주도했다.",
       "exam_tags": [
@@ -377,10 +377,10 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goryeo-reign-gongmin"
+              "ref": "goryeo-reign-u"
             }
           ],
-          "text": "[공민왕]이 즉위한 뒤의 일이다."
+          "text": "[우왕]이 즉위한 뒤의 일이다."
         },
         {
           "level": 2,
@@ -390,7 +390,7 @@
       ],
       "answer": {
         "after": "goryeo-reign-u",
-        "before": null
+        "before": "goryeo-reign-gongyang"
       },
       "explanation": "우왕 6년(1380년)의 일. 이성계가 남원 황산에서 왜구를 크게 무찌른 싸움. 이성계는 이 승리로 이름을 떨쳤다.",
       "exam_tags": [
@@ -447,9 +447,13 @@
             {
               "op": "after",
               "ref": "goryeo-reign-gongmin"
+            },
+            {
+              "op": "before",
+              "ref": "goryeo-reign-gongyang"
             }
           ],
-          "text": "[공민왕]이 즉위한 뒤의 일이다."
+          "text": "[공민왕]이 즉위한 뒤, [공양왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -459,9 +463,9 @@
       ],
       "answer": {
         "after": "goryeo-reign-u",
-        "before": null
+        "before": "goryeo-reign-gongyang"
       },
-      "explanation": "우왕 14년(1388년)의 일. 요동 정벌에 나선 이성계가 위화도에서 군사를 돌려 정권을 잡은 일. 고려 멸망과 조선 건국으로 이어졌다.",
+      "explanation": "우왕 14년(1388년)의 일. 요동 정벌에 나선 이성계가 위화도에서 군사를 돌려 정권을 잡은 일. 고려 멸망과 조선 건국으로 이어졌다. 회군 뒤 즉위한 창왕(1388~1389)은 앵커가 없어 이 카드와 같은 우왕 칸에 든다.",
       "exam_tags": [
         "war",
         "person"
@@ -515,10 +519,10 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goryeo-reign-wonjong"
+              "ref": "goryeo-reign-gongmin"
             }
           ],
-          "text": "[원종]이 즉위한 뒤의 일이다."
+          "text": "[공민왕]이 즉위한 뒤의 일이다."
         },
         {
           "level": 2,
@@ -527,7 +531,7 @@
         }
       ],
       "answer": {
-        "after": "goryeo-reign-u",
+        "after": "goryeo-reign-gongyang",
         "before": null
       },
       "explanation": "공양왕 3년(1391년)의 일. 이성계·조준 세력이 과전법을 공포한 일. 현직·퇴직 관리를 18과로 나누어 경기 땅의 수조권을 주었고, 조선 토지 제도의 바탕이 되었다.",
@@ -542,7 +546,7 @@
         "url": null,
         "db_id": null,
         "exam_rounds": [],
-        "note": "1390 공사전적 소각, 1391 공포, 18과·경기 한정은 itwiki 과전법 요약으로 확인. 월 미확인. 공양왕은 앵커가 아니라 우왕 칸(마지막 칸)에 놓인다(D212). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D212)."
+        "note": "1390 공사전적 소각, 1391 공포, 18과·경기 한정은 itwiki 과전법 요약으로 확인. 월 미확인. D191에 따라 공양왕 앵커(1389)를 더해 공양왕 칸에 둔다(D213). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D180·D212)."
       },
       "disputed": false,
       "disputed_note": null,
