@@ -632,6 +632,7 @@ describe('offListKing', () => {
   const anchors = [{ title: '인종', reign: '인종' }, { title: '명종', reign: '명종' }, { title: '태종 무열왕', reign: '태종 무열왕' }];
   test('목록에 없는 왕 이름을 돌려준다', () => {
     assert.equal(offListKing({ reign: '의종 24년' }, anchors), '의종');
+    assert.equal(offListKing({ reign: '신종 원년' }, anchors), '신종');
     assert.equal(offListKing({ reign: '위덕왕 13년(창왕 13년)' }, anchors), '위덕왕');
     assert.equal(offListKing({ reign: '신라 문무왕 10년(고구려 멸망 2년 뒤)' }, anchors), '신라 문무왕');
   });

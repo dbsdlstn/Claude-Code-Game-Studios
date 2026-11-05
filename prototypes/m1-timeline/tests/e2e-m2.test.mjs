@@ -445,7 +445,8 @@ test('390px 나라 3개: 세로 목록(한 줄 행 44~56px, radiogroup, 행마�
   assert.match(await page.innerText('#title-nations [data-nation="baekje"]'), /백제\s*복습 \d+ · 새 \d+$/);
   assert.equal(await page.getAttribute('#title-nations [data-nation="goguryeo"]', 'aria-checked'), 'true');
   assert.match(await page.getAttribute('#title-nations [data-nation="baekje"]', 'aria-label'), /백제, \d+장 중 0장 학습, 오늘 복습 0장 새 카드 \d+장/);
-  assert.match(await page.innerText('#title-nation-total'), /^오늘 복습 모두 \d+장$/);
+  assert.match(await page.innerText('#title-nation-total'), /^오늘 24장 중 남은 \d+장$/);
+  assert.equal(await page.locator('#title-nation-tip').count(), 0, '나라 3개면 2~3세션 안내 없음');
   assert.match(await page.innerText('#title-nations .nation-soon-list summary'), /준비 중 1개/);
   assert.ok(await noOverflow(page));
   // 한 장 풀고 타이틀로 → 신라로 바꾸려 하면 확인, 취소하면 그대로
@@ -527,6 +528,11 @@ test('이벤트 로그(m2-plan §8): 앱 열기부터 내보내기까지 이벤�
   assert.equal(get('app_open').first_run, true);
   assert.equal(get('app_open').mode, 'general');
   assert.ok(Number.isInteger(get('first_card_shown').ms_since_open) && get('first_card_shown').taps_since_open >= 1);
+  // D193(D238): title_view에 추천 나라와 나라별 할 일
+  const tv = get('title_view');
+  assert.ok('recommended_nation' in tv);
+  assert.ok(Array.isArray(tv.nations) && tv.nations.length >= 1 && tv.nations.every((n) => typeof n.nation === 'string' && Number.isInteger(n.due_n) && Number.isInteger(n.new_n)), JSON.stringify(tv.nations));
+  if (tv.nations.length >= 3) assert.equal(tv.recommended_nation, [...tv.nations].sort((a, b) => (b.due_n + b.new_n) - (a.due_n + a.new_n))[0].nation);
   const ss = get('session_start');
   assert.deepEqual([ss.session, ss.nation, ss.cards_n, ss.new_n, ss.day_sessions_n, ss.intake_guard], [1, 'goguryeo', FIRST, FIRST, 1, false]);
   assert.deepEqual([get('session_end').ended_by, get('session_end').answered_n >= FIRST], ['complete', true]);
@@ -655,6 +661,11 @@ test('390px 실제 나라 5개(통일신라·고려 포함): 세로 목록 5행(
   assert.deepEqual(info.map((x) => x[0]), ['goguryeo', 'baekje', 'silla', 'usilla', 'goryeo']);
   assert.deepEqual(info.map((x) => x[1]), ['고', '백', '신', '통', '려']);
   assert.ok(info.every((x) => x[2] >= 44 && x[2] <= 56), String(info.map((x) => x[2])));
+  // D193(D237): 큰 숫자는 "오늘 24장 중 남은 n장", 5개 나라면 2~3세션 안내, 정렬은 도래+새 카드, 첫 행에 "추천"
+  assert.equal(await page.innerText('#title-nation-total'), '오늘 24장 중 남은 24장');
+  assert.match(await page.innerText('#title-nation-tip'), /하루 2~3세션/);
+  assert.equal(await page.locator('#title-nations .nation-rec').count(), 1);
+  assert.equal(await rows.first().locator('.nation-rec').count(), 1, '추천은 맨 위 행');
   const play = await page.locator('#title-play').evaluate((b) => b.getBoundingClientRect().bottom);
   assert.ok(play <= 664, `[시작] 아래 끝 ${play}px`);
   assert.equal(new Set(info.map((x) => Math.round(x[3]))).size, 1, '한 줄에 하나씩(세로)');
@@ -741,7 +752,7 @@ test('고려(실제 매니페스트, 앵커 14개 D191·D174): 인장 "려"(#7FB
 }));
 
 // D173(D192): 일반 모드 질문은 "연표 어디에 들어갈까?", 앵커 없는 왕 때 사건은 해설 첫 줄에 "실제로는 ○○ 때". 테스트 모드는 그대로.
-test('질문 문구(D173): 일반 "연표 어디에 들어갈까?", 무신정변은 "실제로는 의종 때", 앵커 왕 카드는 그 줄 없음, ?study=1은 "어느 왕 때일까?"', () => withPage(VIEWPORTS.desktop, async (page) => {
+test('질문 문구(D173): 일반 "연표 어디에 들어갈까?", 해설에 "실제로는"이 있으면 자동 줄 없음(D193), 없으면 자동 줄, 앵커 왕 카드는 줄 없음, ?study=1은 "어느 왕 때일까?"', () => withPage(VIEWPORTS.desktop, async (page) => {
   const raw = JSON.parse(readFileSync(new URL('./fixtures/goryeo-offlist.json', import.meta.url), 'utf8'));
   const { deck } = normalizeDeck(raw);
   const byId = new Map([...deck.cards, ...deck.anchors].map((c) => [c.id, c]));
@@ -752,12 +763,14 @@ test('질문 문구(D173): 일반 "연표 어디에 들어갈까?", 무신정변
   while (await page.getAttribute('#card', 'data-card-id')) {
     const c = byId.get(await page.getAttribute('#card', 'data-card-id'));
     await pressGap(page, (await gapsFor(page, c)).right, false);
-    seen[c.title] = (await page.locator('#result-offlist').count()) ? await page.innerText('#result-offlist') : null;
+    seen[c.title] = { line: (await page.locator('#result-offlist').count()) ? await page.innerText('#result-offlist') : null, exp: await page.innerText('#card .result-exp') };
     await page.locator('#btn-next').click();
   }
-  assert.match(seen['무신정변'], /^실제로는 의종 때\(연표 목록에 없는 왕\)예요/);
-  const other = Object.entries(seen).find(([t]) => t !== '무신정변');
-  assert.ok(other && other[1] === null, '앵커 왕(광종) 카드는 줄 없음');
+  assert.equal(seen['무신정변'].line, null, '콘텐츠 해설이 정본(D217), 자동 줄 중복 없음');
+  assert.match(seen['무신정변'].exp, /^의종 24년\(1170년\)의 일\. 실제로는 의종 때의 일이다/);
+  assert.match(seen['(테스트) 해설에 실제로는 없는 카드'].line, /^실제로는 신종 때\(연표 목록에 없는 왕\)예요/);
+  const gw = Object.entries(seen).find(([t]) => t !== '무신정변' && !t.startsWith('(테스트)'));
+  assert.ok(gw && gw[1].line === null, '앵커 왕(광종) 카드는 줄 없음');
   // 사람 테스트 모드(방식 A)는 M1 문구 그대로
   await page.goto(studyUrl(server.base, { participant: 'Q1' }));
   await ready(page);

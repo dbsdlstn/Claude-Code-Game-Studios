@@ -301,7 +301,7 @@ function renderResult(box) {
     r.correct ? null : el('p', { class: 'result-where', id: 'result-where' }, '고른 칸: ', el('s', {}, r.placedText), el('br'), '맞는 칸: ', el('b', {}, r.rightText)),
     el('p', { class: 'result-box', id: 'result-box', dataset: { from: String(r.boxFrom ?? ''), to: String(r.boxTo ?? '') } },
       boxLine, !r.practice && !r.retry && grade ? ` · 등급 ${GRADE_NAME[grade]}` : ''),
-    !app.study && offListKing(card, app.deck.anchors) ? el('p', { class: 'result-offlist', id: 'result-offlist' }, `실제로는 ${offListKing(card, app.deck.anchors)} 때(연표 목록에 없는 왕)예요. 연표에서는 그 앞 왕의 칸에 들어가요.`) : null,
+    !app.study && !String(card.explanation ?? '').includes('실제로는') && offListKing(card, app.deck.anchors) ? el('p', { class: 'result-offlist', id: 'result-offlist' }, `실제로는 ${offListKing(card, app.deck.anchors)} 때(연표 목록에 없는 왕)예요. 연표에서는 그 앞 왕의 칸에 들어가요.`) : null,
     explainBlock(card, !app.study && r.correct && grade >= 2),
     el('button', { type: 'button', id: 'btn-next', class: 'btn btn-primary', onclick: onNext }, isLast ? (app.state.practice ? '연습 끝내기' : '세션 결과 보기') : '다음 카드'),
   ].filter(Boolean));
@@ -1351,6 +1351,7 @@ function switchNation(n) {
 
 /** 타이틀의 나라 선택: 활성 1~2개는 칩 줄 + 요약 한 줄, 3개 이상은 세로 목록(행마다 오늘 할 일). */
 function renderTitleNations() {
+  app.titleNations = null;
   const nations = app.nations.length ? app.nations : [{ id: app.nation, label: app.deck.nation_label ?? app.nation, files: ['-'] }];
   const active = nations.filter((n) => n.files.length && (n.id === app.nation || app.nationDecks.has(n.id)));
   const plans = new Map(active.map((n) => [n.id, planFor(n.id)]));
@@ -1359,10 +1360,18 @@ function renderTitleNations() {
   const learned = (id) => deckOf(id).cards.filter((c) => allP[c.id]?.introduced).length;
   const soon = nations.filter((n) => !active.includes(n));
   if (active.length >= 3) {
-    const order = [...active].sort((a, b) => (plans.get(b.id).left > 0) - (plans.get(a.id).left > 0) || nations.indexOf(a) - nations.indexOf(b));
+    // D193(D237): 추천 정렬은 도래 + 새 카드(도래만 세면 새 나라가 열리지 않는다). 같으면 manifest 순서.
+    const weight = (id) => plans.get(id).due + plans.get(id).fresh;
+    const order = [...active].sort((a, b) => weight(b.id) - weight(a.id) || nations.indexOf(a) - nations.indexOf(b));
+    const rec = weight(order[0].id) > 0 ? order[0].id : null;
+    app.titleNations = { recommended: rec, nations: active.map((n) => ({ nation: n.id, due_n: plans.get(n.id).due, new_n: plans.get(n.id).fresh })) };
+    const cap = R.daily_card_soft_cap;
+    const doneToday = rewardsOn() && app.rewards.day.key === dayOpts().today ? (app.rewards.day.cards ?? 0) : 0;
     const tot = [...plans.values()].reduce((x, p) => ({ due: x.due + p.due, fresh: x.fresh + p.fresh }), { due: 0, fresh: 0 });
     fill($('title-nations'),
-      el('p', { class: 'nation-total', id: 'title-nation-total' }, softCapReached() ? `내일로 미뤄도 돼요 (복습 ${tot.due}장)` : `오늘 복습 모두 ${tot.due}장`),
+      el('p', { class: 'nation-total', id: 'title-nation-total', dataset: { left: String(Math.max(0, cap - doneToday)), due: String(tot.due) } },
+        softCapReached() ? `오늘 ${cap}장을 다 했어요 · 남은 복습은 내일로 미뤄도 돼요` : el('b', {}, `오늘 ${cap}장 중 남은 ${cap - doneToday}장`)),
+      active.length >= 5 ? el('p', { class: 'nation-tip source-note', id: 'title-nation-tip' }, '나라가 많으면 하루 2~3세션이 좋아요') : null,
       el('div', {
         class: 'nation-list', role: 'radiogroup', 'aria-label': '나라',
         // 방향키로 행 사이를 옮기고 Enter·Space로 고른다(title-screen.md §4, 접근성)
@@ -1379,15 +1388,16 @@ function renderTitleNations() {
       }, order.map((n) => {
         const p = plans.get(n.id);
         const on = n.id === app.nation;
-        const label = `${n.label}, ${deckOf(n.id).cards.length}장 중 ${learned(n.id)}장 학습, 오늘 복습 ${p.due}장 새 카드 ${p.fresh}장`;
+        const label = `${n.label}${n.id === rec ? ', 추천' : ''}, ${deckOf(n.id).cards.length}장 중 ${learned(n.id)}장 학습, 오늘 복습 ${p.due}장 새 카드 ${p.fresh}장`;
         return el('button', { type: 'button', role: 'radio', class: 'nation-row' + (on ? ' is-on' : ''), dataset: { nation: n.id }, 'aria-checked': on ? 'true' : 'false', tabindex: on ? '0' : '-1', 'aria-label': label, onclick: () => switchNation(n) },
           el('span', { class: 'nation-mark', 'aria-hidden': 'true' }, on ? '●' : '○'),
-          el('span', { class: 'nation-name' }, seal(n.id), ' ', n.label),
+          el('span', { class: 'nation-name' }, seal(n.id), ' ', n.label, n.id === rec ? el('span', { class: 'nation-rec' }, '추천') : null),
           el('span', { class: 'nation-meta' }, `복습 ${p.due} · 새 ${p.fresh}`));
       })),
       soon.length ? el('details', { class: 'nation-soon-list' }, el('summary', {}, `준비 중 ${soon.length}개`), el('p', { class: 'source-note' }, soon.map((n) => n.label).join(' · '))) : null);
     return;
   }
+  app.titleNations = { recommended: null, nations: active.map((n) => ({ nation: n.id, due_n: plans.get(n.id).due, new_n: plans.get(n.id).fresh })) };
   fill($('title-nations'),
     el('div', { class: 'nation-chips' }, nations.map((n) => el('button', {
       type: 'button', class: 'chip nation', dataset: { nation: n.id }, 'aria-pressed': n.id === app.nation ? 'true' : 'false', disabled: !active.includes(n),
@@ -1427,7 +1437,7 @@ function showTitle() {
   }[plan.mode];
   const label = { continue: `이어하기 · ${plan.left}장 남음`, review: '복습 시작', new: '새 카드 시작', done: '오늘 끝 · 미리 복습' }[plan.mode];
   renderTitleNations();
-  logEvent('title_view', { resume: plan.mode === 'continue', due_n: plan.due, new_n: plan.fresh, est_min: Math.max(1, Math.ceil((plan.left * CONFIG.secondsPerCard) / 60)), nations_active_n: Math.max(1, app.nations.filter((n) => n.files.length).length) });
+  logEvent('title_view', { resume: plan.mode === 'continue', due_n: plan.due, new_n: plan.fresh, est_min: Math.max(1, Math.ceil((plan.left * CONFIG.secondsPerCard) / 60)), nations_active_n: Math.max(1, app.nations.filter((n) => n.files.length).length), recommended_nation: app.titleNations?.recommended ?? null, nations: app.titleNations?.nations ?? [{ nation: app.nation, due_n: plan.due, new_n: plan.fresh }] });
   persist();
   const extra = [];
   if (plan.guarded && plan.unintroduced) extra.push(`아직 열리지 않은 카드 ${plan.unintroduced}장 · 복습을 먼저 마치면 열려요`);

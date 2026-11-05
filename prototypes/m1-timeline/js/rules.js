@@ -439,7 +439,7 @@ export function restoreSession(saved, cards) {
  * 연표 칸은 "이 왕 즉위 뒤 ~ 다음 왕 즉위 전"이라 앵커가 없는 왕 때의 사건은 앞 앵커 칸에 들어간다. 해설 첫 줄에 알린다.
  */
 export function offListKing(card, anchors) {
-  const name = String(card?.reign ?? '').replace(/\(.*?\)/g, '').replace(/\s*(\d+|즉위)년.*$/, '').trim();
+  const name = String(card?.reign ?? '').replace(/\(.*?\)/g, '').replace(/\s*(\d+|즉위|원)년.*$/, '').trim();
   if (!name || !/[왕종조]$/.test(name)) return null;
   const same = (t) => t && (t === name || name.endsWith(` ${t}`) || t.endsWith(` ${name}`));
   return anchors.some((a) => same(a.title) || same(a.reign)) ? null : name;
