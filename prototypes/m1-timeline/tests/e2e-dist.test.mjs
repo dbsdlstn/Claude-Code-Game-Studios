@@ -7,6 +7,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 import { CONFIG } from '../js/config.js';
+import { FULL, FULL_BY_ID, FULL_INFO } from './helpers.mjs';
 import { chromium, VIEWPORTS, REPO_ROOT, PROTO_ROOT, REAL, REAL_BY_ID, currentCard, gapsFor, pressGap, expectedAnchorYears } from './helpers.mjs';
 
 const DIST = path.join(REPO_ROOT, 'dist', 'm1');
@@ -32,10 +33,10 @@ test('dist/m1만으로 실제 초안을 읽고 모바일에서 한 장 꽂기, �
     page.on('pageerror', (e) => errors.push(String(e)));
     await page.goto(`http://127.0.0.1:${port}/index.html?seed=11&intro=0&title=0`);
     await page.waitForSelector('body[data-ready="true"]');
-    assert.match(await page.innerText('#data-info'), /goguryeo-m1\.json · 카드 12장/);
+    assert.ok((await page.innerText('#data-info')).includes(FULL_INFO), await page.innerText('#data-info'));
     assert.match(await page.innerText('#data-warn'), /사실 확인 전/);
-    assert.deepEqual(await page.locator('#timeline .row-anchor .row-year').allInnerTexts(), expectedAnchorYears(REAL));
-    const card = await currentCard(page, REAL_BY_ID);
+    assert.deepEqual(await page.locator('#timeline .row-anchor .row-year').allInnerTexts(), expectedAnchorYears(FULL));
+    const card = await currentCard(page, FULL_BY_ID);
     await pressGap(page, (await gapsFor(page, card)).right, true);
     assert.equal(await page.getAttribute('#result', 'data-result'), 'correct');
     // M2: 타이틀 화면과 덱 목록(data/decks.json)도 묶음만으로

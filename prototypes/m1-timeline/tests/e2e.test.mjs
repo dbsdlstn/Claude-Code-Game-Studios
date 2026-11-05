@@ -5,7 +5,7 @@ import { test, before, after, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  chromium, startServer, openProto, currentCard, gapsFor, pressGap, editSave, VIEWPORTS, SAMPLE, REAL, REAL_BY_ID, expectedAnchorYears,
+  chromium, startServer, openProto, currentCard, gapsFor, pressGap, editSave, VIEWPORTS, SAMPLE, REAL, REAL_BY_ID, expectedAnchorYears, FULL, FULL_BY_ID, FULL_INFO,
 } from './helpers.mjs';
 
 let server;
@@ -265,7 +265,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
   });
 }
 
-describe('실제 콘텐츠(초안 또는 v2)', { skip: !REAL && '데이터 없음' }, () => {
+describe('실제 콘텐츠(덱 목록의 고구려 전체)', { skip: !FULL && '데이터 없음' }, () => {
   for (const [name, opts] of Object.entries(VIEWPORTS)) {
     const mobile = name === 'mobile';
     test(`${name}: 기본 경로, "사실 확인 전", 모든 앵커 재위 기간, 세션 6장 완주(재도전 포함)`, async () => {
@@ -275,15 +275,15 @@ describe('실제 콘텐츠(초안 또는 v2)', { skip: !REAL && '데이터 없�
       page.on('pageerror', (e) => errors.push(String(e)));
       try {
         await openProto(page, server.base, { data: null, seed: 11 });
-        assert.match(await page.innerText('#data-info'), new RegExp(`goguryeo-m1\\.json · 카드 ${REAL.cards.length}장 · 기준 ${REAL.anchors.length}장`));
+        assert.ok((await page.innerText('#data-info')).includes(FULL_INFO), await page.innerText('#data-info'));
         assert.match(await page.innerText('#data-warn'), /사실 확인 전/);
         const years = await page.locator('#timeline .row-anchor .row-year').allInnerTexts();
-        assert.deepEqual(years, expectedAnchorYears(REAL));
+        assert.deepEqual(years, expectedAnchorYears(FULL));
         assert.ok(years.every((y) => y.includes('~')), `재위 기간이 빠진 기준 카드: ${years.filter((y) => !y.includes('~'))}`);
         let first = 0;
         const seen = new Set();
         while (await page.getAttribute('#card', 'data-card-id')) {
-          const card = await currentCard(page, REAL_BY_ID);
+          const card = await currentCard(page, FULL_BY_ID);
           assert.ok(!(await page.innerText('#card')).includes(card.title), `${card.id} 이름 노출`);
           const g = await gapsFor(page, card);
           const bad = !seen.has(card.id) && first === 2;

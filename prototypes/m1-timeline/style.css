@@ -243,3 +243,8 @@ a.btn-primary { color: #fff8ef; }
   .brand-sub { display: none; }
   .top .btn-small { padding: 6px 9px; }
 }
+/* 타이틀 아래 배경이 잘리던 것(짧은 페이지에서 body가 화면보다 짧음) */
+html { background-color: var(--paper); min-height: 100%; }
+body { min-height: 100vh; background-attachment: fixed; }
+.kings { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+@media (min-width: 700px) { .kings { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
