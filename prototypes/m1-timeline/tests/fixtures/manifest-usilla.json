@@ -33,8 +33,8 @@
    "id": "usilla",
    "label": "통일신라",
    "files": [
-    "../../../../assets/data/cards/v2/staging/usilla-m3-b1.json",
-    "../../../../assets/data/cards/v2/staging/usilla-m3-b2.json"
+    "../../../../assets/data/cards/v2/usilla-m3-b1.json",
+    "../../../../assets/data/cards/v2/usilla-m3-b2.json"
    ]
   }
  ]

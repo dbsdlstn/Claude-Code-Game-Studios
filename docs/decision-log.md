@@ -1099,6 +1099,18 @@
 - **F9 보강**: e2e "키보드만"(타이틀 → 세션 → 결과 → 도감, Tab·Enter·방향키만)과 "나라 4개"(실제 3나라 + 통일신라 staging, 390px 세로 4행·인장·56px). 점검표 `production/qa/a11y-m2.md`에 두 줄 추가.
 - **D167**: 새 필드 불필요 확인. 일반 모드 인출 줄에 `card_id`·`correct`·`clue_used`·`box_before`·`ts_ms`·`practice`·`relearn`(같은 세션 다시 풀기 표시)·`day_index`·`clue_open_ms`가 있어 m2-plan 7b의 첫 만남 결과별 다음 정답률과 단서 연 시점 분포를 계산할 수 있다. 7b의 "같은 세션 두 번째 줄 제외"는 `relearn: true`로 바로 거를 수 있다.
 - 단위 90, e2e 63 통과. 결과 화면 스크린샷(`*-05-summary`, `*-05b-summary-bottom`) 재촬영.
+## 2026-11-05 D110. 통일신라(usilla) 지원, 휴식권 용어(D186), 손상 저장 백업 내보내기, 접근성 점검표, 증거 재촬영 (웹 빌드 세션)
+- **통일신라**: `NATION_LABEL`에 usilla '통일신라'·balhae '발해'(gaya 이름 삭제, 인장 정의는 남김). 나라 인장 `CONFIG.nationSeals`(art-bible §4.2, D135: 고 #A23B2A·백 #2F5D7C·신 #C79A2E·통 #5C3399·발 #5B5B5B, 글자 흰색/신라만 #2B2118)를 타이틀 나라 목록·도감 칩·연표 제목에 표시(`aria-hidden`, 이름이 옆에 있음, 사람 테스트 모드 제외). `staging/usilla-m3-b1·b2.json`을 픽스처 매니페스트로 읽으면 기준 12장·카드 22장으로 정상화되는 것을 e2e로 확인. 콘텐츠 세션이 `promote_staging`으로 매니페스트에 올리면 코드 변경 없이 목록에 나온다.
+- **D186 용어**: 화면 문구 "보호권" → "휴식권"(타이틀, 결과 블록). 상한 안내 문구는 D109의 "오늘 경험치는 다 모았어요 (하루 24장까지)"로 대조표 차이 항목을 채운다. 지문 변형 런타임은 구현하지 않았다(M2-A 밖).
+- **저장 손상(F11 보강)**: 손상 감지 시 타이틀에 [이전 기록 내보내기] 버튼, `:broken` 원문을 JSON 파일로 내려받는다(e2e).
+- **접근성(F9)**: `production/qa/a11y-m2.md` 점검표. e2e "접근성" 테스트(`tests/a11y.mjs`)가 타이틀·질문·오답 공개·결과·도감 4탭의 WCAG AA 대비 위반 0, 나라 목록 radiogroup 방향키(로빙 tabindex), 결과 dialog 포커스·progressbar·낭독 영역을 매번 확인. 실제 스크린리더·실기기는 M2-B 몫으로 미확인 표기.
+- **증거**: `production/qa/evidence/m2/` 390·1280 전 화면 61장 재촬영. 단위 90, e2e 61 통과.
+
+## 2026-11-05 D210. 통일신라 덱 manifest 등록 (콘텐츠 세션)
+- 웹 usilla 지원(53bce91) 뒤 `python3 tools/promote_staging.py usilla 통일신라 usilla-m3-b1.json usilla-m3-b2.json --apply`로 등록: staging 두 파일을 `assets/data/cards/v2/`로 옮기고 manifest에 usilla(통일신라) 추가, 사건 목록 planned 22건 → owned.
+- 검증: 기본 실행 PASS(파일 12, 앵커 47, 원문 120, 0/0). E·V 변형 테스트, mark_verified 테스트, validator parity 39/39, 웹 rules(59)·m2(11)·e2e-m2(25) 통과.
+- **웹 테스트 고정 목록 경로 수정**: `prototypes/m1-timeline/tests/fixtures/manifest-usilla.json`이 staging 경로를 가리켜 e2e-m2 1건이 실패했다(파일을 옮긴 결과). 경로만 `v2/`로 고쳐 통과시켰다(웹 소관 파일, 내용·단언 변경 없음).
+- 확인 안내서 재생성(191항목·17묶음), 덱 이름 표기를 "통일신라"로.
 
 ## 남은 문제
 - 카드 44장 전부 `verified: false`. 사람의 사실 확인 전에는 출시 빌드에 넣을 카드가 없다(`validate_cards.py --release` 실패가 정상).
