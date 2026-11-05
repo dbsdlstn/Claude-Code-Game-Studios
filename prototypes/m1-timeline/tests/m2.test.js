@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { CONFIG } from '../js/config.js';
-import { mergeV2, loadManifest, loadNationDeck } from '../js/data.js';
+import { mergeV2, loadManifest, loadNationDeck, normalizeDeck } from '../js/data.js';
 import { migrateSave, nationStoreAdapter, lastNation } from '../js/save.js';
 import { createStore } from '../js/storage.js';
 
@@ -113,4 +113,22 @@ describe('실제 덱 목록(assets/data/cards/v2/manifest.json): 파일이 있�
     });
   }
 
+});
+
+// D113: 고려(goryeo) 준비. 나라 이름과 임시 인장, 인장끼리 글자가 겹치지 않고 글자 대비 AA(4.5:1) 이상.
+describe('나라 인장·이름(D110·D113)', () => {
+  const lum = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)).reduce((s, c, i) => s + c * [0.2126, 0.7152, 0.0722][i], 0);
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  test('인장 글자는 나라마다 다르고 대비 4.5:1 이상', () => {
+    const seals = Object.entries(CONFIG.nationSeals);
+    assert.equal(new Set(seals.map(([, s]) => s.ch)).size, seals.length);
+    for (const [id, s] of seals) assert.ok(ratio(s.bg, s.fg) >= 4.5, `${id} ${ratio(s.bg, s.fg).toFixed(2)}`);
+    assert.equal(CONFIG.nationSeals.goryeo.ch, '려');
+  });
+  test('nation: goryeo 덱은 "고려"로 표시된다', () => {
+    const raw = JSON.parse(readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures/silla-fixture.json'), 'utf8'));
+    const { deck } = normalizeDeck(mergeV2([{ ...raw, cards: raw.cards.map((c) => ({ ...c, nation: 'goryeo' })) }]).raw);
+    assert.equal(deck.nation, 'goryeo');
+    assert.equal(deck.nation_label, '고려');
+  });
 });

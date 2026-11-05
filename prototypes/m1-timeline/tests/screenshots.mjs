@@ -47,6 +47,13 @@ try {
     await page.click('#title-play');
     await shot('26-usilla-timeline', true);
     await page.evaluate(() => localStorage.clear());
+    // 저장 손상 안내(F11, D109·D110): 안내 문구와 [이전 기록 내보내기]
+    await openProto(page, server.base, { data: null, title: null });
+    await page.evaluate(() => { localStorage.setItem('hanyang-m1:save:v2', '{broken'); localStorage.setItem('hanyang-m1:rewards:v1', 'not json'); });
+    await page.reload();
+    await page.waitForSelector('#title:not([hidden])');
+    await shot('27-corrupt-save', true);
+    await page.evaluate(() => localStorage.clear());
     // 처음 안내(D74-5)
     await openProto(page, server.base, { data: DATA, seed: 11, intro: '1' });
     await shot('00-intro');
