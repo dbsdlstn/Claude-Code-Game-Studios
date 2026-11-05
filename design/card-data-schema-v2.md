@@ -25,7 +25,7 @@
 |---|---|---|---|
 | `id` | string | 예 | 고유 ID. 앵커 `<nation>-reign-<slug>`(예: `goguryeo-reign-jangsu`), 사료 카드 `<nation>-src-<nn>`(예: `goguryeo-src-07`). id는 칸을 알려 주지 않아야 하므로 시기·왕대를 넣지 않는다. 한 번 정하면 바꾸지 않는다. |
 | `kind` | enum | 예 | `anchor` / `source` |
-| `nation` | enum | 예 | `goguryeo` / `baekje` / `silla` / `gaya` / `usilla`(통일신라) / `balhae`(발해) (남북국 두 값은 D183·설계 D133) |
+| `nation` | enum | 예 | `goguryeo` / `baekje` / `silla` / `gaya` / `usilla`(통일신라) / `balhae`(발해) / `goryeo`(고려) (남북국 두 값은 D183·설계 D133, 고려는 D190) |
 | `title` | string | 예 | 앵커는 왕 이름, 사료 카드는 정답 공개 후 표시되는 사건 이름. 플레이 중 사료 카드의 제목은 숨겨진다. |
 | `source_ref` | object | 예 | 근거 사료. 아래 "출처". |
 | `verification` | object | 예 | 사실 확인 상태. 아래 "사실 확인". |
