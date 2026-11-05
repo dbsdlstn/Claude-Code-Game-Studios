@@ -135,10 +135,11 @@ describe('나라 인장·이름(D110·D113)', () => {
   });
 });
 
-test('나라별 앵커 상한은 콘텐츠 검증기와 같다(D191·D174)', () => {
+test('나라별 앵커 상한: 웹은 콘텐츠 검증기가 허용하는 수를 모두 받는다(D191, D174 고려 14)', () => {
   const py = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '../../../tools/validate_cards_v2.py'), 'utf8');
-  assert.match(py, /^MAX_ANCHORS = 12\b/m);
-  assert.match(py, /^MAX_ANCHORS_BY_NATION = \{"goryeo": 14\}/m);
-  assert.equal(CONFIG.maxAnchors, 12);
-  assert.deepEqual({ ...CONFIG.maxAnchorsByNation }, { goryeo: 14 });
+  const base = Number(py.match(/^MAX_ANCHORS = (\d+)/m)[1]);
+  const by = JSON.parse(py.match(/^MAX_ANCHORS_BY_NATION = (\{.*\})/m)[1]);
+  assert.equal(CONFIG.maxAnchors, base);
+  for (const [n, cap] of Object.entries(by)) assert.ok((CONFIG.maxAnchorsByNation[n] ?? CONFIG.maxAnchors) >= cap, `${n}: 웹 ${CONFIG.maxAnchorsByNation[n]} < 검증기 ${cap}`);
+  assert.equal(CONFIG.maxAnchorsByNation.goryeo, 14);
 });

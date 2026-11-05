@@ -433,3 +433,14 @@ export function restoreSession(saved, cards) {
     retryResults: Object.freeze(retryResults.map((r) => Object.freeze({ ...r }))), mix: saved.mix ?? null,
   });
 }
+
+/**
+ * D173(D192): 카드의 실제 왕(reign_label 첫 낱말, "의종 24년" → "의종")이 연표 기준 왕 목록에 없으면 그 이름, 아니면 null.
+ * 연표 칸은 "이 왕 즉위 뒤 ~ 다음 왕 즉위 전"이라 앵커가 없는 왕 때의 사건은 앞 앵커 칸에 들어간다. 해설 첫 줄에 알린다.
+ */
+export function offListKing(card, anchors) {
+  const name = String(card?.reign ?? '').replace(/\(.*?\)/g, '').replace(/\s*(\d+|즉위)년.*$/, '').trim();
+  if (!name || !/[왕종조]$/.test(name)) return null;
+  const same = (t) => t && (t === name || name.endsWith(` ${t}`) || t.endsWith(` ${name}`));
+  return anchors.some((a) => same(a.title) || same(a.reign)) ? null : name;
+}

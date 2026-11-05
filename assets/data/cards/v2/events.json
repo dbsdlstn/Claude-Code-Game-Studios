@@ -1387,12 +1387,12 @@
       "key": "1010-khitan-second-invasion",
       "year": 1010,
       "title": "거란의 2차 침입",
-      "owner_card": null,
+      "owner_card": "goryeo-src-21",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-21 작성됨(staging). manifest 등록 때 owned로 바꾼다(D216)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1019-gwiju-battle",
@@ -1431,12 +1431,12 @@
       "key": "1107-dongbuk-nine-fortresses",
       "year": 1107,
       "title": "동북 9성 축조",
-      "owner_card": null,
+      "owner_card": "goryeo-src-22",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-22 작성됨(staging). manifest 등록 때 owned로 바꾼다(D216)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1126-yi-jagyeom-revolt",
@@ -1497,34 +1497,34 @@
       "key": "1196-choe-chungheon",
       "year": 1196,
       "title": "최충헌의 집권",
-      "owner_card": null,
+      "owner_card": "goryeo-src-23",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-23 작성됨(staging). manifest 등록 때 owned로 바꾼다(D216)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1198-manjeok-plot",
       "year": 1198,
       "title": "만적의 난",
-      "owner_card": null,
+      "owner_card": "goryeo-src-24",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-24 작성됨(staging). manifest 등록 때 owned로 바꾼다(D216)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1232-cheoinseong-battle",
       "year": 1232,
       "title": "처인성 전투",
-      "owner_card": null,
+      "owner_card": "goryeo-src-25",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-25 작성됨(staging). manifest 등록 때 owned로 바꾼다(D216)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1232-ganghwa-capital",
@@ -1541,12 +1541,12 @@
       "key": "1251-tripitaka-koreana",
       "year": 1251,
       "title": "팔만대장경 완성",
-      "owner_card": null,
+      "owner_card": "goryeo-src-26",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-26 작성됨(staging). manifest 등록 때 owned로 바꾼다(D216)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1258-choe-regime-fall",
@@ -1618,12 +1618,12 @@
       "key": "1366-jeonmin-byeonjeong",
       "year": 1366,
       "title": "전민변정도감",
-      "owner_card": null,
+      "owner_card": "goryeo-src-27",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-27 작성됨(staging). manifest 등록 때 owned로 바꾼다(D216)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1377-jikji",
