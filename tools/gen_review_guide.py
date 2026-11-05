@@ -37,10 +37,11 @@ SUMMARY_ANCHORS = {"baekje": "보고서 요약: 앵커 전부 일치", "silla": 
 GOGURYEO_ANCHOR_ALIAS = {"dongmyeong", "sosurim", "gwanggaeto", "jangsu", "bojang", "taejo", "gogukcheon", "dongcheon", "micheon"}
 
 MIN = {  # estimated minutes per item (guess)
-    ("source", 1): 8, ("anchor", 1): 6,
-    ("source", 2): 6, ("anchor", 2): 4,
-    ("source", 3): 5, ("anchor", 3): 3,
+    ("source", 1): 8, ("anchor", 1): 6, ("variant", 1): 6,
+    ("source", 2): 6, ("anchor", 2): 4, ("variant", 2): 5,
+    ("source", 3): 5, ("anchor", 3): 3, ("variant", 3): 4,
 }
+VARIANT_REPORT = "fact-check-report-variants-m1.md"
 BATCH_MIN = 60
 DECK_ORDER = {"goguryeo": 0, "baekje": 1, "silla": 2}
 
@@ -80,6 +81,28 @@ def parse_reports():
             seen.add(cid)
             verdicts[cid] = (verdict, clean(cells[3]))
     return verdicts
+
+
+def parse_variant_report():
+    """card id -> (verdict, new-facts note) from the 변형별 대조 table (goguryeo M1 variants only)."""
+    out = {}
+    path = ROOT / "design" / VARIANT_REPORT
+    if not path.exists():
+        return out
+    in_table = False
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("## 변형별 대조"):
+            in_table = True
+            continue
+        if in_table and line.startswith("## "):
+            break
+        if in_table and line.startswith("|"):
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            m = re.match(r"^src-(\d+)", clean(cells[0])) if cells else None
+            if m and len(cells) >= 6:
+                cid = f"goguryeo-src-{int(m.group(1)):02d}"
+                out[cid] = (clean(cells[-1]), clean(cells[2]))
+    return out
 
 
 def year_text(y):
@@ -126,7 +149,7 @@ def search_term(c):
 INTRO = """# 사람 사실 확인 가이드 (비전문가용)
 
 > **상태**: 2026-11-05 생성(`tools/gen_review_guide.py`, D127). 카드나 보고서가 바뀌면 `python3 tools/gen_review_guide.py`로 다시 만든다.
-> **이 문서의 목적**: M2-B의 사람 사실 확인(`production/milestones/m2.md` B1)을 **누구나 따라 할 수 있게** 1시간 단위로 쪼갠 작업표다. 카드 {ncard}장 + 연표 앵커(왕) {nanchor}개 = {n}개 항목.
+> **이 문서의 목적**: M2-B의 사람 사실 확인(`production/milestones/m2.md` B1)을 **누구나 따라 할 수 있게** 1시간 단위로 쪼갠 작업표다. 카드 {ncard}장 + 연표 앵커(왕) {nanchor}개 + **지문 변형 {nvariant}개** = {n}개 항목.
 > **한계**: 시간은 **추정**(측정 안 함)이다. 한국사데이터베이스(db.history.go.kr)의 화면 구성은 이 세션이 접속하지 못해 확인하지 못했으니 메뉴 이름은 바뀌었을 수 있다. 표의 "보고서 판정"은 **모델 세션이 웹 검색으로 한 대조**이며 사람 확인이 아니다. 이 문서도 어떤 사실이 맞다고 보증하지 않는다.
 
 ## 1. 무엇을 하는가 (3줄 요약)
@@ -160,6 +183,26 @@ INTRO = """# 사람 사실 확인 가이드 (비전문가용)
 
 > **막히면**: 원문을 못 찾으면 번역문으로, 그래도 못 찾으면 "못 찾음"으로 메모하고 넘어간다. 한 항목에 15분 넘게 쓰지 않는다.
 > **원문 문장을 그대로 베끼지 않는다.** 이 저장소의 카드 지문은 원문을 직접 풀어 쓴 것이고 번역문은 저작권이 따로 있다(D4). 메모에는 "무엇이 다른지"만 한 줄로 쓴다.
+
+## 3b. 지문 변형 항목 (`카드id#v2` 형식 id)을 확인하는 법
+
+표에서 id에 `#`이 붙은 줄은 **카드 하나의 다른 지문(변형)**이다(`design/card-variants-spec.md`). 변형은 카드와 **따로** 확인한다(변형마다 두 사람). 규칙은 D180이다: **변형은 원 카드와 같은 기사의 내용만** 담아야 한다.
+
+1. 표의 **변형 지문**을 읽는다. 오른쪽 검색어로 **원 카드가 가리키는 기사**(같은 권·조)를 연다.
+2. 아래 **세 가지만** 본다. 하나라도 걸리면 **기록하지 말고** 5절 양식으로 메모한다.
+   - (가) **새 사실이 없는가**: 변형 문장의 모든 내용이 **그 기사에 실려 있는가**. 기사에 없는 배경·이후 영향·학자의 해석은 안 된다. (해설에만 있는 내용도 안 된다. 카드의 해설을 옆에 놓고, 그 문장이 해설에서 온 것이 아닌지 본다.)
+   - (나) **다른 카드·다른 사료의 사실이 섞이지 않았는가**: 같은 왕 때 다른 사건(다른 카드)이나, 삼국유사·일본서기·비문 같은 **다른 책의 이야기**가 들어 있으면 안 된다.
+   - (다) **같은 덱 다른 카드의 이름이 없는가**: 같은 나라의 다른 카드 제목이나 그 카드에만 나오는 사건·인물 이름이 있으면 안 된다(목록에서 비슷한 제목을 찾아 본다).
+3. 정답이 **같은 칸**인지, 왕 이름·연도가 **드러나지 않는지**도 본다(카드와 같은 기준).
+4. 기록은 카드와 똑같지만 **id에 `#v2`까지 붙여** 쓴다. `--url`은 필요 없다(원 카드의 출처를 그대로 쓴다).
+
+```sh
+python3 tools/mark_verified.py --reviewer "홍길동" --date 2026-11-06 \
+    --original-checked --exam-notation-checked goguryeo-src-09#v2 --write
+```
+
+> 변형의 보고서 판정이 *수정 필요*였던 항목은 콘텐츠 담당이 문장을 고쳤는지 먼저 확인한다. **고치기 전 문장은 기록하지 않는다**(고친 뒤에 바뀐 문장을 확인한다. 문장이 바뀌면 이전 확인은 자동으로 무효가 된다).
+> 확인되지 않은 변형은 게임에서 **자동으로 쓰이지 않는다**(그 카드는 원래 지문만 나온다). 그러니 변형 확인은 급하지 않다.
 
 ## 4. 순서와 규칙
 - **위에서 아래로 한 묶음(약 1시간)씩** 한다. 묶음 1이 가장 중요하다(보고서에서 "불확실·수정 필요·확인 못 함"이었던 것, 즉 틀릴 가능성이 높은 것).
@@ -206,10 +249,10 @@ python3 tools/validate_cards_v2.py --release  # 아직 실패가 정상이다(�
 `--release`가 통과하려면 카드마다 확인 2명, 원문 확인, 기출 표기 확인, `source_ref.url`이 있어야 한다. 앵커는 `source_ref.volume`도 필요하다(이미 채워져 있는지 검증기가 알려 준다).
 
 ## 7. 우선순위 규칙 (이 표가 정렬된 방식)
-1. **1순위**: 모델 보고서가 *불확실 / 수정 필요 / 확인 못 함*으로 본 항목.
-2. **2순위**: 보고서에 **아예 없는** 항목(대조되지 않음).
+1. **1순위**: 모델 보고서가 *불확실 / 수정 필요 / 확인 못 함*으로 본 항목(변형 포함).
+2. **2순위**: 보고서에 **아예 없는** 항목(대조되지 않음. 백제·신라 변형이 여기에 많다).
 3. **3순위**: 보고서가 *일치*로 본 항목(모델 대조이며 사람 확인은 필요하다).
-같은 순위 안에서는 고구려 → 백제 → 신라, 번호 순이다. 한 묶음은 약 60분 분량(항목별 추정 시간: 1순위 카드 8분·앵커 6분, 2순위 카드 6분·앵커 4분, 3순위 카드 5분·앵커 3분).
+같은 순위 안에서는 고구려 → 백제 → 신라, 앵커 → 카드 → 변형, 번호 순이다. 한 묶음은 약 60분 분량(항목별 추정 시간: 1순위 카드 8분·앵커 6분·변형 6분, 2순위 카드 6분·앵커 4분·변형 5분, 3순위 카드 5분·앵커 3분·변형 4분).
 
 """
 
@@ -227,11 +270,33 @@ def main(argv=None):
         tier, v = tier_of(c["id"], c["nation"], c["kind"], verdicts)
         detail = verdicts.get(c["id"], ("", ""))[1]
         items.append(dict(card=c, tier=tier, verdict=v, detail=detail))
-    items.sort(key=lambda i: (i["tier"], DECK_ORDER.get(i["card"]["nation"], 9), 0 if i["card"]["kind"] == "anchor" else 1,
-                              i["card"].get("order", 0) if i["card"]["kind"] == "anchor" else int(re.findall(r"\d+$", i["card"]["id"])[0])))
+    vreport = parse_variant_report()
+    for c in cards:
+        if c["kind"] != "source":
+            continue
+        for var in c.get("variants") or []:
+            vid = f"{c['id']}#{var['id']}"
+            if (var.get("verification") or {}).get("verified") is True:
+                continue
+            rep_ = vreport.get(c["id"]) if var["id"] == "v2" else None
+            if rep_:
+                verdict, note = rep_
+                tier = 1 if re.match(r"^(수정|불확실|확인 못)", verdict) else 3
+                detail = note
+            else:
+                verdict, tier, detail = "보고서에 없음", 2, ""
+            items.append(dict(card=c, variant=var, vid=vid, tier=tier, verdict=verdict, detail=detail))
+
+    def sortkey(i):
+        c = i["card"]
+        if "variant" in i:
+            return (i["tier"], DECK_ORDER.get(c["nation"], 9), 2, int(re.findall(r"\d+$", c["id"])[0]))
+        return (i["tier"], DECK_ORDER.get(c["nation"], 9), 0 if c["kind"] == "anchor" else 1,
+                c.get("order", 0) if c["kind"] == "anchor" else int(re.findall(r"\d+$", c["id"])[0]))
+    items.sort(key=sortkey)
     batches, cur, used = [], [], 0
     for it in items:
-        m = MIN[(it["card"]["kind"], it["tier"])]
+        m = MIN[("variant" if "variant" in it else it["card"]["kind"], it["tier"])]
         if cur and used + m > BATCH_MIN:
             batches.append((cur, used))
             cur, used = [], 0
@@ -240,12 +305,13 @@ def main(argv=None):
     if cur:
         batches.append((cur, used))
 
-    nsrc = sum(1 for i in items if i["card"]["kind"] == "source")
-    nanc = len(items) - nsrc
-    out = [INTRO.replace('{ncard}', str(nsrc)).replace('{nanchor}', str(nanc)).replace('{n}', str(len(items)))]
+    nvar = sum(1 for i in items if "variant" in i)
+    nsrc = sum(1 for i in items if i["card"]["kind"] == "source" and "variant" not in i)
+    nanc = len(items) - nsrc - nvar
+    out = [INTRO.replace('{ncard}', str(nsrc)).replace('{nanchor}', str(nanc)).replace('{nvariant}', str(nvar)).replace('{n}', str(len(items)))]
     tiers = {t: sum(1 for i in items if i["tier"] == t) for t in (1, 2, 3)}
     out.append("## 8. 전체 요약\n")
-    out.append(f"- 항목 {len(items)}개 = 카드 {nsrc} + 앵커 {nanc}. 묶음 {len(batches)}개, 추정 총 {sum(u for _, u in batches)}분(약 {sum(u for _, u in batches) / 60:.1f}시간, 확인자 한 명 기준).")
+    out.append(f"- 항목 {len(items)}개 = 카드 {nsrc} + 앵커 {nanc} + 지문 변형 {nvar}. 묶음 {len(batches)}개, 추정 총 {sum(u for _, u in batches)}분(약 {sum(u for _, u in batches) / 60:.1f}시간, 확인자 한 명 기준).")
     out.append(f"- 1순위(불확실·수정 필요) {tiers[1]}개, 2순위(보고서에 없음) {tiers[2]}개, 3순위(보고서상 일치) {tiers[3]}개.")
     out.append("- **확인자 2명이 같은 목록을 각자 하므로** 전체 확인에는 위 시간의 2배가 든다(추정).\n")
     out.append("| 묶음 | 항목 수 | 추정 시간 | 순위 | 내용 |\n|---|---|---|---|---|")
@@ -263,6 +329,14 @@ def main(argv=None):
         out.append("| ☐ | id | 제목 | 확인할 한 줄 | 한국사DB 검색어 | 보고서 판정 · 주의 |\n|---|---|---|---|---|---|")
         for it in b:
             c = it["card"]
+            if "variant" in it:
+                var = it["variant"]
+                note = it["verdict"] + (f" · {it['detail'][:110]}…" if it["tier"] == 1 and it["detail"] else "")
+                if it["tier"] == 1:
+                    note += " · **보고서의 지적이 고쳐졌는지 먼저 본다**"
+                vt = var.get("text", "")
+                out.append(f"| ☐ | `{it['vid']}` | {c['title']} · 변형 {var['id']}({var.get('angle', '')}) | 변형 지문: “{vt}” (원 카드 `{c['id']}`의 기사와 비교) | {search_term(c)} | {note} |")
+                continue
             note = it["verdict"] + (f" · {it['detail'][:110]}…" if it["tier"] == 1 and it["detail"] else "")
             if c["kind"] == "source" and c.get("disputed"):
                 note += " · 판정 제외(disputed)"

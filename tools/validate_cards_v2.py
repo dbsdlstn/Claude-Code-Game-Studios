@@ -48,6 +48,9 @@ RULES (numbers follow the schema doc; a headless test should use the same):
   V11 exam_tags non-empty subset of {institution, person, war, culture}.
   V12 explanation non-empty and contains reign_label.
   V13 source_ref has work, section, entry.
+      V13a (D154) work 삼국사기 with section 신라본기 / 고구려본기 / 백제본기 /
+      열전: volume, when set, is an int within 1-12 / 13-22 / 23-28 / 41-50
+      (권 number, not the 본기's own 제N number).
   V14 verification.verified -> verified_by has >= 2 distinct names,
       verified_at set, original_checked and exam_notation_checked true, and
       content_hash equals the hash of the current content (see content_hash()).
@@ -149,6 +152,8 @@ def content_hash(card):
     return hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
 
 
+# 삼국사기 권 ranges (V13a): 본기 by state, 열전.
+SAGI_VOLUMES = {"신라본기": (1, 12), "고구려본기": (13, 22), "백제본기": (23, 28), "열전": (41, 50)}
 VARIANT_ANGLES = {"record", "actor", "result", "scene"}
 VARIANT_ID_RE = re.compile(r"^v[23]$")
 VARIANT_OBS = []
@@ -459,6 +464,12 @@ def validate(cards, release=False):
         if not isinstance(ref, dict) or not all(nonempty(ref.get(k)) for k in ("work", "section", "entry")):
             err(cid, "V13", "source_ref needs work, section, entry")
             ref = ref if isinstance(ref, dict) else {}
+        # V13a: 삼국사기 volume range per section
+        rng = SAGI_VOLUMES.get(ref.get("section")) if ref.get("work") == "삼국사기" else None
+        if rng and ref.get("volume") is not None:
+            vol = ref.get("volume")
+            if not (isinstance(vol, int) and not isinstance(vol, bool) and rng[0] <= vol <= rng[1]):
+                err(cid, "V13a", f"삼국사기 {ref.get('section')} volume must be {rng[0]}-{rng[1]}, got {vol!r}")
         # V14
         v = c.get("verification")
         if not isinstance(v, dict):

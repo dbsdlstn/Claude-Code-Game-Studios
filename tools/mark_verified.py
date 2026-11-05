@@ -15,6 +15,8 @@ Usage (dry run is the default and changes nothing):
 What it does for every id (a source card or an anchor), per reviewer run:
   * appends the reviewer to verification.verified_by (no duplicates);
   * sets original_checked / exam_notation_checked to true only when the flag is given;
+  * a passage variant is addressed as <card id>#<variant id>, e.g. goguryeo-src-09#v2;
+    it has its own verification object and its hash is variant_hash (design/card-variants-spec.md);
   * for source cards sets verification.content_hash to the current hash
     (tools/validate_cards_v2.py content_hash). If the card already had reviewers and
     its stored hash differs from the current content, the earlier reviewers are
@@ -36,7 +38,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
-from validate_cards_v2 import content_hash  # noqa: E402
+from validate_cards_v2 import content_hash, variant_hash  # noqa: E402
 
 DATA_GLOB = str(ROOT / "assets/data/cards/v2/*.json")
 SKIP = {"manifest.json", "events.json"}
@@ -54,20 +56,30 @@ def load_files(data_glob=DATA_GLOB):
 
 
 def find(files, cid):
+    """Return (file, owner_card, target) where target holds `verification` (card, anchor or variant)."""
+    base, _, vid = cid.partition("#")
     for f, data in files.items():
         for c in data.get("cards", []):
-            if c.get("id") == cid:
-                return f, c
-    return None, None
+            if c.get("id") != base:
+                continue
+            if not vid:
+                return f, c, c
+            for var in c.get("variants") or []:
+                if isinstance(var, dict) and var.get("id") == vid:
+                    return f, c, var
+            return None, None, None
+    return None, None, None
 
 
-def apply(card, reviewer, date, orig, exam, url):
+def apply(card, reviewer, date, orig, exam, url, target=None):
     """Return (new_verification, new_url_or_None, notes)."""
-    v = dict(card.get("verification") or {})
+    target = card if target is None else target
+    is_variant = target is not card
+    v = dict(target.get("verification") or {})
     names = [n for n in (v.get("verified_by") or []) if isinstance(n, str) and n.strip()]
     notes = []
-    is_source = card.get("kind") == "source"
-    cur = content_hash(card) if is_source else None
+    is_source = card.get("kind") == "source" or is_variant
+    cur = (variant_hash(target) if is_variant else content_hash(card)) if is_source else None
     if is_source and names and v.get("content_hash") and v.get("content_hash") != cur:
         notes.append("content changed since earlier review: earlier reviewers dropped")
         names = []
@@ -98,7 +110,11 @@ def apply(card, reviewer, date, orig, exam, url):
             notes.append("needs both original_checked and exam_notation_checked")
     new_url = None
     ref = card.get("source_ref") or {}
-    if url and not ref.get("url"):
+    if is_variant:
+        if url:
+            notes.append("--url ignored for a variant (uses the card's source_ref)")
+        new_url = None
+    elif url and not ref.get("url"):
         new_url = url
     elif url and ref.get("url") and ref.get("url") != url:
         notes.append("source_ref.url already set; not overwritten")
@@ -135,17 +151,17 @@ def main(argv=None):
     changed = set()
     bad = False
     for cid in ids:
-        f, card = find(files, cid)
+        f, card, target = find(files, cid)
         if card is None:
             print(f"ERROR {cid}: not found")
             bad = True
             continue
-        v, new_url, notes = apply(card, a.reviewer.strip(), a.date, a.original_checked, a.exam_notation_checked, a.url)
-        before = card.get("verification") or {}
+        v, new_url, notes = apply(card, a.reviewer.strip(), a.date, a.original_checked, a.exam_notation_checked, a.url, target)
+        before = target.get("verification") or {}
         state = "VERIFIED" if v["verified"] else f"recorded ({len(set(v['verified_by']))} reviewer)"
         print(f"{cid}: {state}" + (f"  [{'; '.join(notes)}]" if notes else ""))
         if v != before or new_url:
-            card["verification"] = v
+            target["verification"] = v
             if new_url:
                 card.setdefault("source_ref", {})["url"] = new_url
             changed.add(f)
