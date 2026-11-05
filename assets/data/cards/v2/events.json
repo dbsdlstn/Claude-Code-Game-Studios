@@ -1475,12 +1475,12 @@
       "key": "1173-kim-bodang-revolt",
       "year": 1173,
       "title": "김보당의 난",
-      "owner_card": null,
+      "owner_card": "goryeo-src-28",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-28 작성됨(staging). manifest 등록 때 owned로 바꾼다(D218)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1176-mangi-mangsoi",
@@ -1552,12 +1552,12 @@
       "key": "1258-choe-regime-fall",
       "year": 1258,
       "title": "최씨 정권의 몰락",
-      "owner_card": null,
+      "owner_card": "goryeo-src-29",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-29 작성됨(staging). manifest 등록 때 owned로 바꾼다(D218)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1270-sambyeolcho-uprising",
@@ -1585,23 +1585,23 @@
       "key": "1274-first-japan-expedition",
       "year": 1274,
       "title": "1차 일본 원정",
-      "owner_card": null,
+      "owner_card": "goryeo-src-30",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-30 작성됨(staging). manifest 등록 때 owned로 바꾼다(D218)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1280-jeongdong-haengseong",
       "year": 1280,
       "title": "정동행성 설치",
-      "owner_card": null,
+      "owner_card": "goryeo-src-31",
       "participants": [
         "goryeo"
       ],
-      "status": "planned",
-      "note": "goryeo-src-31 작성됨(staging). manifest 등록 때 owned로 바꾼다(D218)."
+      "status": "owned",
+      "note": ""
     },
     {
       "key": "1356-ssangseong-recovery",
