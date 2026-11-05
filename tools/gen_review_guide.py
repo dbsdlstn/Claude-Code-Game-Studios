@@ -40,6 +40,7 @@ REPORTS = [
     ("fact-check-report-usilla-b2.md", "usilla", (13, 22), "src"),
     ("fact-check-report-goryeo-b1.md", "goryeo", (1, 12), "src"),
     ("fact-check-report-goryeo-b2.md", "goryeo", (13, 20), "src"),
+    ("fact-check-report-goryeo-b3.md", "goryeo", (21, 27), "src"),
 ]
 # anchors the reports cover by summary only (no per-anchor row) -> treated as "일치(요약)"
 SUMMARY_ANCHORS = {"baekje": "보고서 요약: 앵커 전부 일치", "silla": "보고서 요약: 앵커 전부 일치"}
