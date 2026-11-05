@@ -1298,6 +1298,10 @@
 - **세션 줄**: 타이틀 "오늘 24장 중 남은 n장" 아래 줄을 "이번 세션 n장(복습 a · 새 b) · 약 k분"으로(이어하기·끝은 그대로).
 - 단위 99, e2e 67 통과. 스크린샷 71장. 이후 웹 결정 번호는 D260~.
 
+## 2026-11-05 D242. 테스트 실행 주소 확정 반영 (메인 디렉터리, 웹 D119)
+- `docs/m2b-checklist.md`·`production/playtest/m2-plan.md`: 자리표시를 `http://localhost:8000/prototypes/m1-timeline/?manifest=../../assets/data/cards/v2/manifest-m2test.json`(휴대폰은 `localhost` 대신 컴퓨터 IP)로 채움. 저장소 맨 위에서 서버, `build.py` 불필요. 리허설 기록이 참가자 기록과 섞이지 않게 하라는 줄과 "참가자마다 새 브라우저 프로필"을 추가.
+- 이전 안내(`build.py` → `dist/m1`, `index.html?manifest=`)는 폐기.
+
 ## 남은 문제
 - 카드 44장 전부 `verified: false`. 사람의 사실 확인 전에는 출시 빌드에 넣을 카드가 없다(`validate_cards.py --release` 실패가 정상).
 - 같은 사료(삼국사기 전승)에 기댄 건국기 카드가 많다. 플레이에서 건국기 칸이 단서 3단계 의존으로 쏠리는지 볼 것.
