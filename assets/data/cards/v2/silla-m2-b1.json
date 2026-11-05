@@ -502,7 +502,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "65-kim-alji"
     },
     {
       "id": "silla-src-02",
@@ -573,7 +574,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "400-silla-relief"
     },
     {
       "id": "silla-src-03",
@@ -649,7 +651,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "418-bak-jesang"
     },
     {
       "id": "silla-src-04",
@@ -720,7 +723,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "503-silla-name-and-title"
     },
     {
       "id": "silla-src-05",
@@ -791,7 +795,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "520-silla-yullyeong"
     },
     {
       "id": "silla-src-06",
@@ -867,7 +872,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "528-silla-buddhism"
     },
     {
       "id": "silla-src-07",
@@ -939,7 +945,8 @@
         "신라",
         "S-B1",
         "가야"
-      ]
+      ],
+      "event_key": "532-geumgwan-annex"
     },
     {
       "id": "silla-src-08",
@@ -1010,7 +1017,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "553-sinju"
     },
     {
       "id": "silla-src-09",
@@ -1081,7 +1089,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "576-hwarang"
     },
     {
       "id": "silla-src-10",
@@ -1152,7 +1161,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "634-bunhwangsa"
     },
     {
       "id": "silla-src-11",
@@ -1223,7 +1233,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "651-jipsabu"
     },
     {
       "id": "silla-src-12",
@@ -1294,7 +1305,8 @@
       "tags": [
         "신라",
         "S-B1"
-      ]
+      ],
+      "event_key": "660-baekje-conquest"
     }
   ]
 }

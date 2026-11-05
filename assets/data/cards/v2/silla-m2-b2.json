@@ -70,7 +70,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "487-relay-stations"
     },
     {
       "id": "silla-src-14",
@@ -141,7 +142,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "493-baekje-silla-marriage"
     },
     {
       "id": "silla-src-15",
@@ -212,7 +214,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "502-burial-ban-ox-plough"
     },
     {
       "id": "silla-src-16",
@@ -284,7 +287,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "512-usan-submission"
     },
     {
       "id": "silla-src-17",
@@ -355,7 +359,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "531-sangdaedeung"
     },
     {
       "id": "silla-src-18",
@@ -426,7 +431,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "536-geonwon-era"
     },
     {
       "id": "silla-src-19",
@@ -498,7 +504,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "545-guksa"
     },
     {
       "id": "silla-src-20",
@@ -571,7 +578,8 @@
         "신라",
         "S-B2",
         "가야"
-      ]
+      ],
+      "event_key": "562-daegaya-conquest"
     },
     {
       "id": "silla-src-21",
@@ -642,7 +650,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "581-wihwabu"
     },
     {
       "id": "silla-src-22",
@@ -713,7 +722,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "645-hwangnyongsa-pagoda"
     },
     {
       "id": "silla-src-23",
@@ -780,7 +790,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "675-maeso-battle"
     },
     {
       "id": "silla-src-24",
@@ -792,7 +803,7 @@
       "year_basis": "chronicle",
       "year_note": null,
       "reign_label": "문무왕 16년",
-      "source_text": "우리 수군이 강어귀에서 큰 나라 장수의 수군과 맞붙어 크고 작은 싸움을 스물두 차례 벌여 모두 이겼다.",
+      "source_text": "우리 수군이 강어귀에서 큰 나라 장수의 수군과 맞붙어 처음에는 졌으나, 다시 나아가 크고 작은 싸움 스물두 차례 끝에 이겼다.",
       "text_basis": "own_paraphrase_from_original",
       "clues": [
         {
@@ -828,7 +839,7 @@
         "url": null,
         "db_id": null,
         "exam_rounds": [],
-        "note": "676년 11월 기벌포, 시득, 설인귀, 22차례 승리는 itwiki 나당 전쟁·한경 요약으로 확인. 첫 싸움에서 졌다는 세부는 원문 대조 필요라 쓰지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+        "note": "676년 11월 기벌포, 시득, 설인귀, 22차례 승리는 itwiki 나당 전쟁·한경 요약으로 확인. 첫 패배 뒤 22번 싸워 이겼다(又進大小二十二戰克之)는 신라 b2 대조로 반영(D150). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
       },
       "disputed": false,
       "disputed_note": null,
@@ -847,7 +858,8 @@
       "tags": [
         "신라",
         "S-B2"
-      ]
+      ],
+      "event_key": "676-gibeolpo-battle"
     }
   ]
 }

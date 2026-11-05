@@ -70,7 +70,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "bc18-wirye-founding"
     },
     {
       "id": "baekje-src-14",
@@ -141,7 +142,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "bc5-hansan-capital"
     },
     {
       "id": "baekje-src-15",
@@ -212,7 +214,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "260-jwapyeong-ranks"
     },
     {
       "id": "baekje-src-16",
@@ -283,7 +286,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "262-official-corruption-law"
     },
     {
       "id": "baekje-src-17",
@@ -354,7 +358,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "372-envoy-to-eastern-jin"
     },
     {
       "id": "baekje-src-18",
@@ -430,7 +435,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "433-naje-alliance"
     },
     {
       "id": "baekje-src-19",
@@ -502,7 +508,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "523-muryeong-epitaph"
     },
     {
       "id": "baekje-src-20",
@@ -569,7 +576,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "551-han-river-recovery"
     },
     {
       "id": "baekje-src-21",
@@ -645,7 +653,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "552-buddhism-to-japan"
     },
     {
       "id": "baekje-src-22",
@@ -716,7 +725,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "567-changwang-reliquary"
     },
     {
       "id": "baekje-src-23",
@@ -784,7 +794,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "660-hwangsanbeol-battle"
     },
     {
       "id": "baekje-src-24",
@@ -851,7 +862,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "663-baekgang-battle"
     }
   ]
 }
