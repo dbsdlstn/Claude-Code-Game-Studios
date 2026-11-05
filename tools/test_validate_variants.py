@@ -110,6 +110,38 @@ class CrossCardTerms(unittest.TestCase):
         self.assertTrue(any("goguryeo-src-11" in l for l in v.variant_crossref_obs(sources)))
 
 
+class ContentBoundary(unittest.TestCase):
+    """D131: V22 error, V23 and V24 observations."""
+
+    def boundary(self, text):
+        cards = copy.deepcopy(BASE)
+        next(c for c in cards if c["id"] == CID)["variants"][0]["text"] = text
+        return v.variant_boundary([c for c in cards if c.get("kind") == "source"])
+
+    def test_current_data_has_no_v22_errors(self):
+        errs, _ = v.variant_boundary([c for c in BASE if c.get("kind") == "source"])
+        self.assertEqual(errs, [])
+
+    def test_other_card_title_is_v22_error(self):
+        errs, _ = self.boundary("도읍을 옮긴 뒤에 한성 함락으로 이어지는 남쪽 진출이 시작되었다는 이야기이다.")
+        self.assertTrue(any(e.startswith("[V22]") and "goguryeo-src-10" in e for e in errs))
+
+    def test_short_title_is_not_v22(self):
+        errs, _ = self.boundary("왕이 오래 머물던 도읍을 떠나 남쪽의 큰 성으로 옮겼다는 이야기이다.")
+        self.assertEqual(errs, [])
+
+    def test_copying_the_explanation_is_v23_observation(self):
+        expl = next(c for c in BASE if c["id"] == CID)["explanation"]
+        errs, obs = self.boundary("이야기에 따르면 " + expl[5:25])
+        self.assertEqual(errs, [])
+        self.assertTrue(any(o.startswith("[V23]") for o in obs))
+
+    def test_copying_another_card_text_is_v24_observation(self):
+        other = next(c for c in BASE if c["id"] == "goguryeo-src-25")["source_text"]
+        _, obs = self.boundary("전하는 바로는 " + other[:15] + " 하였다고 한다.")
+        self.assertTrue(any(o.startswith("[V24]") and "goguryeo-src-25" in o for o in obs))
+
+
 class VolumeRange(unittest.TestCase):
     """V13a (D154): 삼국사기 권 number must fit the section."""
 

@@ -4,7 +4,8 @@
 Usage:
     python3 tools/validate_cards_v2.py [path ...] [--release] [--strict-events]
 
-    path       v2 card JSON file(s). Default: the files listed in
+    path       v2 card JSON file(s); anchors of the nations they use are
+               pulled from the manifest when the files hold none. Default: the files listed in
                assets/data/cards/v2/manifest.json, validated nation by nation
                (anchors and ids still checked across all listed files).
     --release  also apply the release gate (R1-R3 below).
@@ -70,6 +71,12 @@ VARIANTS (design/card-variants-spec.md, D121; optional `variants` list):
       angle) as the content hash.
   OBS (D180) a variant naming another same-deck card's title or a term of its
       level-2 direct clue is printed ("uses ... key term(s)").
+  V22 (D131) a variant containing the title (3+ characters) of another source
+      card of the same deck is an error.
+  V23 OBS: a variant sharing 12+ consecutive characters with its own card's
+      explanation.
+  V24 OBS: a variant sharing 10+ consecutive characters with another
+      same-deck card's source_text (common phrases cause false positives).
   V21 the card content_hash ignores variants (content_hash() never reads them).
   R4 is a runtime rule (unverified variants are skipped), not a release error.
 
@@ -650,6 +657,43 @@ def variant_crossref_obs(sources):
     return lines
 
 
+def longest_common(a, b):
+    """Length of the longest common substring of a and b (V23, V24)."""
+    best, prev = 0, [0] * (len(b) + 1)
+    for ch in a:
+        cur = [0] * (len(b) + 1)
+        for j, d in enumerate(b, 1):
+            if ch == d:
+                cur[j] = prev[j - 1] + 1
+                best = max(best, cur[j])
+        prev = cur
+    return best
+
+
+def variant_boundary(sources):
+    """D131 content boundary: V22 errors, V23 and V24 observations."""
+    errs, obs = [], []
+    for c in sources:
+        for var in c.get("variants") or []:
+            vt = var.get("text") if isinstance(var, dict) and nonempty(var.get("text")) else ""
+            if not vt:
+                continue
+            tag = f"{c.get('id')}/{var.get('id')}"
+            n = longest_common(vt, c.get("explanation") or "")
+            if n >= 12:
+                obs.append(f"[V23] {tag}: shares {n} consecutive characters with the explanation")
+            for o in sources:
+                if o is c or o.get("nation") != c.get("nation"):
+                    continue
+                t = o.get("title")
+                if nonempty(t) and len(t) >= 3 and t in vt:
+                    errs.append(f"[V22] {tag}: contains the title of {o.get('id')} '{t}'")
+                n = longest_common(vt, o.get("source_text") or "")
+                if n >= 10:
+                    obs.append(f"[V24] {tag}: shares {n} consecutive characters with {o.get('id')} source_text")
+    return errs, obs
+
+
 def read_manifest():
     """Return (paths, file->nation, errors) from the manifest."""
     try:
@@ -706,9 +750,34 @@ def main(argv):
             if nation and isinstance(c, dict) and c.get("nation") != nation:
                 manifest_errors.append(f"[M2] {c.get('id')}: nation '{c.get('nation')}' but listed under {nation} in the manifest")
         cards.extend(data["cards"])
+    if not owner:
+        # Explicit files (D99 follow-up): a batch file holds source cards only, so
+        # pull in the anchors of every nation it uses from the manifest's files.
+        have = {c.get("nation") for c in cards if isinstance(c, dict) and c.get("kind") == "anchor"}
+        need = {c.get("nation") for c in cards if isinstance(c, dict) and c.get("kind") == "source"} - have
+        if need:
+            mpaths, mowner, _ = read_manifest()
+            ids = {c.get("id") for c in cards if isinstance(c, dict)}
+            added = 0
+            for mp in mpaths or []:
+                if mowner.get(Path(mp).resolve()) not in need or Path(mp).resolve() in {Path(x).resolve() for x in paths}:
+                    continue
+                try:
+                    extra = json.loads(Path(mp).read_text(encoding="utf-8")).get("cards") or []
+                except (OSError, json.JSONDecodeError):
+                    continue
+                for c in extra:
+                    if isinstance(c, dict) and c.get("kind") == "anchor" and c.get("id") not in ids:
+                        cards.append(c)
+                        added += 1
+            print(f"note: added {added} anchor(s) of {', '.join(sorted(n for n in need if n))} from the manifest"
+                  if added else f"note: no anchors found for {', '.join(sorted(n for n in need if n))}; "
+                  "validate with the nation's anchor file or run without paths")
     errors, warnings, anchors, sources = validate(cards, release)
     errors = manifest_errors + errors
     event_obs = []
+    v22, boundary_obs = variant_boundary(sources)
+    errors += v22
     if owner:
         try:
             registry = json.loads(EVENTS.read_text(encoding="utf-8"))
@@ -722,7 +791,7 @@ def main(argv):
           + (" (release mode)" if release else ""))
     for line in observations(anchors, sources):
         print("OBS   " + line)
-    for line in event_obs + VARIANT_OBS + variant_crossref_obs(sources):
+    for line in event_obs + VARIANT_OBS + variant_crossref_obs(sources) + boundary_obs:
         print("OBS   " + line)
     for w in warnings:
         print("WARN  " + w)
