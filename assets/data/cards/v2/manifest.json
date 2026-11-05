@@ -22,13 +22,9 @@
       "label": "신라",
       "files": [
         "silla-m2-b1.json",
-        "silla-m2-b2.json"
+        "silla-m2-b2.json",
+        "silla-m2-b3.json"
       ]
-    },
-    {
-      "id": "gaya",
-      "label": "가야",
-      "files": []
     }
   ]
 }
