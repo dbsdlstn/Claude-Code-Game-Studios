@@ -38,6 +38,8 @@ REPORTS = [
     ("fact-check-report-b3-b4.md", "silla", (28, 33), "src", "신라 묶음 4"),
     ("fact-check-report-usilla-b1.md", "usilla", (1, 12), "src"),
     ("fact-check-report-usilla-b2.md", "usilla", (13, 22), "src"),
+    ("fact-check-report-goryeo-b1.md", "goryeo", (1, 12), "src"),
+    ("fact-check-report-goryeo-b2.md", "goryeo", (13, 20), "src"),
 ]
 # anchors the reports cover by summary only (no per-anchor row) -> treated as "일치(요약)"
 SUMMARY_ANCHORS = {"baekje": "보고서 요약: 앵커 전부 일치", "silla": "보고서 요약: 앵커 전부 일치"}
@@ -51,7 +53,7 @@ MIN = {  # estimated minutes per item (guess)
 }
 VARIANT_REPORT = "fact-check-report-variants-m1.md"
 BATCH_MIN = 60
-DECK_ORDER = {"goguryeo": 0, "baekje": 1, "silla": 2, "usilla": 3}
+DECK_ORDER = {"goguryeo": 0, "baekje": 1, "silla": 2, "usilla": 3, "goryeo": 4}
 
 
 def clean(s):
@@ -331,7 +333,7 @@ def main(argv=None):
         ts = sorted({i["tier"] for i in b})
         decks = []
         for i in b:
-            d = {"goguryeo": "고구려", "baekje": "백제", "silla": "신라", "usilla": "통일신라"}.get(i["card"]["nation"], i["card"]["nation"])
+            d = {"goguryeo": "고구려", "baekje": "백제", "silla": "신라", "usilla": "통일신라", "goryeo": "고려"}.get(i["card"]["nation"], i["card"]["nation"])
             if d not in decks:
                 decks.append(d)
         out.append(f"| {bi} | {len(b)} | {used}분 | {'/'.join(str(t) for t in ts)} | {', '.join(decks)} |")

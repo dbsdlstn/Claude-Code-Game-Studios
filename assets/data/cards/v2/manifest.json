@@ -35,6 +35,14 @@
         "usilla-m3-b1.json",
         "usilla-m3-b2.json"
       ]
+    },
+    {
+      "id": "goryeo",
+      "label": "고려",
+      "files": [
+        "goryeo-m5-b1.json",
+        "goryeo-m5-b2.json"
+      ]
     }
   ]
 }
