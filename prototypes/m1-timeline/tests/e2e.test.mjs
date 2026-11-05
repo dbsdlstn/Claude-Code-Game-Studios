@@ -2,7 +2,7 @@
 // E2E: node --test prototypes/m1-timeline/tests/e2e.test.mjs  (모바일 390×844, 데스크톱 1280×720)
 import { test, before, after, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { chromium, startServer, openProto, currentCard, gapsFor, pressGap, VIEWPORTS, SAMPLE, BY_ID } from './helpers.mjs';
+import { chromium, startServer, openProto, currentCard, gapsFor, pressGap, VIEWPORTS, SAMPLE, BY_ID, REAL, REAL_BY_ID } from './helpers.mjs';
 
 let server;
 let browser;
@@ -191,4 +191,48 @@ test('데이터 확인: 샘플 카드의 order가 표시 연도와 같은 해', 
     assert.ok(c.year_label.includes(y), `${c.id}: ${c.year_label} / ${y}`);
   }
   assert.equal(BY_ID.size, SAMPLE.cards.length + SAMPLE.anchors.length);
+});
+
+describe('실제 콘텐츠 초안(assets/data/cards/v2-draft/goguryeo-m1.json)', { skip: !REAL && '초안 파일 없음' }, () => {
+  for (const [name, opts] of Object.entries(VIEWPORTS)) {
+    const mobile = name === 'mobile';
+    test(`${name}: 기본 경로로 읽고 "사실 확인 전" 표시, 세션 8장 끝까지(같은 해 카드 포함), 수험 정리·출처 공개`, async () => {
+      const ctx = await browser.newContext(opts);
+      const page = await ctx.newPage();
+      const errors = [];
+      page.on('pageerror', (e) => errors.push(String(e)));
+      try {
+        await openProto(page, server.base, { data: null, seed: 11 });
+        assert.match(await page.innerText('#data-info'), /goguryeo-m1\.json · 카드 12장 · 기준 5장/);
+        assert.match(await page.innerText('#data-warn'), /사실 확인 전/);
+        assert.match(await page.innerText('#progress'), /카드 1 \/ 8/);
+        const anchorTitles = await page.locator('#timeline .row-anchor .row-title').allInnerTexts();
+        assert.deepEqual(anchorTitles, [...REAL.anchors].sort((a, b) => a.order - b.order).map((a) => a.title));
+        let n = 0;
+        while (await page.getAttribute('#card', 'data-card-id')) {
+          const card = await currentCard(page, REAL_BY_ID);
+          assert.ok(!(await page.innerText('#card')).includes(card.title), `${card.id} 이름 노출`);
+          await pressGap(page, (await gapsFor(page, card)).right, mobile);
+          assert.equal(await page.getAttribute('#result', 'data-result'), 'correct', card.id);
+          if (card.exam_note) assert.ok((await page.innerText('#result-note')).includes(card.exam_note));
+          assert.ok((await page.innerText('#result-source')).includes(card.source.name));
+          await page.click('#btn-next');
+          n++;
+        }
+        assert.equal(n, 8);
+        await page.waitForSelector('#summary:not([hidden])');
+        assert.deepEqual(errors, []);
+      } finally { await ctx.close(); }
+    });
+  }
+
+  test('같은 해: 고국원왕 전사(371)는 소수림왕 즉위(371) 앞 틈만 정답', async () => {
+    const { buildTimeline, correctGaps } = await import('../js/rules.js');
+    const card = REAL.cards.find((c) => c.title === '고국원왕 전사');
+    assert.ok(card, '카드가 있어야 한다');
+    const t = buildTimeline(REAL.anchors);
+    const k = correctGaps(t, card.order);
+    assert.equal(k.length, 1);
+    assert.equal(t[k[0]].title ?? REAL_BY_ID.get(t[k[0]].id).title, '소수림왕 즉위');
+  });
 });

@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import net from 'node:net';
 import { buildTimeline, correctGaps, isCorrectGap } from '../js/rules.js';
+import { normalizeDeck } from '../js/data.js';
+import { existsSync } from 'node:fs';
 
 const require = createRequire(import.meta.url);
 export const { chromium, devices } = require('playwright');
@@ -16,6 +18,10 @@ export const PROTO_ROOT = path.resolve(here, '..');
 export const REPO_ROOT = path.resolve(here, '..', '..', '..');
 export const SAMPLE = JSON.parse(readFileSync(path.join(PROTO_ROOT, 'data', 'sample.json'), 'utf8'));
 export const BY_ID = new Map([...SAMPLE.cards, ...SAMPLE.anchors].map((c) => [c.id, c]));
+const REAL_PATH = path.join(REPO_ROOT, 'assets', 'data', 'cards', 'v2-draft', 'goguryeo-m1.json');
+/** 콘텐츠 세션의 실제 고구려 초안(정규화 후). 없으면 null. */
+export const REAL = existsSync(REAL_PATH) ? normalizeDeck(JSON.parse(readFileSync(REAL_PATH, 'utf8'))).deck : null;
+export const REAL_BY_ID = new Map(REAL ? [...REAL.cards, ...REAL.anchors].map((c) => [c.id, c]) : []);
 
 /** 모바일 세로 390×844(터치)와 데스크톱 1280×720. */
 export const VIEWPORTS = {
@@ -44,14 +50,17 @@ export async function startServer() {
   throw new Error('정적 서버가 뜨지 않았다');
 }
 
-export async function openProto(page, base, { seed = 7 } = {}) {
-  await page.goto(`${base}/prototypes/m1-timeline/index.html?data=data/sample.json&seed=${seed}`);
+/** data: 'data/sample.json'(기본) 또는 null(설정의 기본 경로 = 실제 초안). */
+export async function openProto(page, base, { seed = 7, data = 'data/sample.json' } = {}) {
+  const q = new URLSearchParams({ seed: String(seed) });
+  if (data) q.set('data', data);
+  await page.goto(`${base}/prototypes/m1-timeline/index.html?${q}`);
   await page.waitForSelector('body[data-ready="true"]');
 }
 
-export async function currentCard(page) {
+export async function currentCard(page, byId = BY_ID) {
   const id = await page.getAttribute('#card', 'data-card-id');
-  return id ? BY_ID.get(id) : null;
+  return id ? byId.get(id) : null;
 }
 
 /** 화면의 연표(기준 + 놓인 카드)를 읽어 맞는 틈과 틀린 틈을 계산한다. */

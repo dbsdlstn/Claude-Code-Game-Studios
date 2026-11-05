@@ -2,7 +2,11 @@
 // 스크린샷: node prototypes/m1-timeline/tests/screenshots.mjs → production/qa/evidence/m1/
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
-import { chromium, startServer, openProto, currentCard, gapsFor, pressGap, VIEWPORTS, REPO_ROOT } from './helpers.mjs';
+import { chromium, startServer, openProto, currentCard as cc, gapsFor, pressGap, VIEWPORTS, REPO_ROOT, REAL, REAL_BY_ID, BY_ID } from './helpers.mjs';
+
+// 실제 콘텐츠 초안이 있으면 그것으로, 없으면 샘플로 찍는다.
+const DATA = REAL ? null : 'data/sample.json';
+const currentCard = (page) => cc(page, REAL ? REAL_BY_ID : BY_ID);
 
 const OUT = path.join(REPO_ROOT, 'production', 'qa', 'evidence', 'm1');
 mkdirSync(OUT, { recursive: true });
@@ -18,7 +22,7 @@ try {
       await page.screenshot({ path: path.join(OUT, `${name}-${file}.png`), fullPage: full });
       console.log('saved', `production/qa/evidence/m1/${name}-${file}.png`);
     };
-    await openProto(page, server.base);
+    await openProto(page, server.base, { data: DATA, seed: 11 });
     await shot('01-question');
     await shot('01b-question-full', true);
     await page.click('#btn-clue');

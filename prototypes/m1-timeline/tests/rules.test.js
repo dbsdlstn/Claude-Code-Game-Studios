@@ -213,3 +213,54 @@ describe('저장과 복원', () => {
     assert.equal(a, dataFingerprint('x', structuredClone(SAMPLE)));
   });
 });
+
+describe('데이터 로더(js/data.js)', async () => {
+  const { normalizeDeck, formatOf, loadRaw } = await import('../js/data.js');
+  const REAL_PATH = path.join(here, '..', '..', '..', 'assets', 'data', 'cards', 'v2-draft', 'goguryeo-m1.json');
+  const { existsSync } = await import('node:fs');
+  const raw = existsSync(REAL_PATH) ? JSON.parse(readFileSync(REAL_PATH, 'utf8')) : null;
+
+  test('샘플은 그대로, 알 수 없는 형식은 오류', () => {
+    assert.equal(formatOf(SAMPLE), 'm1-draft');
+    assert.equal(normalizeDeck(SAMPLE).deck, SAMPLE);
+    assert.deepEqual(normalizeDeck({ foo: 1 }).errors, ['알 수 없는 데이터 형식']);
+  });
+
+  test('콘텐츠 초안: 변환 후 검증 오류 없음, 앵커 5·카드 12, 앞면은 사료 지문', { skip: !raw && '초안 없음' }, () => {
+    const n = normalizeDeck(raw);
+    assert.equal(n.format, 'v2-draft-content');
+    assert.deepEqual(n.errors, []);
+    assert.deepEqual(validateDeck(n.deck), []);
+    assert.equal(n.deck.anchors.length, 5);
+    assert.equal(n.deck.cards.length, 12);
+    assert.equal(n.deck.cards[0].source_text, raw.cards[0].front);
+  });
+
+  test('콘텐츠 초안: 모든 카드가 timeline.after/before가 가리키는 기준 카드 사이에서 정답', { skip: !raw && '초안 없음' }, () => {
+    const { deck } = normalizeDeck(raw);
+    const t = buildTimeline(deck.anchors);
+    for (const c of raw.cards) {
+      const k = correctGaps(t, deck.cards.find((x) => x.id === c.id).order);
+      assert.equal(k.length, 1, c.id);
+      const before = k[0] > 0 ? t[k[0] - 1].id : null;
+      const after = k[0] < t.length ? t[k[0]].id : null;
+      assert.equal(before, c.timeline.after ?? null, `${c.id} 앞`);
+      assert.equal(after, c.timeline.before ?? null, `${c.id} 뒤`);
+    }
+  });
+
+  test('같은 해 기준 카드와의 순서는 timeline으로, 모순이면 오류', () => {
+    const base = { _format: 'v2-draft-content x', nation: 'goguryeo',
+      anchors: [{ id: 'a1', title: 'A1', year: 100, year_label: '100년' }, { id: 'a2', title: 'A2', year: 200, year_label: '200년' }],
+      cards: [{ id: 'c1', title: 'C1', year: 200, year_label: '200년', front: '지문', clues: [], timeline: { after: 'a1', before: 'a2' } }] };
+    assert.equal(normalizeDeck(base).deck.cards[0].order, 199.5);
+    const bad = structuredClone(base);
+    bad.cards[0].year = 300;
+    assert.match(normalizeDeck(bad).errors.join(), /먼저가 아니다/);
+  });
+
+  test('loadRaw: 앞 경로가 없으면 다음 경로', async () => {
+    const r = await loadRaw(['a', 'b'], async (u) => ({ ok: u === 'b', status: 404, json: async () => ({ x: 1 }) }));
+    assert.equal(r.url, 'b');
+  });
+});
