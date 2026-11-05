@@ -47,6 +47,12 @@ try {
     await page.click('#title-play');
     await shot('26-usilla-timeline', true);
     await page.evaluate(() => localStorage.clear());
+    // 고려(staging 미리 보기, D114·D191 13앵커·D235 인장): 타이틀과 압축 연표
+    await openProto(page, server.base, { data: null, title: null, manifest: 'tests/fixtures/manifest-goryeo.json', nation: 'goryeo' });
+    await shot('28-goryeo-title');
+    await page.click('#title-play');
+    await shot('29-goryeo-timeline', true);
+    await page.evaluate(() => localStorage.clear());
     // 저장 손상 안내(F11, D109·D110): 안내 문구와 [이전 기록 내보내기]
     await openProto(page, server.base, { data: null, title: null });
     await page.evaluate(() => { localStorage.setItem('hanyang-m1:save:v2', '{broken'); localStorage.setItem('hanyang-m1:rewards:v1', 'not json'); });

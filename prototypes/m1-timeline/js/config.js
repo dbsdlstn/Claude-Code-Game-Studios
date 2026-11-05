@@ -62,8 +62,8 @@ export const CONFIG = Object.freeze({
     gaya: Object.freeze({ ch: '가', bg: '#4F7A55', fg: '#FFFFFF' }),
     usilla: Object.freeze({ ch: '통', bg: '#5C3399', fg: '#FFFFFF' }),
     balhae: Object.freeze({ ch: '발', bg: '#5B5B5B', fg: '#FFFFFF' }),
-    // 고려: 임시값(D113). 설계가 art-bible에서 인장·색을 정하면 바꾼다. '고'는 고구려와 겹쳐 '려', 흰 글자 대비 5.97:1.
-    goryeo: Object.freeze({ ch: '려', bg: '#1F6F64', fg: '#FFFFFF' }),
+    // 고려(D235 확정): 청자 비색, 먹 글자 "려"(고구려 "고"와 겹치지 않게). 한지 바탕 대비가 1.87이라 둘레 선 색 1px 테두리.
+    goryeo: Object.freeze({ ch: '려', bg: '#7FB5A3', fg: '#2B2118', border: '#8A6D3B' }),
   }),
   /** 타이틀의 "약 k분"(D93·D102): 카드 한 장에 드는 시간 추정(초). M1 관찰 전 임시값. */
   secondsPerCard: 40,

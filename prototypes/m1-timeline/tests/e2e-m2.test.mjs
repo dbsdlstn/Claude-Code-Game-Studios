@@ -695,3 +695,50 @@ test('키보드만: 타이틀 → 학습 세션(칸 Tab+Enter) → 결과 → �
   assert.notEqual(after[0], before);
   assert.equal(after[1], 'true', '방향키로 탭이 바뀜');
 }));
+
+// D114: 고려(staging 미리 확인, D191 앵커 13개, D235 인장). 390px 압축 연표에서 13앵커·44px "+"·정답 칸 표시.
+const GORYEO = 'tests/fixtures/manifest-goryeo.json';
+const GORYEO_BY_ID = (() => {
+  const fx = (f) => JSON.parse(readFileSync(new URL(f, import.meta.url), 'utf8'));
+  const files = ['../../../assets/data/cards/v2/staging/goryeo-m5-b1.json', '../../../assets/data/cards/v2/staging/goryeo-m5-b2.json', './fixtures/goryeo-anchor13.json'].map(fx);
+  const { deck } = normalizeDeck({ schema: 2, cards: files.flatMap((f) => f.cards) });
+  return new Map([...deck.cards, ...deck.anchors].map((c) => [c.id, c]));
+})();
+test('고려(staging + 13번째 앵커): 인장 "려"(#7FB5A3, 먹 글자, 1px 테두리), 390px 압축 연표 13앵커, 정답·오답 뒤 맞는 칸 표시', () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, title: null, manifest: GORYEO, nation: 'goryeo' });
+  await page.waitForSelector('#title:not([hidden])');
+  const s = await page.locator('#title-nations [data-nation="goryeo"] .seal').evaluate((n) => { const c = getComputedStyle(n); return [n.textContent, c.backgroundColor, c.color, c.borderTopWidth, c.borderTopColor, Math.round(n.getBoundingClientRect().width)]; });
+  assert.deepEqual(s, ['려', 'rgb(127, 181, 163)', 'rgb(43, 33, 24)', '1px', 'rgb(138, 109, 59)', 22]);
+  await page.locator('#title-play').tap();
+  await page.waitForSelector('#card[data-card-id]');
+  assert.match(await page.innerText('#timeline-title'), /려\s*고려 왕대 연표/);
+  assert.equal(await page.locator('#timeline.compact').count(), 1);
+  const anchors = await page.locator('#timeline .row-anchor').evaluateAll((r) => r.map((x) => [x.innerText.replace(/\s+/g, ' '), x.getBoundingClientRect().height]));
+  assert.equal(anchors.length, 13);
+  assert.match(anchors[12][0], /1389~1392 공양왕/);
+  assert.ok(anchors.every(([, h]) => h <= 48), `앵커 줄 ${anchors.map((a) => a[1])}`);
+  assert.equal(await page.locator('#timeline .gap').count(), 13);
+  const btns = await page.locator('#timeline .gap').evaluateAll((g) => g.map((b) => [Math.round(b.getBoundingClientRect().width), Math.round(b.getBoundingClientRect().height)]));
+  assert.ok(btns.every(([w, h]) => w >= 44 && h >= 44), String(btns));
+  const ratio = await page.evaluate(() => document.querySelector('.timeline-wrap').getBoundingClientRect().height / innerHeight);
+  assert.ok(ratio <= 2.0, `연표 ${ratio.toFixed(2)}창`);
+  assert.ok(await noOverflow(page));
+  // 오답 한 번, 정답 한 번: 놓인 카드는 맞는 앵커 바로 아래(같은 칸)에 ○/✕로, 오답은 "맞는 칸" 표시
+  const anchorIds = await page.locator('#timeline .row-anchor').evaluateAll((r) => r.map((x) => x.dataset.id));
+  for (const wrongFirst of [true, false]) {
+    const c = await currentCard(page, GORYEO_BY_ID);
+    const g = await gapsFor(page, c);
+    await pressGap(page, wrongFirst ? g.wrong : g.right, true);
+    const placed = page.locator('#timeline .row-placed.row-new');
+    assert.equal(await placed.count(), 1);
+    assert.match(await placed.getAttribute('class'), wrongFirst ? /row-wrong/ : /row-right/);
+    assert.match(await placed.innerText(), new RegExp(`${wrongFirst ? '✕' : '○'}\\s*${c.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+    if (wrongFirst) assert.match(await placed.innerText(), /맞는 칸/);
+    const prevAnchor = await placed.evaluate((n) => { let p = n.previousElementSibling; while (p && !p.classList.contains('row-anchor')) p = p.previousElementSibling; return p?.dataset.id ?? null; });
+    assert.equal(prevAnchor, g.right === 0 ? null : anchorIds[g.right - 1], '맞는 앵커 아래');
+    assert.ok(await placed.evaluate((n) => { const r = n.getBoundingClientRect(); return r.width > 0 && r.right <= innerWidth; }));
+    assert.ok(await noOverflow(page));
+    await page.locator('#btn-next').tap();
+    await page.waitForSelector('#card[data-card-id]');
+  }
+}));
