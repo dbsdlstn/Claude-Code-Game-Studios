@@ -318,12 +318,12 @@ export function placeCurrent(state, k, cardsById, anchors, progress, cfg, at = n
     next = Object.freeze({
       ...state, index: state.index + 1, clues: 0,
       queue: requeue ? Object.freeze([...state.queue, id]) : state.queue,
-      placed: Object.freeze([...state.placed, Object.freeze({ id, order: card.order, correct, gap: k, clueUsed: result.clueUsed, boxFrom: result.boxFrom, boxTo: result.boxTo, nearMiss: result.nearMiss, bestFrom: before?.best_grade ?? 0, bestTo: entry?.best_grade ?? 0, probation: !!entry?.probation })]),
+      placed: Object.freeze([...state.placed, Object.freeze({ id, order: card.order, correct, gap: k, clueUsed: result.clueUsed, boxFrom: result.boxFrom, boxTo: result.boxTo, nearMiss: result.nearMiss, bestFrom: before?.best_grade ?? 0, bestTo: entry?.best_grade ?? 0, probation: !!entry?.probation, probationFrom: !!before?.probation })]),
     });
   } else {
     next = Object.freeze({
       ...state, index: state.index + 1, clues: 0,
-      placed: retry ? state.placed : Object.freeze([...state.placed, Object.freeze({ id, order: card.order, correct, gap: k, clueUsed: result.clueUsed, boxFrom: result.boxFrom, boxTo: result.boxTo, nearMiss: result.nearMiss, bestFrom: before?.best_grade ?? 0, bestTo: entry?.best_grade ?? 0, probation: !!entry?.probation })]),
+      placed: retry ? state.placed : Object.freeze([...state.placed, Object.freeze({ id, order: card.order, correct, gap: k, clueUsed: result.clueUsed, boxFrom: result.boxFrom, boxTo: result.boxTo, nearMiss: result.nearMiss, bestFrom: before?.best_grade ?? 0, bestTo: entry?.best_grade ?? 0, probation: !!entry?.probation, probationFrom: !!before?.probation })]),
       retryResults: retry ? Object.freeze([...state.retryResults, Object.freeze({ id, correct, gap: k, clueUsed: result.clueUsed })]) : state.retryResults,
     });
   }

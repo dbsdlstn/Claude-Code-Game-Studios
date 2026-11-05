@@ -100,29 +100,35 @@ async function playOneSession(page, mobile = false) {
   await page.waitForSelector('#summary:not([hidden])');
 }
 
-test('보상 정산(session-result.md): 결과 요약 → 카드별 → 하루 목표·연속 → 레벨 → 업적 → 다음 복습, 별도 저장 키', () => withPage(VIEWPORTS.desktop, async (page) => {
+test('결과 한 화면(D128): A 요약 → B 다음 복습·[다음 세션] → C XP → D 바뀐 카드만 → E 목표·연속 → F 레벨 → G 업적, 별도 저장 키', () => withPage(VIEWPORTS.desktop, async (page) => {
   await openProto(page, server.base);
   await playOneSession(page);
   const X = CONFIG.rewards.xp;
-  assert.equal(await page.innerText('#summary-title'), '오늘의 세션 · 고구려');
+  assert.equal(await page.innerText('#summary-title'), '오늘의 세션 · 고구려 · 세션 1');
+  assert.match(await page.innerText('#session-no'), /세션 1/, '머리글은 방금 끝난 세션');
   assert.match(await page.innerText('#stage-summary'), new RegExp(`정답 ${FIRST - 1} / ${FIRST}\\s+깨끗한 정답 ${FIRST - 1} · 단서를 쓴 정답 0 · 오답 1\\s+다시 풀기 1장 중 1장 성공`));
-  assert.doesNotMatch(await page.innerText('#stage-summary'), /XP/, '1단계에는 XP가 없다');
-  assert.deepEqual(await page.locator('#summary-body .stage').evaluateAll((n) => n.map((x) => x.dataset.stage)), ['summary', 'cards', 'goal', 'level', 'ach', 'next']);
-  // 카드별: 깨끗한 정답 +10, 상자 승급 +5, 오답 +0과 재학습 안내
-  const lines = await page.locator('#settle-list .settle').evaluateAll((n) => n.map((x) => [x.dataset.kind, x.dataset.xp, x.innerText]));
-  const all = lines.map(([k, , t]) => [k, t]);
-  assert.equal(all.length, FIRST);
-  const wrong = all.find(([k]) => k === 'wrong');
+  assert.doesNotMatch(await page.innerText('#stage-summary'), /XP/, 'A에는 XP가 없다');
+  assert.deepEqual(await page.locator('#summary-body .stage').evaluateAll((n) => n.map((x) => x.dataset.stage)), ['summary', 'next', 'xp', 'cards', 'goal', 'level', 'ach']);
+  assert.equal(await page.locator('#stage-next #summary-next').count(), 1, '[다음 세션]은 B 블록 안');
+  assert.equal(await page.isVisible('#summary-skip'), false);
+  assert.equal(await page.isVisible('#summary-step'), false);
+  // D: 바뀐 카드만(새 카드 첫 정답은 상자 1 → 2, 보너스 없음; 오답은 재학습 표시가 새로 붙음)
+  const lines = await page.locator('#settle-list .settle').evaluateAll((n) => n.map((x) => [x.dataset.kind, x.innerText]));
+  assert.equal(lines.length, FIRST, '이번 세션은 모두 바뀜(새 카드)');
+  const wrong = lines.find(([k]) => k === 'wrong');
   assert.match(wrong[1], /해설을 읽어 보세요\s*\+0[\s\S]*다음에 두 번 연속 맞히면 올라가요/);
-  assert.ok(all.filter(([k]) => k === 'clean').every(([, t]) => /깨끗한 정답\s*\+10[\s\S]*상자 1 → 2 · \+5/.test(t)));
-  const xp = (FIRST - 1) * (X.clean + X.box_up) + X.daily_goal;
+  for (const [, t] of lines.filter(([k]) => k === 'clean')) {
+    assert.match(t, /깨끗한 정답\s*\+10[\s\S]*상자 1 → 2/);
+    assert.doesNotMatch(t, /상자 1 → 2 · \+5/, '상자 1 → 2에는 승급 보너스가 없다(D164)');
+  }
+  assert.doesNotMatch(await page.innerText('#summary-body'), /직접 힌트/);
+  const xp = (FIRST - 1) * X.clean + X.daily_goal;
   assert.equal(await page.getAttribute('#summary-xp', 'data-xp'), String(xp));
   assert.match(await page.innerText('#summary-goal'), new RegExp(`오늘 목표 달성 · \\+${X.daily_goal}`));
   assert.match(await page.innerText('#summary-streak'), /연속 1일째예요/);
-  assert.match(await page.innerText('#summary-levelup'), /레벨 \d → \d|레벨 \d이 되었어요/);
   assert.match(await page.innerText('#summary-achievements'), /업적 · 첫 걸음 · 첫 세션을 마쳤어요/);
-  assert.match(await page.innerText('#stage-next'), /다음 세션 복습 1장|다음 세션에는 새 카드부터/);
-  assert.equal(await page.isVisible('#summary-next'), true);
+  // B: 같은 날이라 오답 카드는 내일(D94), 이를 알린다
+  assert.match(await page.innerText('#stage-next'), /오늘 푼 카드 \d+장은 내일 다시 나와요/);
   assert.equal(await page.isVisible('#summary-home'), true);
   assert.doesNotMatch(await page.innerText('#summary-body'), /null|undefined|NaN/);
   await page.reload();
@@ -133,25 +139,26 @@ test('보상 정산(session-result.md): 결과 요약 → 카드별 → 하루 �
   assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:save:v2')).rewards), undefined, '학습 저장과 분리');
 }));
 
-test('보상 정산은 탭으로 한 단계씩, 건너뛰기로 끝까지(동작 줄이기 꺼짐)', () => withPage({ ...VIEWPORTS.mobile, reducedMotion: 'no-preference' }, async (page) => {
+test('390px 결과 한 화면: A와 B([다음 세션])가 스크롤 없이 첫 화면, 탭 0번으로 모두 보이고 탭하면 애니메이션 끝, Esc 무시', () => withPage({ ...VIEWPORTS.mobile, reducedMotion: 'no-preference' }, async (page) => {
   await openProto(page, server.base);
   await playOneSession(page, true);
-  const shown = () => page.locator('#summary-body .stage:not([hidden])').count();
-  assert.equal(await shown(), 1, '처음에는 결과 요약만');
-  assert.equal(await page.isVisible('#summary-next'), false);
-  assert.equal(await page.evaluate(() => document.activeElement.id), 'summary-skip');
-  await page.locator('#summary-step').tap();
-  assert.equal(await shown(), 2);
+  const inView = (sel) => page.locator(sel).evaluate((n) => { const r = n.getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; });
+  assert.ok(await inView('#stage-summary'));
+  assert.ok(await inView('#summary-next'), '[다음 세션]이 첫 화면');
+  const bh = await page.locator('#summary-next').evaluate((b) => b.getBoundingClientRect().height);
+  assert.ok(bh >= 44);
+  assert.equal(await page.locator('#summary-body.reveal').count(), 1);
+  assert.equal(await page.locator('#summary-body .stage[hidden]').count(), 0, '탭 없이 모든 블록이 문서에 있다');
+  await page.locator('#stage-summary').tap();
+  assert.equal(await page.locator('#summary-body.reveal-done').count(), 1, '탭하면 애니메이션 끝');
   await page.keyboard.press('Escape');
   assert.equal(await page.isVisible('#summary'), true, 'Esc로 닫히지 않는다');
-  await page.locator('#summary-skip').tap();
-  assert.equal(await shown(), Number(await page.getAttribute('#summary-body', 'data-total')));
-  assert.equal(await page.isVisible('#summary-next'), true);
+  assert.ok(await noOverflow(page));
   await page.locator('#summary-home').tap();
   await page.waitForSelector('#title:not([hidden])');
 }));
 
-test('하루 세 번째 세션: 인출 XP 0과 안내, 승급 보너스는 그대로', () => withPage(VIEWPORTS.desktop, async (page) => {
+test('하루 세 번째 세션: 카드별 +0 없이 "오늘 경험치는 다 모았어요" 한 줄, 승급·등급 보너스는 따로', () => withPage(VIEWPORTS.desktop, async (page) => {
   await openProto(page, server.base);
   await page.evaluate(() => {
     const d = new Date(Date.now() - 3 * 3600000);
@@ -162,9 +169,9 @@ test('하루 세 번째 세션: 인출 XP 0과 안내, 승급 보너스는 그�
   await page.reload();
   await page.waitForSelector('body[data-ready="true"]');
   await playOneSession(page);
-  const X = CONFIG.rewards.xp;
-  assert.equal(await page.getAttribute('#summary-xp', 'data-xp'), String((FIRST - 1) * X.box_up), '승급만');
-  assert.match(await page.innerText('#stage-next'), /경험치는 하루 두 세션까지예요/);
+  assert.equal(await page.getAttribute('#summary-xp', 'data-xp'), '0', '새 카드 첫 정답이라 보너스도 없다');
+  assert.match(await page.innerText('#stage-xp'), /오늘 경험치는 다 모았어요 \(하루 두 세션까지\)/);
+  assert.equal(await page.locator('#settle-list .settle-xp').count(), 0, '카드별 +0 줄 없음');
   assert.match(await page.innerText('#stage-next'), /오늘은 충분히 했어요/);
   assert.equal(await page.locator('#stage-goal').count(), 0, '목표는 이미 달성');
   // 권장 상한(하루 3세션, D94): 막지 않고 타이틀에도 안내만

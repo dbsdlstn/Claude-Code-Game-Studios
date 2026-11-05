@@ -59,7 +59,8 @@ export const CONFIG = Object.freeze({
    */
   rewards: Object.freeze({
     enabled: true,
-    xp: Object.freeze({ clean: 10, clue_relation: 5, clue_direct: 3, wrong: 0, box_up: 5, grade_up: Object.freeze([0, 20, 40, 80]), daily_goal: 20 }),
+    /** box_up은 상자 box_up_min_box 이상에서 오를 때만(D164), 재학습 해제 만회 probation_release(D166). */
+    xp: Object.freeze({ clean: 10, clue_relation: 5, clue_direct: 3, wrong: 0, box_up: 5, box_up_min_box: 2, probation_release: 5, grade_up: Object.freeze([0, 20, 40, 80]), daily_goal: 20 }),
     xp_sessions_per_day: 2,
     level: Object.freeze({ base: 25, step: 30 }),
     daily_goal_sessions: 1,

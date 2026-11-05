@@ -1,11 +1,62 @@
 {
-  "_note": "보상 수치(design/rewards-spec.md §9·§14, D120·D121). 웹 프로토타입이 읽는다(D103). 없거나 키가 빠지면 prototypes/m1-timeline/js/config.js의 기본값.",
-  "xp": { "clean": 10, "clue_relation": 5, "clue_direct": 3, "wrong": 0, "box_up": 5, "grade_up": [0, 20, 40, 80], "daily_goal": 20 },
+  "_note": "보상 수치(design/rewards-spec.md §9·§14, D120·D121·D128). 웹 프로토타입이 읽는다(D103·D107). 없거나 키가 빠지면 prototypes/m1-timeline/js/config.js의 기본값.",
+  "xp": {
+    "clean": 10,
+    "clue_relation": 5,
+    "clue_direct": 3,
+    "wrong": 0,
+    "box_up": 5,
+    "box_up_min_box": 2,
+    "probation_release": 5,
+    "grade_up": [
+      0,
+      20,
+      40,
+      80
+    ],
+    "daily_goal": 20
+  },
   "xp_sessions_per_day": 2,
-  "level": { "base": 25, "step": 30 },
+  "level": {
+    "base": 25,
+    "step": 30
+  },
   "daily_goal_sessions": 1,
   "goal_min_cards": 3,
-  "streak": { "rest_pass_every": 7, "rest_pass_max": 2, "day_rollover_hour": 3 },
-  "titles": [[1, "입문자"], [5, "서당 학동"], [10, "향교 유생"], [15, "성균관 유생"], [20, "진사"], [30, "급제자"], [40, "대제학"]],
+  "streak": {
+    "rest_pass_every": 7,
+    "rest_pass_max": 2,
+    "day_rollover_hour": 3
+  },
+  "titles": [
+    [
+      1,
+      "입문자"
+    ],
+    [
+      5,
+      "서당 학동"
+    ],
+    [
+      10,
+      "향교 유생"
+    ],
+    [
+      15,
+      "성균관 유생"
+    ],
+    [
+      20,
+      "진사"
+    ],
+    [
+      30,
+      "급제자"
+    ],
+    [
+      40,
+      "대제학"
+    ]
+  ],
   "daily_session_soft_cap": 3
 }
