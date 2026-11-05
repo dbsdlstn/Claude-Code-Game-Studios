@@ -37,7 +37,8 @@ func setup(config: GameConfig, anchors: Array[CardData]) -> void:
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		header.add_child(name_label)
 		var def_label := HanjiTheme.small_label(config.era_definition(e))
-		def_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		# 단어 단위로만 줄을 바꾼다("전/쟁기"처럼 낱말 중간에서 끊기지 않게, CI 화면 S2).
+		def_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 		def_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		def_label.custom_minimum_size = Vector2(176, 0)
 		header.add_child(def_label)

@@ -334,6 +334,12 @@
 - **gdUnit4 플러그인**: CI 체크아웃에서만 `project.godot`에 `[editor_plugins]`를 붙인다. 저장소의 `project.godot`은 바꾸지 않는다(로컬 설치는 사용자 몫).
 - **결과**(2026-11-05): 3회차에서 Godot 4.7.2 + gdUnit4 6.2.2로 175/175 통과(파싱 오류 0, 고아 노드 0). 앞의 두 회차에서 실제 파싱 오류 2개를 고쳤다(`docs/reviews/godot-ci-runs.md`). "남은 문제"의 "Godot 미실행"과 "gdUnit4 4.7 호환 미확인"은 테스트 범위에서 해소됐다. 화면 확인과 스크린샷 증거는 여전히 남았다.
 
+## 2026-11-05 D55. CI에서 Godot 화면 캡처 (Godot MVP)
+- **잡** `godot-screens`: Xvfb(1280×720×24) + Mesa llvmpipe(소프트웨어 OpenGL)로 `--rendering-driver opengl3` 창을 띄운다(`--headless`는 그리지 않으므로 쓰지 않는다). 한글 글꼴은 `fonts-noto-cjk`를 깐다(사용자 PC의 시스템 한글 글꼴을 흉내. 글꼴이 없는 경우의 안내는 D18·D35로 따로 다룬다).
+- **캡처 스크립트** `tests/screens/capture_screens.gd`(SceneTree 스크립트, 게임 코드 변경 없음): `main.tscn`을 띄우고 Main의 함수로 상태를 만든 뒤 `root.get_texture().get_image().save_png()`. 튜토리얼 2장, 타이틀, 보드 시작·단서 펼침·관계 강조, 정답 뒤, 오답 뒤, 라운드 결과, 도감, 하는 방법.
+- **증거 보관**: artifact `godot-screens`. 받은 PNG는 `production/qa/evidence/godot/`에 커밋한다.
+- **액션 버전**: Node 20 경고 때문에 checkout `v5.0.0`, upload-artifact `v5.0.0`으로 올렸다.
+
 ## 남은 문제
 - 카드 44장 전부 `verified: false`. 사람의 사실 확인 전에는 출시 빌드에 넣을 카드가 없다(`validate_cards.py --release` 실패가 정상).
 - 같은 사료(삼국사기 전승)에 기댄 건국기 카드가 많다. 플레이에서 건국기 칸이 단서 3단계 의존으로 쏠리는지 볼 것.

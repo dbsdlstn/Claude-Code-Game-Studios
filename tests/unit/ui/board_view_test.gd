@@ -85,3 +85,18 @@ func test_empty_ink_glyph_color_meets_non_text_contrast() -> void:
 	# 리뷰 3 H4: ○는 MUTED로 그린다(3:1 이상). 바이블 INK_EMPTY는 장식 전용.
 	assert_float(HanjiTheme.contrast_ratio(HanjiTheme.MUTED, HanjiTheme.PAPER)).is_greater_equal(3.0)
 	assert_float(HanjiTheme.contrast_ratio(HanjiTheme.INK_EMPTY, HanjiTheme.PAPER)).is_less(3.0)
+
+
+func test_cell_lines_keep_their_own_result_color() -> void:
+	# CI 화면 S2: 오답이 더해져도 앞의 정답 줄은 정답 글자색으로 남는다.
+	var board := _board()
+	board.show_placed("silla", "ending", "가", true)
+	board.show_placed("silla", "ending", "나", false)
+	var labels: Array = []
+	for n: Node in board.cell("silla", "ending").find_children("*", "Label", true, false):
+		var l := n as Label
+		if l.text.begins_with("○") or l.text.begins_with("×"):
+			labels.append(l)
+	assert_int(labels.size()).is_equal(2)
+	assert_str((labels[0] as Label).get_theme_color("font_color").to_html(false)).is_equal(HanjiTheme.CORRECT_TEXT.to_html(false))
+	assert_str((labels[1] as Label).get_theme_color("font_color").to_html(false)).is_equal(HanjiTheme.WRONG_TEXT.to_html(false))
