@@ -240,6 +240,18 @@
       "note": ""
     },
     {
+      "key": "381-widu-envoy",
+      "year": 381,
+      "title": "전진에 보낸 사신",
+      "owner_card": "silla-src-28",
+      "participants": [
+        "goguryeo",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
       "key": "384-baekje-buddhism",
       "year": 384,
       "title": "불교 수용",
@@ -284,6 +296,17 @@
       "note": ""
     },
     {
+      "key": "397-jeonji-hostage",
+      "year": 397,
+      "title": "왜에 보낸 태자",
+      "owner_card": "baekje-src-25",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
       "key": "400-silla-relief",
       "year": 400,
       "title": "신라 구원",
@@ -302,12 +325,35 @@
       "note": ""
     },
     {
+      "key": "402-misaheun-hostage",
+      "year": 402,
+      "title": "왜에 보낸 볼모",
+      "owner_card": "silla-src-29",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
       "key": "410-east-buyeo-campaign",
       "year": 410,
       "title": "동부여 정벌",
       "owner_card": "goguryeo-src-30",
       "participants": [
         "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "412-bokho-hostage",
+      "year": 412,
+      "title": "고구려에 보낸 볼모",
+      "owner_card": "silla-src-30",
+      "participants": [
+        "goguryeo",
+        "silla"
       ],
       "status": "owned",
       "note": ""
@@ -368,6 +414,31 @@
       "note": ""
     },
     {
+      "key": "450-samjik-incident",
+      "year": 450,
+      "title": "고구려 장수를 죽인 일",
+      "owner_card": "silla-src-31",
+      "participants": [
+        "goguryeo",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "455-baekje-rescue",
+      "year": 455,
+      "title": "백제 구원",
+      "owner_card": "silla-src-32",
+      "participants": [
+        "baekje",
+        "goguryeo",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
       "key": "472-letter-to-wei",
       "year": 472,
       "title": "북위에 보낸 국서",
@@ -402,6 +473,18 @@
       "owner_card": "baekje-src-06",
       "participants": [
         "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "478-haegu-revolt",
+      "year": 478,
+      "title": "해구의 반란",
+      "owner_card": "baekje-src-26",
+      "participants": [
+        "baekje",
+        "goguryeo"
       ],
       "status": "owned",
       "note": ""
@@ -452,6 +535,17 @@
       "owner_card": "goguryeo-src-18",
       "participants": [
         "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "498-tamna-expedition",
+      "year": 498,
+      "title": "탐라 원정",
+      "owner_card": "baekje-src-27",
+      "participants": [
+        "baekje"
       ],
       "status": "owned",
       "note": ""
@@ -749,6 +843,30 @@
       "note": ""
     },
     {
+      "key": "602-amak-fortress",
+      "year": 602,
+      "title": "아막성 공격",
+      "owner_card": "baekje-src-28",
+      "participants": [
+        "baekje",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "608-geolsapyo",
+      "year": 608,
+      "title": "걸사표",
+      "owner_card": "silla-src-33",
+      "participants": [
+        "goguryeo",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
       "key": "612-salsu-battle",
       "year": 612,
       "title": "살수대첩",
@@ -788,6 +906,17 @@
       "owner_card": "silla-src-10",
       "participants": [
         "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "634-gungnamji",
+      "year": 634,
+      "title": "궁궐 남쪽의 연못",
+      "owner_card": "baekje-src-29",
+      "participants": [
+        "baekje"
       ],
       "status": "owned",
       "note": ""
@@ -965,6 +1094,13 @@
         "silla-src-12"
       ],
       "reason": "황산벌 전투(계백)와 나당 연합군의 사비 도성 공격·백제 항복은 다른 사건"
+    },
+    {
+      "cards": [
+        "baekje-src-29",
+        "silla-src-10"
+      ],
+      "reason": "백제 궁남지 조성과 신라 분황사 창건은 같은 해의 다른 사건"
     }
   ]
 }
