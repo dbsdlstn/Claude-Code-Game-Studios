@@ -554,7 +554,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "56-okjeo-conquest"
     },
     {
       "id": "goguryeo-src-02",
@@ -625,7 +626,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "194-jindae-relief"
     },
     {
       "id": "goguryeo-src-03",
@@ -696,7 +698,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "242-seoanpyeong-attack"
     },
     {
       "id": "goguryeo-src-04",
@@ -767,7 +770,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "313-nangnang-expulsion"
     },
     {
       "id": "goguryeo-src-05",
@@ -839,7 +843,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "371-pyongyang-fortress-battle"
     },
     {
       "id": "goguryeo-src-06",
@@ -910,7 +915,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "372-goguryeo-buddhism"
     },
     {
       "id": "goguryeo-src-07",
@@ -981,7 +987,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "373-goguryeo-yullyeong"
     },
     {
       "id": "goguryeo-src-08",
@@ -1052,7 +1059,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "400-silla-relief"
     },
     {
       "id": "goguryeo-src-09",
@@ -1123,7 +1131,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "427-pyongyang-capital"
     },
     {
       "id": "goguryeo-src-10",
@@ -1194,7 +1203,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "475-hanseong-fall"
     },
     {
       "id": "goguryeo-src-11",
@@ -1266,7 +1276,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "612-salsu-battle"
     },
     {
       "id": "goguryeo-src-12",
@@ -1333,7 +1344,8 @@
       "tags": [
         "고구려",
         "M1"
-      ]
+      ],
+      "event_key": "643-taoism-request"
     }
   ]
 }
