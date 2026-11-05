@@ -1260,6 +1260,9 @@
 - **D238 로그**: `title_view`에 `recommended_nation`·`nations` 필드 추가(웹).
 - 설계가 rewards-spec §9 예시의 `daily_session_soft_cap`을 `daily_card_soft_cap: 24`로 고친다.
 
+## 2026-11-05 D240. rewards-spec §9·§14 설정 이름 정정 (메인 디렉터리, D193 후속)
+- §14.4 예시 `daily_session_soft_cap: 3` → `daily_card_soft_cap: 24`(하루 본 인출 장수, D172), §14.1 표의 권장 상한 문구, §14.7 제안에 "D193으로 채택" 표시. `rewards.json`은 이미 `daily_card_soft_cap: 24`.
+
 ## 남은 문제
 - 카드 44장 전부 `verified: false`. 사람의 사실 확인 전에는 출시 빌드에 넣을 카드가 없다(`validate_cards.py --release` 실패가 정상).
 - 같은 사료(삼국사기 전승)에 기댄 건국기 카드가 많다. 플레이에서 건국기 칸이 단서 3단계 의존으로 쏠리는지 볼 것.
