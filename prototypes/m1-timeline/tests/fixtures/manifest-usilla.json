@@ -1,11 +1,32 @@
 {
- "_note": "테스트용 덱 목록(D110): 고구려 실제 + 통일신라(staging, 등록 전 확인용).",
+ "_note": "테스트용 덱 목록(D110·D111): 실제 매니페스트 3나라 + 통일신라(staging, 등록 전 확인용).",
  "nations": [
   {
    "id": "goguryeo",
    "label": "고구려",
    "files": [
-    "../../../../assets/data/cards/v2/goguryeo-m1.json"
+    "../../../../assets/data/cards/v2/goguryeo-m1.json",
+    "../../../../assets/data/cards/v2/goguryeo-m2-b2.json",
+    "../../../../assets/data/cards/v2/goguryeo-m2-b3.json"
+   ]
+  },
+  {
+   "id": "baekje",
+   "label": "백제",
+   "files": [
+    "../../../../assets/data/cards/v2/baekje-m2-b1.json",
+    "../../../../assets/data/cards/v2/baekje-m2-b2.json",
+    "../../../../assets/data/cards/v2/baekje-m2-b3.json"
+   ]
+  },
+  {
+   "id": "silla",
+   "label": "신라",
+   "files": [
+    "../../../../assets/data/cards/v2/silla-m2-b1.json",
+    "../../../../assets/data/cards/v2/silla-m2-b2.json",
+    "../../../../assets/data/cards/v2/silla-m2-b3.json",
+    "../../../../assets/data/cards/v2/silla-m2-b4.json"
    ]
   },
   {

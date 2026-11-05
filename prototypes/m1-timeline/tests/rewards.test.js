@@ -106,7 +106,7 @@ describe('§11 수용 기준', () => {
     assert.deepEqual([rw.streak, rw.rest_passes], [7, 1]);
     rw = goalRun(rw, days(14, '2026-11-08'));
     assert.deepEqual([rw.streak, rw.rest_passes], [21, 2], '최대 2장');
-    // 하루 쉬고(11-22) 11-23에 학습: 보호권 1장 사용, 연속 이어짐
+    // 하루 쉬고(11-22) 11-23에 학습: 휴식권 1장 사용, 연속 이어짐
     const r = settle(rw, [rec(), rec(), rec()], at('2026-11-23'));
     assert.equal(r.report.goal.usedPasses, 1);
     assert.deepEqual([r.rewards.streak, r.rewards.rest_passes], [22, 1]);
