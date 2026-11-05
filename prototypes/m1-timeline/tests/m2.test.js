@@ -135,10 +135,10 @@ describe('나라 인장·이름(D110·D113)', () => {
   });
 });
 
-test('나라별 앵커 상한은 콘텐츠 검증기와 같다(D191)', () => {
+test('나라별 앵커 상한은 콘텐츠 검증기와 같다(D191·D174)', () => {
   const py = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '../../../tools/validate_cards_v2.py'), 'utf8');
   assert.match(py, /^MAX_ANCHORS = 12\b/m);
-  assert.match(py, /^MAX_ANCHORS_BY_NATION = \{"goryeo": 13\}/m);
+  assert.match(py, /^MAX_ANCHORS_BY_NATION = \{"goryeo": 14\}/m);
   assert.equal(CONFIG.maxAnchors, 12);
-  assert.deepEqual({ ...CONFIG.maxAnchorsByNation }, { goryeo: 13 });
+  assert.deepEqual({ ...CONFIG.maxAnchorsByNation }, { goryeo: 14 });
 });

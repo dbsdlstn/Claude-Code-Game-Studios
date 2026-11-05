@@ -23,7 +23,7 @@ RULES (numbers follow the schema doc; a headless test should use the same):
   V4  Per nation, anchors have order 1..n without gaps; reign.start strictly
       increases with order; start <= end; previous end <= next start;
       reign.basis in {chronicle, inscription, consensus}.
-      V4a (D63, D85): at most 12 anchors per nation; goryeo 13 (D191,
+      V4a (D63, D85): at most 12 anchors per nation; goryeo 14 (D191, D174,
       MAX_ANCHORS_BY_NATION).
   V5  answer.after is an anchor of the same nation; answer.before is the anchor
       with the next order, or null only when after is the last anchor.
@@ -145,7 +145,7 @@ EXAM_TAGS = {"institution", "person", "war", "culture"}
 MAX_ANCHORS = 12
 # per-nation exceptions (D191: Goryeo adds King Gongyang so that the 1391 land law
 # does not sit in King U's gap)
-MAX_ANCHORS_BY_NATION = {"goryeo": 13}
+MAX_ANCHORS_BY_NATION = {"goryeo": 14}  # D191 Gongyang, D174 Chungnyeol
 YEAR_RE = re.compile(r"\d{3,4}\s*년|기원전|서기")
 
 COMMON_REQ = ["id", "kind", "nation", "title", "source_ref", "verification"]
