@@ -37,6 +37,21 @@ test('dist/m1만으로 실제 초안을 읽고 모바일에서 한 장 꽂기, �
     await pressGap(page, (await gapsFor(page, card)).right, true);
     assert.equal(await page.getAttribute('#result', 'data-result'), 'correct');
     assert.deepEqual(failed, []);
+    // 사람 테스트 모드도 묶음만으로 돈다: 참가자 만들기 → pre 한 장 → 방식 B 화면.
+    await page.goto(`http://127.0.0.1:${port}/index.html?study=1&participant=P1`);
+    await page.waitForSelector('#study-create');
+    await page.locator('#study-create').tap();
+    await page.locator('#study-stages a[data-go="pre"]').tap();
+    await page.waitForSelector('#test-card');
+    await page.locator('#test-unknown').tap();
+    await page.locator('#test-submit').tap();
+    await page.waitForSelector('#test-progress[data-index="1"]');
+    await page.goto(`http://127.0.0.1:${port}/index.html?study=1&participant=P1&stage=learn-B`);
+    await page.waitForSelector('#btn-flip');
+    await page.goto(`http://127.0.0.1:${port}/index.html?study=1&participant=P1&stage=learn-A`);
+    await page.waitForSelector('#card[data-card-id]');
+    assert.match(await page.innerText('#nation-label'), /방식 A · P1/);
+    assert.deepEqual(failed, []);
     assert.deepEqual(errors, []);
     await ctx.close();
   } finally {

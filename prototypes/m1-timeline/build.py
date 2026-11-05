@@ -5,7 +5,7 @@
 Usage: python3 prototypes/m1-timeline/build.py [--out DIR]   (기본 dist/m1, git 제외)
 
 - index.html, style.css, js/, data/(샘플·재위 표)를 복사하고(tests/, build.py, README 제외)
-- 콘텐츠 초안 assets/data/cards/v2-draft/goguryeo-m1.json을 data/goguryeo-m1.json으로 넣고
+- 콘텐츠 데이터(스키마 v2) assets/data/cards/v2/goguryeo-m1.json을 data/goguryeo-m1.json으로 넣고
 - js/config.js의 첫 데이터 경로를 data/goguryeo-m1.json으로 바꾼다(저장소 루트 없이도 돈다).
 결과 폴더만 정적 서버로 띄우면 된다: python3 -m http.server 8000 --directory dist/m1
 프로토타입이므로 배포(공개 호스팅)는 하지 않는다. 사람 테스트용 로컬·비공개 전달만(D61).
@@ -17,10 +17,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
-# 스키마 v2가 있으면 그것, 없으면 임시 형식 초안(js/config.js의 dataUrls 순서와 같다).
+# 스키마 v2 콘텐츠 데이터(js/config.js의 첫 dataUrls).
 V2 = ROOT / "assets" / "data" / "cards" / "v2" / "goguryeo-m1.json"
-DRAFT = ROOT / "assets" / "data" / "cards" / "v2-draft" / "goguryeo-m1.json"
-REPO_URLS = ["'../../assets/data/cards/v2/goguryeo-m1.json',", "'../../assets/data/cards/v2-draft/goguryeo-m1.json',"]
+REPO_URLS = ["'../../assets/data/cards/v2/goguryeo-m1.json',"]
 DIST_URL = "'data/goguryeo-m1.json',"
 COPY = ["index.html", "style.css", "js", "data"]
 
@@ -44,11 +43,9 @@ def main(argv):
         if u not in text:
             print(f"BUILD FAILED: {u} not in config.js")
             return 1
-    src = V2 if V2.exists() else DRAFT if DRAFT.exists() else None
-    # 저장소 경로 둘을 빼고 묶음 안 경로 하나로(없는 경로를 시도하면 404가 난다).
-    first, second = REPO_URLS
-    text = text.replace(first, DIST_URL if src else "", 1)
-    text = text.replace(second, "", 1)
+    src = V2 if V2.exists() else None
+    # 저장소 경로를 묶음 안 경로로(없는 경로를 시도하면 404가 난다).
+    text = text.replace(REPO_URLS[0], DIST_URL if src else "", 1)
     if src:
         shutil.copy2(src, out / "data" / "goguryeo-m1.json")
     else:

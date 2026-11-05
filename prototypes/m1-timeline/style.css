@@ -161,3 +161,32 @@ button { font: inherit; color: inherit; }
 .empty-title { font-family: var(--serif); font-weight: 700; font-size: 17px; margin: 0 0 6px; }
 .btn-quiet { background: transparent; margin-top: 8px; }
 .notice { color: var(--indigo); font-weight: 700; }
+
+/* 사람 테스트 모드(D72) */
+a.btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; color: inherit; }
+a.btn-primary { color: #fff8ef; }
+.study { padding: 12px 16px 24px; display: grid; gap: 14px; max-width: 760px; margin: 0 auto; }
+.study-title { font-family: var(--serif); font-size: 21px; margin: 4px 0 0; }
+.study-box { background: #fbf6ea; border: 1px solid var(--line-soft); border-radius: 8px; padding: 12px 14px; display: grid; gap: 8px; }
+.study-box h2 { font-size: 16px; margin: 0; }
+.study-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.study-row input { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; min-height: 44px; width: 9em; background: #fff; }
+.study-known { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 14px; }
+.chip { border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; text-decoration: none; color: var(--ink); background: var(--paper-2); min-height: 36px; display: inline-flex; align-items: center; }
+.study-radio { display: flex; gap: 6px; align-items: center; min-height: 40px; }
+.study-stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.study-stage { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 8px 10px; border: 1px solid var(--line-soft); border-radius: 6px; background: var(--paper-2); }
+.study-stage.is-next { border-color: var(--seal); border-width: 2px; }
+.study-stage.is-done { opacity: .7; }
+.study-stage-status { font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
+.study-halves summary { cursor: pointer; font-size: 14px; color: var(--ink-soft); min-height: 32px; }
+.study-halves h3 { font-size: 14px; margin: 6px 0 0; }
+.study-halves ol { margin: 0; padding-left: 1.4em; font-size: 14px; }
+.study-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; font-size: 14px; color: var(--ink-soft); }
+.study-answer { display: grid; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line-soft); }
+.study-answer textarea { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: #fff; resize: vertical; }
+.study-label { font-size: 14px; font-weight: 600; }
+.btn-selected { background: var(--paper-3); border-width: 2px; }
+.flash-back { border-top: 1px dashed var(--line-soft); margin-top: 8px; padding-top: 8px; }
+.study .card { max-height: none; }
+[hidden] { display: none !important; }

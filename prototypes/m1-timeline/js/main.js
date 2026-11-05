@@ -11,6 +11,7 @@ import {
   sessionTimeline, isRetry, isSessionDone, attemptsOf, completedAfter, sessionSummary, gradeCounts, gradeOf, GRADE_NAME,
   dueCount, earlyReviewIds, wrongNoteIds, logLine, sessionSeed, nextBox, restoreProgress, restoreSession, dataFingerprint, fnv1a,
 } from './rules.js';
+import { armStoreAdapter, splitHalves, armIds } from './study.js';
 
 const L = CONFIG.leitner;
 const $ = (id) => document.getElementById(id);
@@ -35,6 +36,8 @@ const app = {
   completed: 0, progress: Object.freeze({}), state: null, log: [], participant: '-',
   lastResult: null, seedParam: 0, pendingGap: null, confirmMode: CONFIG.confirmPlacement,
   cardShownAt: 0, notice: '',
+  /** 사람 테스트 모드의 방식 A 학습(`?study=1&stage=learn-A`)이면 {participant, cap, menuUrl}. */
+  study: null,
 };
 
 const sessionIndex = () => app.completed + 1;
@@ -73,6 +76,7 @@ function slotText(items, k) {
 /* ------------------------------------------------------------------ 세션 시작·끝 */
 
 function startLearnSession() {
+  if (app.study && app.completed >= app.study.cap) { app.state = null; render(); renderStudyDone(); return; }
   const s = sessionIndex();
   const pick = buildSession(app.deck.cards, app.progress, s, L, sessionSeed(app.deckHash, s, app.seedParam));
   app.state = createSessionState(s, pick.ids, { kind: 'learn', mix: { due: pick.due, fresh: pick.fresh } });
@@ -108,8 +112,17 @@ function finishSession() {
 
 /* ------------------------------------------------------------------ 렌더 */
 
+/** 테스트 모드: 방식 A 학습 단계를 다 했다. */
+function renderStudyDone() {
+  $('card').className = 'card card-empty';
+  $('card').replaceChildren(
+    el('p', { class: 'empty-title', id: 'study-done' }, `학습 세션 ${app.study.cap}회를 마쳤습니다.`),
+    el('p', { class: 'source-note' }, '진행자에게 알려 주세요.'),
+    el('a', { class: 'btn btn-primary', id: 'btn-menu-done', href: app.study.menuUrl }, '진행자 메뉴로'));
+}
+
 function renderTop() {
-  $('nation-label').textContent = app.deck.nation_label ?? '';
+  $('nation-label').textContent = app.study ? `방식 A · ${app.study.participant}` : (app.deck.nation_label ?? '');
   $('session-no').textContent = app.state?.practice ? '연습(상태 안 바뀜)' : `세션 ${app.state?.session ?? sessionIndex()}`;
   if (!app.state) { $('progress').textContent = ''; $('progress').dataset.index = '0'; return; }
   const total = app.state.queue.length;
@@ -190,7 +203,7 @@ function renderResult(box) {
       el('span', { class: 'mark', 'aria-hidden': 'true' }, r.correct ? '○' : '✕'),
       r.correct ? '정답' : (r.nearMiss ? '오답 · 한 칸 차이' : '오답')),
     el('h3', { class: 'result-title' }, card.title),
-    el('p', { class: 'result-meta' }, `${card.year_label} · ${card.reign ?? ''}`),
+    el('p', { class: 'result-meta' }, card.reign && !card.year_label.includes(card.reign) ? `${card.year_label} · ${card.reign}` : card.year_label),
     r.correct ? null : el('p', { class: 'result-where', id: 'result-where' }, '고른 칸: ', el('s', {}, r.placedText), el('br'), '맞는 칸: ', el('b', {}, r.rightText)),
     el('p', { class: 'result-exp' }, card.explanation),
     card.exam_note ? el('p', { class: 'result-note', id: 'result-note' }, el('b', {}, '수험 정리 '), card.exam_note) : null,
@@ -209,16 +222,16 @@ function renderEmpty(box) {
   box.replaceChildren(
     el('p', { class: 'empty-title', id: 'empty-title' }, '오늘 도래한 카드를 모두 했습니다.'),
     app.notice ? el('p', { class: 'source-note', id: 'notice' }, app.notice) : null,
-    el('p', { class: 'source-note' }, '미리 복습은 연습이라 상자와 일정을 바꾸지 않습니다.'),
+    app.study ? null : el('p', { class: 'source-note' }, '미리 복습은 연습이라 상자와 일정을 바꾸지 않습니다.'),
     el('div', { class: 'clue-bar' },
-      early.length ? el('button', { type: 'button', id: 'btn-early', class: 'btn', onclick: () => startPractice('early', early) }, `미리 복습 ${early.length}장`) : null,
+      early.length && !app.study ? el('button', { type: 'button', id: 'btn-early', class: 'btn', onclick: () => startPractice('early', early) }, `미리 복습 ${early.length}장`) : null,
       el('button', { type: 'button', id: 'btn-skip', class: 'btn btn-primary', onclick: skipSession }, '다음 세션으로')),
     el('p', { class: 'source-note' }, '"다음 세션으로"는 하루가 지난 것으로 칩니다(세션 번호 +1).'));
 }
 
 function renderCard() {
   const box = $('card');
-  if (!app.state) { box.replaceChildren(); return; }
+  if (!app.state) { if (!app.study) box.replaceChildren(); return; }
   if (app.lastResult) { renderResult(box); return; }
   const id = currentId(app.state);
   if (!id) { renderEmpty(box); return; }
@@ -368,12 +381,16 @@ function showSummary(st) {
         ` ${c.title}${clue}${st.practice ? '' : ` · 상자 ${p.boxFrom ?? '새'}→${p.boxTo}`}`);
     })),
     el('p', { class: 'medals' }, `숙련(현재): 금 ${counts.gold} · 은 ${counts.silver} · 동 ${counts.bronze}`));
-  $('summary-next').textContent = '다음 세션';
+  const studyEnd = app.study && app.completed >= app.study.cap;
+  $('summary-next').textContent = studyEnd ? '학습 단계 끝 · 진행자 메뉴로' : '다음 세션';
+  $('summary-next').dataset.end = studyEnd ? '1' : '0';
+  $('summary-dogam').hidden = !!app.study;
   $('summary').hidden = false;
   $('summary-next').focus();
 }
 
 function nextSession() {
+  if (app.study && app.completed >= app.study.cap) { location.assign(app.study.menuUrl); return; }
   $('summary').hidden = true;
   startLearnSession();
   $('card').focus();
@@ -518,6 +535,16 @@ function setupRefs() {
 
 async function init() {
   const params = new URLSearchParams(location.search);
+  // 사람 테스트 모드: 방식 A 학습만 이 화면을 쓰고, 나머지(진행자 설정·방식 B·테스트)는 study-ui.js.
+  if (params.get('study') === '1') {
+    if (params.get('stage') !== 'learn-A') { (await import('./study-ui.js')).start(params); return; }
+    const pid = params.get('participant') ?? '';
+    const menuUrl = studyMenuUrl(params);
+    const studyStore = createStore(CONFIG.study.storagePrefix + pid);
+    if (!studyStore.load()) { location.replace(menuUrl); return; }
+    app.study = { participant: pid, cap: CONFIG.study.sessionsPerArm, menuUrl, studyStore };
+    app.store = armStoreAdapter(studyStore, 'A', CONFIG.study.sessionsPerArm);
+  }
   const seed = Number.parseInt(params.get('seed') ?? '', 10);
   app.seedParam = Number.isFinite(seed) ? seed >>> 0 : 0;
   if (params.get('confirm') === '1') app.confirmMode = 'always';
@@ -539,10 +566,20 @@ async function init() {
     return;
   }
   app.deck = loaded.deck;
+  app.dataId = dataFingerprint(loaded.url, app.deck);
+  if (app.study) {
+    const save = app.study.studyStore.load();
+    if (save.dataId !== app.dataId) {
+      $('card').replaceChildren(el('p', {}, '데이터가 이 참가자를 만들 때와 다릅니다. 진행자 메뉴에서 확인하세요.'), el('a', { class: 'btn', href: app.study.menuUrl }, '진행자 메뉴로'));
+      document.body.dataset.ready = 'error';
+      return;
+    }
+    const keep = new Set(armIds(splitHalves(app.deck.cards, CONFIG.study.halves), save.assignment, 'A'));
+    app.deck = { ...app.deck, cards: app.deck.cards.filter((c) => keep.has(c.id)) };
+  }
   app.dataFile = loaded.url.split('/').pop();
   app.cardsById = new Map(app.deck.cards.map((c) => [c.id, c]));
   app.anchorsById = new Map(app.deck.anchors.map((a) => [a.id, a]));
-  app.dataId = dataFingerprint(loaded.url, app.deck);
   app.deckHash = fnv1a(app.dataId);
   const unverified = [...app.deck.cards, ...app.deck.anchors].some((c) => !c.verified);
   $('data-info').textContent = `데이터: ${app.dataFile} · 카드 ${app.deck.cards.length}장 · 기준 ${app.deck.anchors.length}장 · M1 프로토타입`;
@@ -553,13 +590,17 @@ async function init() {
   app.progress = same ? restoreProgress(saved.cards, app.deck.cards, L) : Object.freeze({});
   app.completed = same && Number.isInteger(saved.completed_sessions) && saved.completed_sessions >= 0 ? saved.completed_sessions : 0;
   app.log = same && Array.isArray(saved.log) ? saved.log : [];
-  app.participant = (params.get('participant') || saved?.participant || '-').slice(0, 20);
+  app.participant = app.study ? app.study.participant : (params.get('participant') || saved?.participant || '-').slice(0, 20);
   const restored = same ? restoreSession(saved.current, app.deck.cards) : null;
 
   setupDrag();
   setupRefs();
-  $('btn-dogam').addEventListener('click', openDogam);
-  const closeDogam = () => { $('dogam').hidden = true; $('btn-dogam').focus(); };
+  if (app.study) {
+    $('btn-dogam').replaceWith(el('a', { class: 'btn btn-small', id: 'btn-menu', href: app.study.menuUrl }, '진행자'));
+    $('summary-dogam').hidden = true;
+  }
+  $('btn-dogam')?.addEventListener('click', openDogam);
+  const closeDogam = () => { $('dogam').hidden = true; $('btn-dogam')?.focus(); };
   $('dogam-close').addEventListener('click', closeDogam);
   $('btn-reset').addEventListener('click', confirmReset);
   $('btn-export').addEventListener('click', exportLog);
@@ -587,6 +628,14 @@ async function init() {
   }
   if (app.notice) announce(app.notice);
   document.body.dataset.ready = 'true';
+}
+
+/** 진행자 메뉴 주소(참가자·데이터·시드 파라미터를 유지). */
+function studyMenuUrl(params) {
+  const q = new URLSearchParams();
+  q.set('study', '1');
+  for (const k of ['participant', 'data', 'seed', 'confirm']) if (params.get(k)) q.set(k, params.get(k));
+  return `?${q}`;
 }
 
 init();

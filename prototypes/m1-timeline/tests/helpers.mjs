@@ -18,10 +18,9 @@ export const PROTO_ROOT = path.resolve(here, '..');
 export const REPO_ROOT = path.resolve(here, '..', '..', '..');
 export const SAMPLE = JSON.parse(readFileSync(path.join(PROTO_ROOT, 'data', 'sample.json'), 'utf8'));
 export const BY_ID = new Map([...SAMPLE.cards, ...SAMPLE.anchors].map((c) => [c.id, c]));
-// 실제 데이터: 스키마 v2가 있으면 그것, 없으면 임시 형식 초안(설정의 dataUrls 순서와 같다).
+// 실제 데이터: 스키마 v2(설정의 첫 dataUrls).
 const V2_PATH = path.join(REPO_ROOT, 'assets', 'data', 'cards', 'v2', 'goguryeo-m1.json');
-const DRAFT_PATH = path.join(REPO_ROOT, 'assets', 'data', 'cards', 'v2-draft', 'goguryeo-m1.json');
-export const REAL_PATH = existsSync(V2_PATH) ? V2_PATH : DRAFT_PATH;
+export const REAL_PATH = V2_PATH;
 /** 콘텐츠 세션의 실제 고구려 초안(정규화 후). 없으면 null. */
 export const REAL = existsSync(REAL_PATH) ? normalizeDeck(JSON.parse(readFileSync(REAL_PATH, 'utf8'))).deck : null;
 /** 연표 기준 카드 줄의 기대 표시(앵커의 재위 기간, 없으면 즉위 연도) — 데이터에서 계산한다. */

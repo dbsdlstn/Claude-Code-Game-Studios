@@ -347,12 +347,12 @@ export function dueCount(cards, progress, session) {
  * slot_chosen, correct, clue_used, box_before, box_after, near_miss, ms_on_card, relearn, reason_text.
  * 연습(미리 복습·오답 노트)은 규격에 phase 값이 없어 phase "learn"으로 두고 추가 필드 practice를 붙인다(D66).
  */
-export function logLine({ ts, participant, result, session, msOnCard }) {
+export function logLine({ ts, participant, result, session, msOnCard, phase = 'learn', arm = 'A' }) {
   const line = {
-    ts_ms: ts, participant, phase: 'learn', arm: 'A', session_index: session, card_id: result.id,
-    slot_chosen: result.slotChosen, correct: result.correct, clue_used: result.clueUsed,
-    box_before: result.boxFrom, box_after: result.boxTo, near_miss: result.nearMiss,
-    ms_on_card: msOnCard, relearn: result.retry, reason_text: null,
+    ts_ms: ts, participant, phase, arm, session_index: session, card_id: result.id,
+    slot_chosen: result.slotChosen ?? null, self_rating: result.selfRating ?? null, correct: result.correct, clue_used: result.clueUsed,
+    box_before: result.boxFrom, box_after: result.boxTo, near_miss: result.nearMiss ?? null,
+    ms_on_card: msOnCard, relearn: result.retry, reason_text: result.reasonText ?? null,
   };
   if (result.practice) line.practice = true;
   return line;

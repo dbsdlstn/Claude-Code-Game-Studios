@@ -200,7 +200,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       const lines = readFileSync(await dl.path(), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
       assert.equal(lines.length, 1);
       const l = lines[0];
-      assert.deepEqual(Object.keys(l), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
+      assert.deepEqual(Object.keys(l), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
       assert.deepEqual([l.participant, l.phase, l.arm, l.session_index, l.card_id, l.correct, l.clue_used, l.box_after, l.near_miss, l.relearn], ['P7', 'learn', 'A', 1, c0.id, false, 1, 1, true, false]);
       assert.ok(l.ms_on_card >= 0 && Number.isInteger(l.ms_on_card));
       assert.ok(SAMPLE.anchors.some((a) => a.id === l.slot_chosen));

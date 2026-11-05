@@ -2,8 +2,7 @@
 /**
  * 데이터 로더. 형식 차이는 이 파일 한 곳에서 흡수해 화면과 규칙에는 같은 모양({nation, anchors, cards})을 넘긴다.
  * 지원 형식:
- *   - 'v2'               : 스키마 v2 `{ schema: 2, cards: [...] }`(design/card-data-schema-v2.md). 콘텐츠가 옮기면 이것만 남긴다.
- *   - 'v2-draft-content' : 임시 형식(D58, assets/data/cards/v2-draft/). v2로 옮겨지면 지운다(D66).
+ *   - 'v2'               : 스키마 v2 `{ schema: 2, cards: [...] }`(design/card-data-schema-v2.md). 콘텐츠가 v2로 옮겨 임시 형식(D58) 변환은 지웠다(D72).
  *   - 'm1-draft'         : data/sample.json(테스트용 샘플)
  * 정규화 결과(카드 공통): id, title, order(정렬 값), year_label, reign(왕), source_text, source{name, ref},
  * clues[{level, kind, text, refs}], explanation, exam_note, verified. 앵커: id, title(단서의 [제목]과 맞춤),
@@ -21,7 +20,6 @@ const rangeText = (s, e) => `${s < 0 ? `기원전 ${-s}` : s}~${e < 0 ? `기원�
 
 export function formatOf(raw) {
   if (raw?.schema === 2 && Array.isArray(raw.cards)) return 'v2';
-  if (typeof raw?._format === 'string' && raw._format.startsWith('v2-draft-content')) return 'v2-draft-content';
   if (raw?.schema === 'm1-draft') return 'm1-draft';
   return 'unknown';
 }
@@ -69,35 +67,11 @@ function fromV2(raw) {
   return { deck: { schema: 'v2', nation, nation_label: NATION_LABEL[nation] ?? nation, anchors, cards }, errors };
 }
 
-function fromDraft(raw) {
-  const errors = [];
-  const anchors = (raw.anchors ?? []).map((a) => ({
-    id: a.id, title: a.title, order: a.year, year_label: a.year_label,
-    reign: a.reign ?? a.title.replace(/\s*즉위$/, ''), reign_range: a.reign_range ?? null,
-    explanation: a.explanation ?? '', verified: a.verified === true,
-  }));
-  const byId = new Map(anchors.map((a) => [a.id, a]));
-  const cards = (raw.cards ?? []).map((c) => {
-    const after = c.timeline?.after ? byId.get(c.timeline.after) ?? null : null;
-    const before = c.timeline?.before ? byId.get(c.timeline.before) ?? null : null;
-    if (c.timeline?.after && !after) errors.push(`${c.id}: timeline.after가 기준 카드가 아니다: ${c.timeline.after}`);
-    if (c.timeline?.before && !before) errors.push(`${c.id}: timeline.before가 기준 카드가 아니다: ${c.timeline.before}`);
-    return {
-      id: c.id, title: c.title, order: orderInSlot(c, c.year, after, before, errors), year_label: c.year_label, reign: c.reign ?? null,
-      source_text: c.front, source: { name: c.source_ref ?? '', ref: '' },
-      clues: (c.clues ?? []).map((cl) => ({ level: cl.level, kind: cl.kind, text: cl.text, refs: cl.refs ?? [] })),
-      explanation: c.explanation ?? '', exam_note: c.exam_note ?? '', verified: c.verified === true,
-    };
-  });
-  return { deck: { schema: 'v2-draft-content', nation: raw.nation, nation_label: NATION_LABEL[raw.nation] ?? raw.nation, anchors, cards }, errors };
-}
-
 /** @returns {{format: string, deck: object|null, errors: string[]}} */
 export function normalizeDeck(raw) {
   const format = formatOf(raw);
   if (format === 'm1-draft') return { format, deck: raw, errors: [] };
   if (format === 'v2') return { format, ...fromV2(raw) };
-  if (format === 'v2-draft-content') return { format, ...fromDraft(raw) };
   return { format, deck: null, errors: ['알 수 없는 데이터 형식'] };
 }
 
