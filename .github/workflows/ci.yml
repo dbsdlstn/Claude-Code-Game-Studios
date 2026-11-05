@@ -1,5 +1,5 @@
 # 한양 도감 CI (decision-log D52)
-# - data-and-web: 카드 데이터 검증(Python), 검증기 동등성, 웹 규칙 단위 테스트(Node)
+# - data-and-web: 카드 데이터 검증(Python, v1과 v2), 검증기 동등성, 웹 규칙 단위 테스트(Node)
 # - godot: Godot 4.7.2 헤드리스로 import 후 gdUnit4 6.2.2로 res://tests 실행, 리포트 업로드
 # - godot-screens: Xvfb + Mesa llvmpipe(소프트웨어 OpenGL)로 실제 창을 띄워 주요 화면을 1280×720 PNG로 저장(D55)
 # 버전은 모두 고정한다. 바꿀 때는 docs/engine-reference/godot/ 와 docs/run-locally.md 도 함께 고친다.
@@ -43,6 +43,9 @@ jobs:
 
       - name: Validate tutorial file
         run: python3 tools/validate_cards.py --tutorial assets/data/cards/tutorial.json
+
+      - name: Validate v2 cards (M1)
+        run: python3 tools/validate_cards_v2.py
 
       - name: Validator parity (Python)
         run: python3 tools/validator_parity.py
