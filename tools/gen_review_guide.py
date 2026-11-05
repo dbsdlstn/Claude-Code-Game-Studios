@@ -154,11 +154,42 @@ def claim(c, anchors):
             + (f"{before} 즉위 전'" if before else "끝'") + (f" (이설: {alt})" if alt else ""))
 
 
+def key_terms(c):
+    """Words to look for in the entry: the level-2 direct clue terms after its first '. '."""
+    if c.get("kind") == "anchor":
+        return c.get("title", "")
+    clues = c.get("clues") or []
+    direct = next((x.get("text") for x in clues if isinstance(x, dict) and x.get("level") == 2), "") or ""
+    tail = direct.split(". ", 1)[1] if ". " in direct else ""
+    words = [w.strip() for w in re.split(r"[,·]", tail.rstrip(".")) if w.strip()]
+    # keep words that name the event; drop years, "…왕 때", places of a monument, accession notes
+    words = [w for w in words if not re.search(r"\d+년|때$|즉위|지린성|지안", w)]
+    return ", ".join(words) if words else c.get("title", "")
+
+
 def search_term(c):
+    """Table-of-contents path (book > section > volume > entry) plus the words to look for.
+
+    D221: the guide reader browses the DB by book and entry, then searches the page,
+    so a path is easier to follow than one long query. A source_ref that pairs two
+    books with ';' is split into one path per book.
+    """
     ref = c.get("source_ref") or {}
-    vol = f"권{ref['volume']} " if ref.get("volume") else ""
-    work = ref.get("work") or "삼국사기"
-    return f"{work} {ref.get('section', '')} {ref.get('entry', '')}".replace("  ", " ").strip() + (f" ({vol.strip()})" if vol else "")
+    works = [w.strip() for w in (ref.get("work") or "삼국사기").split(";")]
+    sections = [x.strip() for x in (ref.get("section") or "").split(";")]
+    entries = [x.strip() for x in (ref.get("entry") or "").split(";")]
+    paths = []
+    for i, w in enumerate(works):
+        sec = sections[i] if i < len(sections) else ""
+        ent = entries[i] if i < len(entries) else ""
+        vol = f"권{ref['volume']}" if ref.get("volume") and i == len(works) - 1 else ""
+        paths.append(" › ".join(x for x in (w, sec, vol, ent) if x))
+    return " / ".join(paths) + f" — 찾을 말: {key_terms(c)}"
+
+
+def clean_detail(text):
+    """Drop references to numbered items inside the source report (e.g. '(위 4번)')."""
+    return re.sub(r"\s*\(위 [^)]*\)", "", text)
 
 
 INTRO = """# 사람 사실 확인 가이드 (비전문가용)
@@ -185,7 +216,9 @@ INTRO = """# 사람 사실 확인 가이드 (비전문가용)
 표의 한 줄이 한 항목이다. **왼쪽부터** 따라 한다.
 
 1. **`확인할 한 줄`**을 읽는다. 카드가 말하는 연도·왕·정답 칸이다.
-2. **`검색어`**를 한국사DB 검색창에 넣고 *삼국사기*(또는 표에 적힌 책)로 좁힌다. 해당 본기의 해당 왕 해당 연도 기사를 연다.
+2. **`찾아갈 곳`**은 `책 › 편 › 권 › 기사` 순서의 목차 길이다. 한국사DB에서 그 책의 목차로 들어가 권과 왕·연도 기사를 연다(검색창에 긴 문장을 넣는 것보다 빠르다). 기사를 열면 **`찾을 말`**을 페이지 안 찾기(Ctrl+F)로 찾는다. 원문이 한문이면 번역문 쪽에서 찾는다.
+   - 책이 둘(`/`로 나뉨)이면 두 기사를 각각 연다(예: 일본서기와 삼국사기에 같은 사건이 있는 카드).
+   - 삼국사기·고려사가 아닌 책(광개토왕비, 삼국유사, 일본서기, 직지 간기, 종 명문)은 한국사DB에 없거나 메뉴가 다를 수 있다. 못 찾으면 그 책의 번역·해설 자료(국립중앙박물관, 한국민족문화대백과 등)로 보고, 메모에 "원문 대신 ○○로 봄"이라고 적는다.
 3. **원문(또는 번역문)에서 같은 기사를 찾아 읽고 세 가지만 본다.**
    - (가) **연도**: 기사의 연도(왕 몇 년)가 카드의 연도와 같은가? 왕의 즉위년과 더해 계산이 맞는가?
    - (나) **왕·사건**: 기사의 왕과 사건이 카드와 같은가?
@@ -341,18 +374,18 @@ def main(argv=None):
     out.append("\n## 9. 묶음별 작업표\n")
     for bi, (b, used) in enumerate(batches, 1):
         out.append(f"### 묶음 {bi} (약 {used}분, 항목 {len(b)}개)\n")
-        out.append("| ☐ | id | 제목 | 확인할 한 줄 | 한국사DB 검색어 | 보고서 판정 · 주의 |\n|---|---|---|---|---|---|")
+        out.append("| ☐ | id | 제목 | 확인할 한 줄 | 찾아갈 곳 — 찾을 말 | 보고서 판정 · 주의 |\n|---|---|---|---|---|---|")
         for it in b:
             c = it["card"]
             if "variant" in it:
                 var = it["variant"]
-                note = it["verdict"] + (f" · {it['detail'][:110]}…" if it["tier"] == 1 and it["detail"] else "")
+                note = it["verdict"] + (f" · {clean_detail(it['detail'])[:110]}…" if it["tier"] == 1 and it["detail"] else "")
                 if it["tier"] == 1:
                     note += " · **보고서의 지적이 고쳐졌는지 먼저 본다**"
                 vt = var.get("text", "")
                 out.append(f"| ☐ | `{it['vid']}` | {c['title']} · 변형 {var['id']}({var.get('angle', '')}) | 변형 지문: “{vt}” (원 카드 `{c['id']}`의 기사와 비교) | {search_term(c)} | {note} |")
                 continue
-            note = it["verdict"] + (f" · {it['detail'][:110]}…" if it["tier"] == 1 and it["detail"] else "")
+            note = it["verdict"] + (f" · {clean_detail(it['detail'])[:110]}…" if it["tier"] == 1 and it["detail"] else "")
             if c["kind"] == "source" and c.get("disputed"):
                 note += " · 판정 제외(disputed)"
             out.append(f"| ☐ | `{c['id']}` | {c['title']} | {claim(c, anchors)} | {search_term(c)} | {note} |")
