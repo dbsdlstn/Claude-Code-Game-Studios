@@ -16,7 +16,7 @@
 ## 파일
 
 - 데이터: `assets/data/cards/v2/<이름>.json` (객체 하나: `{ "schema": 2, "cards": [ ... ] }`, 앵커와 사료 카드를 같은 배열에 둔다). M1은 `assets/data/cards/v2/goguryeo-m1.json`.
-- 검증기(M2에서 만든다): `tools/validate_cards_v2.py`. 종료 코드는 `validate_cards.py`와 같게 한다(0 통과, 1 위반, 2 파일 오류).
+- 검증기: `tools/validate_cards_v2.py`(D67, 표준 라이브러리, V1~V15와 release R1~R3, 앵커 상한 10). 종료 코드는 `validate_cards.py`와 같게 한다(0 통과, 1 위반, 2 파일 오류).
 - 연도는 정수. **기원전은 음수**(기원전 37년 = `-37`), 서기는 양수이며 `0`은 쓰지 않는다.
 
 ## 공통 필드
@@ -39,6 +39,7 @@
 | `order` | int | 예 | 같은 나라 앵커의 연표 순서(1부터 빈틈없이). |
 | `reign` | object | 예 | `{ "start": int, "end": int, "basis": "chronicle\|inscription\|consensus" }`. 즉위·재위 끝 연도와 근거(삼국사기 기년 / 금석문 / 통설·기출 표기). |
 | `summary` | string | 예 | 정답 공개 후 보이는 한 줄(예: `고구려 제2대 왕.`). 칸을 알려 주는 사건을 쓰지 않는다. |
+| `reign_alt` | array | 아니오 | 재위 이설(D68 정식 필드). `[{ "start": int, "end": int, "note": string }]`. 자료마다 다른 재위(예: 광개토왕 392~413, 태조왕 53~165 사망 기준)를 근거와 함께 둔다. **판정에는 쓰지 않고** 연표 표시와 해설에만 쓴다. 없으면 `[]`. |
 
 ```json
 {
@@ -60,6 +61,8 @@
 }
 ```
 
+> **콘텐츠 초안 형식의 필드(D65)**: 이전 초안(`assets/data/cards/v2-draft/`)은 앵커에 표시용 `reign_range`(문자열), 다른 값 목록 `reign_range_alt`, 출처 메모 `reign_note`를 썼다. 스키마 v2에서는 정식 필드 `reign`(판정용 start/end)과 `reign_alt`로 대체되었고 출처 메모는 `source_ref.note`에 둔다. 세 필드는 v2 파일에 넣지 않는다. 웹 로더는 초안 형식을 읽을 때만 이 필드를 읽는다.
+
 ## 사료 카드
 
 | 필드 | 타입 | 필수 | 설명 |
@@ -72,7 +75,7 @@
 | `source_text` | string | 예 | **카드 앞면 사료 지문.** 원문을 근거로 **직접 풀어 쓴** 문장 2~4개(권장 40~200자). 번역문을 옮기지 않는다(D4). 사건 이름, 왕 이름, 연도를 쓰지 않는다. |
 | `text_basis` | enum | 예 | `own_paraphrase_from_original`만 허용. 번역문 인용이 섞이면 이 값을 쓰지 못한다. |
 | `clues` | array(2) | 예 | 단서 2개. 아래 "단서". |
-| `answer` | object | 예 | 연표 위 정답 칸. `{ "after": <앵커 id>, "before": <다음 앵커 id 또는 null> }`. |
+| `answer` | object | 예 | 연표 위 정답 칸. `{ "after": <앵커 id>, "before": <다음 앵커 id 또는 null>, "same_year": null \| "before_next_accession" }`. `same_year`(D68 정식 필드, 선택)는 사건이 **다음 앵커의 즉위와 같은 해**에 있었지만 즉위 **앞**에 일어난 경우에만 `"before_next_accession"`으로 둔다(예: 고국원왕 전사 371 → 소수림왕 즉위 371 이전). 이 값이 있으면 `year == before.reign.start`가 허용된다(V6). 다른 값은 오류. |
 | `explanation` | string | 예 | 정답 후 해설. `reign_label`과 연도, 왜 그 칸인지, 시험에서 연결되는 내용을 담는다. |
 | `exam_tags` | array(enum) | 예 | 출제 주제, 하나 이상: `institution`(제도·정치) / `person`(인물) / `war`(전쟁·대외) / `culture`(문화·종교·사회). 새 값을 넣으려면 결정 기록이 필요하다. |
 | `disputed` | bool | 예 | 학설이 갈려 판정에서 뺀다. `year_basis`가 `disputed`이면 true. |
@@ -104,7 +107,7 @@
 
 | 단계 | `kind` | 규칙 | 숙련도 비용(`leitner-spec.md`) |
 |---|---|---|---|
-| 1 | `relation` | "기준 사건보다 먼저/나중" 형식. `relations`는 **1~2개**: 각각 `op`가 `before`(앵커의 즉위 **이전**) 또는 `after`(앵커의 즉위 **이후**), `ref`가 같은 나라의 앵커 id다. 2개일 때는 `after` 하나와 `before` 하나로 **구간**을 만들고 `after`의 앵커가 `before`의 앵커보다 앞 순서여야 한다. 본문에 쓴 모든 `ref`의 `[앵커 제목]`이 들어간다. | 열고 맞히면 승급 없음 |
+| 1 | `relation` | **후보 칸을 2~3개로 좁히는 구간**(D68, D62의 "한쪽만"을 대체). `relations`는 `after` 하나와 `before` 하나(필요하면 한쪽만)로, 각각 `op`가 `before`(앵커의 즉위 **이전**) 또는 `after`(앵커의 즉위 **이후**), `ref`가 같은 나라의 앵커 id다. `after`의 앵커는 `before`의 앵커보다 앞 순서이고, 두 앵커 사이의 **틈이 2~3개**가 되게 고른다(정답 틈의 바로 앞뒤 두 앵커를 함께 말해 후보를 1칸으로 만드는 것은 **금지**: 정답을 그대로 알려 준다). 본문에 쓴 모든 `ref`의 `[앵커 제목]`이 들어간다. 후보가 4칸 이상이면 경고. | 열고 맞히면 승급 없음 |
 | 2 | `direct` | 연도·왕·인물 등 직접 힌트. 정답을 거의 확정해도 된다. | 열고 맞히면 한 상자 강등 |
 
 사료 지문(앞면)은 단서가 아니라 문제이므로 비용이 없다.
@@ -160,6 +163,8 @@
 
 ## 검증 규칙 (초안)
 
+> **검증기와의 차이(e099b43 기준)**: 검증기는 아직 D62 동작(기본 `relations` 1개, `--allow-two-relations`로 2개)이고 "후보 1칸 오류, 4칸 이상 경고"(D68)는 반영 전이다. 위 표가 정답 규칙이고 검증기가 따라온다. 현재 검증기는 후보 칸 수를 관찰값(OBS)으로만 출력한다.
+
 규칙 번호는 `tools/validate_cards_v2.py`와 헤드리스 테스트가 같이 쓴다.
 
 | # | 규칙 |
@@ -169,11 +174,11 @@
 | V3 | `kind`가 `anchor` 또는 `source`이고, 종류별 필수 필드가 있다. |
 | V4 | 한 나라의 앵커는 `order`가 1부터 빈틈없이 이어지고, `reign.start`가 `order`와 함께 **엄격히 증가**하며, `start ≤ end`, 앞 앵커의 `end ≤` 다음 앵커의 `start`다. |
 | V5 | 사료 카드의 `answer.after`는 같은 나라 앵커 id이고, `answer.before`는 그 앵커 바로 다음 순서의 앵커 id다. `after`가 마지막 앵커일 때만 `before`는 null이다. |
-| V6 | `year`가 정답 칸 안에 있다: `after.reign.start ≤ year`이고, `before`가 있으면 `year < before.reign.start`다. `year`는 0이 아니다. |
+| V6 | `year`가 정답 칸 안에 있다: `after.reign.start ≤ year`이고, `before`가 있으면 `year < before.reign.start`다. 예외(D67·D68): `answer.same_year`가 `"before_next_accession"`이면 `year == before.reign.start`도 허용한다. `year`는 0이 아니다. |
 | V7 | `year_basis`가 `disputed`이면 `disputed`는 true다. `disputed`가 true이면 `disputed_note`가 있다. |
 | V8 | `source_text`에 **카드 `title`**, **`answer.after` 앵커의 `title`**, **연도 표현**(`\d{3,4}\s*년`, `기원전`, `서기`)이 없다. 길이는 20~200자(범위를 벗어나면 경고). |
 | V9 | `text_basis`가 `own_paraphrase_from_original`이다. |
-| V10 | `clues`가 정확히 2개이고 `level`이 1, 2이며 `kind`가 `relation`, `direct`다. `relations`가 1~2개이고 각각 `op`가 `before`/`after`, `ref`가 같은 나라의 앵커이며, **모든 관계가 참이다**(`before`: `year < ref.reign.start`, `after`: `year ≥ ref.reign.start`). 2개이면 `after` 하나와 `before` 하나이고 `after`의 앵커 순서가 `before`의 앵커 순서보다 앞선다. 본문에 모든 `ref`의 `[앵커 제목]`이 있다. `direct` 본문이 비어 있지 않다. |
+| V10 | `clues`가 정확히 2개이고 `level`이 1, 2이며 `kind`가 `relation`, `direct`다. `relations`의 각 `op`가 `before`/`after`, `ref`가 같은 나라의 앵커이며 **모든 관계가 참이다**(`before`: `year < ref.reign.start`, `after`: `year ≥ ref.reign.start`, `same_year`이면 정답 `before` 앵커에 한해 `year == start`도 참). 두 개이면 `after` 하나와 `before` 하나이고 `after`의 순서가 `before`의 순서보다 앞선다. 본문에 모든 `ref`의 `[앵커 제목]`이 있다. `direct` 본문이 비어 있지 않다. **관계 단서 뒤 후보 칸이 1이면 오류, 4 이상이면 경고**(D68). |
 | V11 | `exam_tags`가 비어 있지 않고 정해진 값의 부분집합이다. |
 | V12 | `explanation`이 비어 있지 않고 `reign_label`을 포함한다. |
 | V13 | `source_ref`에 `work`, `section`, `entry`가 있다. |
