@@ -238,14 +238,14 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goguryeo-reign-sosurim"
+              "ref": "goguryeo-reign-micheon"
             },
             {
               "op": "before",
-              "ref": "goguryeo-reign-yeongyang"
+              "ref": "goguryeo-reign-jangsu"
             }
           ],
-          "text": "[소수림왕]이 즉위한 뒤, [영양왕]이 즉위하기 전의 일이다."
+          "text": "[미천왕]이 즉위한 뒤, [장수왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -326,7 +326,7 @@
       ],
       "answer": {
         "after": "goguryeo-reign-jangsu",
-        "before": "goguryeo-reign-yeongyang"
+        "before": "goguryeo-reign-munja"
       },
       "explanation": "장수왕 2년(갑인년)(414년)의 일. 장수왕이 아버지 광개토왕의 업적을 기리려 세운 비. 건국 설화, 정복 활동, 수묘인 규정이 새겨져 있다.",
       "exam_tags": [
@@ -380,10 +380,14 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goguryeo-reign-jangsu"
+              "ref": "goguryeo-reign-munja"
+            },
+            {
+              "op": "before",
+              "ref": "goguryeo-reign-bojang"
             }
           ],
-          "text": "[장수왕]이 즉위한 뒤의 일이다."
+          "text": "[문자명왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -392,7 +396,7 @@
         }
       ],
       "answer": {
-        "after": "goguryeo-reign-jangsu",
+        "after": "goguryeo-reign-munja",
         "before": "goguryeo-reign-yeongyang"
       },
       "explanation": "문자명왕 3년(494년)의 일. 부여 왕실이 고구려에 투항해 부여가 완전히 고구려에 들어온 일. 물길(말갈)의 압박에 밀린 투항으로 보는 설명도 있다.",
@@ -447,14 +451,14 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goguryeo-reign-gwanggaeto"
+              "ref": "goguryeo-reign-munja"
             },
             {
               "op": "before",
-              "ref": "goguryeo-reign-bojang"
+              "ref": "goguryeo-reign-yeongnyu"
             }
           ],
-          "text": "[광개토왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
+          "text": "[문자명왕]이 즉위한 뒤, [영류왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -464,7 +468,7 @@
       ],
       "answer": {
         "after": "goguryeo-reign-yeongyang",
-        "before": "goguryeo-reign-bojang"
+        "before": "goguryeo-reign-yeongnyu"
       },
       "explanation": "영양왕 9년(598년)의 일. 영양왕이 수의 요서 지역을 먼저 공격한 일. 수 문제가 보낸 30만 대군은 장마와 질병으로 물러갔고, 이후 612년 살수대첩까지 수와의 전쟁이 이어진다.",
       "exam_tags": [
@@ -531,7 +535,7 @@
       ],
       "answer": {
         "after": "goguryeo-reign-yeongyang",
-        "before": "goguryeo-reign-bojang"
+        "before": "goguryeo-reign-yeongnyu"
       },
       "explanation": "영양왕 11년(600년)의 일. 이문진이 『유기』를 정리해 『신집』 5권을 편찬한 일.",
       "exam_tags": [
@@ -585,10 +589,10 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goguryeo-reign-jangsu"
+              "ref": "goguryeo-reign-yeongyang"
             }
           ],
-          "text": "[장수왕]이 즉위한 뒤의 일이다."
+          "text": "[영양왕]이 즉위한 뒤의 일이다."
         },
         {
           "level": 2,
@@ -597,7 +601,7 @@
         }
       ],
       "answer": {
-        "after": "goguryeo-reign-yeongyang",
+        "after": "goguryeo-reign-yeongnyu",
         "before": "goguryeo-reign-bojang"
       },
       "explanation": "영류왕 14년(631년)의 일. 당의 침략에 대비해 부여성에서 바다까지 천여 리에 걸쳐 쌓은 방어선. 642년 연개소문이 공사를 감독하다 정변을 일으켰다.",
@@ -721,10 +725,10 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goguryeo-reign-jangsu"
+              "ref": "goguryeo-reign-yeongyang"
             }
           ],
-          "text": "[장수왕]이 즉위한 뒤의 일이다."
+          "text": "[영양왕]이 즉위한 뒤의 일이다."
         },
         {
           "level": 2,

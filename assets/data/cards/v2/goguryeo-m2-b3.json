@@ -447,14 +447,14 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goguryeo-reign-sosurim"
+              "ref": "goguryeo-reign-jangsu"
             },
             {
               "op": "before",
               "ref": "goguryeo-reign-yeongyang"
             }
           ],
-          "text": "[소수림왕]이 즉위한 뒤, [영양왕]이 즉위하기 전의 일이다."
+          "text": "[장수왕]이 즉위한 뒤, [영양왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -464,7 +464,7 @@
       ],
       "answer": {
         "after": "goguryeo-reign-jangsu",
-        "before": "goguryeo-reign-yeongyang"
+        "before": "goguryeo-reign-munja"
       },
       "explanation": "장수왕 3년(을묘년)(415년)의 일. 광개토왕 사후 3년째(415)에 만든 고구려 그릇이 신라 고분(호우총)에서 나온 것. 400년 신라 구원 이후 신라가 고구려의 영향 아래 있었음을 보여 준다. 무덤은 6세기 초 축조로 보는 견해가 많다.",
       "exam_tags": [
@@ -518,14 +518,14 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goguryeo-reign-jangsu"
+              "ref": "goguryeo-reign-munja"
             },
             {
               "op": "before",
               "ref": "goguryeo-reign-bojang"
             }
           ],
-          "text": "[장수왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
+          "text": "[문자명왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -534,7 +534,7 @@
         }
       ],
       "answer": {
-        "after": "goguryeo-reign-jangsu",
+        "after": "goguryeo-reign-munja",
         "before": "goguryeo-reign-yeongyang"
       },
       "explanation": "평원왕 28년(586년)의 일. 평원왕이 평양 대성산성 일대에서 장안성(지금의 평양 시가)으로 도읍을 옮긴 일. 장안성은 552년부터 쌓기 시작했다.",
@@ -589,14 +589,14 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goguryeo-reign-gwanggaeto"
+              "ref": "goguryeo-reign-jangsu"
             },
             {
               "op": "before",
-              "ref": "goguryeo-reign-bojang"
+              "ref": "goguryeo-reign-yeongnyu"
             }
           ],
-          "text": "[광개토왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
+          "text": "[장수왕]이 즉위한 뒤, [영류왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
@@ -606,7 +606,7 @@
       ],
       "answer": {
         "after": "goguryeo-reign-yeongyang",
-        "before": "goguryeo-reign-bojang"
+        "before": "goguryeo-reign-yeongnyu"
       },
       "explanation": "영양왕 즉위년(590년)의 일. 평원왕의 사위 온달이 신라에 빼앗긴 죽령 이북 땅을 되찾으려 나섰다가 아단성 아래에서 전사한 일(삼국사기 열전). 이야기 부분(바보 온달과 평강 공주)은 설화성이 강하다.",
       "exam_tags": [
@@ -673,7 +673,7 @@
         }
       ],
       "answer": {
-        "after": "goguryeo-reign-yeongyang",
+        "after": "goguryeo-reign-yeongnyu",
         "before": "goguryeo-reign-bojang"
       },
       "explanation": "영류왕 7년(624년)의 일. 영류왕 때 당에서 도사를 보내 노자의 도법을 강론한 일. 643년 연개소문의 도교 진흥 요청보다 앞선다.",
@@ -728,14 +728,10 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goguryeo-reign-jangsu"
-            },
-            {
-              "op": "before",
-              "ref": "goguryeo-reign-bojang"
+              "ref": "goguryeo-reign-yeongyang"
             }
           ],
-          "text": "[장수왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다."
+          "text": "[영양왕]이 즉위한 뒤의 일이다."
         },
         {
           "level": 2,
@@ -744,7 +740,7 @@
         }
       ],
       "answer": {
-        "after": "goguryeo-reign-yeongyang",
+        "after": "goguryeo-reign-yeongnyu",
         "before": "goguryeo-reign-bojang",
         "same_year": "before_next_accession"
       },
@@ -801,10 +797,10 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goguryeo-reign-jangsu"
+              "ref": "goguryeo-reign-yeongyang"
             }
           ],
-          "text": "[장수왕]이 즉위한 뒤의 일이다."
+          "text": "[영양왕]이 즉위한 뒤의 일이다."
         },
         {
           "level": 2,
