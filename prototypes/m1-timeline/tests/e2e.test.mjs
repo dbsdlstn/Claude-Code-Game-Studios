@@ -38,7 +38,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
         const how = first ? plan(card) : 'right';
         const g = await gapsFor(page, card, { near: how === 'near' });
         await pressGap(page, how === 'right' ? g.right : g.wrong, mobile);
-        out.push({ id: card.id, first, how, from: await page.getAttribute('#result-box', 'data-from'), to: await page.getAttribute('#result-box', 'data-to') });
+        out.push({ id: card.id, first, how, from: await page.getAttribute('#result-box', 'data-from'), to: await page.getAttribute('#result-box', 'data-to'), boxText: await page.innerText('#result-box') });
         await page.click('#btn-next');
       }
       return out;
@@ -98,7 +98,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       assert.equal(await page.getAttribute('#result-box', 'data-to'), '1');
     }));
 
-    test('세션 1 → 재도전 → 결과 → 세션 2는 도래한 오답 카드 + 남은 새 카드 2장, 상자 1→2', () => withPage(async (page) => {
+    test('세션 1 → 재도전 → 결과 → 세션 2는 도래한 오답 카드 + 남은 새 카드 2장; 오답 카드는 재학습 표시로 상자 1 유지', () => withPage(async (page) => {
       let n = 0;
       const r1 = await playSession(page, () => (n++ % 3 === 1 ? 'wrong' : 'right'));
       const wrongIds = r1.filter((x) => x.first && x.how === 'wrong').map((x) => x.id);
@@ -108,6 +108,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       assert.ok(retries.every((x) => x.to === '1'), '재도전은 상자를 바꾸지 않는다');
       await page.waitForSelector('#summary:not([hidden])');
       assert.equal(await page.getAttribute('#summary-stats', 'data-right'), String(6 - wrongIds.length));
+      assert.doesNotMatch(await page.innerText('#summary-body'), /null/, 'B3: 세션 결과에 "null"이 찍히면 안 된다');
       assert.match(await page.innerText('#summary-retry'), new RegExp(`${wrongIds.length} / ${wrongIds.length} 성공`));
       await page.click('#summary-next');
       assert.match(await page.innerText('#session-no'), /세션 2/);
@@ -115,7 +116,10 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       const ids2 = r2.map((x) => x.id);
       assert.equal(ids2.length, wrongIds.length + 2, '도래 카드(오답) + 새 카드 예약 2장, 남는 자리는 채우지 않음');
       assert.ok(wrongIds.every((id) => ids2.includes(id)));
-      for (const x of r2) assert.deepEqual([x.from, x.to], wrongIds.includes(x.id) ? ['1', '2'] : ['', '2']);
+      // 재학습 표시(D74-3): 상자 1에서 틀린 카드는 깨끗한 정답 1번으로는 상자 1 그대로, 1번 더 필요.
+      for (const x of r2) assert.deepEqual([x.from, x.to], wrongIds.includes(x.id) ? ['1', '1'] : ['', '2']);
+      for (const x of r2.filter((y) => wrongIds.includes(y.id))) assert.match(x.boxText, /재학습 표시: 단서 없이 1번 연속 맞히면 상자 2/);
+      assert.ok(r1.filter((x) => x.first && x.how === 'wrong').every((x) => /재학습 표시: 단서 없이 2번/.test(x.boxText)));
     }));
 
     test('도감: 현재 등급과 최고 등급, 오답 노트와 다시 풀기(연습, 상태 안 바뀜)', () => withPage(async (page) => {
@@ -165,6 +169,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
         return s;
       });
       assert.match(await page.innerText('#empty-title'), /도래한 카드를 모두/);
+      assert.doesNotMatch(await page.innerText('#card'), /null/, 'B3: 빈 세션 화면에 "null"이 찍히면 안 된다');
       await page.click('#btn-early');
       assert.equal(await page.locator('#practice-badge').count(), 1);
       const card = await currentCard(page);
@@ -200,7 +205,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       const lines = readFileSync(await dl.path(), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
       assert.equal(lines.length, 1);
       const l = lines[0];
-      assert.deepEqual(Object.keys(l), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
+      assert.deepEqual(Object.keys(l), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'king_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
       assert.deepEqual([l.participant, l.phase, l.arm, l.session_index, l.card_id, l.correct, l.clue_used, l.box_after, l.near_miss, l.relearn], ['P7', 'learn', 'A', 1, c0.id, false, 1, 1, true, false]);
       assert.ok(l.ms_on_card >= 0 && Number.isInteger(l.ms_on_card));
       assert.ok(SAMPLE.anchors.some((a) => a.id === l.slot_chosen));

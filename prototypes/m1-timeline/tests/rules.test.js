@@ -11,7 +11,7 @@ import {
   validateDeck, buildTimeline, isCorrectGap, correctGaps, selectableGaps, slotAnchorId, isNearMiss,
   nextBox, schedule, gradeOf, isDue, newEntry, buildSession, earlyReviewIds, wrongNoteIds, sessionSeed,
   createSessionState, currentId, revealClue, placeCurrent, sessionTimeline, isSessionDone, isRetry, attemptsOf,
-  completedAfter, sessionSummary, gradeCounts, logLine, restoreProgress, restoreSession, dataFingerprint,
+  completedAfter, sessionSummary, gradeCounts, logLine, restoreProgress, restoreSession, dataFingerprint, previewBox,
 } from '../js/rules.js';
 import { normalizeDeck, formatOf, loadRaw, yearText } from '../js/data.js';
 
@@ -277,7 +277,7 @@ describe('인출 로그(m1-plan §11 규격)', () => {
     const st = sampleSession();
     const r = placeCurrent(st, wrong(st, M1, true), BY_ID, SAMPLE.anchors, {}, M1).result;
     const line = logLine({ ts: 123, participant: 'P1', result: r, session: 1, msOnCard: 4567 });
-    assert.deepEqual(Object.keys(line), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
+    assert.deepEqual(Object.keys(line), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'king_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
     assert.deepEqual([line.phase, line.arm, line.correct, line.near_miss, line.box_before, line.box_after, line.relearn], ['learn', 'A', false, true, null, 1, false]);
     assert.ok(SAMPLE.anchors.some((a) => a.id === line.slot_chosen));
   });
@@ -384,7 +384,7 @@ describe('데이터 로더(js/data.js)', () => {
 /* ------------------------------------------------------------------ 사람 테스트 모드(D72) */
 import {
   ASSIGNMENTS, splitHalves, stageOrder, armIds, newStudySave, nextStage, testOrder, post1Timing, createTestState, answerTest, testDone,
-  rateCurrent, validParticipant, armStoreAdapter,
+  rateCurrent, validParticipant, armStoreAdapter, correctKing,
 } from '../js/study.js';
 const STUDY_CONFIG = CONFIG;
 const REAL_V2 = existsSync(V2_PATH) ? normalizeDeck(JSON.parse(readFileSync(V2_PATH, 'utf8'))).deck : null;
@@ -411,6 +411,13 @@ describe('사람 테스트 모드: 배정·반·단계', () => {
     const sorted = [...REAL_V2.cards].sort((a, b) => a.order - b.order).map((c) => c.id);
     for (let i = 0; i < 12; i += 2) assert.notEqual(h.S1.includes(sorted[i]), h.S1.includes(sorted[i + 1]), `짝 ${i / 2 + 1}`);
     assert.deepEqual(armIds(h, ASSIGNMENTS.P1, 'A'), h.S1);
+    // D74-1: 같은 칸(정답 앞 앵커가 같은) 카드는 서로 다른 반. 반마다 6장이 모두 다른 칸.
+    const raw = JSON.parse(readFileSync(V2_PATH, 'utf8'));
+    const slotOf = new Map(raw.cards.filter((c) => c.kind === 'source').map((c) => [c.id, c.answer.after]));
+    for (const half of ['S1', 'S2']) assert.equal(new Set(h[half].map((id) => slotOf.get(id))).size, 6, `${half} 안에 같은 칸 카드`);
+    for (const [x, y] of [['goguryeo-src-04', 'goguryeo-src-05'], ['goguryeo-src-06', 'goguryeo-src-07'], ['goguryeo-src-09', 'goguryeo-src-10']]) {
+      assert.notEqual(h.S1.includes(x), h.S1.includes(y), `${x}·${y}는 다른 반`);
+    }
   });
   test('다음 단계는 끝나지 않은 첫 단계, 모두 끝나면 null', () => {
     const s = newStudySave('P2', ASSIGNMENTS.P2, 'x');
@@ -446,21 +453,28 @@ describe('사람 테스트 모드: 테스트 화면 규칙', () => {
     assert.deepEqual([...a].sort(), SAMPLE.cards.map((c) => c.id).sort());
     assert.notDeepEqual(a, testOrder(SAMPLE.cards, 'P1', 'post0'));
   });
-  test('답 기록: 규격 필드, 단서 0, 상자 없음, 근거 저장. "모르겠다"는 slot null·오답', () => {
+  test('B2 답 기록: "어느 왕 때인가" → king_chosen, slot_chosen null, 단서 0, 상자 없음, 근거 저장. "모르겠다"는 null·오답', () => {
+    const king = correctKing(card, anchors);
+    assert.equal(king, slotAnchorId(items, right), '정답 왕 = 카드가 놓이는 칸의 앞쪽 기준 왕');
     const st = createTestState([card.id, SAMPLE.cards[1].id]);
-    const r = answerTest(st, { k: right, reason: '  광개토왕 비문  ', card, anchors, participant: 'P1', phase: 'pre', ts: 5, msOnCard: 900 });
-    assert.deepEqual(Object.keys(r.line), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
+    const r = answerTest(st, { king, reason: '  광개토왕 비문  ', card, anchors, participant: 'P1', phase: 'pre', ts: 5, msOnCard: 900 });
+    assert.deepEqual(Object.keys(r.line), ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'king_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text']);
     assert.equal(r.line.correct, true); assert.equal(r.line.arm, '-'); assert.equal(r.line.clue_used, 0);
     assert.equal(r.line.box_before, null); assert.equal(r.line.reason_text, '광개토왕 비문');
-    assert.equal(r.line.slot_chosen, slotAnchorId(items, right));
-    const u = answerTest(r.state, { k: null, reason: '', card: SAMPLE.cards[1], anchors, participant: 'P1', phase: 'post1', ts: 6, msOnCard: 1 });
-    assert.equal(u.line.slot_chosen, null); assert.equal(u.line.correct, false); assert.equal(u.line.near_miss, false);
+    assert.equal(r.line.slot_chosen, null); assert.equal(r.line.king_chosen, king);
+    const u = answerTest(r.state, { king: null, reason: '', card: SAMPLE.cards[1], anchors, participant: 'P1', phase: 'post1', ts: 6, msOnCard: 1 });
+    assert.equal(u.line.king_chosen, null); assert.equal(u.line.correct, false); assert.equal(u.line.near_miss, false);
     assert.ok(testDone(u.state));
   });
-  test('한 칸 차이 오답은 near_miss', () => {
-    const near = selectableGaps(items, CONFIG.leitner).find((k) => Math.abs(k - right) === 1);
-    const r = answerTest(createTestState([card.id]), { k: near, reason: '', card, anchors, participant: 'P1', phase: 'post0', ts: 1, msOnCard: 1 });
-    assert.equal(r.line.correct, false); assert.equal(r.line.near_miss, true);
+  test('바로 앞이나 뒤 기준 왕을 고르면 near_miss, 더 멀면 아님', () => {
+    const sorted = [...anchors].sort((a, b) => a.order - b.order).map((a) => a.id);
+    const king = correctKing(card, anchors);
+    const i = sorted.indexOf(king);
+    const near = sorted[i + 1] ?? sorted[i - 1];
+    const far = sorted.find((k) => Math.abs(sorted.indexOf(k) - i) >= 2);
+    const go = (k) => answerTest(createTestState([card.id]), { king: k, reason: '', card, anchors, participant: 'P1', phase: 'post0', ts: 1, msOnCard: 1 }).line;
+    assert.deepEqual([go(near).correct, go(near).near_miss], [false, true]);
+    assert.deepEqual([go(far).correct, go(far).near_miss], [false, false]);
   });
 });
 
@@ -496,5 +510,56 @@ describe('사람 테스트 모드: 방식 B(플래시카드)', () => {
     ad.save({ completed_sessions: 3, cards: {}, current: null, log: [] });
     assert.ok(saved.stages['learn-A'].done_at);
     assert.equal(saved.arms.B, null);
+  });
+});
+
+describe('재학습 표시(probation, D74-3)', () => {
+  const cfg = M1;
+  const play = (entry, seq) => seq.reduce((e, [correct, clueUsed], i) => schedule(e, { correct, clueUsed, session: i + 1 }, cfg), entry);
+  test('설정: 켜짐, 깨끗한 정답 2번', () => {
+    assert.deepEqual({ ...cfg.probation }, { enabled: true, clean_needed: 2 });
+  });
+  test('새 카드를 틀리면 표시, 깨끗한 정답 1번은 상자 1 그대로, 2번 연속이면 상자 2로 오르고 표시가 지워진다', () => {
+    let e = play(undefined, [[false, 0]]);
+    assert.equal(e.box, 1); assert.equal(e.probation, true);
+    e = play(e, [[true, 0]]);
+    assert.equal(e.box, 1); assert.equal(e.probation, true); assert.equal(e.probation_clean, 1);
+    e = play(e, [[true, 0]]);
+    assert.equal(e.box, 2); assert.equal(e.probation, false); assert.equal(e.probation_clean, 0);
+  });
+  test('표시 중 단서를 보고 맞히면 연속이 끊기고 표시는 남는다(상자 1)', () => {
+    let e = play(undefined, [[false, 0], [true, 0], [true, 1]]);
+    assert.equal(e.box, 1); assert.equal(e.probation, true); assert.equal(e.probation_clean, 0);
+    e = play(e, [[true, 0], [true, 0]]);
+    assert.equal(e.box, 2); assert.equal(e.probation, false);
+  });
+  test('단서를 보고 맞힌 경우는 표시가 붙지 않는다; 상자 1에서 찍어 틀리기보다 단서가 낫다', () => {
+    const clue = play(undefined, [[true, 1]]);
+    assert.equal(clue.probation, false);
+    assert.equal(play(clue, [[true, 0]]).box, 2, '단서 정답 뒤 깨끗한 정답 한 번이면 상자 2');
+    const guess = play(undefined, [[false, 0]]);
+    assert.equal(play(guess, [[true, 0]]).box, 1, '찍어서 틀린 뒤에는 깨끗한 정답 한 번으로 못 오른다');
+  });
+  test('상자 2 이상에서 틀리면 상자 1로 가지만 표시는 없다; 그 뒤 상자 1에서 또 틀리면 표시', () => {
+    let e = play(undefined, [[true, 0], [true, 0]]);
+    assert.equal(e.box, 3);
+    e = play(e, [[false, 0]]);
+    assert.equal(e.box, 1); assert.equal(e.probation, false);
+    assert.equal(play(e, [[true, 0]]).box, 2);
+    assert.equal(play(e, [[false, 0]]).probation, true);
+  });
+  test('끄면 명세 §4 표 그대로(오답 뒤 깨끗한 정답 한 번이면 상자 2)', () => {
+    const off = { ...cfg, probation: { enabled: false, clean_needed: 2 } };
+    const e = schedule(schedule(undefined, { correct: false, clueUsed: 0, session: 1 }, off), { correct: true, clueUsed: 0, session: 2 }, off);
+    assert.equal(e.box, 2); assert.equal(e.probation, false);
+  });
+  test('previewBox는 표시를 반영한다; 저장 복원도 표시를 지킨다', () => {
+    const e = play(undefined, [[false, 0]]);
+    assert.equal(previewBox(e, true, 0, cfg), 1);
+    assert.equal(previewBox(play(e, [[true, 0]]), true, 0, cfg), 2);
+    const r = restoreProgress({ [SAMPLE.cards[0].id]: JSON.parse(JSON.stringify(e)) }, SAMPLE.cards, cfg);
+    assert.equal(r[SAMPLE.cards[0].id].probation, true);
+    const old = restoreProgress({ [SAMPLE.cards[0].id]: { box: 1, introduced: true, due_session: 2, last_session: 1, clean_streak: 0, lapses: 1, best_grade: 0, last_played_at: null } }, SAMPLE.cards, cfg);
+    assert.equal(old[SAMPLE.cards[0].id].probation, false, '표시 필드가 없는 이전 저장은 표시 없음');
   });
 });

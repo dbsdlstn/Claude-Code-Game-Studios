@@ -59,7 +59,20 @@
       <button id="btn-export" type="button" class="btn btn-small">기록 내보내기(JSONL)</button>
     </section>
     <div class="sheet-actions">
+      <button id="btn-intro" type="button" class="btn btn-small">처음 안내 다시 보기</button>
       <button id="btn-reset" type="button" class="btn btn-danger btn-small">학습 기록 초기화</button>
+    </div>
+  </div>
+</div>
+
+<div id="intro" class="overlay" hidden>
+  <div class="sheet intro" role="dialog" aria-modal="true" aria-labelledby="intro-title" aria-describedby="intro-body">
+    <p id="intro-step" class="source-note"></p>
+    <h2 id="intro-title"></h2>
+    <p id="intro-body"></p>
+    <div class="sheet-actions">
+      <button id="intro-skip" type="button" class="btn">건너뛰기</button>
+      <button id="intro-next" type="button" class="btn btn-primary">다음</button>
     </div>
   </div>
 </div>
@@ -72,6 +85,7 @@
   </div>
 </div>
 
+<div id="confirm-dock" class="confirm-dock"></div>
 <footer class="foot"><span id="data-info"></span> <strong id="data-warn" class="data-warn" role="note"></strong></footer>
 <div id="drag-ghost" class="drag-ghost" hidden></div>
 <div id="announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>

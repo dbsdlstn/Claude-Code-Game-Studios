@@ -57,8 +57,9 @@ export async function startServer() {
 }
 
 /** data: 'data/sample.json'(기본) 또는 null(설정의 기본 경로 = 실제 초안). */
-export async function openProto(page, base, { seed = 7, data = 'data/sample.json', participant = null } = {}) {
+export async function openProto(page, base, { seed = 7, data = 'data/sample.json', participant = null, intro = '0' } = {}) {
   const q = new URLSearchParams({ seed: String(seed) });
+  if (intro !== null) q.set('intro', intro);
   if (data) q.set('data', data);
   if (participant) q.set('participant', participant);
   await page.goto(`${base}/prototypes/m1-timeline/index.html?${q}`);

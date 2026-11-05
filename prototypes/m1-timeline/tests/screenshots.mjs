@@ -23,6 +23,9 @@ try {
       await page.screenshot({ path: path.join(OUT, `${name}-${file}.png`), fullPage: full });
       console.log('saved', `production/qa/evidence/m1/${name}-${file}.png`);
     };
+    // 처음 안내(D74-5)
+    await openProto(page, server.base, { data: DATA, seed: 11, intro: '1' });
+    await shot('00-intro');
     await openProto(page, server.base, { data: DATA, seed: 11 });
     await shot('01-question');
     if (mobile) {
@@ -67,6 +70,12 @@ try {
       const MAP = { 'menu-new': '07-study-create', menu: '08-study-menu', test: '09-study-test', 'learn-a': '10-study-learn-a', 'flash-front': '11-study-flash-front', 'flash-back': '12-study-flash-back', 'b-summary': '13-study-b-summary', 'menu-post1': '14-study-menu-post1', 'menu-done': '15-study-done' };
       const sctx = await browser.newContext({ ...opts, deviceScaleFactor: 2 });
       const sp = await sctx.newPage();
+      // 진행자 메뉴 잠금(B5)
+      await sp.goto(`${server.base}/prototypes/m1-timeline/index.html?study=1&participant=${mobile ? 'P1' : 'P2'}`);
+      await sp.waitForSelector('#lock-code');
+      await sp.waitForTimeout(300);
+      await sp.screenshot({ path: path.join(OUT, `${name}-07a-study-lock.png`) });
+      console.log('saved', `production/qa/evidence/m1/${name}-07a-study-lock.png`);
       const taken = new Set();
       const sshot = async (key) => {
         const file = MAP[key];
@@ -76,7 +85,7 @@ try {
         await sp.screenshot({ path: path.join(OUT, `${name}-${file}.png`) });
         console.log('saved', `production/qa/evidence/m1/${name}-${file}.png`);
       };
-      await runParticipant(sp, server.base, { participant: mobile ? 'P1' : 'P2', preset: mobile ? 'P1' : 'P2', byId: REAL_BY_ID, mobile, shot: sshot });
+      await runParticipant(sp, server.base, { participant: mobile ? 'P1' : 'P2', preset: mobile ? 'P1' : 'P2', deck: REAL, byId: REAL_BY_ID, mobile, shot: sshot });
       await sctx.close();
     }
   }
