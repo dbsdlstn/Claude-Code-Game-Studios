@@ -1,7 +1,7 @@
 // PROTOTYPE - NOT FOR PRODUCTION (M1, decision-log D72)
 // 사람 테스트 모드를 한 참가자로 끝까지 돈다(E2E와 스크린샷 공용). shot(name)은 화면마다 불린다(없으면 무시).
-import { buildTimeline, correctGaps, isCorrectGap } from '../js/rules.js';
 import { CONFIG } from '../js/config.js';
+import { correctKing } from '../js/study.js';
 import { gapsFor, pressGap } from './helpers.mjs';
 
 export const STUDY_PREFIX = CONFIG.study.storagePrefix;
@@ -14,8 +14,14 @@ export function studyUrl(base, { participant = null, stage = null, data = null, 
   return `${base}/prototypes/m1-timeline/index.html?${q}`;
 }
 
-async function ready(page) {
+/** 페이지가 준비되면, 진행자 메뉴가 잠겨 있으면 코드를 넣어 연다(B5). */
+export async function ready(page) {
   await page.waitForSelector('body[data-ready="true"]');
+  if (await page.locator('#lock-code').count()) {
+    await page.fill('#lock-code', CONFIG.study.facilitatorCode);
+    await page.click('#lock-open');
+    await page.waitForSelector('#study-pid');
+  }
 }
 
 async function press(page, sel, mobile) {
@@ -31,30 +37,28 @@ export async function goStage(page, stage, mobile) {
 }
 
 /**
- * 테스트 한 단계(12장). 카드마다 answer(i, card) → 'right' | 'wrong' | 'unknown'.
+ * 테스트 한 단계(12장, "어느 왕 때인가"). 카드마다 answer(i, card) → 'right' | 'wrong' | 'unknown'.
  * @returns 고른 결과 목록
  */
-export async function doTest(page, byId, mobile, answer, shot = async () => {}) {
+export async function doTest(page, deck, byId, mobile, answer, shot = async () => {}) {
   const out = [];
+  const sorted = [...deck.anchors].sort((a, b) => a.order - b.order).map((a) => a.id);
   for (let i = 0; ; i++) {
     if (await page.locator('#test-done').count()) break;
     const id = await page.getAttribute('#test-card', 'data-card-id');
     const card = byId.get(id);
     const kind = answer(i, card);
-    if (kind === 'unknown') await press(page, '#test-unknown', mobile);
-    else {
-      const items = await page.locator('#test-timeline .row-anchor').evaluateAll((rows) => rows.map((r) => ({ id: r.dataset.id, order: Number(r.dataset.order), kind: 'anchor' })));
-      const t = buildTimeline([], []).concat(items);
-      const right = correctGaps(t, card.order)[0];
-      const ks = await page.locator('#test-timeline .gap').evaluateAll((g) => g.map((x) => Number(x.dataset.gap)));
-      const k = kind === 'right' ? right : ks.find((x) => !isCorrectGap(t, x, card.order));
-      await press(page, `#test-timeline .gap[data-gap="${k}"]`, mobile);
-    }
+    const right = correctKing(card, deck.anchors);
+    // 오답은 정답에서 가장 먼 왕(한 칸 차이가 아니게)
+    const wrong = sorted.reduce((best, k) => (Math.abs(sorted.indexOf(k) - sorted.indexOf(right)) > Math.abs(sorted.indexOf(best) - sorted.indexOf(right)) ? k : best), sorted[0]);
+    const king = kind === 'right' ? right : kind === 'wrong' ? wrong : null;
+    if (king === null) await press(page, '#test-unknown', mobile);
+    else await press(page, `#test-kings .king[data-king="${king}"]`, mobile);
     await page.fill('#test-reason', `근거 ${i + 1}: ${card.title.slice(0, 2)}`);
     if (i === 0) await shot('test');
     await press(page, '#test-submit', mobile);
     await page.waitForFunction((n) => document.querySelector('#test-done') || Number(document.querySelector('#test-progress')?.dataset.index) === n, i + 1);
-    out.push({ id, kind });
+    out.push({ id, kind, king, right });
   }
   return out;
 }
@@ -124,7 +128,7 @@ export async function readStudy(page, participant) {
 }
 
 /** 한 참가자: 메뉴 → 만들기(preset) → pre → 첫 방식 → 두 번째 방식 → post0 → (하루 뒤) post1. */
-export async function runParticipant(page, base, { participant, preset, byId, mobile, data = null, shot = async () => {} }) {
+export async function runParticipant(page, base, { participant, preset, deck, byId, mobile, data = null, shot = async () => {} }) {
   await page.goto(studyUrl(base, { participant, data }));
   await ready(page);
   await press(page, `#asg-${preset}`, mobile);
@@ -150,7 +154,7 @@ export async function runParticipant(page, base, { participant, preset, byId, mo
     else {
       // pre: 3장마다 하나 "모르겠다", 짝수 번째 정답. post: 거의 다 정답.
       const ans = stage === 'pre' ? (i) => (i % 3 === 2 ? 'unknown' : i % 2 === 0 ? 'right' : 'wrong') : (i) => (i === 1 ? 'wrong' : 'right');
-      results[stage] = await doTest(page, byId, mobile, ans, stage === 'pre' ? shot : async () => {});
+      results[stage] = await doTest(page, deck, byId, mobile, ans, stage === 'pre' ? shot : async () => {});
       await shot(`${stage}-done`);
     }
     if (!(await page.locator('#study-stages').count())) {

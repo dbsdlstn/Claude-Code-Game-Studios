@@ -190,3 +190,20 @@ a.btn-primary { color: #fff8ef; }
 .flash-back { border-top: 1px dashed var(--line-soft); margin-top: 8px; padding-top: 8px; }
 .study .card { max-height: none; }
 [hidden] { display: none !important; }
+.kings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+@media (min-width: 700px) { .kings { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.king { display: flex; flex-direction: column; align-items: flex-start; gap: 0; min-height: 48px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper-2); cursor: pointer; text-align: left; line-height: 1.25; }
+.king-name { font-family: var(--serif); font-weight: 700; font-size: 16px; }
+.king-year { font-size: 12.5px; color: var(--ink-soft); }
+.king-selected { background: #fdf0c8; border: 2px solid var(--select); }
+.test-card .source-text { margin-bottom: 0; }
+/* B4: 좁은 화면에서 확정 막대는 화면 아래에 고정(위에 붙은 카드에 가리지 않게), 결과는 카드를 펼친다. */
+@media (max-width: 899px) {
+  .card { max-height: 40vh; }
+  .gap-pending { scroll-margin-bottom: 140px; }
+  .timeline.asking { padding-bottom: 120px; }
+  .has-result .hand { position: static; }
+  .has-result .card { max-height: none; }
+}
+#confirm-dock .confirm-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; margin: 0; border-radius: 0; border-width: 2px 0 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 14px rgba(60,40,20,.18); }
+@media (min-width: 900px) { #confirm-dock .confirm-bar { left: 50%; right: auto; width: min(560px, 100%); transform: translateX(-50%); border-width: 2px; border-radius: 10px 10px 0 0; } }

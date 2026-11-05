@@ -4,7 +4,7 @@
  * 단계: pre → 첫 방식 학습 → 두 번째 방식 학습 → post0 → (다음 날) post1.
  */
 import {
-  createRng, shuffle, fnv1a, currentId, isRetry, schedule, buildTimeline, isCorrectGap, correctGaps, isNearMiss, slotAnchorId,
+  createRng, shuffle, fnv1a, currentId, isRetry, schedule, buildTimeline, correctGaps, slotAnchorId,
 } from './rules.js';
 
 export const PHASES = Object.freeze(['pre', 'learn-A', 'learn-B', 'post0', 'post1']);
@@ -76,17 +76,34 @@ export function createTestState(order) {
 }
 
 /**
- * 테스트 한 장에 답한다. k = 칸 번호, null이면 "모르겠다". 정답은 화면에 알리지 않는다.
+ * 테스트 문항 "어느 왕 때인가"(D74-2)의 정답: 카드가 연표에 놓이는 칸의 앞쪽 기준 왕(즉위 기준 직전 앵커).
+ * 기준 왕 목록에 없는 왕 때의 사건(예: 고국원왕 전사 → 미천왕)도 이 규칙을 따른다(D75).
+ */
+export function correctKing(card, anchors) {
+  const items = buildTimeline(anchors, []);
+  return slotAnchorId(items, correctGaps(items, card.order)[0]);
+}
+
+/** 카드의 실제 왕(reign_label)이 정답 기준 왕과 다른가. 데이터 확인·분석용. */
+export function kingMismatch(card, anchors) {
+  const a = anchors.find((x) => x.id === correctKing(card, anchors));
+  return !!(card.reign && a && !card.reign.startsWith(a.reign));
+}
+
+/**
+ * 테스트 한 장에 답한다. king = 고른 기준 왕(앵커 id), null이면 "모르겠다". 정답은 화면에 알리지 않는다.
+ * near_miss = 정답 왕의 바로 앞이나 뒤 기준 왕을 고름.
  * @returns {{state, line}}
  */
-export function answerTest(state, { k, reason, card, anchors, participant, phase, ts, msOnCard }) {
-  const items = buildTimeline(anchors, []);
-  const correct = k === null ? false : isCorrectGap(items, k, card.order);
-  const right = correctGaps(items, card.order);
+export function answerTest(state, { king, reason, card, anchors, participant, phase, ts, msOnCard }) {
+  const right = correctKing(card, anchors);
+  const sorted = [...anchors].sort((a, b) => a.order - b.order).map((a) => a.id);
+  const correct = king !== null && king === right;
+  const near = king !== null && !correct && Math.abs(sorted.indexOf(king) - sorted.indexOf(right)) === 1;
   const line = {
     ts_ms: ts, participant, phase, arm: '-', session_index: null, card_id: card.id,
-    slot_chosen: k === null ? null : slotAnchorId(items, k), self_rating: null, correct, clue_used: 0,
-    box_before: null, box_after: null, near_miss: k === null ? false : !correct && isNearMiss(right, k),
+    slot_chosen: null, king_chosen: king, self_rating: null, correct, clue_used: 0,
+    box_before: null, box_after: null, near_miss: near,
     ms_on_card: msOnCard, relearn: false, reason_text: String(reason ?? '').trim(),
   };
   return { state: Object.freeze({ ...state, index: state.index + 1 }), line };

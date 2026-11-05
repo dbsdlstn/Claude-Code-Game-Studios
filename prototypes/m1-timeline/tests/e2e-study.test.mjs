@@ -5,11 +5,11 @@ import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { chromium, startServer, VIEWPORTS, REAL, REAL_BY_ID } from './helpers.mjs';
-import { runParticipant, studyUrl, readStudy, STUDY_PREFIX } from './study-driver.mjs';
+import { runParticipant, studyUrl, readStudy, ready, STUDY_PREFIX } from './study-driver.mjs';
 import { CONFIG } from '../js/config.js';
-import { splitHalves, ASSIGNMENTS } from '../js/study.js';
+import { splitHalves, ASSIGNMENTS, correctKing, kingMismatch } from '../js/study.js';
 
-const FIELDS = ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text'];
+const FIELDS = ['ts_ms', 'participant', 'phase', 'arm', 'session_index', 'card_id', 'slot_chosen', 'king_chosen', 'self_rating', 'correct', 'clue_used', 'box_before', 'box_after', 'near_miss', 'ms_on_card', 'relearn', 'reason_text'];
 
 let server;
 let browser;
@@ -31,7 +31,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     try {
-      const { order, results } = await runParticipant(page, server.base, { participant: preset, preset, byId: REAL_BY_ID, mobile });
+      const { order, results } = await runParticipant(page, server.base, { participant: preset, preset, deck: REAL, byId: REAL_BY_ID, mobile });
       assert.deepEqual(order, preset === 'P1' ? ['pre', 'learn-A', 'learn-B', 'post0', 'post1'] : ['pre', 'learn-B', 'learn-A', 'post0', 'post1']);
       assert.equal(await page.locator('#study-all-done').count(), 1);
       assert.equal(await page.locator('#study-stages li[data-done="1"]').count(), 5);
@@ -60,10 +60,14 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
         t.forEach((l, i) => {
           assert.equal(l.card_id, exp[i].id);
           assert.equal(l.correct, exp[i].kind === 'right', `${p} ${i}`);
-          if (exp[i].kind === 'unknown') { assert.equal(l.slot_chosen, null); assert.equal(l.near_miss, false); } else assert.match(l.slot_chosen, /^goguryeo-reign-/);
+          // B2: 테스트는 "어느 왕 때인가". 칸은 고르지 않는다(slot_chosen null), king_chosen = 고른 기준 왕.
+          assert.equal(l.slot_chosen, null);
+          assert.equal(l.king_chosen, exp[i].king);
+          if (exp[i].kind === 'right') assert.equal(l.king_chosen, correctKing(REAL_BY_ID.get(l.card_id), REAL.anchors));
+          if (exp[i].kind !== 'right') assert.equal(l.near_miss, false);
         });
       }
-      assert.ok(by('pre').some((l) => l.slot_chosen === null), 'pre에 "모르겠다"가 있어야 한다');
+      assert.ok(by('pre').some((l) => l.king_chosen === null), 'pre에 "모르겠다"가 있어야 한다');
       // 학습: A는 꽂기, B는 자기 평가. 각자 반의 카드만.
       const A = by('learn', 'A');
       const B = by('learn', 'B');
@@ -95,17 +99,26 @@ test('참가자별 저장이 섞이지 않고 일반 학습 모드와도 따로�
   const ctx = await browser.newContext(VIEWPORTS.desktop);
   const page = await ctx.newPage();
   try {
+    // B5: 메뉴는 진행자 코드로 잠겨 있다. 틀린 코드면 안 열린다.
     await page.goto(studyUrl(server.base, { participant: 'P1' }));
-    await page.waitForSelector('body[data-ready="true"]');
+    await page.waitForSelector('#lock-code');
+    assert.equal(await page.locator('#study-halves, #study-pid').count(), 0);
+    await page.fill('#lock-code', '0000');
+    await page.click('#lock-open');
+    assert.match(await page.innerText('#lock-msg'), /맞지 않습니다/);
+    assert.equal(await page.locator('#study-halves').count(), 0);
+    await ready(page);
     assert.equal(await page.isChecked('#asg-P1'), true);
     await page.click('#study-create');
     await page.click('#study-stages a[data-go="pre"]');
     await page.waitForSelector('#test-card');
-    // 고르기 전에는 다음으로 못 간다. 같은 칸을 다시 누르면 선택 해제.
+    // B2: 기준 왕 10명 버튼 + 모르겠다, 연표 칸은 없다. 고르기 전에는 다음으로 못 간다. 같은 왕을 다시 누르면 선택 해제.
+    assert.equal(await page.locator('#test-kings .king').count(), REAL.anchors.length);
+    assert.equal(await page.locator('#test-timeline, .gap').count(), 0);
     assert.equal(await page.isDisabled('#test-submit'), true);
-    await page.click('#test-timeline .gap >> nth=0');
+    await page.click('#test-kings .king >> nth=0');
     assert.equal(await page.isDisabled('#test-submit'), false);
-    await page.click('#test-timeline .gap >> nth=0');
+    await page.click('#test-kings .king >> nth=0');
     assert.equal(await page.isDisabled('#test-submit'), true);
     // 정답은 보여 주지 않는다.
     await page.click('#test-unknown');
@@ -117,6 +130,7 @@ test('참가자별 저장이 섞이지 않고 일반 학습 모드와도 따로�
     assert.equal(await page.getAttribute('#test-progress', 'data-index'), '1');
 
     await page.goto(studyUrl(server.base, { participant: 'Q9' }));
+    await ready(page);
     await page.waitForSelector('#study-create');
     await page.click('#study-create');
     assert.equal(await page.getAttribute('#study-log-count', 'data-count'), '0');
@@ -126,13 +140,14 @@ test('참가자별 저장이 섞이지 않고 일반 학습 모드와도 따로�
     assert.equal(await page.evaluate(() => localStorage.getItem('hanyang-m1:save:v2')), null);
 
     // 일반 모드는 그대로(진행자 화면 없음, 도감 있음)
-    await page.goto(`${server.base}/prototypes/m1-timeline/index.html?seed=7`);
+    await page.goto(`${server.base}/prototypes/m1-timeline/index.html?seed=7&intro=0`);
     await page.waitForSelector('body[data-ready="true"]');
     assert.equal(await page.locator('#study').count(), 0);
     assert.equal(await page.locator('#btn-dogam').count(), 1);
 
     // 다른 데이터로 열면 막는다
     await page.goto(studyUrl(server.base, { participant: 'P1', data: 'data/sample.json' }));
+    await ready(page);
     await page.waitForSelector('#study-mismatch');
     assert.equal(await page.locator('#study-stages a[data-go]').count(), 0);
     await page.goto(studyUrl(server.base, { participant: 'P1', stage: 'learn-A', data: 'data/sample.json' }));
@@ -140,6 +155,7 @@ test('참가자별 저장이 섞이지 않고 일반 학습 모드와도 따로�
 
     // 두 단계 확인 후 지우기
     await page.goto(studyUrl(server.base, { participant: 'P1' }));
+    await ready(page);
     await page.waitForSelector('#study-reset');
     await page.click('#study-reset');
     await page.click('#reset-next');
@@ -149,11 +165,36 @@ test('참가자별 저장이 섞이지 않고 일반 학습 모드와도 따로�
   } finally { await ctx.close(); }
 });
 
+test('참가자 화면의 "진행자" 버튼은 잠긴 메뉴로 간다(반 구성이 보이지 않음); 테스트 모드에는 처음 안내가 없다', { skip: !REAL && '실제 데이터 없음' }, async () => {
+  const ctx = await browser.newContext(VIEWPORTS.mobile);
+  const page = await ctx.newPage();
+  try {
+    await page.goto(studyUrl(server.base, { participant: 'P5' }));
+    await ready(page);
+    await page.locator('#study-create').tap();
+    for (const stage of ['learn-A', 'learn-B']) {
+      await page.goto(studyUrl(server.base, { participant: 'P5', stage }));
+      await page.waitForSelector('body[data-ready="true"]');
+      assert.equal(await page.locator('#intro:not([hidden])').count(), 0, '테스트 모드에는 처음 안내 없음');
+      await page.locator('#btn-menu').tap();
+      await page.waitForSelector('#lock-code');
+      assert.equal(await page.locator('#study-halves, #study-stages').count(), 0, stage);
+    }
+  } finally { await ctx.close(); }
+});
+
+test('정답 왕 규칙: 칸의 앞쪽 기준 왕; 실제 왕과 다른 카드는 고국원왕 전사(미천왕)뿐', { skip: !REAL && '실제 데이터 없음' }, () => {
+  const mism = REAL.cards.filter((c) => kingMismatch(c, REAL.anchors)).map((c) => [c.id, correctKing(c, REAL.anchors)]);
+  assert.deepEqual(mism, [['goguryeo-src-05', 'goguryeo-reign-micheon']]);
+});
+
 test('없는 참가자로 방식 A 단계를 열면 진행자 메뉴로 돌아간다', async () => {
   const ctx = await browser.newContext(VIEWPORTS.desktop);
   const page = await ctx.newPage();
   try {
     await page.goto(studyUrl(server.base, { participant: 'Z1', stage: 'learn-A', data: 'data/sample.json' }));
+    await page.waitForURL((u) => !/stage=/.test(String(u)));
+    await ready(page);
     await page.waitForSelector('#study-create');
     assert.doesNotMatch(page.url(), /stage=/);
   } finally { await ctx.close(); }

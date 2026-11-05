@@ -119,7 +119,7 @@ export const GRADE_NAME = ['없음', '동', '은', '금'];
 
 /** 새 카드의 출발 상태(§2). */
 export function newEntry() {
-  return { box: 1, introduced: false, due_session: 0, last_session: 0, clean_streak: 0, lapses: 0, best_grade: 0, last_played_at: null };
+  return { box: 1, introduced: false, due_session: 0, last_session: 0, clean_streak: 0, lapses: 0, best_grade: 0, last_played_at: null, probation: false, probation_clean: 0 };
 }
 
 /**
@@ -128,9 +128,22 @@ export function newEntry() {
  * @param {{correct: boolean, clueUsed: number, session: number, at?: string|null}} r
  */
 export function schedule(entry, { correct, clueUsed, session, at = null }, cfg) {
-  const e = entry ?? newEntry();
-  const box = nextBox(e.box, correct, clueUsed, cfg);
+  const e = { ...newEntry(), ...(entry ?? {}) };
+  let box = nextBox(e.box, correct, clueUsed, cfg);
   const clean = correct && clueUsed <= 0;
+  // 재학습 표시(D74-3)
+  let probation = !!e.probation;
+  let probationClean = e.probation_clean ?? 0;
+  const P = cfg.probation;
+  if (P?.enabled) {
+    if (!correct) {
+      if (!e.introduced || e.box === 1 || probation) probation = true;
+      probationClean = 0;
+    } else if (probation) {
+      probationClean = clean ? probationClean + 1 : 0;
+      if (probationClean >= P.clean_needed) { probation = false; probationClean = 0; box = nextBox(1, true, 0, cfg); } else box = 1;
+    }
+  }
   const next = {
     box,
     introduced: true,
@@ -140,9 +153,16 @@ export function schedule(entry, { correct, clueUsed, session, at = null }, cfg) 
     lapses: e.lapses + (correct ? 0 : 1),
     best_grade: e.best_grade,
     last_played_at: at,
+    probation,
+    probation_clean: probationClean,
   };
   next.best_grade = Math.max(e.best_grade, gradeOf(next, cfg));
   return Object.freeze(next);
+}
+
+/** 지금 이 결과라면 상자가 몇이 되는지(화면의 비용 안내용). 재학습 표시까지 반영한다. */
+export function previewBox(entry, correct, clueUsed, cfg) {
+  return schedule(entry, { correct, clueUsed, session: 0 }, cfg).box;
 }
 
 export function isDue(entry, session) {
@@ -350,7 +370,7 @@ export function dueCount(cards, progress, session) {
 export function logLine({ ts, participant, result, session, msOnCard, phase = 'learn', arm = 'A' }) {
   const line = {
     ts_ms: ts, participant, phase, arm, session_index: session, card_id: result.id,
-    slot_chosen: result.slotChosen ?? null, self_rating: result.selfRating ?? null, correct: result.correct, clue_used: result.clueUsed,
+    slot_chosen: result.slotChosen ?? null, king_chosen: null, self_rating: result.selfRating ?? null, correct: result.correct, clue_used: result.clueUsed,
     box_before: result.boxFrom, box_after: result.boxTo, near_miss: result.nearMiss ?? null,
     ms_on_card: msOnCard, relearn: result.retry, reason_text: result.reasonText ?? null,
   };

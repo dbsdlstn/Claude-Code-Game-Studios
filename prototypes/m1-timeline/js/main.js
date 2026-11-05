@@ -9,12 +9,16 @@ import { loadRaw, normalizeDeck } from './data.js';
 import {
   validateDeck, gapBounds, selectableGaps, buildSession, createSessionState, currentId, revealClue, placeCurrent,
   sessionTimeline, isRetry, isSessionDone, attemptsOf, completedAfter, sessionSummary, gradeCounts, gradeOf, GRADE_NAME,
-  dueCount, earlyReviewIds, wrongNoteIds, logLine, sessionSeed, nextBox, restoreProgress, restoreSession, dataFingerprint, fnv1a,
+  dueCount, earlyReviewIds, wrongNoteIds, logLine, sessionSeed, previewBox, restoreProgress, restoreSession, dataFingerprint, fnv1a,
 } from './rules.js';
 import { armStoreAdapter, splitHalves, armIds } from './study.js';
 
 const L = CONFIG.leitner;
 const $ = (id) => document.getElementById(id);
+/** replaceChildren은 null을 "null" 글자로 넣는다(B3). 자식 중 null·undefined·false를 거르고 넣는다. */
+function fill(node, ...children) {
+  node.replaceChildren(...children.flat().filter((c) => c !== null && c !== undefined && c !== false));
+}
 function el(tag, attrs = {}, ...children) {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -115,7 +119,7 @@ function finishSession() {
 /** 테스트 모드: 방식 A 학습 단계를 다 했다. */
 function renderStudyDone() {
   $('card').className = 'card card-empty';
-  $('card').replaceChildren(
+  fill($('card'), 
     el('p', { class: 'empty-title', id: 'study-done' }, `학습 세션 ${app.study.cap}회를 마쳤습니다.`),
     el('p', { class: 'source-note' }, '진행자에게 알려 주세요.'),
     el('a', { class: 'btn btn-primary', id: 'btn-menu-done', href: app.study.menuUrl }, '진행자 메뉴로'));
@@ -135,8 +139,9 @@ function costText(card) {
   const e = app.progress[card.id];
   const box = e?.introduced ? e.box : 1;
   if (app.state.practice || isRetry(app.state)) return '연습이라 상자는 바뀌지 않습니다.';
-  const now = nextBox(box, true, app.state.clues, L);
+  const now = previewBox(e, true, app.state.clues, L);
   const parts = [`지금 맞히면 상자 ${box}→${now}`];
+  if (e?.probation) parts.push(`재학습 중: 단서 없이 ${L.probation.clean_needed - (e.probation_clean ?? 0)}번 더 맞혀야 상자 2`);
   if (app.state.clues === 0) parts.push('관계 단서를 열면 승급 없음');
   else if (app.state.clues === 1) parts.push('직접 단서를 열면 한 칸 내려감');
   return parts.join(' · ');
@@ -167,7 +172,7 @@ function renderQuestion(box, card) {
   box.className = 'card card-question';
   box.dataset.cardId = card.id; // E2E가 정답을 데이터에서 찾을 때 쓴다(화면에는 보이지 않음).
   const shown = card.clues.slice(0, app.state.clues);
-  box.replaceChildren(...[
+  fill(box, ...[
     el('div', { class: 'card-head' }, el('span', { class: 'badge' }, '사료'), el('span', { class: 'card-title' }, '어느 왕 때일까?'),
       isRetry(app.state) ? el('span', { class: 'badge badge-retry', id: 'retry-badge' }, '다시 풀기') : null,
       app.state.practice ? el('span', { class: 'badge badge-retry', id: 'practice-badge' }, '연습') : null),
@@ -194,22 +199,23 @@ function renderResult(box) {
   else {
     const wait = entry.due_session - app.state.session;
     boxLine = `상자 ${r.boxFrom ?? '새 카드'} → ${r.boxTo} · ${wait <= 1 ? '다음 세션에 다시' : `${wait}세션 뒤 복습`}`
-      + (!r.correct && L.relearn_in_session ? ' · 이번 세션 끝에 한 번 더' : '');
+      + (!r.correct && L.relearn_in_session ? ' · 이번 세션 끝에 한 번 더' : '')
+      + (entry.probation ? ` · 재학습 표시: 단서 없이 ${L.probation.clean_needed - (entry.probation_clean ?? 0)}번 연속 맞히면 상자 2` : '');
   }
   const grade = entry?.introduced ? gradeOf(entry, L) : 0;
   const isLast = isSessionDone(app.state);
-  box.replaceChildren(...[
+  fill(box, ...[
     el('div', { class: 'result-head', id: 'result', dataset: { result: r.correct ? 'correct' : 'wrong', near: r.nearMiss ? '1' : '0' } },
       el('span', { class: 'mark', 'aria-hidden': 'true' }, r.correct ? '○' : '✕'),
       r.correct ? '정답' : (r.nearMiss ? '오답 · 한 칸 차이' : '오답')),
     el('h3', { class: 'result-title' }, card.title),
     el('p', { class: 'result-meta' }, card.reign && !card.year_label.includes(card.reign) ? `${card.year_label} · ${card.reign}` : card.year_label),
     r.correct ? null : el('p', { class: 'result-where', id: 'result-where' }, '고른 칸: ', el('s', {}, r.placedText), el('br'), '맞는 칸: ', el('b', {}, r.rightText)),
+    el('p', { class: 'result-box', id: 'result-box', dataset: { from: String(r.boxFrom ?? ''), to: String(r.boxTo ?? '') } },
+      boxLine, !r.practice && !r.retry && grade ? ` · 등급 ${GRADE_NAME[grade]}` : ''),
     el('p', { class: 'result-exp' }, card.explanation),
     card.exam_note ? el('p', { class: 'result-note', id: 'result-note' }, el('b', {}, '수험 정리 '), card.exam_note) : null,
     el('p', { class: 'result-source', id: 'result-source' }, `출처: ${card.source?.name ?? ''}${card.source?.ref ? ' ' + card.source.ref : ''}`),
-    el('p', { class: 'result-box', id: 'result-box', dataset: { from: String(r.boxFrom ?? ''), to: String(r.boxTo ?? '') } },
-      boxLine, !r.practice && !r.retry && grade ? ` · 등급 ${GRADE_NAME[grade]}` : ''),
     el('button', { type: 'button', id: 'btn-next', class: 'btn btn-primary', onclick: onNext }, isLast ? (app.state.practice ? '연습 끝내기' : '세션 결과 보기') : '다음 카드'),
   ].filter(Boolean));
 }
@@ -219,7 +225,7 @@ function renderEmpty(box) {
   box.className = 'card card-empty';
   delete box.dataset.cardId;
   const early = earlyReviewIds(app.deck.cards, app.progress, L);
-  box.replaceChildren(
+  fill(box, 
     el('p', { class: 'empty-title', id: 'empty-title' }, '오늘 도래한 카드를 모두 했습니다.'),
     app.notice ? el('p', { class: 'source-note', id: 'notice' }, app.notice) : null,
     app.study ? null : el('p', { class: 'source-note' }, '미리 복습은 연습이라 상자와 일정을 바꾸지 않습니다.'),
@@ -231,7 +237,7 @@ function renderEmpty(box) {
 
 function renderCard() {
   const box = $('card');
-  if (!app.state) { if (!app.study) box.replaceChildren(); return; }
+  if (!app.state) { if (!app.study) fill(box); return; }
   if (app.lastResult) { renderResult(box); return; }
   const id = currentId(app.state);
   if (!id) { renderEmpty(box); return; }
@@ -248,6 +254,7 @@ function renderTimeline() {
   const hideId = app.state && isRetry(app.state) ? currentId(app.state) : null;
   const placed = (app.state?.placed ?? []).filter((p) => p.id !== hideId);
   const nodes = [];
+  let dock = null;
   const gap = (k) => {
     if (!allowed.has(k)) return null;
     const pending = asking && app.pendingGap === k;
@@ -257,7 +264,8 @@ function renderTimeline() {
       'aria-label': `${text} 칸에 꽂기`, 'aria-pressed': pending ? 'true' : null, onclick: () => onGap(k),
     }, el('span', { class: 'gap-plus', 'aria-hidden': 'true' }, pending ? '✓' : '＋'), el('span', { class: 'gap-label' }, pending ? '이 칸을 골랐습니다' : '이 칸에 꽂기')));
     if (pending) {
-      row.append(el('div', { class: 'confirm-bar' },
+      // B4: 확정 막대는 화면 아래 고정(연표 밖의 #confirm-dock, 위에 붙은 카드에 가리지 않게).
+      dock = (el('div', { class: 'confirm-bar', id: 'confirm-bar' },
         el('span', { class: 'confirm-text' }, text),
         el('button', { type: 'button', id: 'cancel-place', class: 'btn btn-small', onclick: () => { app.pendingGap = null; renderTimeline(); } }, '취소'),
         el('button', { type: 'button', id: 'confirm-place', class: 'btn btn-primary btn-small', onclick: () => place(k) }, '이 칸에 꽂기')));
@@ -291,15 +299,21 @@ function renderTimeline() {
     }
     nodes.push(gap(i + 1));
   });
-  $('timeline').replaceChildren(...nodes.filter(Boolean));
+  fill($('timeline'), ...nodes.filter(Boolean));
   $('timeline').classList.toggle('asking', asking);
+  fill($('confirm-dock'), dock);
   $('timeline-title').textContent = `${app.deck.nation_label ?? ''} 왕대 연표`;
   $('timeline-help').textContent = asking
     ? (needsConfirm() ? '사건이 들어갈 칸(＋)을 고른 뒤 "이 칸에 꽂기"를 누르세요.' : '사건이 들어갈 칸(＋)을 누르세요. 카드를 끌어 놓아도 됩니다.')
     : '';
 }
 
+/** 좁은 화면(한 단 배치, 카드가 위에 붙음). */
+const narrow = () => { try { return matchMedia('(max-width: 899px)').matches; } catch { return false; } };
+
 function render() {
+  // B4: 결과를 보일 때는 카드를 위에 붙이지 않고 펼친다(○/✕·고른 칸·맞는 칸·상자 줄이 잘리지 않게).
+  document.body.classList.toggle('has-result', !!app.lastResult);
   renderTop();
   renderCard();
   renderTimeline();
@@ -311,7 +325,9 @@ function onGap(k) {
   if (!needsConfirm()) { place(k); return; }
   app.pendingGap = k;
   renderTimeline();
-  $('confirm-place')?.focus();
+  $('confirm-place')?.focus({ preventScroll: true });
+  // B4: 고른 칸이 위에 붙은 카드나 아래 확정 막대에 가리지 않게.
+  document.querySelector('.gap-pending')?.scrollIntoView?.({ block: narrow() ? 'end' : 'nearest' });
 }
 
 function place(k) {
@@ -331,8 +347,9 @@ function place(k) {
   announce(result.correct
     ? `정답. ${card.title}, ${card.year_label}.`
     : `오답${result.nearMiss ? ', 한 칸 차이' : ''}. 맞는 칸은 ${app.lastResult.rightText}. ${card.title}, ${card.year_label}.`);
-  $('btn-next').focus();
-  document.querySelector('.row-new')?.scrollIntoView?.({ block: 'nearest' });
+  $('btn-next').focus({ preventScroll: true });
+  if (narrow()) window.scrollTo?.({ top: 0 });
+  else document.querySelector('.row-new')?.scrollIntoView?.({ block: 'nearest' });
 }
 
 function onNext() {
@@ -365,7 +382,7 @@ function showSummary(st) {
   const counts = gradeCounts(app.deck.cards, app.progress, L);
   const nextDue = dueCount(app.deck.cards, app.progress, app.completed + 1);
   $('summary-title').textContent = st.practice ? '연습 결과' : `세션 ${st.session} 결과`;
-  $('summary-body').replaceChildren(
+  fill($('summary-body'), 
     st.practice ? el('p', { class: 'source-note' }, '연습이라 상자와 일정은 바뀌지 않았습니다.') : null,
     el('dl', { class: 'stats', id: 'summary-stats', dataset: { right: String(s.right), total: String(s.total) } },
       el('dt', {}, '정답'), el('dd', {}, `${s.right} / ${s.total}`),
@@ -404,7 +421,7 @@ function openDogam() {
   $('dogam-counts').dataset.gold = String(counts.gold);
   const cards = [...app.deck.cards].sort((a, b) => a.order - b.order);
   const s = sessionIndex();
-  $('dogam-list').replaceChildren(...cards.map((c) => {
+  fill($('dogam-list'), ...cards.map((c) => {
     const e = app.progress[c.id];
     const g = e?.introduced ? gradeOf(e, L) : -1;
     const key = g < 0 ? 'unseen' : GRADE_KEY[g];
@@ -414,12 +431,12 @@ function openDogam() {
       el('span', { class: 'dogam-main' },
         el('span', { class: 'dogam-title' }, e?.introduced ? c.title : '？？？'),
         el('span', { class: 'dogam-sub' }, e?.introduced
-          ? `${shortYear(c)} · 상자 ${e.box} · ${wait === 0 ? '복습할 때' : `${wait}세션 뒤`} · 최고 ${GRADE_NAME[e.best_grade]} · 틀린 횟수 ${e.lapses}`
+          ? `${shortYear(c)} · 상자 ${e.box}${e.probation ? '(재학습)' : ''} · ${wait === 0 ? '복습할 때' : `${wait}세션 뒤`} · 최고 ${GRADE_NAME[e.best_grade]} · 틀린 횟수 ${e.lapses}`
           : '아직 만나지 않은 카드')));
   }));
   // 오답 노트(§6)
   const note = wrongNoteIds(app.deck.cards, app.progress);
-  $('note-list').replaceChildren(...(note.length ? note.map((id) => {
+  fill($('note-list'), ...(note.length ? note.map((id) => {
     const c = app.cardsById.get(id);
     return el('li', { dataset: { id } }, el('details', {}, el('summary', {}, `${c.title} · ${c.year_label}`), el('p', {}, c.explanation)));
   }) : [el('li', { class: 'source-note' }, '없음')]));
@@ -447,8 +464,8 @@ function exportLog() {
 
 function openModal(title, body, actions, kind) {
   $('modal-title').textContent = title;
-  $('modal-body').replaceChildren(...body);
-  $('modal-actions').replaceChildren(...actions);
+  fill($('modal-body'), ...body);
+  fill($('modal-actions'), ...actions);
   $('modal').dataset.kind = kind;
   $('modal').hidden = false;
   actions[0]?.focus();
@@ -531,6 +548,37 @@ function setupRefs() {
   card.addEventListener('click', (e) => { const b = e.target.closest?.('.ref-link'); if (b) show(b, document.activeElement === b); });
 }
 
+/* ------------------------------------------------------------------ 처음 안내(30초) */
+
+const INTRO = [
+  ['사료를 읽습니다', '위 카드는 이름을 숨긴 사료 지문입니다. 읽고 어느 왕 때의 일인지 떠올려 보세요.'],
+  ['칸을 고릅니다', '아래 왕대 연표에서 사건이 들어갈 칸(＋)을 고릅니다. 칸은 "이 왕 즉위 이후 ~ 다음 왕 즉위 이전"입니다. 휴대폰에서는 칸을 누른 뒤 "이 칸에 꽂기"로 확정합니다.'],
+  ['단서는 승급을 늦춥니다', '막히면 단서를 볼 수 있습니다. 대신 상자(복습 간격)가 덜 오릅니다. 처음 보는 카드를 찍어서 틀리면 재학습 표시가 붙어 오히려 더 오래 걸리니, 모르면 단서가 낫습니다.'],
+  ['틀린 카드는 다시 나옵니다', '틀린 카드는 세션 끝에 한 번 더, 다음 세션에도 다시 나옵니다. 맞힐수록 상자가 올라 더 드물게 나옵니다.'],
+];
+let introStep = 0;
+
+function introSeen() { try { return localStorage.getItem(CONFIG.introKey) === '1'; } catch { return false; } }
+function markIntroSeen() { try { localStorage.setItem(CONFIG.introKey, '1'); } catch { /* 무시 */ } }
+
+function showIntro(step = 0) {
+  introStep = step;
+  const [title, body] = INTRO[step];
+  $('intro-step').textContent = `처음 안내 ${step + 1} / ${INTRO.length}`;
+  $('intro-title').textContent = title;
+  $('intro-body').textContent = body;
+  $('intro-next').textContent = step === INTRO.length - 1 ? '시작하기' : '다음';
+  $('intro').dataset.step = String(step);
+  $('intro').hidden = false;
+  $('intro-next').focus();
+}
+
+function closeIntro() {
+  $('intro').hidden = true;
+  markIntroSeen();
+  $('card').focus();
+}
+
 /* ------------------------------------------------------------------ 시작 */
 
 async function init() {
@@ -555,13 +603,13 @@ async function init() {
     const norm = normalizeDeck(raw);
     loaded = { url, deck: norm.deck, convErrors: norm.errors };
   } catch (e) {
-    $('card').replaceChildren(el('p', {}, String(e.message)));
+    fill($('card'), el('p', {}, String(e.message)));
     document.body.dataset.ready = 'error';
     return;
   }
   const errs = [...loaded.convErrors, ...(loaded.deck ? validateDeck(loaded.deck) : [])];
   if (errs.length) {
-    $('card').replaceChildren(el('p', {}, `데이터 오류 ${errs.length}건`), el('ul', {}, errs.slice(0, 10).map((x) => el('li', {}, x))));
+    fill($('card'), el('p', {}, `데이터 오류 ${errs.length}건`), el('ul', {}, errs.slice(0, 10).map((x) => el('li', {}, x))));
     document.body.dataset.ready = 'error';
     return;
   }
@@ -570,7 +618,7 @@ async function init() {
   if (app.study) {
     const save = app.study.studyStore.load();
     if (save.dataId !== app.dataId) {
-      $('card').replaceChildren(el('p', {}, '데이터가 이 참가자를 만들 때와 다릅니다. 진행자 메뉴에서 확인하세요.'), el('a', { class: 'btn', href: app.study.menuUrl }, '진행자 메뉴로'));
+      fill($('card'), el('p', {}, '데이터가 이 참가자를 만들 때와 다릅니다. 진행자 메뉴에서 확인하세요.'), el('a', { class: 'btn', href: app.study.menuUrl }, '진행자 메뉴로'));
       document.body.dataset.ready = 'error';
       return;
     }
@@ -603,6 +651,9 @@ async function init() {
   const closeDogam = () => { $('dogam').hidden = true; $('btn-dogam')?.focus(); };
   $('dogam-close').addEventListener('click', closeDogam);
   $('btn-reset').addEventListener('click', confirmReset);
+  $('btn-intro').addEventListener('click', () => { $('dogam').hidden = true; showIntro(0); });
+  $('intro-skip').addEventListener('click', closeIntro);
+  $('intro-next').addEventListener('click', () => (introStep >= INTRO.length - 1 ? closeIntro() : showIntro(introStep + 1)));
   $('btn-export').addEventListener('click', exportLog);
   $('btn-note-practice').addEventListener('click', () => startPractice('note', wrongNoteIds(app.deck.cards, app.progress)));
   $('participant').addEventListener('change', (e) => { app.participant = (e.target.value.trim() || '-').slice(0, 20); persist(); });
@@ -610,7 +661,8 @@ async function init() {
   $('summary-dogam').addEventListener('click', () => { $('summary').hidden = true; openDogam(); });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (!$('modal').hidden) closeModal();
+    if (!$('intro').hidden) closeIntro();
+    else if (!$('modal').hidden) closeModal();
     else if (!$('dogam').hidden) closeDogam();
   });
 
@@ -627,6 +679,8 @@ async function init() {
     startLearnSession();
   }
   if (app.notice) announce(app.notice);
+  const introParam = params.get('intro');
+  if (!app.study && (introParam === '1' || (introParam !== '0' && !introSeen()))) showIntro(0);
   document.body.dataset.ready = 'true';
 }
 
