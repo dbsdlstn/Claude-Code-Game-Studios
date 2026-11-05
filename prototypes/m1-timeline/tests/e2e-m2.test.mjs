@@ -164,6 +164,10 @@ test('하루 세 번째 세션: 인출 XP 0과 안내, 승급 보너스는 그�
   assert.match(await page.innerText('#stage-next'), /경험치는 하루 두 세션까지예요/);
   assert.match(await page.innerText('#stage-next'), /오늘은 충분히 했어요/);
   assert.equal(await page.locator('#stage-goal').count(), 0, '목표는 이미 달성');
+  // 권장 상한(하루 3세션, D94): 막지 않고 타이틀에도 안내만
+  await page.click('#summary-home');
+  assert.match(await page.innerText('#title-today'), /오늘은 충분히 했어요. 내일 이어서 해요/);
+  assert.equal(await page.isDisabled('#title-play'), false);
 }));
 
 test('M1 저장(최상위 completed_sessions·cards)을 읽어 진행을 잇는다', () => withPage(VIEWPORTS.desktop, async (page) => {

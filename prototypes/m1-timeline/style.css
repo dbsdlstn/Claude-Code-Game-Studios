@@ -321,3 +321,7 @@ body { min-height: 100vh; background-attachment: fixed; }
 .nation-hint { grid-column: 2 / -1; font-size: 12px; color: var(--gold); }
 .nation-total { margin: 0; font-size: 14px; color: var(--ink-soft); }
 .nation-soon-list summary { font-size: 13px; color: var(--ink-soft); cursor: pointer; }
+.dogam-card { grid-template-columns: 84px 1fr; }
+.dogam-card .medal { white-space: nowrap; font-size: 12.5px; }
+.title-nations .nation-list, .title-nations .nation-total { justify-self: stretch; }
+.title-nations .nation-total { text-align: center; }

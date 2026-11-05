@@ -17,7 +17,8 @@ import {
 } from './rules.js';
 import { armStoreAdapter, splitHalves, armIds } from './study.js';
 
-const L = CONFIG.leitner;
+/** Leitner 설정: 테스트 모드는 CONFIG.leitner(M1), 일반 모드는 여기에 leitnerNormal(D94)을 얹는다(init). */
+let L = CONFIG.leitner;
 const $ = (id) => document.getElementById(id);
 /** replaceChildren은 null을 "null" 글자로 넣는다(B3). 자식 중 null·undefined·false를 거르고 넣는다. */
 function fill(node, ...children) {
@@ -99,7 +100,7 @@ function slotText(items, k) {
 function startLearnSession() {
   if (app.study && app.completed >= app.study.cap) { app.state = null; render(); renderStudyDone(); return; }
   const s = sessionIndex();
-  const pick = buildSession(app.deck.cards, app.progress, s, L, sessionSeed(app.deckHash, s, app.seedParam));
+  const pick = buildSession(app.deck.cards, app.progress, s, L, sessionSeed(app.deckHash, s, app.seedParam), dayOpts());
   app.state = createSessionState(s, pick.ids, { kind: 'learn', mix: { due: pick.due, fresh: pick.fresh } });
   app.lastResult = null;
   app.pendingGap = null;
@@ -130,6 +131,12 @@ function finishSession() {
   app.state = null;
   app.lastResult = null;
   persist();
+}
+
+/** 같은 날 재출제 금지(D94)에 쓰는 오늘과 날짜 함수(보상과 같은 하루 기준: 오전 3시). */
+function dayOpts() {
+  const h = R.streak?.day_rollover_hour ?? 3;
+  return { today: dayKey(new Date(), h), dayOf: (iso) => dayKey(new Date(iso), h) };
 }
 
 /** 학습 세션을 마칠 때의 보상(세션 보너스·하루 목표·연속일·업적). 연습·0장은 없음. */
@@ -496,6 +503,7 @@ function nextStage(st) {
   const lines = [];
   if (plan.mode === 'done') lines.push('오늘 할 카드를 모두 했어요');
   else lines.push(plan.due ? `다음 세션 복습 ${plan.due}장` : '다음 세션에는 새 카드부터 시작해요');
+  if (plan.guarded && plan.unintroduced) lines.push(`아직 열리지 않은 카드 ${plan.unintroduced}장 · 복습을 먼저 마치면 열려요`);
   if (g?.capped) lines.push('경험치는 하루 두 세션까지예요. 학습은 그대로 쌓여요');
   if (rewardsOn() && app.rewards.day.goal_met && app.rewards.day.sessions >= R.daily_session_soft_cap) lines.push('오늘은 충분히 했어요. 내일 이어서 해요');
   return { plan, node: el('section', { class: 'stage', dataset: { stage: 'next' }, id: 'stage-next' }, ...lines.map((t) => el('p', {}, t))) };
@@ -567,7 +575,7 @@ function showRewardSummary(st) {
     $('summary-next').textContent = done ? '오늘은 여기까지' : '다음 세션';
     $('summary-next').disabled = done;
     $('summary-next').dataset.end = '0';
-    (done ? $('summary-home') : $('summary-next')).focus();
+    (done ? $('summary-home') : $('summary-next')).focus({ preventScroll: true });
   };
   const update = () => {
     stages.forEach((n, i) => { n.hidden = i >= shown; });
@@ -586,7 +594,10 @@ function showRewardSummary(st) {
   $('summary-skip').onclick = () => { shown = stages.length; update(); announce('정산을 모두 보였어요.'); };
   $('summary').hidden = false;
   update();
-  if (shown < stages.length) $('summary-skip').focus();
+  if (shown < stages.length) $('summary-skip').focus({ preventScroll: true });
+  // 결과 요약(1단계)은 항상 첫 화면에(session-result.md §3)
+  const sheet = $('summary').querySelector('.sheet');
+  if (sheet) sheet.scrollTop = 0;
 }
 
 function nextSession() {
@@ -963,6 +974,7 @@ async function init() {
     app.study = { participant: pid, cap: CONFIG.study.sessionsPerArm, menuUrl, studyStore };
     app.store = armStoreAdapter(studyStore, 'A', CONFIG.study.sessionsPerArm);
   }
+  if (!app.study) L = Object.freeze({ ...CONFIG.leitner, ...CONFIG.leitnerNormal });
   const seed = Number.parseInt(params.get('seed') ?? '', 10);
   app.seedParam = Number.isFinite(seed) ? seed >>> 0 : 0;
   if (params.get('confirm') === '1') app.confirmMode = 'always';
@@ -1166,7 +1178,7 @@ function planFor(nationId) {
     if (attemptsOf(cur) === 0) return { mode: 'continue', due: 0, fresh: 0, left: cur.queue.length - cur.index };
   }
   const done = (n.completed_sessions ?? 0) + (cur && attemptsOf(cur) >= L.count_session_min_answers ? 1 : 0);
-  const pick = buildSession(deck.cards, progress, done + 1, L, 1);
+  const pick = buildSession(deck.cards, progress, done + 1, L, 1, dayOpts());
   return { mode: pick.due ? 'review' : pick.fresh ? 'new' : 'done', due: pick.due, fresh: pick.fresh, left: pick.due + pick.fresh };
 }
 
@@ -1234,9 +1246,9 @@ function todayPlan() {
     return { mode: 'continue', due: 0, fresh: 0, left };
   }
   const s = sessionIndex();
-  const pick = buildSession(app.deck.cards, app.progress, s, L, sessionSeed(app.deckHash, s, app.seedParam));
+  const pick = buildSession(app.deck.cards, app.progress, s, L, sessionSeed(app.deckHash, s, app.seedParam), dayOpts());
   const mode = pick.due ? 'review' : pick.fresh ? 'new' : 'done';
-  return { mode, due: pick.due, fresh: pick.fresh, left: pick.due + pick.fresh };
+  return { mode, due: pick.due, fresh: pick.fresh, left: pick.due + pick.fresh, guarded: pick.guarded, unintroduced: pick.unintroduced, blocked: pick.blocked };
 }
 
 function showTitle() {
@@ -1255,7 +1267,10 @@ function showTitle() {
   }[plan.mode];
   const label = { continue: `이어하기 · ${plan.left}장 남음`, review: '복습 시작', new: '새 카드 시작', done: '오늘 끝 · 미리 복습' }[plan.mode];
   renderTitleNations();
-  $('title-today').textContent = today;
+  const extra = [];
+  if (plan.guarded && plan.unintroduced) extra.push(`아직 열리지 않은 카드 ${plan.unintroduced}장 · 복습을 먼저 마치면 열려요`);
+  if (app.rewards && app.rewards.day.key === dayOpts().today && app.rewards.day.sessions >= R.daily_session_soft_cap) extra.push('오늘은 충분히 했어요. 내일 이어서 해요');
+  fill($('title-today'), today, ...extra.map((t) => [el('br'), el('small', { class: 'title-note' }, t)]));
   Object.assign($('title-today').dataset, { mode: plan.mode, due: String(plan.due), fresh: String(plan.fresh), left: String(plan.left), minutes: String(mins) });
   $('title-play').textContent = label;
   $('title-play').dataset.mode = plan.mode;

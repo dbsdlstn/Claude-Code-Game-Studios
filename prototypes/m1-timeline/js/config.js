@@ -75,6 +75,11 @@ export const CONFIG = Object.freeze({
   rewardsKey: 'hanyang-m1:rewards:v1',
   /** 처음 실행 안내(D74-5): 일반 학습 모드에서 한 번, 건너뛰기 가능. 테스트 모드는 진행자 대본이 대신한다. `?intro=0|1`로 강제. */
   introKey: 'hanyang-m1:intro:v1',
+  /**
+   * 일반 학습 모드에만 얹는 Leitner 설정(D94, leitner-spec §5 3b, rewards-spec §14). 테스트 모드(`?study=1`)는 M1 그대로.
+   * 끄려면 intake_guard_late: 0, same_day_block: false.
+   */
+  leitnerNormal: Object.freeze({ intake_guard_late: 8, same_day_block: true }),
   /** 사람 테스트 모드(`?study=1`, m1-plan §4·§5·§11, D72). 참가자마다 저장 키가 따로다. */
   study: Object.freeze({
     /** 테스트 모드는 M1 데이터 파일 하나로 고정(덱이 늘어도 참가자 기록이 흔들리지 않게). */

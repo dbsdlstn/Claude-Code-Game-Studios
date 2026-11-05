@@ -9,7 +9,7 @@ import path from 'node:path';
 import { CONFIG, LEITNER_DEFAULT, M1_OVERRIDE } from '../js/config.js';
 import {
   validateDeck, buildTimeline, isCorrectGap, correctGaps, selectableGaps, slotAnchorId, isNearMiss,
-  nextBox, schedule, gradeOf, isDue, newEntry, buildSession, earlyReviewIds, wrongNoteIds, sessionSeed,
+  nextBox, schedule, gradeOf, isDue, newEntry, buildSession, createRng, earlyReviewIds, wrongNoteIds, sessionSeed,
   createSessionState, currentId, revealClue, placeCurrent, sessionTimeline, isSessionDone, isRetry, attemptsOf,
   completedAfter, sessionSummary, gradeCounts, logLine, restoreProgress, restoreSession, dataFingerprint, previewBox,
 } from '../js/rules.js';
@@ -562,5 +562,66 @@ describe('재학습 표시(probation, D74-3)', () => {
     assert.equal(r[SAMPLE.cards[0].id].probation, true);
     const old = restoreProgress({ [SAMPLE.cards[0].id]: { box: 1, introduced: true, due_session: 2, last_session: 1, clean_streak: 0, lapses: 1, best_grade: 0, last_played_at: null } }, SAMPLE.cards, cfg);
     assert.equal(old[SAMPLE.cards[0].id].probation, false, '표시 필드가 없는 이전 저장은 표시 없음');
+  });
+});
+
+/* ------------------------------------------------------------------ D94: 백로그 보호, 같은 날 재출제 금지(rewards-spec §14.5) */
+describe('D94 하루 학습량(일반 모드 설정)', () => {
+  const N = { ...CONFIG.leitner, ...CONFIG.leitnerNormal };
+  const deck = (n) => Array.from({ length: n }, (_, i) => ({ id: `c${String(i).padStart(2, '0')}` }));
+  const entry = (o) => ({ ...newEntry(), introduced: true, box: 1, due_session: 1, last_session: 0, ...o });
+  test('설정: 일반 모드만 켜고(intake_guard_late 8, same_day_block), 테스트 모드 설정에는 없다', () => {
+    assert.deepEqual({ ...CONFIG.leitnerNormal }, { intake_guard_late: 8, same_day_block: true });
+    assert.equal(CONFIG.leitner.intake_guard_late, undefined);
+    assert.equal(CONFIG.leitner.same_day_block, undefined);
+  });
+  test('1. 2세션 이상 밀린 카드가 8장 이상이면 새 카드 0장(예약 포함)', () => {
+    const cards = deck(20);
+    const progress = Object.fromEntries(cards.slice(0, 8).map((c) => [c.id, entry({ due_session: 1 })]));
+    const r = buildSession(cards, progress, 3, N, 1);
+    assert.equal(r.late, 8); assert.equal(r.guarded, true); assert.equal(r.fresh, 0);
+  });
+  test('2. 밀린 카드가 임계 미만이면 평소처럼 도입; 1세션만 밀린 카드는 세지 않는다', () => {
+    const cards = deck(20);
+    const p7 = Object.fromEntries(cards.slice(0, 7).map((c) => [c.id, entry({ due_session: 1 })]));
+    assert.equal(buildSession(cards, p7, 3, N, 1).guarded, false);
+    assert.ok(buildSession(cards, p7, 3, N, 1).fresh > 0);
+    const p8late1 = Object.fromEntries(cards.slice(0, 8).map((c) => [c.id, entry({ due_session: 2 })]));
+    assert.equal(buildSession(cards, p8late1, 3, N, 1).late, 0);
+  });
+  test('4. 같은 날 이미 인출한 카드는 도래에서 빠지고, 다음 날에는 나온다; 끄면 그대로 나온다', () => {
+    const cards = deck(10);
+    const today = '2026-11-05';
+    const dayOf = (iso) => iso.slice(0, 10);
+    const progress = { c00: entry({ last_played_at: '2026-11-05T10:00:00Z' }), c01: entry({ last_played_at: '2026-11-04T10:00:00Z' }) };
+    // 명세 기본값(new_min 2)으로 본다: M1 덮어쓰기(new_min 6)는 안 본 카드가 많으면 도래 자리가 없다(D102 발견)
+    const Nd = { ...LEITNER_DEFAULT, ...CONFIG.leitnerNormal };
+    const r = buildSession(cards, progress, 2, Nd, 1, { today, dayOf });
+    assert.ok(!r.ids.includes('c00') && r.ids.includes('c01'));
+    assert.equal(r.blocked, 1);
+    assert.ok(buildSession(cards, progress, 2, Nd, 1, { today: '2026-11-06', dayOf }).ids.includes('c00'));
+    assert.ok(buildSession(cards, progress, 2, { ...Nd, same_day_block: false }, 1, { today, dayOf }).ids.includes('c00'));
+    assert.equal(buildSession(cards, progress, 2, CONFIG.leitner, 1, { today, dayOf }).blocked, 0, '테스트 모드 설정은 영향 없음');
+  });
+  test('5. 덱 36장, 60일, 하루 1세션(명세 기본 세션 8장 + 백로그 보호): 60일째 3세션 이상 밀린 카드 0장', () => {
+    const cfg = { ...LEITNER_DEFAULT, intake_guard_late: 8, same_day_block: true, slotBeforeFirst: false, placedJoinTimeline: false };
+    const cards = deck(36);
+    const rng = createRng(4242);
+    const know = new Map(cards.map((c) => [c.id, 0]));
+    let progress = {};
+    for (let s = 1; s <= 60; s++) {
+      const today = `d${s}`;
+      const pick = buildSession(cards, progress, s, cfg, s, { today, dayOf: (x) => x });
+      for (const id of pick.ids) {
+        const k = know.get(id);
+        const clue = k < 0.3 ? 1 : 0;
+        const correct = rng() < (clue ? k + 0.4 * (1 - k) : k + 0.1 * (1 - k));
+        progress = { ...progress, [id]: schedule(progress[id], { correct, clueUsed: clue, session: s, at: today }, cfg) };
+        know.set(id, k + 0.3 * (1 - k));
+      }
+    }
+    const late3 = cards.filter((c) => progress[c.id]?.introduced && 61 - progress[c.id].due_session >= 3).length;
+    assert.equal(late3, 0);
+    assert.equal(cards.filter((c) => progress[c.id]?.introduced).length, 36);
   });
 });

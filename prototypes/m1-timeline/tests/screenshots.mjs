@@ -35,6 +35,10 @@ try {
     await page.click('#title-play');
     await shot('22-baekje-timeline', true);
     await page.evaluate(() => localStorage.clear());
+    // 나라 3개(D104, 신라는 테스트 고정 데이터): 세로 목록
+    await openProto(page, server.base, { data: null, title: null, manifest: 'tests/fixtures/manifest-three-nations.json' });
+    await shot('23-three-nations-title');
+    await page.evaluate(() => localStorage.clear());
     // 처음 안내(D74-5)
     await openProto(page, server.base, { data: DATA, seed: 11, intro: '1' });
     await shot('00-intro');
@@ -75,6 +79,13 @@ try {
     await shot('05-summary');
     await page.click('#summary-dogam');
     await shot('06-dogam');
+    await page.click('#tab-ach');
+    await shot('06b-dogam-achievements');
+    await page.click('#tab-titles');
+    await shot('06c-dogam-titles');
+    await page.click('#tab-note');
+    await shot('06d-dogam-note');
+    await page.click('#tab-cards');
     // M2: 학습한 뒤의 타이틀(이어하기, 레벨·연속일)
     await page.click('#dogam-close');
     await page.click('#btn-home');

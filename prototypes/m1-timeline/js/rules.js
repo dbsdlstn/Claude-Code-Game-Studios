@@ -209,21 +209,33 @@ export function sessionSeed(deckHash, session, extra = 0) {
  * @param {Array<object>} cards 덱 순서
  * @returns {{ids: string[], due: number, fresh: number}}
  */
-export function buildSession(cards, progress, session, cfg, seed) {
+/**
+ * 세션 구성(§5). D94·leitner-spec §5 3b(일반 모드만, 설정 키가 없으면 꺼짐):
+ * - 백로그 보호 `intake_guard_late`: 2세션 이상 밀린 도래 카드가 그 수 이상이면 새 카드 0장(예약 포함).
+ * - 같은 날 재출제 금지 `same_day_block`: opts.today와 같은 날(opts.dayOf(last_played_at))에 이미 인출한 카드는 도래에서 뺀다.
+ *   세션 끝 재도전·연습은 이 함수를 거치지 않으므로 영향이 없다.
+ * @param {{today?: string, dayOf?: (iso: string) => string}} opts
+ */
+export function buildSession(cards, progress, session, cfg, seed, opts = {}) {
   const S = cfg.session_size;
   const unintroduced = cards.filter((c) => !progress[c.id]?.introduced);
-  const reserve = Math.min(cfg.new_min, unintroduced.length);
   const order = new Map(cards.map((c, i) => [c.id, i]));
-  const due = cards.filter((c) => isDue(progress[c.id], session))
+  const blockToday = !!(cfg.same_day_block && opts.today && opts.dayOf);
+  const playedToday = (e) => blockToday && !!e?.last_played_at && opts.dayOf(e.last_played_at) === opts.today;
+  const dueAll = cards.filter((c) => isDue(progress[c.id], session));
+  const due = dueAll.filter((c) => !playedToday(progress[c.id]))
     .sort((a, b) => progress[a.id].box - progress[b.id].box
       || progress[a.id].due_session - progress[b.id].due_session
       || order.get(a.id) - order.get(b.id));
+  const late = dueAll.filter((c) => session - progress[c.id].due_session >= 2).length;
+  const guarded = !!cfg.intake_guard_late && late >= cfg.intake_guard_late;
+  const reserve = guarded ? 0 : Math.min(cfg.new_min, unintroduced.length);
   const pickDue = due.slice(0, Math.max(0, S - reserve));
   const newMax = Math.max(cfg.new_min, Math.floor(S * cfg.new_max_ratio));
-  const newCount = Math.min(unintroduced.length, Math.max(reserve, Math.min(newMax, S - pickDue.length)));
+  const newCount = guarded ? 0 : Math.min(unintroduced.length, Math.max(reserve, Math.min(newMax, S - pickDue.length)));
   const pickNew = unintroduced.slice(0, newCount);
   const ids = shuffle([...pickDue, ...pickNew].map((c) => c.id), createRng(seed));
-  return { ids, due: pickDue.length, fresh: pickNew.length };
+  return { ids, due: pickDue.length, fresh: pickNew.length, late, guarded, blocked: dueAll.length - due.length, unintroduced: unintroduced.length };
 }
 
 /** 미리 복습(연습) 큐: 도입된 카드 중 가장 빨리 도래할 카드부터 S장(§5-4). 상태를 바꾸지 않는다. */
