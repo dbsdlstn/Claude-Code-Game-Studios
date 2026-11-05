@@ -1329,6 +1329,17 @@
       "note": ""
     },
     {
+      "key": "936-later-three-kingdoms-unification",
+      "year": 936,
+      "title": "후삼국 통일",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-13 작성됨(staging). manifest 등록 때 owned로 바꾼다(D212)."
+    },
+    {
       "key": "956-nobi-angeom",
       "year": 956,
       "title": "노비안검법",
@@ -1382,6 +1393,17 @@
       ],
       "status": "planned",
       "note": "goryeo-src-05 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "1076-gyeongjeong-jeonsigwa",
+      "year": 1076,
+      "title": "경정 전시과",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-14 작성됨(staging). manifest 등록 때 owned로 바꾼다(D212)."
     },
     {
       "key": "1104-byeolmuban",
@@ -1450,6 +1472,28 @@
       "note": "goryeo-src-11 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
     },
     {
+      "key": "1270-sambyeolcho-uprising",
+      "year": 1270,
+      "title": "삼별초의 봉기",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-15 작성됨(staging). manifest 등록 때 owned로 바꾼다(D212)."
+    },
+    {
+      "key": "1273-sambyeolcho-end",
+      "year": 1273,
+      "title": "삼별초의 최후",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-16 작성됨(staging). manifest 등록 때 owned로 바꾼다(D212)."
+    },
+    {
       "key": "1356-ssangseong-recovery",
       "year": 1356,
       "title": "쌍성총관부 수복",
@@ -1459,6 +1503,50 @@
       ],
       "status": "planned",
       "note": "goryeo-src-12 작성됨(staging). manifest 등록 때 owned로 바꾼다(D211)."
+    },
+    {
+      "key": "1377-jikji",
+      "year": 1377,
+      "title": "금속 활자로 찍은 책",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-17 작성됨(staging). manifest 등록 때 owned로 바꾼다(D212)."
+    },
+    {
+      "key": "1380-hwangsan-battle",
+      "year": 1380,
+      "title": "황산대첩",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-18 작성됨(staging). manifest 등록 때 owned로 바꾼다(D212)."
+    },
+    {
+      "key": "1388-wihwado-retreat",
+      "year": 1388,
+      "title": "위화도 회군",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-19 작성됨(staging). manifest 등록 때 owned로 바꾼다(D212)."
+    },
+    {
+      "key": "1391-gwajeonbeop",
+      "year": 1391,
+      "title": "과전법",
+      "owner_card": null,
+      "participants": [
+        "goryeo"
+      ],
+      "status": "planned",
+      "note": "goryeo-src-20 작성됨(staging). manifest 등록 때 owned로 바꾼다(D212)."
     }
   ],
   "distinct_pairs": [
