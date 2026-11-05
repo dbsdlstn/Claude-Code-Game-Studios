@@ -23,7 +23,8 @@ RULES (numbers follow the schema doc; a headless test should use the same):
   V4  Per nation, anchors have order 1..n without gaps; reign.start strictly
       increases with order; start <= end; previous end <= next start;
       reign.basis in {chronicle, inscription, consensus}.
-      V4a (D63, D85): at most 12 anchors per nation.
+      V4a (D63, D85): at most 12 anchors per nation; goryeo 13 (D191,
+      MAX_ANCHORS_BY_NATION).
   V5  answer.after is an anchor of the same nation; answer.before is the anchor
       with the next order, or null only when after is the last anchor.
   V6  year != 0 and after.reign.start <= year, and year < before.reign.start
@@ -139,6 +140,9 @@ REIGN_BASIS = {"chronicle", "inscription", "consensus"}
 YEAR_BASIS = {"chronicle", "inscription", "consensus", "disputed"}
 EXAM_TAGS = {"institution", "person", "war", "culture"}
 MAX_ANCHORS = 12
+# per-nation exceptions (D191: Goryeo adds King Gongyang so that the 1391 land law
+# does not sit in King U's gap)
+MAX_ANCHORS_BY_NATION = {"goryeo": 13}
 YEAR_RE = re.compile(r"\d{3,4}\s*년|기원전|서기")
 
 COMMON_REQ = ["id", "kind", "nation", "title", "source_ref", "verification"]
@@ -255,8 +259,9 @@ def validate(cards, release=False):
         by_nation.setdefault(a.get("nation"), []).append(a)
     for nation, items in by_nation.items():
         items.sort(key=lambda a: a.get("order") if isinstance(a.get("order"), int) else 10**9)
-        if len(items) > MAX_ANCHORS:
-            err(f"nation {nation}", "V4", f"{len(items)} anchors, at most {MAX_ANCHORS} (D63, D85)")
+        cap = MAX_ANCHORS_BY_NATION.get(nation, MAX_ANCHORS)
+        if len(items) > cap:
+            err(f"nation {nation}", "V4", f"{len(items)} anchors, at most {cap} (D63, D85, D191)")
         orders = [a.get("order") for a in items]
         if orders != list(range(1, len(items) + 1)):
             err(f"nation {nation}", "V4", f"anchor order must be 1..{len(items)} without gaps, got {orders}")

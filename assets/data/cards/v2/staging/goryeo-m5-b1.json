@@ -440,6 +440,42 @@
       "v1_id": null
     },
     {
+      "id": "goryeo-reign-gongyang",
+      "kind": "anchor",
+      "nation": "goryeo",
+      "title": "공양왕",
+      "order": 13,
+      "reign": {
+        "start": 1389,
+        "end": 1392,
+        "basis": "chronicle"
+      },
+      "reign_alt": [],
+      "summary": "고려 제34대 왕(마지막 왕).",
+      "source_ref": {
+        "work": "고려사",
+        "section": "세가",
+        "volume": null,
+        "entry": "공양왕 즉위조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "재위 1389~1392: 1389년 11월 창왕 폐위 뒤 즉위, 1392년 7월 폐위(thewiki 창왕·RFA·서울신문 요약, D191). 창왕(1388~1389)은 앵커 없이 우왕 칸에 든다. 권 번호는 원문 대조 필요. D213에서 추가. 검증 전."
+      },
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null
+    },
+    {
       "id": "goryeo-src-01",
       "kind": "source",
       "nation": "goryeo",
@@ -1259,14 +1295,14 @@
           "relations": [
             {
               "op": "after",
-              "ref": "goryeo-reign-wonjong"
+              "ref": "goryeo-reign-gongmin"
             },
             {
               "op": "before",
-              "ref": "goryeo-reign-u"
+              "ref": "goryeo-reign-gongyang"
             }
           ],
-          "text": "[원종]이 즉위한 뒤, [우왕]이 즉위하기 전의 일이다."
+          "text": "[공민왕]이 즉위한 뒤, [공양왕]이 즉위하기 전의 일이다."
         },
         {
           "level": 2,
