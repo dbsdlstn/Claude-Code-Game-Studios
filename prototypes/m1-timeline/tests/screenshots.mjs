@@ -23,6 +23,9 @@ try {
       await page.screenshot({ path: path.join(OUT, `${name}-${file}.png`), fullPage: full });
       console.log('saved', `production/qa/evidence/m1/${name}-${file}.png`);
     };
+    // M2 타이틀(D82)
+    await openProto(page, server.base, { data: DATA, seed: 11, title: null });
+    await shot('00b-title');
     // 처음 안내(D74-5)
     await openProto(page, server.base, { data: DATA, seed: 11, intro: '1' });
     await shot('00-intro');
@@ -63,6 +66,10 @@ try {
     await shot('05-summary');
     await page.click('#summary-dogam');
     await shot('06-dogam');
+    // M2: 학습한 뒤의 타이틀(이어하기, 레벨·연속일)
+    await page.click('#dogam-close');
+    await page.click('#btn-home');
+    await shot('00c-title-continue');
     await ctx.close();
 
     // 사람 테스트 모드(D72): 한 참가자 전체 진행 중 화면마다 한 장.

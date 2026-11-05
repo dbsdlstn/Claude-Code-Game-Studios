@@ -1,6 +1,6 @@
 # M1 프로토타입: 사료 카드 + 왕대 연표 + 간격 반복 (PROTOTYPE - NOT FOR PRODUCTION)
 
-**상태**: 진행 중. 규칙은 `design/leitner-spec.md`(§3~§6, §10)와 M1 설정(`production/playtest/m1-plan.md`)을 따른다(D66). 결정 기록: `docs/decision-log.md` D56, D59, D61, D64, D66, D72, D75. **사람 테스트 준비 완료**: 진행자 안내는 `STUDY.md`.
+**상태**: 진행 중. 규칙은 `design/leitner-spec.md`(§3~§6, §10)와 M1 설정(`production/playtest/m1-plan.md`)을 따른다(D66). 결정 기록: `docs/decision-log.md` D56, D59, D61, D64, D66, D72, D75, D82. **사람 테스트 준비 완료**(M1 테스트 빌드는 브랜치 `claude/m1-test-build`에 보존, D79). 이 폴더는 M2로 발전 중: 진행자 안내는 `STUDY.md`.
 
 ## 검증할 가설
 한능검 심화 수험생에게 "이름 없는 사료 지문을 읽고 한 나라의 왕대 연표 사이에 꽂기 + 단서 비용 + Leitner 간격 반복"이
@@ -26,6 +26,7 @@ python3 -m http.server 8000
 - 세션 끝에 그 세션에서 틀린 카드를 한 번 더(재도전, 상자 변화 없음). "세션 끝내기"로 일찍 끝낼 수 있다.
 - 도래 카드와 새 카드가 없으면 빈 세션: **미리 복습**(연습, 상태 안 바뀜) 또는 **다음 세션으로**(세션 +1).
 - **숙련 도감**: 카드별 현재 등급(동 상자≥3, 은 ≥4, 금 = 상자 5이고 마지막이 깨끗한 정답)과 최고 등급, 상자, 다음 복습, 틀린 횟수. **오답 노트**(틀린 적 있고 지금 상자 2 이하)와 "다시 풀기(연습)". **기록 내보내기(JSONL)**: m1-plan §11 로그 규격, 참가자 ID는 도감에서 입력하거나 `?participant=P1`.
+- **M2(D82)**: 타이틀 화면(시작하기/이어하기, 숙련 도감, 하는 방법, 나라 선택: 지금은 고구려만), 덱 목록(`data/decks.json`, 또는 콘텐츠의 `assets/data/cards/v2/manifest.json`)으로 나라별 여러 파일을 합쳐 읽기, 보상 골격(XP·레벨·연속일·하루 목표·업적, 수치는 `config.rewards`). 저장은 카드 id 기준이라 덱이 늘어도 진행이 유지된다. `?title=0`이면 타이틀 없이 바로 학습. 테스트 모드에서는 타이틀·보상이 꺼진다.
 - 처음 실행하면 30초 안내(4장, 건너뛰기 가능, 도감에서 다시 보기). `?intro=0|1`로 강제. 테스트 모드에서는 끔.
 - 저장: localStorage(`hanyang-m1:save:v2`, 형식 leitner-spec §2). 학습 세션을 1장 이상 하고 닫으면, 다시 열 때 그 세션을 끝난 것으로 처리한다(§5). 도감의 "학습 기록 초기화"(두 번 확인).
 
@@ -46,6 +47,9 @@ python3 -m http.server 8000
 node --test prototypes/m1-timeline/tests/rules.test.js   # 규칙 단위(판정, 단서 비용, 상자, 세션 구성, 저장, 데이터 로더)
 node --test prototypes/m1-timeline/tests/e2e.test.mjs    # Playwright: 모바일 390×844(터치), 데스크톱 1280×720
 node --test prototypes/m1-timeline/tests/e2e-dist.test.mjs  # build.py로 묶은 dist/m1만으로 실행 확인(사람 테스트 모드 포함)
+node --test prototypes/m1-timeline/tests/m2.test.js          # M2 단위(덱 합치기, 나라별 저장, 보상)
+node --test prototypes/m1-timeline/tests/e2e-m2.test.mjs     # M2: 타이틀, 보상 자리, 저장 옮기기, 테스트 모드에서 꺼짐
+node --test prototypes/m1-timeline/tests/e2e-ux.test.mjs     # 처음 안내, 모바일 가림
 node --test prototypes/m1-timeline/tests/e2e-study.test.mjs # 사람 테스트: 한 참가자 pre → A/B → post0 → post1, 로그 규격
 node prototypes/m1-timeline/tests/screenshots.mjs        # → production/qa/evidence/m1/
 ```
