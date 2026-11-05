@@ -1,0 +1,20 @@
+{
+ "_note": "테스트용 덱 목록(D110): 고구려 실제 + 통일신라(staging, 등록 전 확인용).",
+ "nations": [
+  {
+   "id": "goguryeo",
+   "label": "고구려",
+   "files": [
+    "../../../../assets/data/cards/v2/goguryeo-m1.json"
+   ]
+  },
+  {
+   "id": "usilla",
+   "label": "통일신라",
+   "files": [
+    "../../../../assets/data/cards/v2/staging/usilla-m3-b1.json",
+    "../../../../assets/data/cards/v2/staging/usilla-m3-b2.json"
+   ]
+  }
+ ]
+}

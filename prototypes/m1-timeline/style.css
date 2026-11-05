@@ -338,3 +338,7 @@ body { min-height: 100vh; background-attachment: fixed; }
 .medal-silver .medal { border: 2px solid var(--grade-silver-ring); background: transparent; color: var(--grade-silver-ink); }
 .medal-bronze .medal { border: 2px solid var(--grade-bronze-ring); background: transparent; color: var(--grade-bronze-ink); }
 .medal-none .medal { border: 2px dotted var(--grade-none-ring); background: transparent; color: var(--grade-none-ink); }
+/* D110: 나라 인장(art-bible §4.2) */
+.seal { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-family: var(--serif); font-weight: 700; font-size: 15px; line-height: 1; vertical-align: middle; flex: 0 0 auto; }
+.chip .seal { width: 22px; height: 22px; font-size: 12px; }
+.nation-name { display: inline-flex; align-items: center; gap: 6px; }
