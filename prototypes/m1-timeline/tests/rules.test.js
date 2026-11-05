@@ -233,7 +233,7 @@ describe('데이터 로더(js/data.js)', async () => {
     assert.deepEqual(validateDeck(n.deck), []);
     assert.equal(n.deck.anchors.length, raw.anchors.length);
     assert.equal(n.deck.cards.length, raw.cards.length);
-    assert.ok(raw.anchors.length <= 9, '기준 카드는 최대 9장(D62)');
+    assert.ok(raw.anchors.length <= 10, '기준 카드는 최대 10장(D63)');
     assert.equal(n.deck.cards[0].source_text, raw.cards[0].front);
   });
 

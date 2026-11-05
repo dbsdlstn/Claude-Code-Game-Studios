@@ -27,7 +27,7 @@
       "verified": false,
       "verified_by": null,
       "year_alt": [],
-      "source_note": "즉위 연도는 연표·백과 미러 검색 결과로 확인(2차 자료). 미천왕 300년은 한 자료에 기대므로 원문 대조 필요. D62에서 추가."
+      "source_note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가."
     },
     {
       "id": "goguryeo-anchor-gogukcheon",
@@ -41,7 +41,7 @@
       "verified": false,
       "verified_by": null,
       "year_alt": [],
-      "source_note": "즉위 연도는 연표·백과 미러 검색 결과로 확인(2차 자료). 미천왕 300년은 한 자료에 기대므로 원문 대조 필요. D62에서 추가."
+      "source_note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가."
     },
     {
       "id": "goguryeo-anchor-dongcheon",
@@ -55,7 +55,7 @@
       "verified": false,
       "verified_by": null,
       "year_alt": [],
-      "source_note": "즉위 연도는 연표·백과 미러 검색 결과로 확인(2차 자료). 미천왕 300년은 한 자료에 기대므로 원문 대조 필요. D62에서 추가."
+      "source_note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가."
     },
     {
       "id": "goguryeo-anchor-micheon",
@@ -69,7 +69,7 @@
       "verified": false,
       "verified_by": null,
       "year_alt": [],
-      "source_note": "즉위 연도는 연표·백과 미러 검색 결과로 확인(2차 자료). 미천왕 300년은 한 자료에 기대므로 원문 대조 필요. D62에서 추가."
+      "source_note": "봉상왕 9년(300) 창조리의 정변으로 봉상왕이 폐위된 뒤 즉위. 연표·백과 미러와 한국민족문화대백과(창조리 관련 항목) 등 2차 자료 여럿으로 확인(M1 2차 대조 일치). D62에서 추가."
     },
     {
       "id": "goguryeo-anchor-sosurim",
@@ -121,6 +121,20 @@
           "basis": "광개토왕비 기년(광개토왕 412년 사망)으로 계산한 값. 소수 견해"
         }
       ]
+    },
+    {
+      "id": "goguryeo-anchor-yeongyang",
+      "title": "영양왕 즉위",
+      "anchor": true,
+      "nation": "goguryeo",
+      "year": 590,
+      "year_label": "590년",
+      "year_basis": "수험 표준 표기(삼국사기 기년)",
+      "source_ref": "삼국사기 권20 고구려본기 제8 영양왕 즉위조",
+      "verified": false,
+      "verified_by": null,
+      "year_alt": [],
+      "source_note": "평원왕 32년(590) 사망 후 태자가 즉위. 한국민족문화대백과 영양왕 항목 요약과 위키백과로 확인(재위 590~618, 589/617 이설을 적은 자료도 있음). D63에서 추가."
     },
     {
       "id": "goguryeo-anchor-bojang",
@@ -461,16 +475,16 @@
       "reign": "장수왕",
       "timeline": {
         "after": "goguryeo-anchor-jangsu",
-        "before": "goguryeo-anchor-bojang"
+        "before": "goguryeo-anchor-yeongyang"
       },
       "front": "왕이 도읍을 평양으로 옮겼다.",
       "clues": [
         {
           "level": 1,
           "kind": "relation",
-          "text": "[보장왕 즉위]보다 먼저.",
+          "text": "[영양왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-bojang"
+            "goguryeo-anchor-yeongyang"
           ]
         },
         {
@@ -500,16 +514,16 @@
       "reign": "장수왕",
       "timeline": {
         "after": "goguryeo-anchor-jangsu",
-        "before": "goguryeo-anchor-bojang"
+        "before": "goguryeo-anchor-yeongyang"
       },
       "front": "가을에 왕이 군사 3만을 이끌고 남쪽 이웃 나라를 쳐서 그 도읍을 함락하고, 그 나라 왕을 죽인 뒤 남녀 수천 명을 사로잡아 돌아왔다.",
       "clues": [
         {
           "level": 1,
           "kind": "relation",
-          "text": "[보장왕 즉위]보다 먼저.",
+          "text": "[영양왕 즉위]보다 먼저.",
           "refs": [
-            "goguryeo-anchor-bojang"
+            "goguryeo-anchor-yeongyang"
           ]
         },
         {
@@ -538,7 +552,7 @@
       "year_basis": "삼국사기 기년",
       "reign": "영양왕",
       "timeline": {
-        "after": "goguryeo-anchor-jangsu",
+        "after": "goguryeo-anchor-yeongyang",
         "before": "goguryeo-anchor-bojang"
       },
       "front": "적의 장수에게 시를 보내 그 공이 이미 높으니 그만 돌아가라고 넌지시 권하였다. 적군이 물러가다 살수를 반쯤 건넜을 때 뒤에서 쳐서 크게 무찔렀다. 처음 요하를 건너온 30만 5천 명 가운데 요동성까지 살아 돌아간 자는 2천 7백 명뿐이었다.",
@@ -580,7 +594,7 @@
         "after": "goguryeo-anchor-bojang",
         "before": null
       },
-      "front": "권력을 쥔 대신이 왕에게, 세 가르침은 솥의 세 발과 같아 하나라도 없으면 안 되는데 지금 유교와 불교는 성하나 도교는 그렇지 못하니 당에 사신을 보내 구하자고 아뢰었다. 당은 도사 여덟 명과 노자의 경전을 보내왔고, 왕은 승려들의 절을 거두어 그들을 머물게 하였다.",
+      "front": "권력을 쥔 대신이 왕에게, 지금 유교와 불교는 성하나 도교는 그렇지 못하니 당에 사신을 보내 구하자고 아뢰었다. 당은 도사 여덟 명과 노자의 경전을 보내왔고, 왕은 승려들의 절을 거두어 그들을 머물게 하였다.",
       "clues": [
         {
           "level": 1,
@@ -600,7 +614,7 @@
       "explanation": "연개소문의 요청으로 당에서 도사와 『도덕경』을 받아들인 일. 승려 보덕이 이에 반발해 백제로 떠났다는 전승이 있다.",
       "exam_note": "보장왕·연개소문: 정변(642), 도교 장려(643), 안시성(645). 영류왕 때(624)에도 당 도사의 노자 강론이 있었다.",
       "source_ref": "삼국사기 권21 고구려본기 제9 보장왕 2년 3월조",
-      "source_note": "'삼교는 솥발과 같다(三敎譬如鼎足)'와 '승려의 절을 취해 머물게 했다(取僧寺館之)'는 우리역사넷 '연개소문의 도교 수용'과 한국사DB 비교보기를 인용한 검색 요약으로 확인(원문 페이지는 직접 열지 못함). 판본에 따라 僧寺/浮屠寺 표기 차이가 있다. 도사 이름(숙달, 삼국유사는 敍達)은 해설에만 둔다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전",
+      "source_note": "'승려의 절을 취해 머물게 했다(取僧寺館之)'는 우리역사넷 '연개소문의 도교 수용'과 한국사DB 비교보기를 인용한 검색 요약으로 확인(원문 페이지는 직접 열지 못함). '세 가르침은 솥의 세 발과 같다(三敎鼎足)' 비유는 독립 대조에서 확인되지 않아 확인될 때까지 지문에서 뺐다(D63). 판본에 따라 僧寺/浮屠寺 표기 차이가 있다. 도사 이름(숙달, 삼국유사는 敍達)은 해설에만 둔다. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전",
       "verified": false,
       "verified_by": null,
       "difficulty": 2
