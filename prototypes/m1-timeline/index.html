@@ -65,12 +65,33 @@
       <h2 id="dogam-title">숙련 도감</h2>
       <button id="dogam-close" type="button" class="btn btn-small">닫기</button>
     </div>
-    <p id="dogam-counts" class="dogam-counts"></p>
-    <ol id="dogam-list" class="dogam-list"></ol>
-    <section class="note" aria-labelledby="note-title">
-      <h3 id="note-title">오답 노트 <span class="source-note">틀린 적 있고 지금 상자 2 이하</span></h3>
+    <div id="dogam-profile" class="dogam-profile"></div>
+    <div id="dogam-tabs" class="tabs" role="tablist" aria-label="도감">
+      <button id="tab-cards" type="button" role="tab" class="tab" aria-controls="panel-cards" aria-selected="true">카드</button>
+      <button id="tab-ach" type="button" role="tab" class="tab" aria-controls="panel-ach" aria-selected="false" tabindex="-1">업적</button>
+      <button id="tab-titles" type="button" role="tab" class="tab" aria-controls="panel-titles" aria-selected="false" tabindex="-1">칭호</button>
+      <button id="tab-note" type="button" role="tab" class="tab" aria-controls="panel-note" aria-selected="false" tabindex="-1">오답 노트</button>
+    </div>
+    <section id="panel-cards" class="panel" role="tabpanel" aria-labelledby="tab-cards">
+      <div id="dogam-nations" class="dogam-nations" role="group" aria-label="나라"></div>
+      <p id="dogam-counts" class="dogam-counts"></p>
+      <div id="dogam-filters" class="filters" role="group" aria-label="등급으로 거르기"></div>
+      <p id="dogam-shown" class="source-note" aria-live="polite"></p>
+      <ol id="dogam-list" class="dogam-list"></ol>
+      <div id="card-detail" class="card-detail" hidden></div>
+    </section>
+    <section id="panel-ach" class="panel" role="tabpanel" aria-labelledby="tab-ach" hidden>
+      <div id="ach-filters" class="filters" role="group" aria-label="업적 거르기"></div>
+      <ul id="ach-list" class="ach-list"></ul>
+    </section>
+    <section id="panel-titles" class="panel" role="tabpanel" aria-labelledby="tab-titles" hidden>
+      <p class="source-note">칭호는 표시용이에요. 레벨이 학습 기능을 열지는 않아요.</p>
+      <ul id="title-list" class="title-list"></ul>
+    </section>
+    <section id="panel-note" class="panel note" role="tabpanel" aria-labelledby="tab-note" hidden>
+      <p class="source-note">틀린 적 있고 지금 상자 2 이하인 카드예요. 연습은 기록을 바꾸지 않아요. 진짜 복습은 세션에서 돌아와요.</p>
+      <button id="btn-note-practice" type="button" class="btn btn-small">오답 노트 연습</button>
       <ol id="note-list" class="note-list"></ol>
-      <button id="btn-note-practice" type="button" class="btn btn-small">오답 노트 다시 풀기(연습)</button>
     </section>
     <section class="note" aria-labelledby="log-title">
       <h3 id="log-title">플레이테스트 기록</h3>

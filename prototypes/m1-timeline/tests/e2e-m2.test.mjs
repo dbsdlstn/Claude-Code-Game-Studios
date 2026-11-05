@@ -164,6 +164,10 @@ test('하루 세 번째 세션: 인출 XP 0과 안내, 승급 보너스는 그�
   assert.match(await page.innerText('#stage-next'), /경험치는 하루 두 세션까지예요/);
   assert.match(await page.innerText('#stage-next'), /오늘은 충분히 했어요/);
   assert.equal(await page.locator('#stage-goal').count(), 0, '목표는 이미 달성');
+  // 권장 상한(하루 3세션, D94): 막지 않고 타이틀에도 안내만
+  await page.click('#summary-home');
+  assert.match(await page.innerText('#title-today'), /오늘은 충분히 했어요. 내일 이어서 해요/);
+  assert.equal(await page.isDisabled('#title-play'), false);
 }));
 
 test('M1 저장(최상위 completed_sessions·cards)을 읽어 진행을 잇는다', () => withPage(VIEWPORTS.desktop, async (page) => {
@@ -263,6 +267,8 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) for (const C of CASES) {
     await tap(page, '#btn-home');
     // 백제로
     await tap(page, '#title-nations [data-nation="baekje"]');
+    // 진행 중 세션(1장 풂)이 있으므로 확인 대화상자(title-screen.md, D104)
+    await tap(page, '#switch-confirm');
     await page.waitForURL(/nation=baekje/);
     await page.waitForSelector('#title:not([hidden])');
     assert.equal(await page.getAttribute('#title-nations [data-nation="baekje"]', 'aria-pressed'), 'true');
@@ -357,4 +363,98 @@ test('숙련 카드(은 이상)를 맞히면 해설은 접혀 있고, 그 밖에
   assert.equal(await page.isVisible('.result-exp'), false);
   await page.click('#result-details summary');
   assert.ok(await page.isVisible('.result-exp'));
+}));
+
+// D104: 도감 탭(design/ux/dogam.md)과 나라 3개 이상의 타이틀 목록·전환 확인(title-screen.md)
+test('도감: 프로필 줄, 탭 4개(방향키), 안 만난 카드는 ?, 카드 상세·이 카드만 연습, 필터, 업적·칭호', () => withPage(VIEWPORTS.desktop, async (page) => {
+  await openProto(page, server.base);
+  await playOneSession(page);
+  await page.click('#summary-dogam');
+  await page.waitForSelector('#dogam:not([hidden])');
+  assert.match(await page.innerText('#dogam-profile'), /입문자|서당 학동/);
+  assert.match(await page.innerText('#dogam-streak'), /연속 1일 · 최고 1일 · 보호권 0장/);
+  assert.equal(await page.getAttribute('#tab-cards', 'aria-selected'), 'true');
+  // 요약 줄 = 목록
+  const counts = await page.innerText('#dogam-counts');
+  const unseen = Number(/아직 안 만남 (\d+)/.exec(counts)[1]);
+  assert.equal(await page.locator('#dogam-list .dogam-row[data-mastery="unseen"]').count(), unseen);
+  assert.ok(await page.locator('#dogam-list .dogam-row[data-mastery="unseen"] .dogam-title').allInnerTexts().then((t) => t.every((x) => x.startsWith('?'))), '안 만난 카드는 제목을 숨긴다');
+  // 왕 줄 진행(은 이상/칸 카드 수)
+  assert.ok(await page.locator('#dogam-list .dogam-king').count() >= 1);
+  // 카드 상세, 이 카드만 연습(상태 불변)
+  const seen = page.locator('#dogam-list .dogam-row:not([data-mastery="unseen"]) .dogam-card').first();
+  const before = await page.evaluate(() => localStorage.getItem('hanyang-m1:save:v2'));
+  await seen.click();
+  await page.waitForSelector('#card-detail:not([hidden])');
+  assert.match(await page.innerText('#detail-state'), /상자 \d/);
+  await page.click('#detail-practice');
+  assert.equal(await page.locator('#practice-badge').count(), 1);
+  const card = await currentCard(page);
+  await pressGap(page, (await gapsFor(page, card)).right, false);
+  await page.click('#btn-next');
+  await page.waitForSelector('#summary:not([hidden])');
+  assert.match(await page.innerText('#summary-title'), /연습 결과/);
+  const cardsBefore = JSON.parse(before).cards;
+  const cardsAfter = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:save:v2')).cards);
+  assert.deepEqual(cardsAfter, cardsBefore, '연습은 상태를 바꾸지 않는다');
+  await page.click('#summary-dogam');
+  // 필터
+  await page.click('#dogam-filters [data-filter="unseen"]');
+  assert.equal(await page.locator('#dogam-list .dogam-row:not([data-mastery="unseen"])').count(), 0);
+  // 방향키로 탭 이동
+  await page.focus('#tab-cards');
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await page.getAttribute('#tab-ach', 'aria-selected'), 'true');
+  assert.equal(await page.isVisible('#panel-ach'), true);
+  const ach = await page.locator('#ach-list .ach-row').evaluateAll((r) => r.map((x) => [x.dataset.id, x.dataset.got]));
+  assert.equal(ach.length, 13 + 4, '고유 13 + 나라별 4(고구려)');
+  assert.equal(ach[0][0], 'first-step');
+  assert.equal(ach[0][1], '1');
+  assert.match(await page.innerText('#ach-list [data-id="first-step"]'), /획득 · \d+월 \d+일/);
+  assert.match(await page.innerText('#ach-list [data-id="streak-7"]'), /1\/7/);
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await page.getAttribute('#tab-titles', 'aria-selected'), 'true');
+  assert.match(await page.innerText('#title-list'), /서당 학동 · Lv 5\s+Lv 5에 얻어요/);
+  await page.click('#title-list [data-title="입문자"] button');
+  assert.equal(await page.innerText('#dogam-honor'), '입문자');
+  const rw = await page.evaluate(() => JSON.parse(localStorage.getItem('hanyang-m1:rewards:v1')));
+  assert.equal(rw.title_pinned, '입문자');
+  await page.keyboard.press('Escape');
+  // 다시 열면 카드 탭
+  await page.click('#btn-dogam');
+  assert.equal(await page.getAttribute('#tab-cards', 'aria-selected'), 'true');
+  assert.ok(await noOverflow(page));
+}));
+
+const THREE = 'tests/fixtures/manifest-three-nations.json';
+test('390px 나라 3개: 세로 목록(행 56px 이상, radiogroup, 행마다 오늘 할 일, 합계, 준비 중 접기), 진행 중 세션이면 전환 확인', { skip: !nationDeck('baekje') && '백제 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, title: null, manifest: THREE });
+  await page.waitForSelector('#title:not([hidden])');
+  const rows = page.locator('#title-nations .nation-row');
+  assert.equal(await rows.count(), 3);
+  assert.equal(await page.locator('#title-nations [role="radiogroup"]').count(), 1);
+  const hs = await rows.evaluateAll((r) => r.map((x) => x.getBoundingClientRect().height));
+  assert.ok(hs.every((h) => h >= 56), String(hs));
+  assert.equal(await page.getAttribute('#title-nations [data-nation="goguryeo"]', 'aria-checked'), 'true');
+  assert.match(await page.getAttribute('#title-nations [data-nation="baekje"]', 'aria-label'), /백제, \d+장 중 0장 학습, 오늘 복습 0장 새 카드 \d+장/);
+  assert.match(await page.innerText('#title-nation-total'), /오늘 복습 모두 \d+장 · 새 카드 \d+장/);
+  assert.match(await page.innerText('#title-nations .nation-soon-list summary'), /준비 중 1개/);
+  assert.ok(await noOverflow(page));
+  // 한 장 풀고 타이틀로 → 신라로 바꾸려 하면 확인, 취소하면 그대로
+  await page.locator('#title-play').tap();
+  const c = await currentCard(page, FULL_BY_ID);
+  await pressGap(page, (await gapsFor(page, c)).right, true);
+  await page.locator('#btn-next').tap();
+  await page.locator('#btn-home').tap();
+  await page.locator('#title-nations [data-nation="silla"]').tap();
+  await page.waitForSelector('#modal:not([hidden])');
+  assert.match(await page.innerText('#modal-body'), /지금 세션을 끝내고 신라로 옮길까요\? 푼 카드는 저장돼요/);
+  await page.locator('#switch-cancel').tap();
+  assert.doesNotMatch(page.url(), /nation=silla/);
+  assert.equal(await page.getAttribute('#title-play', 'data-mode'), 'continue');
+  await page.locator('#title-nations [data-nation="silla"]').tap();
+  await page.locator('#switch-confirm').tap();
+  await page.waitForURL(/nation=silla/);
+  await page.waitForSelector('#title:not([hidden])');
+  assert.equal(await page.getAttribute('#title-nations [data-nation="silla"]', 'aria-checked'), 'true');
 }));

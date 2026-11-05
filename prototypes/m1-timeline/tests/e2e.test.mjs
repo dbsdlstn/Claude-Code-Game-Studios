@@ -98,7 +98,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       assert.equal(await page.getAttribute('#result-box', 'data-to'), '1');
     }));
 
-    test('세션 1 → 재도전 → 결과 → 세션 2는 도래한 오답 카드 + 남은 새 카드 2장; 오답 카드는 재학습 표시로 상자 1 유지', () => withPage(async (page) => {
+    test('세션 1 → 재도전 → 결과 → 같은 날 세션 2는 새 카드만(재출제 금지), 다음 날 세션 3에 오답 카드; 재학습 표시로 상자 1 유지', () => withPage(async (page) => {
       let n = 0;
       const r1 = await playSession(page, () => (n++ % 3 === 1 ? 'wrong' : 'right'));
       const wrongIds = r1.filter((x) => x.first && x.how === 'wrong').map((x) => x.id);
@@ -112,13 +112,27 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       assert.match(await page.innerText('#summary-retry'), new RegExp(`다시 풀기 ${wrongIds.length}장 중 ${wrongIds.length}장 성공`));
       await page.click('#summary-next');
       assert.match(await page.innerText('#session-no'), /세션 2/);
+      // 같은 날 재출제 금지(D94): 오늘 이미 푼 오답 카드는 세션 2에 나오지 않고, 새 카드 예약 2장만
       const r2 = await playSession(page);
       const ids2 = r2.map((x) => x.id);
-      assert.equal(ids2.length, wrongIds.length + 2, '도래 카드(오답) + 새 카드 예약 2장, 남는 자리는 채우지 않음');
-      assert.ok(wrongIds.every((id) => ids2.includes(id)));
+      assert.equal(ids2.length, 2, '같은 날: 새 카드 2장만');
+      assert.ok(wrongIds.every((id) => !ids2.includes(id)), '오늘 푼 카드는 오늘 다시 나오지 않는다');
+      // 다음 날(마지막 인출을 하루 전으로 옮김): 도래한 오답 카드가 돌아온다
+      await page.waitForSelector('#summary:not([hidden])');
+      await editSave(page, (s) => {
+        const y = new Date(Date.now() - 36 * 3600 * 1000).toISOString();
+        for (const e of Object.values(s.cards)) if (e.last_played_at) e.last_played_at = y;
+        for (const n of Object.values(s.nations)) n.current = null;
+        return s;
+      });
+      assert.match(await page.innerText('#session-no'), /세션 3/);
+      const r3 = await playSession(page);
+      const firstRight = r1.filter((x) => x.first && x.how === 'right').map((x) => x.id);
+      const r3f = r3.filter((x) => x.first);
+      assert.deepEqual(r3f.map((x) => x.id).sort(), [...wrongIds, ...firstRight].sort(), '세션 3: 오답 카드(상자 1, 간격 1) + 세션 1의 정답 카드(상자 2, 간격 2)');
       // 재학습 표시(D74-3): 상자 1에서 틀린 카드는 깨끗한 정답 1번으로는 상자 1 그대로, 1번 더 필요.
-      for (const x of r2) assert.deepEqual([x.from, x.to], wrongIds.includes(x.id) ? ['1', '1'] : ['', '2']);
-      for (const x of r2.filter((y) => wrongIds.includes(y.id))) assert.match(x.boxText, /재학습 표시: 단서 없이 1번 연속 맞히면 상자 2/);
+      for (const x of r3f) assert.deepEqual([x.from, x.to], wrongIds.includes(x.id) ? ['1', '1'] : ['2', '3']);
+      for (const x of r3f.filter((y) => wrongIds.includes(y.id))) assert.match(x.boxText, /재학습 표시: 단서 없이 1번 연속 맞히면 상자 2/);
       assert.ok(r1.filter((x) => x.first && x.how === 'wrong').every((x) => /재학습 표시: 단서 없이 2번/.test(x.boxText)));
     }));
 
@@ -130,6 +144,7 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
       await page.waitForSelector('#dogam:not([hidden])');
       assert.equal(await page.locator(`#dogam-list [data-id="${card.id}"][data-mastery="none"]`).count(), 1);
       assert.match(await page.innerText(`#dogam-list [data-id="${card.id}"]`), /최고 없음 · 틀린 횟수 1/);
+      await page.click('#tab-note');
       assert.equal(await page.locator(`#note-list [data-id="${card.id}"]`).count(), 1);
       await page.click('#btn-note-practice');
       assert.equal(await page.locator('#practice-badge').count(), 1);
