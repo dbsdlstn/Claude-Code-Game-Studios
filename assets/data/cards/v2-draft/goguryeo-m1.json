@@ -13,7 +13,10 @@
       "source_ref": "삼국사기 권13 고구려본기 제1 시조 동명성왕 즉위조",
       "verified": false,
       "verified_by": null,
-      "year_alt": []
+      "year_alt": [],
+      "reign_range": "기원전 37~기원전 19",
+      "reign_range_alt": [],
+      "reign_note": "삼국사기 기년(전승). 위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
     },
     {
       "id": "goguryeo-anchor-taejo",
@@ -27,7 +30,15 @@
       "verified": false,
       "verified_by": null,
       "year_alt": [],
-      "source_note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가."
+      "source_note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가.",
+      "reign_range": "53~146",
+      "reign_range_alt": [
+        {
+          "range": "53~165",
+          "basis": "146년 동생 수성(차대왕)에게 왕위를 넘긴 뒤 165년에 죽었다는 기록 기준(사망까지)"
+        }
+      ],
+      "reign_note": "146년 차대왕에게 양위(한국민족문화대백과 태조왕, 위키백과). 끝 연도를 145년으로 적는 자료가 있다는 웹 표 메모는 이번 검색으로 확인하지 못했다. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
     },
     {
       "id": "goguryeo-anchor-gogukcheon",
@@ -41,7 +52,10 @@
       "verified": false,
       "verified_by": null,
       "year_alt": [],
-      "source_note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가."
+      "source_note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가.",
+      "reign_range": "179~197",
+      "reign_range_alt": [],
+      "reign_note": "위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
     },
     {
       "id": "goguryeo-anchor-dongcheon",
@@ -55,7 +69,10 @@
       "verified": false,
       "verified_by": null,
       "year_alt": [],
-      "source_note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가."
+      "source_note": "즉위 연도는 연표·백과 미러 검색으로 확인(2차 자료). M1 2차 대조 일치. D62에서 추가.",
+      "reign_range": "227~248",
+      "reign_range_alt": [],
+      "reign_note": "위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
     },
     {
       "id": "goguryeo-anchor-micheon",
@@ -69,7 +86,19 @@
       "verified": false,
       "verified_by": null,
       "year_alt": [],
-      "source_note": "봉상왕 9년(300) 창조리의 정변으로 봉상왕이 폐위된 뒤 즉위. 연표·백과 미러와 한국민족문화대백과(창조리 관련 항목) 등 2차 자료 여럿으로 확인(M1 2차 대조 일치). D62에서 추가."
+      "source_note": "봉상왕 9년(300) 창조리의 정변으로 봉상왕이 폐위된 뒤 즉위. 연표·백과 미러와 한국민족문화대백과(창조리 관련 항목) 등 2차 자료 여럿으로 확인(M1 2차 대조 일치). D62에서 추가.",
+      "reign_range": "300~331",
+      "reign_range_alt": [
+        {
+          "range": "300~330",
+          "basis": "한국민족문화대백과 정의부 표기"
+        },
+        {
+          "range": "300~332",
+          "basis": "삼국사기 역주 표기로 소개됨"
+        }
+      ],
+      "reign_note": "331년 2월 재위 32년 만에 사망, 고국원왕 즉위(한국민족문화대백과 미천왕·고국원왕). 끝 연도가 자료마다 다르다. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
     },
     {
       "id": "goguryeo-anchor-sosurim",
@@ -82,7 +111,10 @@
       "source_ref": "삼국사기 권18 고구려본기 제6 소수림왕 즉위조",
       "verified": false,
       "verified_by": null,
-      "year_alt": []
+      "year_alt": [],
+      "reign_range": "371~384",
+      "reign_range_alt": [],
+      "reign_note": "위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
     },
     {
       "id": "goguryeo-anchor-gwanggaeto",
@@ -101,7 +133,15 @@
           "label": "392년(재위 392~413)",
           "basis": "삼국사기 기년"
         }
-      ]
+      ],
+      "reign_range": "391~412",
+      "reign_range_alt": [
+        {
+          "range": "392~413",
+          "basis": "삼국사기 기년"
+        }
+      ],
+      "reign_note": "수험 표준 표기는 비문 기년(D60). 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
     },
     {
       "id": "goguryeo-anchor-jangsu",
@@ -120,7 +160,15 @@
           "label": "412년",
           "basis": "광개토왕비 기년(광개토왕 412년 사망)으로 계산한 값. 소수 견해"
         }
-      ]
+      ],
+      "reign_range": "413~491",
+      "reign_range_alt": [
+        {
+          "range": "412~491",
+          "basis": "광개토왕비 기년으로 계산한 즉위(소수 견해)"
+        }
+      ],
+      "reign_note": "수험 표준 표기는 삼국사기 기년(D60). 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
     },
     {
       "id": "goguryeo-anchor-yeongyang",
@@ -134,7 +182,15 @@
       "verified": false,
       "verified_by": null,
       "year_alt": [],
-      "source_note": "평원왕 32년(590) 사망 후 태자가 즉위. 한국민족문화대백과 영양왕 항목 요약과 위키백과로 확인(재위 590~618, 589/617 이설을 적은 자료도 있음). D63에서 추가."
+      "source_note": "평원왕 32년(590) 사망 후 태자가 즉위. 한국민족문화대백과 영양왕 항목 요약과 위키백과로 확인(재위 590~618, 589/617 이설을 적은 자료도 있음). D63에서 추가.",
+      "reign_range": "590~618",
+      "reign_range_alt": [
+        {
+          "range": "589~617",
+          "basis": "1년 이른 연도를 병기한 자료(위키백과 일부)"
+        }
+      ],
+      "reign_note": "한국민족문화대백과 영양왕, 위키백과(재위 590년 10월~618년 9월). 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
     },
     {
       "id": "goguryeo-anchor-bojang",
@@ -147,7 +203,10 @@
       "source_ref": "삼국사기 권21 고구려본기 제9 보장왕 즉위조",
       "verified": false,
       "verified_by": null,
-      "year_alt": []
+      "year_alt": [],
+      "reign_range": "642~668",
+      "reign_range_alt": [],
+      "reign_note": "위키백과 군주 목록 등으로 확인. 웹 검색(2차 자료) 기준, 원문 대조 전(D65)."
     }
   ],
   "cards": [
