@@ -100,7 +100,7 @@ func setup(config: GameConfig, cards: CardSet, notice: String) -> void:
 	_card_view.more_clues_requested.connect(func() -> void: more_clues_requested.emit())
 	_card_view.selection_changed.connect(_on_selection_changed)
 	side.add_child(_card_view)
-	_reveal = RevealView.new()
+	_reveal = RevealView.new(true)
 	side.add_child(_reveal)
 	_message_label = Label.new()
 	_message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -160,13 +160,13 @@ func show_placement(r: Dictionary, chosen_nation: String, chosen_era: String) ->
 	var card: CardData = r["card"]
 	var correct: bool = r["correct"]
 	_board.show_placed(card.nation, card.era, card.title, correct)
-	_reveal.show_card(_config, card, correct)
+	_reveal.show_card(_config, card, correct, card.explanation)
 	if correct:
-		set_message("정답! [%s]\n%s" % [card.title, card.explanation])
+		set_message("○ 정답! [%s] 도감에 넣었습니다." % card.title)
 	else:
 		_board.flash_wrong(chosen_nation, chosen_era)
-		set_message("오답 (먹물 -1). [%s]의 자리는 %s %s입니다.\n%s" % [
-			card.title, _config.nation_label(card.nation), _config.era_label(card.era), card.explanation])
+		set_message("× 오답 (먹물 -1). [%s]의 자리는 %s %s입니다." % [
+			card.title, _config.nation_label(card.nation), _config.era_label(card.era)])
 
 
 ## 메시지 칸.

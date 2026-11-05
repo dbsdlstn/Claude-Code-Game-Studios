@@ -50,6 +50,7 @@ func _init() -> void:
 	add_child(box)
 
 	_art = CardArtView.new()
+	_art.size_flags_horizontal = Control.SIZE_SHRINK_CENTER  # 옆 패널 폭으로 늘어나지 않게(바이블 §7 220×165)
 	box.add_child(_art)
 
 	_heading = Label.new()

@@ -19,3 +19,4 @@
 | 회차 | 커밋 | 실행 | 결과 | 발견·수정 |
 |---|---|---|---|---|
 | S1 | a5cdf7f | [41946160901](https://github.com/dbsdlstn/Claude-Code-Game-Studios/actions/runs/41946160901) | 세 잡 모두 통과. Xvfb + llvmpipe에서 캡처 성공, artifact `godot-screens`(약 0.9MB). checkout/upload-artifact v5로 올린 뒤에도 정상 | 세션에서 artifact를 받지 못했다(프록시 정책이 `*.blob.core.windows.net`을 막음, 우회하지 않음). 그래서 잡이 PNG를 `production/qa/evidence/godot/`에 커밋하도록 바꾸고(그림이 바뀔 때만), 캡처 시드를 고정했다 |
+| S2 | e58c35e | [41946685312](https://github.com/dbsdlstn/Claude-Code-Game-Studios/actions/runs/41946685312) | 통과, CI가 PNG 11장을 `production/qa/evidence/godot/`에 커밋(124c403) | 화면을 직접 보고 웹 스크린샷과 비교: **한글 정상(두부 없음), 겹침·잘림 없음, 색은 바이블대로**. 고친 것: ① 결말기 정의가 "전/쟁기"로 낱말 중간에서 줄바꿈 → 단어 단위 줄바꿈 ② 오답이 더해진 칸에서 앞의 정답 줄까지 붉은 글자 → 줄마다 Label과 색(테스트 1개 추가) ③ 놓은 뒤 공개 카드·해설이 옆 패널 아래로 밀려 화면 밖 → 공개 카드를 웹처럼 그림 옆에 글을 두는 가로 배치로 줄이고 해설을 그 안에, 메시지는 한 줄로. 숨김 카드 그림 영역이 패널 폭으로 늘어나지 않게 ④ 도감 상세에서 제목·연도가 위 공개 카드와 겹쳐 두 번 나옴 → 뺌 |

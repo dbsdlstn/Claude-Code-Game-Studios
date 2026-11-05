@@ -127,12 +127,10 @@ static func format_stats(st: Dictionary) -> String:
 
 ## 카드 해설 문장을 만든다(화면 밖에서도 쓸 수 있게 static).
 static func describe(config: GameConfig, c: CardData) -> String:
+	# 제목·연도·인장·유형 배지는 위의 공개 카드(RevealView)가 보인다. 여기서는 겹치지 않게 뺀다(CI 화면 S2).
 	var lines: PackedStringArray = PackedStringArray()
-	lines.append(c.title)
 	lines.append("%s · %s (%s) · 유형: %s" % [
 		config.nation_label(c.nation), config.era_label(c.era), config.era_definition(c.era), HanjiTheme.type_label(c.type)])
-	if not c.date_label.is_empty():
-		lines.append("연도(참고): " + c.date_label)
 	lines.append("")
 	if not c.explanation.is_empty():
 		lines.append(c.explanation)

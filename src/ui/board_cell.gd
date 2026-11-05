@@ -28,7 +28,10 @@ var _highlight_style: StyleBoxFlat
 var _ref_on: bool = false
 var _hovering: bool = false
 var _anchor_label: Label
-var _content_label: Label
+## 놓인 카드 줄을 줄마다 Label로 그린다(정답 줄과 오답 줄의 글자색이 따로, CI 화면 S2).
+var _lines_box: VBoxContainer
+## _lines와 같은 순서의 정답 여부.
+var _line_correct: Array[bool] = []
 var _lines: PackedStringArray = PackedStringArray()
 
 
@@ -60,22 +63,20 @@ func setup(cell_nation: String, cell_era: String, anchor_titles: PackedStringArr
 	_anchor_label.visible = not anchor_titles.is_empty()
 	box.add_child(_anchor_label)
 
-	_content_label = Label.new()
-	_content_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_content_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_content_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_content_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_content_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_content_label.add_theme_font_size_override("font_size", 14)
-	box.add_child(_content_label)
+	_lines_box = VBoxContainer.new()
+	_lines_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_lines_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_lines_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	_lines_box.add_theme_constant_override("separation", 2)
+	box.add_child(_lines_box)
 	show_empty()
 
 
 ## 빈 칸으로 되돌린다(새 라운드).
 func show_empty() -> void:
 	_lines = PackedStringArray()
-	_content_label.text = ""
-	_content_label.remove_theme_color_override("font_color")
+	_line_correct.clear()
+	_render_lines()
 	tooltip_text = ""
 	var bg: Color = HanjiTheme.ANCHOR if _anchor_label.visible else HanjiTheme.CELL
 	_set_base(HanjiTheme.box(bg, HanjiTheme.BORDER, 1))
@@ -85,8 +86,8 @@ func show_empty() -> void:
 func show_placed(title: String, correct: bool) -> void:
 	# 색만으로 구분하지 않게 ○/× 표시와 글자를 함께 쓴다(바이블 §4.3).
 	_lines.append(line_text(title, correct))
-	_content_label.text = visible_text(_lines, MAX_VISIBLE_LINES)
-	_content_label.add_theme_color_override("font_color", HanjiTheme.CORRECT_TEXT if correct else HanjiTheme.WRONG_TEXT)
+	_line_correct.append(correct)
+	_render_lines()
 	tooltip_text = "\n".join(_lines)
 	var bg: Color = HanjiTheme.CORRECT if correct else HanjiTheme.WRONG
 	_set_base(HanjiTheme.box(bg, HanjiTheme.BORDER, 2))
@@ -95,6 +96,30 @@ func show_placed(title: String, correct: bool) -> void:
 ## 칸에 쌓이는 한 줄. 정답 "○ 제목", 오답 "× 제목 (오답)".
 static func line_text(title: String, correct: bool) -> String:
 	return "○ %s" % title if correct else "× %s (오답)" % title
+
+
+## 줄 Label을 다시 만든다. 보이는 글은 visible_text()와 같다(맨 위 "외 n장" + 최근 MAX_VISIBLE_LINES줄).
+func _render_lines() -> void:
+	for child in _lines_box.get_children():
+		_lines_box.remove_child(child)
+		child.queue_free()
+	var hidden := maxi(_lines.size() - MAX_VISIBLE_LINES, 0)
+	if hidden > 0:
+		_lines_box.add_child(_line_label("외 %d장" % hidden, HanjiTheme.MUTED))
+	for i in range(hidden, _lines.size()):
+		var color: Color = HanjiTheme.CORRECT_TEXT if _line_correct[i] else HanjiTheme.WRONG_TEXT
+		_lines_box.add_child(_line_label(_lines[i], color))
+
+
+func _line_label(text: String, color: Color) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.add_theme_font_size_override("font_size", 14)
+	l.add_theme_color_override("font_color", color)
+	return l
 
 
 ## 칸에 보일 글: 최근 max_lines줄, 그보다 많으면 맨 위에 "외 n장".
