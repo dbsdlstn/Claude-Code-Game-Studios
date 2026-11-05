@@ -331,7 +331,7 @@ def main(argv=None):
         ts = sorted({i["tier"] for i in b})
         decks = []
         for i in b:
-            d = {"goguryeo": "고구려", "baekje": "백제", "silla": "신라", "usilla": "통일신라(staging)"}.get(i["card"]["nation"], i["card"]["nation"])
+            d = {"goguryeo": "고구려", "baekje": "백제", "silla": "신라", "usilla": "통일신라"}.get(i["card"]["nation"], i["card"]["nation"])
             if d not in decks:
                 decks.append(d)
         out.append(f"| {bi} | {len(b)} | {used}분 | {'/'.join(str(t) for t in ts)} | {', '.join(decks)} |")
