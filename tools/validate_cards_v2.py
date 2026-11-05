@@ -769,7 +769,10 @@ def read_manifest():
             paths.append(str(p))
     for f in sorted(glob.glob(str(V2_DIR / "*.json"))):
         p = Path(f).resolve()
-        if p not in (MANIFEST.resolve(), EVENTS.resolve()) and p not in owner:
+        # manifest-*.json are alternative deck lists (e.g. manifest-m2test.json, D194), not card files.
+        if p.name.startswith("manifest") or p == EVENTS.resolve():
+            continue
+        if p not in owner:
             errs.append(f"[M1] manifest: {p.name} is not listed")
     return paths, owner, errs
 
