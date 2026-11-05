@@ -94,7 +94,8 @@ python3 tools/gd_card_validator_port.py assets/data/cards/samguk.json   # 0 erro
 `.github/workflows/ci.yml`이 `claude/**` 브랜치 push와 수동 실행(`workflow_dispatch`)에서 돈다.
 - `data-and-web`: 카드·튜토리얼 검증, 검증기 동등성, 웹 규칙 단위 테스트(Node). 웹 E2E(Playwright)는 무거워 CI에서 뺐다.
 - `godot`: Godot 4.7.2(공식 linux.x86_64 zip)로 import(크래시 대비 1회 재시도) → gdUnit4 6.2.2로 `res://tests` 실행 → `godot-test-reports` artifact(리포트, 로그) 업로드. 테스트가 실패해도 리포트는 올라간다.
-- 결과 기록: `docs/reviews/godot-ci-runs.md`.
+- 결과 기록: `docs/reviews/godot-ci-runs.md`. 2026-11-05 3회차에서 175/175 통과(Godot 4.7.2, gdUnit4 6.2.2).
+- 이 저장소에서는 Actions가 켜져 있어 push마다 돈다.
 
 **실행이 보이지 않으면**: 포크 저장소는 Actions가 기본으로 꺼져 있다. GitHub 저장소 → **Settings → Actions → General**에서 Actions를 허용하거나, **Actions 탭**의 "I understand my workflows, go ahead and enable them"을 누른다. 그다음 Actions 탭의 `ci` → "Run workflow"로 `claude/godot-mvp`를 고르거나 브랜치에 다시 push한다.
 

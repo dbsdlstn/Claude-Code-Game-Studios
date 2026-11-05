@@ -6,3 +6,10 @@
 |---|---|---|---|---|---|
 | 1 | f72d4f4 | [41944309398](https://github.com/dbsdlstn/Claude-Code-Game-Studios/actions/runs/41944309398) | 통과 | 실패: import 중 파싱 오류. `progress_data.gd`가 파싱되지 않아 `main.gd`가 연쇄 실패(`ProgressData` 해석 불가, `:=` 추론 실패). Godot 4.7.2 다운로드·gdUnit4 6.2.2 설치·import 자체는 성공 | `progress_data.gd:67` `var cleared := ... and summary["cleared"]`: Variant가 섞인 `and`는 타입을 추론하지 못한다 → `: bool`로 명시. 같은 패턴 6곳 모두 명시. CI에 스크립트별 `--check-only` 파싱 단계를 더해 한 번에 모든 오류를 보게 함 |
 | 2 | 80e30ef | [41945077083](https://github.com/dbsdlstn/Claude-Code-Game-Studios/actions/runs/41945077083) | 통과 | 실패(105): 여전히 `ProgressData`만 파싱 실패, 연쇄로 `main.gd`·테스트 3개(round_session, progress_data, save_store) 로드 실패. **다른 스크립트·테스트 파일은 모두 파싱됨.** 파일별 파싱 단계는 Actions 기본 셸 `bash -e` 때문에 첫 파일에서 멈춰 원인 줄을 못 보여 줌 | 원인: `ProgressData.from_dict`에서 바깥 `var ids`와 안쪽 블록 `var ids`가 겹침(GDScript는 바깥 지역 변수를 가리는 선언을 오류로 본다). 바깥을 `raw_collected`로 바꿈. 같은 패턴을 찾는 스캐너로 다른 곳 없음 확인. CI 셸 단계에 `set +e` |
+| 3 | dc16a6b | [41945416603](https://github.com/dbsdlstn/Claude-Code-Game-Studios/actions/runs/41945416603) | 통과 | **통과**: 파일별 파싱 오류 0, gdUnit4 `175 test cases / 0 errors / 0 failures / 0 flaky / 0 skipped / 0 orphans`, 15/15 스위트, 종료 코드 0 | — |
+
+## 정리
+- Godot 4.7.2 + gdUnit4 6.2.2에서 처음으로 실제 실행해 175개 테스트가 모두 통과했다(3회차).
+- 실제로 발견된 결함은 2개였고 둘 다 정적 검사(gdparse·gdlint)로는 잡히지 않았다: Variant가 섞인 `and`의 `:=` 추론, 바깥 지역 변수를 가리는 안쪽 `var` 선언. 다음에는 `:=`에 Variant가 섞이면 타입을 명시하고, 같은 함수 안 변수 이름이 겹치지 않게 한다.
+- CI 경고: `actions/checkout@v4.2.2`·`upload-artifact@v4.6.2`가 Node.js 20 대상이라 러너가 Node 24로 강제 실행한다는 알림이 나온다. 지금은 동작에 문제가 없고, Node 24 대상 메이저 버전으로 올리는 것은 후속 작업으로 남긴다.
+- 아직 확인하지 않은 것: 화면(UI) 동작과 모습. 테스트는 규칙·로딩·저장·일부 UI 노드 글만 다룬다. 스크린샷 증거(`production/qa/evidence/`)는 여전히 없다.
