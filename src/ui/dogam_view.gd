@@ -77,7 +77,7 @@ func show_dogam(config: GameConfig, cards: CardSet, progress: ProgressData) -> v
 	for c: CardData in cards.playable:
 		if progress.is_collected(c.id):
 			collected_count += 1
-	var complete := collected_count > 0 and collected_count == cards.playable.size()
+	var complete: bool = collected_count > 0 and collected_count == cards.playable.size()
 	_summary.text = "%s  %d / %d" % ["도감 완성" if complete else "도감", collected_count, cards.playable.size()]
 	_detail.text = "왼쪽에서 모은 카드를 누르면 해설이 열립니다."
 	_reveal.clear()

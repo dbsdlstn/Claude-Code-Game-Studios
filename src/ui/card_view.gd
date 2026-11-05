@@ -158,7 +158,7 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 func _gui_input(event: InputEvent) -> void:
 	# 누른 뒤 끌지 않고 뗐을 때만 고르기를 바꾼다(끌어 놓으면 떼는 입력은 칸이 받는다).
 	var mb := event as InputEventMouseButton
-	var toggle := mb != null and mb.button_index == MOUSE_BUTTON_LEFT and not mb.pressed
+	var toggle: bool = mb != null and mb.button_index == MOUSE_BUTTON_LEFT and not mb.pressed
 	if mb == null and event.is_action_pressed("ui_accept"):
 		toggle = true
 	if toggle and not _card_id.is_empty():

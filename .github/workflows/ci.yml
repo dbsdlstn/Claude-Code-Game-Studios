@@ -115,14 +115,36 @@ jobs:
             echo "import attempt $attempt exit $code"
             if [ "$code" -eq 0 ]; then break; fi
           done
-          if grep -E "Parse Error|SCRIPT ERROR" import-*.log; then
-            echo "::error::GDScript parse errors during import"
-            exit 1
-          fi
           test -f .godot/global_script_class_cache.cfg
+
+      # 파일마다 따로 파싱해 한 번의 실행에서 모든 오류를 본다(import는 첫 오류의 연쇄만 보여 준다).
+      - name: Parse check each script
+        id: parse
+        run: |
+          set -uo pipefail
+          : > parse-check.log
+          bad=0
+          while IFS= read -r f; do
+            out="$("$GODOT" --headless --path . --check-only --script "res://$f" 2>&1)"
+            if echo "$out" | grep -qE "Parse Error|SCRIPT ERROR|Failed to load"; then
+              bad=$((bad + 1))
+              { echo "=== $f"; echo "$out" | grep -E "Parse Error|SCRIPT ERROR|at: |Failed to load"; } >> parse-check.log
+            fi
+          done < <(git ls-files 'src/*.gd' 'tests/*.gd')
+          echo "scripts with parse errors: $bad"
+          cat parse-check.log
+          {
+            echo "### Parse check"
+            echo "scripts with parse errors: $bad"
+            echo '```'
+            head -n 200 parse-check.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "bad=$bad" >> "$GITHUB_OUTPUT"
 
       - name: Run gdUnit4 tests
         id: tests
+        if: always()
         run: |
           set -uo pipefail
           "$GODOT" --headless --path . -s -d --remote-debug tcp://127.0.0.1:0 \
@@ -130,6 +152,13 @@ jobs:
           code=${PIPESTATUS[0]}
           echo "gdUnit4 exit $code (0 pass, 100 fail, 101 warnings/orphans, 105 parse error)"
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          {
+            echo "### gdUnit4"
+            echo "exit code: $code"
+            echo '```'
+            grep -E "Overall Summary|Executed test|passed|failed|errors|orphan" gdunit.log | tail -n 40 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
           exit "$code"
 
       - name: Upload test reports
@@ -142,4 +171,11 @@ jobs:
             reports/
             gdunit.log
             import-*.log
+            parse-check.log
             .godot/global_script_class_cache.cfg
+
+      - name: Fail on parse errors
+        if: always() && steps.parse.outputs.bad != '0'
+        run: |
+          echo "::error::${{ steps.parse.outputs.bad }} script(s) failed to parse (see parse-check.log artifact)"
+          exit 1
