@@ -4,7 +4,8 @@
 Usage:
     python3 tools/validate_cards_v2.py [path ...] [--release] [--strict-events]
 
-    path       v2 card JSON file(s). Default: the files listed in
+    path       v2 card JSON file(s); anchors of the nations they use are
+               pulled from the manifest when the files hold none. Default: the files listed in
                assets/data/cards/v2/manifest.json, validated nation by nation
                (anchors and ids still checked across all listed files).
     --release  also apply the release gate (R1-R3 below).
@@ -749,6 +750,29 @@ def main(argv):
             if nation and isinstance(c, dict) and c.get("nation") != nation:
                 manifest_errors.append(f"[M2] {c.get('id')}: nation '{c.get('nation')}' but listed under {nation} in the manifest")
         cards.extend(data["cards"])
+    if not owner:
+        # Explicit files (D99 follow-up): a batch file holds source cards only, so
+        # pull in the anchors of every nation it uses from the manifest's files.
+        have = {c.get("nation") for c in cards if isinstance(c, dict) and c.get("kind") == "anchor"}
+        need = {c.get("nation") for c in cards if isinstance(c, dict) and c.get("kind") == "source"} - have
+        if need:
+            mpaths, mowner, _ = read_manifest()
+            ids = {c.get("id") for c in cards if isinstance(c, dict)}
+            added = 0
+            for mp in mpaths or []:
+                if mowner.get(Path(mp).resolve()) not in need or Path(mp).resolve() in {Path(x).resolve() for x in paths}:
+                    continue
+                try:
+                    extra = json.loads(Path(mp).read_text(encoding="utf-8")).get("cards") or []
+                except (OSError, json.JSONDecodeError):
+                    continue
+                for c in extra:
+                    if isinstance(c, dict) and c.get("kind") == "anchor" and c.get("id") not in ids:
+                        cards.append(c)
+                        added += 1
+            print(f"note: added {added} anchor(s) of {', '.join(sorted(n for n in need if n))} from the manifest"
+                  if added else f"note: no anchors found for {', '.join(sorted(n for n in need if n))}; "
+                  "validate with the nation's anchor file or run without paths")
     errors, warnings, anchors, sources = validate(cards, release)
     errors = manifest_errors + errors
     event_obs = []
