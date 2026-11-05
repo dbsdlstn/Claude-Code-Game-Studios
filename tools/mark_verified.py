@@ -45,9 +45,13 @@ SKIP = {"manifest.json", "events.json"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
+STAGING_GLOB = str(ROOT / "assets/data/cards/v2/staging/*.json")  # D207: staged decks too
+
+
 def load_files(data_glob=DATA_GLOB):
     files = {}
-    for f in sorted(glob.glob(data_glob)):
+    pattern = [data_glob] + ([STAGING_GLOB] if data_glob == DATA_GLOB else [])
+    for f in sorted(f for g in pattern for f in glob.glob(g)):
         if Path(f).name in SKIP:
             continue
         text = Path(f).read_text(encoding="utf-8")
