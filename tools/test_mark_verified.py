@@ -197,5 +197,71 @@ class TestValidatorAfterMarking(Base):
         self.assertTrue(any("content_hash mismatch" in str(e) for e in self.v14_errors()))
 
 
+class TestVariants(Base):
+    """Passage variants are addressed as <card id>#<variant id> and carry their own record."""
+
+    VID = SOURCE_ID + "#v2"
+
+    def variant(self, cid=SOURCE_ID, vid="v2"):
+        card = self.card(cid)
+        return next(x for x in card["variants"] if x["id"] == vid)
+
+    def edit_variant_text(self):
+        path = self.dir / "goguryeo-m1.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for c in data["cards"]:
+            if c["id"] == SOURCE_ID:
+                for x in c["variants"]:
+                    if x["id"] == "v2":
+                        x["text"] += " 다."
+        path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    def test_two_reviewers_verify_the_variant_only(self):
+        card_before = self.card(SOURCE_ID)["verification"].copy()
+        self.run_cli(self.VID, write=True, reviewer="갑")
+        self.assertFalse(self.variant()["verification"]["verified"])
+        self.run_cli(self.VID, write=True, reviewer="을")
+        vv = self.variant()["verification"]
+        self.assertTrue(vv["verified"])
+        self.assertEqual(vv["verified_by"], ["갑", "을"])
+        self.assertEqual(vv["content_hash"], v.variant_hash(self.variant()))
+        self.assertEqual(self.card(SOURCE_ID)["verification"], card_before)  # the card itself is untouched
+
+    def test_variant_edit_drops_earlier_reviewers(self):
+        self.run_cli(self.VID, write=True, reviewer="갑")
+        self.edit_variant_text()
+        code, out, _ = self.run_cli(self.VID, write=True, reviewer="을")
+        self.assertIn("earlier reviewers dropped", out)
+        self.assertEqual(self.variant()["verification"]["verified_by"], ["을"])
+
+    def test_unknown_variant_id_is_not_found(self):
+        before = self.snapshot()
+        code, out, _ = self.run_cli(SOURCE_ID + "#v9", write=True)
+        self.assertEqual(code, 2)
+        self.assertIn("not found", out)
+        self.assertEqual(before, self.snapshot())
+
+    def test_url_is_ignored_for_a_variant(self):
+        code, out, _ = self.run_cli(self.VID, "--url", "https://db.history.go.kr/x", write=True)
+        self.assertIn("ignored for a variant", out)
+        self.assertIsNone(self.card(SOURCE_ID)["source_ref"].get("url"))
+
+    def test_validator_accepts_verified_variant_and_flags_edits(self):
+        self.run_cli(self.VID, write=True, reviewer="갑")
+        self.run_cli(self.VID, write=True, reviewer="을")
+
+        def v20():
+            cards = []
+            for f in sorted(self.dir.glob("*.json")):
+                if f.name not in mv.SKIP:
+                    cards.extend(json.loads(f.read_text(encoding="utf-8"))["cards"])
+            errors = v.validate(cards)[0]
+            return [e for e in errors if "V20" in str(e)]
+
+        self.assertEqual(v20(), [])
+        self.edit_variant_text()
+        self.assertTrue(any("content changed" in str(e) for e in v20()))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
