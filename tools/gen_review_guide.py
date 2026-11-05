@@ -17,7 +17,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+# v2 card files plus staging/ (D207: staged decks are reviewed before registration)
 DATA = sorted(p for p in glob.glob(str(ROOT / "assets/data/cards/v2/*.json"))
+              + glob.glob(str(ROOT / "assets/data/cards/v2/staging/*.json"))
               if Path(p).name not in ("manifest.json", "events.json"))
 OUT = ROOT / "design/human-review-guide.md"
 
@@ -30,6 +32,12 @@ REPORTS = [
     ("fact-check-report-baekje-b2.md", "baekje", (13, 24), "src"),
     ("fact-check-report-silla-b1.md", "silla", (1, 12), "src"),
     ("fact-check-report-silla-b2.md", "silla", (13, 24), "src"),
+    ("fact-check-report-silla-b3.md", "silla", (25, 27), "src"),
+    # one report, two decks: only rows under the named "## " section count
+    ("fact-check-report-b3-b4.md", "baekje", (25, 29), "src", "백제 묶음 3"),
+    ("fact-check-report-b3-b4.md", "silla", (28, 33), "src", "신라 묶음 4"),
+    ("fact-check-report-usilla-b1.md", "usilla", (1, 12), "src"),
+    ("fact-check-report-usilla-b2.md", "usilla", (13, 22), "src"),
 ]
 # anchors the reports cover by summary only (no per-anchor row) -> treated as "일치(요약)"
 SUMMARY_ANCHORS = {"baekje": "보고서 요약: 앵커 전부 일치", "silla": "보고서 요약: 앵커 전부 일치"}
@@ -43,7 +51,7 @@ MIN = {  # estimated minutes per item (guess)
 }
 VARIANT_REPORT = "fact-check-report-variants-m1.md"
 BATCH_MIN = 60
-DECK_ORDER = {"goguryeo": 0, "baekje": 1, "silla": 2}
+DECK_ORDER = {"goguryeo": 0, "baekje": 1, "silla": 2, "usilla": 3}
 
 
 def clean(s):
@@ -53,13 +61,17 @@ def clean(s):
 def parse_reports():
     """id -> (verdict, detail). Only the first matching row of each report counts."""
     verdicts = {}
-    for fname, deck, (lo, hi), kind in REPORTS:
+    for fname, deck, (lo, hi), kind, *section in REPORTS:
         path = ROOT / "design" / fname
         if not path.exists():
             continue
         seen = set()
+        inside = not section
         for line in path.read_text(encoding="utf-8").splitlines():
-            if not line.startswith("|"):
+            if section and line.startswith("## "):
+                inside = section[0] in line
+                continue
+            if not inside or not line.startswith("|"):
                 continue
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
             if len(cells) < 4:
@@ -319,7 +331,7 @@ def main(argv=None):
         ts = sorted({i["tier"] for i in b})
         decks = []
         for i in b:
-            d = {"goguryeo": "고구려", "baekje": "백제", "silla": "신라"}.get(i["card"]["nation"], i["card"]["nation"])
+            d = {"goguryeo": "고구려", "baekje": "백제", "silla": "신라", "usilla": "통일신라(staging)"}.get(i["card"]["nation"], i["card"]["nation"])
             if d not in decks:
                 decks.append(d)
         out.append(f"| {bi} | {len(b)} | {used}분 | {'/'.join(str(t) for t in ts)} | {', '.join(decks)} |")
