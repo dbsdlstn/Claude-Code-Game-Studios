@@ -1,0 +1,424 @@
+[
+  {
+    "id": "goguryeo-ending-04",
+    "type": "artifact",
+    "title": "천리장성",
+    "anchor": false,
+    "answer": {
+      "nation": "goguryeo",
+      "era": "ending"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "서쪽 대국의 침략에 대비해, 북쪽 성에서 남쪽 바닷가까지 천 리가 넘는 방어선을 16년에 걸쳐 쌓는다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[광개토대왕릉비]를 세운 나라가 200여 년 뒤, 당과의 전쟁에 대비해 쌓았다.",
+        "refs": [
+          "goguryeo-peak-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "631년 시작, 647년 무렵 완성. 642년 연개소문이 공사를 감독.",
+        "refs": []
+      }
+    ],
+    "explanation": "고구려가 당의 침략에 대비해 쌓은 방어선. 멸망(668)으로 이어지는 당과의 마지막 전쟁기에 그 전쟁을 대비해 쌓은 시설이므로 결말기.",
+    "date_label": "631~647년",
+    "source": {
+      "name": "삼국사기 고구려본기 영류왕 14년·25년조",
+      "url": null,
+      "note": "631년 착공·647년 무렵 완성, 642년 연개소문 감독은 2차 자료(itwiki 등)로 확인. 부여성과 남쪽 바다의 위치, 장성의 구조(산성 연결인지 흙 장벽인지)는 견해가 갈려 단서에 쓰지 않았다. D41 후보. 검증 전"
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "D41 후보",
+      "고구려",
+      "성곽"
+    ]
+  },
+  {
+    "id": "goguryeo-peak-04",
+    "type": "person",
+    "title": "승려 도림",
+    "anchor": false,
+    "answer": {
+      "nation": "goguryeo",
+      "era": "peak"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "바둑을 잘 두는 승려가 이웃 나라 왕의 곁에 들어가, 큰 성과 궁궐 공사를 부추겨 나라 살림을 바닥나게 한 뒤 몰래 돌아간다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[광개토대왕릉비]를 세운 왕이 남쪽으로 영토를 넓히기 직전에 보낸 사람이다.",
+        "refs": [
+          "goguryeo-peak-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "장수왕이 보냄, 상대는 백제 개로왕, 475년 한성 함락 직전.",
+        "refs": []
+      }
+    ],
+    "explanation": "장수왕이 백제에 보낸 첩자 승려 도림. 한성을 함락하고 한강 유역을 차지하는, 영토를 크게 넓힌 남진의 준비 과정에 나오는 인물이므로 전성기.",
+    "date_label": "475년 무렵",
+    "source": {
+      "name": "삼국사기 백제본기 개로왕 21년조",
+      "url": null,
+      "note": "도림이 바둑으로 개로왕에게 접근해 토목 공사를 부추겼다는 기사는 2차 자료(dh.aks 도림, 언론)로 확인. D41 후보. 검증 전"
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "D41 후보",
+      "고구려",
+      "인물",
+      "첩자"
+    ]
+  },
+  {
+    "id": "baekje-founding-04",
+    "type": "person",
+    "title": "소서노",
+    "anchor": false,
+    "answer": {
+      "nation": "baekje",
+      "era": "founding"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "남편을 잃고 두 아들을 기르던 여인이, 새 나라를 세운 왕과 다시 혼인했다가 아들들과 함께 남쪽으로 내려간다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[황산벌 전투]에서 끝나는 나라를 세운 형제의 어머니다.",
+        "refs": [
+          "baekje-ending-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "졸본 사람 연타발의 딸, 비류와 온조의 어머니.",
+        "refs": []
+      }
+    ],
+    "explanation": "비류를 시조로 전하는 백제 건국 전승의 인물 소서노. 나라를 세운 형제와 함께 남쪽으로 내려온 건국 전승의 인물이므로 건국기.",
+    "date_label": "전승 기원전 1세기",
+    "source": {
+      "name": "삼국사기 백제본기 시조 온조왕조(비류 시조설 주석)",
+      "url": null,
+      "note": "소서노라는 이름은 비류 시조설에만 나온다(한국민족문화대백과 요약). 본문 온조왕 13년 '왕의 어머니가 61세로 죽었다'는 기사를 소서노로 보는 것은 동일인이라는 전제 아래의 해석이다. D41 후보. 검증 전"
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "D41 후보",
+      "백제",
+      "인물",
+      "건국"
+    ]
+  },
+  {
+    "id": "baekje-ending-04",
+    "type": "artifact",
+    "title": "정림사지 오층석탑의 승전 글",
+    "anchor": false,
+    "answer": {
+      "nation": "baekje",
+      "era": "ending"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "도읍의 절에 서 있던 돌탑 몸돌에, 이 나라를 무너뜨린 외국 장수가 자기 승전을 알리는 긴 글을 새긴다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[황산벌 전투] 한 달쯤 뒤, 함락된 도읍에서 새겨진 글이다.",
+        "refs": [
+          "baekje-ending-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "660년 8월, 당 소정방, '대당평백제국비명'.",
+        "refs": []
+      }
+    ],
+    "explanation": "백제를 멸망시킨 당군이 사비의 석탑에 새긴 승전 기록. 마지막 전쟁기가 멸망으로 끝났음을 보여 주는 유물이므로 결말기.",
+    "date_label": "660년(글을 새긴 해)",
+    "source": {
+      "name": "대당평백제국비명(정림사지 오층석탑 명문)",
+      "url": null,
+      "note": "탑은 사비 시기에 세워졌고 글은 660년 8월 15일에 새겼다(2차 자료). 이 글 때문에 한때 '평제탑'으로 잘못 불렸다. 카드의 시기는 글을 새긴 사건 기준이다. D41 후보. 검증 전"
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "D41 후보",
+      "백제",
+      "탑",
+      "유물"
+    ]
+  },
+  {
+    "id": "baekje-ending-05",
+    "type": "myth",
+    "title": "타사암 전승",
+    "anchor": false,
+    "answer": {
+      "nation": "baekje",
+      "era": "ending"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "도읍이 무너지자, 왕의 후궁들이 적에게 욕을 당하느니 죽겠다며 강가 큰 바위에서 함께 강물로 몸을 던진다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[황산벌 전투] 뒤 도읍이 함락될 때의 일로 전한다.",
+        "refs": [
+          "baekje-ending-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "부여 낙화암, 삼국유사가 인용한 '백제고기'.",
+        "refs": []
+      }
+    ],
+    "explanation": "삼국유사가 백제고기를 인용해 전하는 타사암(지금의 낙화암) 전승. 나라가 멸망하는 장면의 이야기이므로 결말기.",
+    "date_label": "660년(전승)",
+    "source": {
+      "name": "삼국유사 기이편 태종춘추공조(백제고기 인용)",
+      "url": null,
+      "note": "원전은 '후궁'이 몸을 던졌다고 적는다. '삼천 궁녀'는 조선 시대 이후의 문학적 표현으로 보는 견해가 많아 쓰지 않았다(한국민족문화대백과 '낙화암' 요약). D41 후보. 검증 전"
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 1,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "D41 후보",
+      "백제",
+      "전승",
+      "멸망"
+    ]
+  },
+  {
+    "id": "silla-peak-04",
+    "type": "myth",
+    "title": "치술령 망부석",
+    "anchor": false,
+    "answer": {
+      "nation": "silla",
+      "era": "peak"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "바다 건너 인질을 구하러 갔다가 돌아오지 못한 남편을 기다리던 아내가, 고개 위에서 바다 쪽을 바라보며 울다 그 자리에서 돌이 된다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[박혁거세 신화]의 나라가 바다 건너 왜에 잡혀 있던 왕의 동생을 데려오던 때의 이야기다.",
+        "refs": [
+          "silla-founding-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "박제상의 아내, 치술령, 눌지 마립간(418년 무렵).",
+        "refs": []
+      }
+    ],
+    "explanation": "박제상이 왜에 인질로 간 왕의 동생 미사흔을 구하고 죽은 일에 얽힌 아내의 전승. 마립간 체제로 왕권이 커지던 5세기의 일로 보아 전성기.",
+    "date_label": "418년 무렵(전승)",
+    "source": {
+      "name": "삼국유사 기이편 내물왕 김제상조; 삼국사기 열전 박제상조",
+      "url": null,
+      "note": "미사흔 귀환은 418년(눌지왕 2년)으로 적으나 425년 설 등 이견이 있다. 아내가 치술령에서 죽어 치술신모가 되었다는 전승은 2차 자료로 확인. 5세기 초를 전성기로 보는 것은 '확장·번영 사건'이라는 D2 성격 기준으로는 약하다(시기 판단 주의). D41 후보. 검증 전"
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "D41 후보",
+      "신라",
+      "전승"
+    ]
+  },
+  {
+    "id": "silla-ending-04",
+    "type": "artifact",
+    "title": "태종무열왕릉비",
+    "anchor": false,
+    "answer": {
+      "nation": "silla",
+      "era": "ending"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "거북 모양 받침돌 위에 여섯 마리 용이 얽힌 머릿돌만 남고, 글을 새긴 몸돌은 사라진 비석이다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[황산벌 전투]에서 이긴 나라의 왕으로, 그 이듬해 세상을 떠난 왕의 비석이다.",
+        "refs": [
+          "baekje-ending-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "661년, 김춘추, 머릿돌에 '태종무열대왕지비'.",
+        "refs": []
+      }
+    ],
+    "explanation": "백제를 멸망시키고 고구려와 싸우던 중에 세상을 떠난 태종무열왕(김춘추)의 비. 통일로 이어지는 마지막 전쟁기 한가운데 세워졌으므로 결말기.",
+    "date_label": "661년",
+    "source": {
+      "name": "경주 태종무열왕릉비(국보) 이수 명문; 대동금석서",
+      "url": null,
+      "note": "661년 건립은 대동금석서 기록, 김인문 글씨설은 추정이라 쓰지 않았다(한국민족문화대백과 요약). 서악동 귀부(보물)와 혼동하지 않는다. D41 후보. 검증 전"
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 2,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "D41 후보",
+      "신라",
+      "비석",
+      "유물"
+    ]
+  },
+  {
+    "id": "gaya-founding-04",
+    "type": "artifact",
+    "title": "김해 회현리 패총",
+    "anchor": false,
+    "answer": {
+      "nation": "gaya",
+      "era": "founding"
+    },
+    "clues": [
+      {
+        "level": 1,
+        "kind": "description",
+        "text": "바닷가 언덕에 쌓인 조개껍데기 더미에서 불탄 쌀과, 바다 건너 대륙 왕조가 만든 동전 한 닢이 나온다.",
+        "refs": []
+      },
+      {
+        "level": 2,
+        "kind": "relation",
+        "text": "[수로왕 탄생 신화]가 전하는 나라의 도읍 가까이에서, 그 나라 초기 사람들이 남긴 생활 흔적이다.",
+        "refs": [
+          "gaya-founding-anchor"
+        ]
+      },
+      {
+        "level": 3,
+        "kind": "direct",
+        "text": "경남 김해, 신(新)나라 왕망의 동전 '화천', 1920년 발굴.",
+        "refs": []
+      }
+    ],
+    "explanation": "금관가야 중심지에서 초기 사람들이 남긴 조개무지. 연맹이 처음 자리 잡던 때의 생활과 바다 건너 교역을 보여 주므로 건국기.",
+    "date_label": "1~4세기 무렵",
+    "source": {
+      "name": "김해 봉황동 유적(옛 회현리 패총) 사적 지정 자료; 한국민족문화대백과",
+      "url": null,
+      "note": "화천은 이 유적의 상한 연대 근거. 형성 시기는 1~4세기 설과 2~6세기 설이 있어, 시기 판단(건국기)이 늦은 연대 쪽으로는 약해진다. 지금은 봉황동 유적으로 확대 지정되었다. D41 후보. 검증 전"
+    },
+    "verified": false,
+    "verified_by": null,
+    "disputed": false,
+    "disputed_note": null,
+    "difficulty": 3,
+    "image": null,
+    "image_source": null,
+    "image_license": null,
+    "tags": [
+      "D41 후보",
+      "가야",
+      "유적",
+      "유물"
+    ]
+  }
+]

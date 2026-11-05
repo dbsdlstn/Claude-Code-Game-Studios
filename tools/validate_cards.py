@@ -4,12 +4,16 @@
 Usage:
     python3 tools/validate_cards.py [path ...] [--release]
     python3 tools/validate_cards.py --tutorial TUTORIAL [--deck DECK] [--release]
+    python3 tools/validate_cards.py --candidates FILE [--deck DECK]
 
     path        card JSON file(s). Default: assets/data/cards/samguk.json
     --release   also apply rule 9 as a gate: the release set
                 (verified: true and disputed: false) must itself satisfy rule 8.
     --tutorial  also validate a tutorial file (format below) against the deck.
-    --deck      deck file(s) for --tutorial. Default: the paths, else samguk.json.
+    --candidates  also validate a candidate card file (a JSON array, not part of
+                the deck yet) against the deck. Rule 8 is not applied to it.
+    --deck      deck file(s) for --tutorial/--candidates. Default: the paths,
+                else samguk.json.
                 The deck itself is validated and reported exactly as without
                 --tutorial; the tutorial report follows it.
 
@@ -63,6 +67,13 @@ schema doc "검증 규칙"). A Godot test should implement the same predicates:
       the reduced sets. If no tutorial card survives, that is an error.
   T7  No tutorial card is an anchor, and cards[0] (the practice card the
       game uses) is not disputed.
+
+  CANDIDATE FILE (decision-log D54; checked only with --candidates):
+  C1  Top level is a JSON array of card objects.
+  C2  Every candidate passes the per-card rules (FIELD, R1-R7, R9 verified_by)
+      together with the deck, so ids must not clash and relation refs must be
+      deck anchors. R8 (cell coverage) is not applied to candidates.
+  C3  No candidate shares a `title` with a deck card.
 
   Field checks (schema "카드 객체" table): required fields present with the
   right types; type in {event, artifact, person, myth}; difficulty int 1..3;
@@ -316,6 +327,25 @@ def validate_tutorial(tutorial, deck, release=False):
     return errors, len(tgood)
 
 
+def validate_candidates(cands, deck):
+    """Return (errors, n_cards) for a candidate card array checked against the deck."""
+    if not isinstance(cands, list) or not all(isinstance(c, dict) for c in cands):
+        return ["[C1] candidates: top level must be a JSON array of card objects"], 0
+    deck_good = [c for c in deck if isinstance(c, dict)]
+    cids = {c.get("id") for c in cands}
+    errors = []
+    combined_errors, _, _, _ = validate(deck_good + cands)
+    for e in combined_errors:
+        tag, rest = e[1:e.index("]")], e[e.index("]") + 2:]
+        if tag != "R8" and rest.split(": ", 1)[0] in cids:
+            errors.append(e)
+    deck_titles = {c.get("title") for c in deck_good}
+    for c in cands:
+        if c.get("title") in deck_titles:
+            errors.append(f"[C3] {c.get('id')}: title '{c.get('title')}' also used by a deck card")
+    return errors, len(cands)
+
+
 def load_json(p):
     try:
         return json.loads(Path(p).read_text(encoding="utf-8")), None
@@ -340,6 +370,7 @@ def take_option(argv, name):
 def main(argv):
     argv = list(argv)
     tutorial_paths = take_option(argv, "--tutorial")
+    candidate_paths = take_option(argv, "--candidates")
     deck_paths = take_option(argv, "--deck")
     release = "--release" in argv
     paths = [Path(a) for a in deck_paths + [a for a in argv if a != "--release"]] or [DEFAULT_PATH]
@@ -381,6 +412,25 @@ def main(argv):
             print("FAIL  " + e)
         print("TUTORIAL RESULT: " + ("FAIL" if terrors else "PASS") + f" ({len(terrors)} error(s))")
         if terrors:
+            status = 1
+    for cp in candidate_paths:
+        data, problem = load_json(cp)
+        if problem:
+            print(problem)
+            return 2
+        cerrors, n = validate_candidates(data, cards)
+        print(f"candidates {cp}: {n} card(s)")
+        if isinstance(data, list):
+            combos = {}
+            for c in data:
+                if isinstance(c, dict):
+                    key = f"{c.get('type')}/{(c.get('answer') or {}).get('era')}"
+                    combos[key] = combos.get(key, 0) + 1
+            print("  type/era: " + ", ".join(f"{k} {v}" for k, v in sorted(combos.items())))
+        for e in cerrors:
+            print("FAIL  " + e)
+        print("CANDIDATES RESULT: " + ("FAIL" if cerrors else "PASS") + f" ({len(cerrors)} error(s))")
+        if cerrors:
             status = 1
     return status
 
