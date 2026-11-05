@@ -7,12 +7,34 @@
 **같은 내용을 플래시카드로 외우는 것보다 낫다**(더 오래 기억하고, 순서·왕대를 근거로 말할 수 있다). 판단은 사람 테스트로 한다(D56 ④).
 
 ## 실행
-저장소 루트에서 정적 서버를 띄운다(실제 데이터 경로 `../../assets/...`를 읽기 위해 루트에서 띄운다).
 
-```sh
-python3 -m http.server 8000
-```
-→ http://localhost:8000/prototypes/m1-timeline/ (휴대폰 세로 화면 기준, 데스크톱도 됨)
+### PC에서 바로 해 보기(일반 학습 모드)
+필요한 것: Python 3(설치만 하면 된다, 추가 패키지 없음)과 최신 브라우저(Chrome·Edge·Firefox·Safari). 인터넷 연결은 필요 없다.
+
+1. 저장소를 받는다(`git clone` 또는 GitHub의 Code → Download ZIP 후 압축 풀기).
+2. 터미널을 **저장소 맨 위 폴더**(`CLAUDE.md`가 있는 곳)에서 연다. 카드 데이터 `assets/data/...`를 읽으려면 반드시 이 폴더에서 띄워야 한다.
+   - Windows: 탐색기에서 그 폴더를 열고 주소창에 `cmd` 입력 후 Enter(또는 폴더 빈 곳 Shift+우클릭 → "PowerShell 창 열기/터미널에서 열기").
+   - macOS: 터미널에서 `cd 저장소경로`.
+3. 정적 서버를 띄운다.
+
+   | 운영체제 | 명령 |
+   |---|---|
+   | Windows | `py -m http.server 8000` (안 되면 `python -m http.server 8000`) |
+   | macOS·Linux | `python3 -m http.server 8000` |
+
+4. 브라우저에서 **http://localhost:8000/prototypes/m1-timeline/** 를 연다. 타이틀에서 나라(고구려·백제·신라·통일신라)를 고르고 [새 카드 시작]을 누르면 일반 학습 모드다. 기록·레벨·도감은 이 브라우저에 저장되어 다음에 열면 이어진다.
+5. 끝낼 때는 터미널에서 Ctrl+C.
+
+자주 막히는 것:
+- **"데이터를 읽지 못했다: … (HTTP 404)"**: 서버를 `prototypes/m1-timeline` 안에서 띄웠을 때다. 저장소 맨 위 폴더에서 다시 띄운다. 파일을 더블클릭(`file://`)으로 열면 동작하지 않는다(브라우저가 모듈·데이터 읽기를 막는다).
+- **`py`를 찾을 수 없음**: python.org에서 설치할 때 "Add python.exe to PATH"와 "py launcher"를 켠다. Microsoft Store판이면 `python` 명령을 쓴다.
+- **8000 포트가 이미 쓰임**: 숫자를 바꾼다(`py -m http.server 8080` → http://localhost:8080/prototypes/m1-timeline/).
+- **처음부터 다시**: [숙련 도감] → 오답 노트 탭 아래 [학습 기록 초기화](학습 기록과 레벨·업적을 지운다). 모든 나라 기록을 한 번에 확실히 비우려면 브라우저 개발자 도구 → Application → Local Storage → `localhost:8000`을 지운다. 기록을 남기려면 먼저 [기록 내보내기(JSONL)].
+- 휴대폰으로 보려면 PC와 같은 Wi-Fi에서 `http://PC의IP:8000/prototypes/m1-timeline/`(Windows 방화벽이 물으면 "개인 네트워크" 허용). 공개 인터넷에 올리지 않는다(프로토타입 배포 금지).
+
+### 주소 옵션
+- `?nation=baekje`처럼 나라를 바로 고른다(goguryeo, baekje, silla, usilla).
+- `?study=1`은 M1 사람 테스트 모드다(아래). 일반 학습과 저장이 따로다.
 
 - 데이터: `js/config.js`의 `dataUrls` 순서로 찾는다. 스키마 v2 `assets/data/cards/v2/goguryeo-m1.json`(앵커 10 + 사료 12) → `data/sample.json`(테스트용 8장, 왕 앵커 5개). `?data=경로`로 고정, `?seed=7`로 섞기 고정. 임시 형식(D58) 변환은 v2로 옮겨 지웠다(D72).
 - **사람 테스트 모드** `?study=1`: 진행자 메뉴(참가자 ID, P1/P2 교차 배정, 단계 pre / learn-A / learn-B / post0 / post1), 방식 B 플래시카드, 테스트 화면("어느 왕 때인가" 기준 왕 10명 + 근거, 단서·정답 없음), 진행자 메뉴 잠금(코드), 참가자별 저장과 JSONL 내보내기. 코드: `js/study.js`(규칙), `js/study-ui.js`(화면), 방식 A는 일반 화면을 반(6장)만 걸러 쓴다. 안내: `STUDY.md`.
@@ -59,6 +81,7 @@ node prototypes/m1-timeline/tests/screenshots.mjs        # → production/qa/evi
 python3 prototypes/m1-timeline/build.py                  # → dist/m1/ (git 제외). 콘텐츠 데이터(v2)를 data/로 넣고 경로를 맞춘다
 python3 -m http.server 8000 --directory dist/m1          # → http://localhost:8000/
 ```
+Windows는 `python3` 대신 `py`(예: `py prototypes\m1-timeline\build.py`, `py -m http.server 8000 --directory dist\m1`). 묶은 `dist/m1`은 그 폴더만 복사해 다른 PC에서 같은 명령으로 띄울 수 있다.
 
 ## 발견(진행 중)
 - 아직 사람 테스트 없음. 모델·자동 테스트만 돌렸다.
