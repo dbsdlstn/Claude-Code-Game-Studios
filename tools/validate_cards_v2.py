@@ -53,6 +53,21 @@ RULES (numbers follow the schema doc; a headless test should use the same):
       content_hash equals the hash of the current content (see content_hash()).
   V15 image set -> image_source and image_license non-empty.
 
+VARIANTS (design/card-variants-spec.md, D121; optional `variants` list):
+  V16 every variant text follows V8 (no card title, no answer.after anchor
+      title, no year expression; 20-200 characters else a warning) and no two
+      texts of a card (source_text included) are equal after normalising
+      whitespace.
+  V17 variant text_basis == own_paraphrase_from_original.
+  V18 0-2 variants; ids unique within the card, matching v2/v3 (not v1);
+      angle in {record, actor, result, scene} and distinct within the card.
+  V19 another anchor's title in a variant is printed as an observation; the
+      answer.before anchor's title (the neighbouring king) is a warning.
+  V20 variant verification follows V14, with variant_hash(variant) (text and
+      angle) as the content hash.
+  V21 the card content_hash ignores variants (content_hash() never reads them).
+  R4 is a runtime rule (unverified variants are skipped), not a release error.
+
 RELEASE (--release, D56 item 8 quality gate):
   R1  every source card shipped is verified and not disputed, and so are the
       anchors it references (answer and relations).
@@ -132,6 +147,18 @@ def content_hash(card):
         "source_ref": {"work": ref.get("work"), "section": ref.get("section"), "entry": ref.get("entry")},
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
+
+
+VARIANT_ANGLES = {"record", "actor", "result", "scene"}
+VARIANT_ID_RE = re.compile(r"^v[23]$")
+VARIANT_OBS = []
+
+
+def variant_hash(variant):
+    """sha256 over a variant's text and angle (V20)."""
+    blob = json.dumps({"text": variant.get("text"), "angle": variant.get("angle")},
+                      ensure_ascii=False, sort_keys=True)
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
 
 def v1_ids():
@@ -297,6 +324,69 @@ def validate(cards, release=False):
                 err(cid, "V8", f"source_text contains a year expression '{m.group(0)}'")
             if not 20 <= len(text) <= 200:
                 warnings.append(f"[V8] {cid}: source_text is {len(text)} characters (recommended 20-200)")
+        # V16-V20 (variants)
+        variants = c.get("variants")
+        if variants is not None:
+            if not isinstance(variants, list):
+                err(cid, "V18", "variants must be a list")
+                variants = []
+            if len(variants) > 2:
+                err(cid, "V18", f"{len(variants)} variants (at most 2)")
+            norm = lambda t: re.sub(r"\s+", " ", t).strip()
+            seen_text = {norm(text)} if text else set()
+            seen_ids, seen_angles = set(), set()
+            nation_anchors = list(order_index.get(nation, {}).values())
+            for var in variants:
+                if not isinstance(var, dict):
+                    err(cid, "V18", "variant must be an object")
+                    continue
+                vid, vt = var.get("id"), var.get("text") if nonempty(var.get("text")) else ""
+                tag = f"{cid}/{vid}"
+                if not (isinstance(vid, str) and VARIANT_ID_RE.match(vid)) or vid in seen_ids:
+                    err(cid, "V18", f"variant id {vid!r} must be v2 or v3 and unique")
+                seen_ids.add(vid)
+                if var.get("angle") not in VARIANT_ANGLES:
+                    err(cid, "V18", f"variant {vid}: angle {var.get('angle')!r} not in {sorted(VARIANT_ANGLES)}")
+                elif var.get("angle") in seen_angles:
+                    err(cid, "V18", f"variant {vid}: angle {var.get('angle')} repeated")
+                seen_angles.add(var.get("angle"))
+                if var.get("text_basis") != "own_paraphrase_from_original":
+                    err(cid, "V17", f"variant {vid}: text_basis must be own_paraphrase_from_original")
+                if not vt:
+                    err(cid, "V16", f"variant {vid}: text is empty")
+                    continue
+                if nonempty(c.get("title")) and c["title"] in vt:
+                    err(cid, "V16", f"variant {vid} contains the card title")
+                if after is not None and nonempty(after.get("title")) and after["title"] in vt:
+                    err(cid, "V16", f"variant {vid} contains the answer anchor title '{after['title']}'")
+                m = YEAR_RE.search(vt)
+                if m:
+                    err(cid, "V16", f"variant {vid} contains a year expression '{m.group(0)}'")
+                if not 20 <= len(vt) <= 200:
+                    warnings.append(f"[V16] {tag}: text is {len(vt)} characters (recommended 20-200)")
+                if norm(vt) in seen_text:
+                    err(cid, "V16", f"variant {vid} repeats another text of the card")
+                seen_text.add(norm(vt))
+                for a in nation_anchors:
+                    t = a.get("title")
+                    if not nonempty(t) or a is after or t not in vt:
+                        continue
+                    if before is not None and a is before:
+                        warnings.append(f"[V19] {tag}: names the neighbouring anchor '{t}'")
+                    else:
+                        VARIANT_OBS.append(f"variant {tag} names anchor '{t}'")
+                vv = var.get("verification")
+                if not isinstance(vv, dict):
+                    err(cid, "V20", f"variant {vid}: verification must be an object")
+                elif vv.get("verified") is True:
+                    if len({n for n in (vv.get("verified_by") or []) if nonempty(n)}) < 2:
+                        err(cid, "V20", f"variant {vid}: verified needs two or more distinct verified_by names")
+                    if not nonempty(vv.get("verified_at")):
+                        err(cid, "V20", f"variant {vid}: verified needs verified_at")
+                    if vv.get("original_checked") is not True or vv.get("exam_notation_checked") is not True:
+                        err(cid, "V20", f"variant {vid}: verified needs original_checked and exam_notation_checked")
+                    if vv.get("content_hash") != variant_hash(var):
+                        err(cid, "V20", f"variant {vid}: content changed since verification")
         # V9
         if c.get("text_basis") != "own_paraphrase_from_original":
             err(cid, "V9", "text_basis must be own_paraphrase_from_original")
@@ -590,7 +680,7 @@ def main(argv):
           + (" (release mode)" if release else ""))
     for line in observations(anchors, sources):
         print("OBS   " + line)
-    for line in event_obs:
+    for line in event_obs + VARIANT_OBS:
         print("OBS   " + line)
     for w in warnings:
         print("WARN  " + w)
