@@ -1,0 +1,1106 @@
+{
+  "schema": 1,
+  "events": [
+    {
+      "key": "bc18-wirye-founding",
+      "year": -18,
+      "title": "위례성 건국",
+      "owner_card": "baekje-src-13",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "bc5-hansan-capital",
+      "year": -5,
+      "title": "한산 아래로 천도",
+      "owner_card": "baekje-src-14",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "3-gungnae-capital",
+      "year": 3,
+      "title": "국내성 천도",
+      "owner_card": "goguryeo-src-25",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "22-buyeo-campaign",
+      "year": 22,
+      "title": "부여 정벌과 대소왕 전사",
+      "owner_card": "goguryeo-src-26",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "42-garak-founding",
+      "year": 42,
+      "title": "가락국 건국 전승",
+      "owner_card": "silla-src-25",
+      "participants": [
+        "gaya",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "56-okjeo-conquest",
+      "year": 56,
+      "title": "동옥저 정복",
+      "owner_card": "goguryeo-src-01",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "65-kim-alji",
+      "year": 65,
+      "title": "김알지 전승",
+      "owner_card": "silla-src-01",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "191-eulpaso",
+      "year": 191,
+      "title": "을파소 등용",
+      "owner_card": "goguryeo-src-27",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "194-jindae-relief",
+      "year": 194,
+      "title": "진대법",
+      "owner_card": "goguryeo-src-02",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "242-seoanpyeong-attack",
+      "year": 242,
+      "title": "서안평 공격",
+      "owner_card": "goguryeo-src-03",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "246-hwando-fall",
+      "year": 246,
+      "title": "관구검 침입과 환도성 함락",
+      "owner_card": "goguryeo-src-13",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "260-jwapyeong-ranks",
+      "year": 260,
+      "title": "6좌평·16관등 제정",
+      "owner_card": "baekje-src-15",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "262-official-corruption-law",
+      "year": 262,
+      "title": "관리 부정 처벌령",
+      "owner_card": "baekje-src-16",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "311-seoanpyeong-capture",
+      "year": 311,
+      "title": "서안평 점령",
+      "owner_card": "goguryeo-src-14",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "313-nangnang-expulsion",
+      "year": 313,
+      "title": "낙랑군 축출",
+      "owner_card": "goguryeo-src-04",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "342-former-yan-invasion",
+      "year": 342,
+      "title": "전연의 침입",
+      "owner_card": "goguryeo-src-15",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "371-pyongyang-fortress-battle",
+      "year": 371,
+      "title": "평양성 공격",
+      "owner_card": "baekje-src-01",
+      "participants": [
+        "baekje",
+        "goguryeo"
+      ],
+      "status": "perspective_pair",
+      "pair_cards": [
+        "baekje-src-01",
+        "goguryeo-src-05"
+      ],
+      "pair_reason": "근초고왕 칸(백제 평양성 공격)과 고국원왕 칸(고구려, 미천왕~소수림왕 사이)을 각각 묻는 출제 가능성",
+      "note": ""
+    },
+    {
+      "key": "372-envoy-to-eastern-jin",
+      "year": 372,
+      "title": "동진에 사신을 보냄",
+      "owner_card": "baekje-src-17",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "372-goguryeo-buddhism",
+      "year": 372,
+      "title": "불교 전래",
+      "owner_card": "goguryeo-src-06",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "373-goguryeo-yullyeong",
+      "year": 373,
+      "title": "율령 반포",
+      "owner_card": "goguryeo-src-07",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "375-seogi",
+      "year": 375,
+      "title": "서기 편찬",
+      "owner_card": "baekje-src-02",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "381-widu-envoy",
+      "year": 381,
+      "title": "전진에 보낸 사신",
+      "owner_card": "silla-src-28",
+      "participants": [
+        "goguryeo",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "384-baekje-buddhism",
+      "year": 384,
+      "title": "불교 수용",
+      "owner_card": "baekje-src-03",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "391-yeongnak-era",
+      "year": 391,
+      "title": "영락 연호",
+      "owner_card": "goguryeo-src-16",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "395-biryeo-campaign",
+      "year": 395,
+      "title": "비려 정벌",
+      "owner_card": "goguryeo-src-28",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "396-baekje-58-fortresses",
+      "year": 396,
+      "title": "백제 58성 공략",
+      "owner_card": "goguryeo-src-29",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "397-jeonji-hostage",
+      "year": 397,
+      "title": "왜에 보낸 태자",
+      "owner_card": "baekje-src-25",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "400-silla-relief",
+      "year": 400,
+      "title": "신라 구원",
+      "owner_card": "goguryeo-src-08",
+      "participants": [
+        "gaya",
+        "goguryeo",
+        "silla"
+      ],
+      "status": "perspective_pair",
+      "pair_cards": [
+        "goguryeo-src-08",
+        "silla-src-02"
+      ],
+      "pair_reason": "광개토왕 칸(고구려)과 내물 마립간 칸(신라)을 각각 묻는 출제 가능성. 행위자는 고구려",
+      "note": ""
+    },
+    {
+      "key": "402-misaheun-hostage",
+      "year": 402,
+      "title": "왜에 보낸 볼모",
+      "owner_card": "silla-src-29",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "410-east-buyeo-campaign",
+      "year": 410,
+      "title": "동부여 정벌",
+      "owner_card": "goguryeo-src-30",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "412-bokho-hostage",
+      "year": 412,
+      "title": "고구려에 보낸 볼모",
+      "owner_card": "silla-src-30",
+      "participants": [
+        "goguryeo",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "414-gwanggaeto-stele",
+      "year": 414,
+      "title": "광개토왕비 건립",
+      "owner_card": "goguryeo-src-17",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "415-hou-bowl",
+      "year": 415,
+      "title": "호우명 그릇",
+      "owner_card": "goguryeo-src-31",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "418-bak-jesang",
+      "year": 418,
+      "title": "박제상의 왕제 구출",
+      "owner_card": "silla-src-03",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "427-pyongyang-capital",
+      "year": 427,
+      "title": "평양 천도",
+      "owner_card": "goguryeo-src-09",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "433-naje-alliance",
+      "year": 433,
+      "title": "나제 동맹",
+      "owner_card": "baekje-src-18",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "450-samjik-incident",
+      "year": 450,
+      "title": "고구려 장수를 죽인 일",
+      "owner_card": "silla-src-31",
+      "participants": [
+        "goguryeo",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "455-baekje-rescue",
+      "year": 455,
+      "title": "백제 구원",
+      "owner_card": "silla-src-32",
+      "participants": [
+        "baekje",
+        "goguryeo",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "472-letter-to-wei",
+      "year": 472,
+      "title": "북위에 보낸 국서",
+      "owner_card": "baekje-src-04",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "475-hanseong-fall",
+      "year": 475,
+      "title": "한성 함락",
+      "owner_card": "goguryeo-src-10",
+      "participants": [
+        "baekje",
+        "goguryeo"
+      ],
+      "status": "perspective_pair",
+      "pair_cards": [
+        "goguryeo-src-10",
+        "baekje-src-05"
+      ],
+      "pair_reason": "장수왕 칸(고구려)과 개로왕 칸(백제, same_year)을 각각 묻는 출제 가능성",
+      "note": ""
+    },
+    {
+      "key": "475-ungjin-capital",
+      "year": 475,
+      "title": "웅진 천도",
+      "owner_card": "baekje-src-06",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "478-haegu-revolt",
+      "year": 478,
+      "title": "해구의 반란",
+      "owner_card": "baekje-src-26",
+      "participants": [
+        "baekje",
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "479-gara-ha-ji-investiture",
+      "year": 479,
+      "title": "가라왕 하지의 남제 책봉",
+      "owner_card": null,
+      "participants": [
+        "gaya"
+      ],
+      "status": "planned",
+      "note": "D149에서 보류: 소지·동성 즉위와 같은 해라 칸이 모호"
+    },
+    {
+      "key": "487-relay-stations",
+      "year": 487,
+      "title": "우역 설치",
+      "owner_card": "silla-src-13",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "493-baekje-silla-marriage",
+      "year": 493,
+      "title": "신라와 결혼 동맹",
+      "owner_card": "baekje-src-07",
+      "participants": [
+        "baekje",
+        "silla"
+      ],
+      "status": "perspective_pair",
+      "pair_cards": [
+        "baekje-src-07",
+        "silla-src-14"
+      ],
+      "pair_reason": "동성왕 칸(백제)과 소지 마립간 칸(신라)을 각각 묻는 출제 가능성. 청혼은 백제",
+      "note": ""
+    },
+    {
+      "key": "494-buyeo-surrender",
+      "year": 494,
+      "title": "부여 왕실의 투항",
+      "owner_card": "goguryeo-src-18",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "498-tamna-expedition",
+      "year": 498,
+      "title": "탐라 원정",
+      "owner_card": "baekje-src-27",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "502-burial-ban-ox-plough",
+      "year": 502,
+      "title": "순장 금지와 소갈이",
+      "owner_card": "silla-src-15",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "503-silla-name-and-title",
+      "year": 503,
+      "title": "국호와 왕호 제정",
+      "owner_card": "silla-src-04",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "512-usan-submission",
+      "year": 512,
+      "title": "우산국 복속",
+      "owner_card": "silla-src-16",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "520-silla-yullyeong",
+      "year": 520,
+      "title": "율령 반포",
+      "owner_card": "silla-src-05",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "521-memorial-to-liang",
+      "year": 521,
+      "title": "양에 보낸 표문",
+      "owner_card": "baekje-src-08",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "522-daegaya-marriage",
+      "year": 522,
+      "title": "대가야와의 혼인",
+      "owner_card": "silla-src-26",
+      "participants": [
+        "gaya",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "523-muryeong-epitaph",
+      "year": 523,
+      "title": "무령왕릉 지석",
+      "owner_card": "baekje-src-19",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "528-silla-buddhism",
+      "year": 528,
+      "title": "이차돈 순교와 불교 공인",
+      "owner_card": "silla-src-06",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "531-sangdaedeung",
+      "year": 531,
+      "title": "상대등 설치",
+      "owner_card": "silla-src-17",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "532-geumgwan-annex",
+      "year": 532,
+      "title": "금관가야 병합",
+      "owner_card": "silla-src-07",
+      "participants": [
+        "gaya",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "536-geonwon-era",
+      "year": 536,
+      "title": "건원 연호",
+      "owner_card": "silla-src-18",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "538-sabi-capital",
+      "year": 538,
+      "title": "사비 천도",
+      "owner_card": "baekje-src-09",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "545-guksa",
+      "year": 545,
+      "title": "국사 편찬",
+      "owner_card": "silla-src-19",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "551-han-river-recovery",
+      "year": 551,
+      "title": "한강 하류 회복",
+      "owner_card": "baekje-src-20",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "551-ureuk",
+      "year": 551,
+      "title": "우륵의 가야금 연주",
+      "owner_card": "silla-src-27",
+      "participants": [
+        "gaya",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "552-buddhism-to-japan",
+      "year": 552,
+      "title": "일본에 불교를 전함",
+      "owner_card": "baekje-src-21",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "553-sinju",
+      "year": 553,
+      "title": "신주 설치",
+      "owner_card": "silla-src-08",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "554-gwansan-battle",
+      "year": 554,
+      "title": "관산성 전투와 성왕 전사",
+      "owner_card": "baekje-src-10",
+      "participants": [
+        "baekje",
+        "gaya",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "562-daegaya-conquest",
+      "year": 562,
+      "title": "대가야 정벌",
+      "owner_card": "silla-src-20",
+      "participants": [
+        "gaya",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "567-changwang-reliquary",
+      "year": 567,
+      "title": "창왕명 석조사리감",
+      "owner_card": "baekje-src-22",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "576-hwarang",
+      "year": 576,
+      "title": "화랑도 개편",
+      "owner_card": "silla-src-09",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "581-wihwabu",
+      "year": 581,
+      "title": "위화부 설치",
+      "owner_card": "silla-src-21",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "586-jangan-capital",
+      "year": 586,
+      "title": "장안성 천도",
+      "owner_card": "goguryeo-src-32",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "590-ondal-death",
+      "year": 590,
+      "title": "온달의 전사",
+      "owner_card": "goguryeo-src-33",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "598-liaoxi-attack",
+      "year": 598,
+      "title": "요서 공격",
+      "owner_card": "goguryeo-src-19",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "600-sinjip",
+      "year": 600,
+      "title": "신집 편찬",
+      "owner_card": "goguryeo-src-20",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "602-amak-fortress",
+      "year": 602,
+      "title": "아막성 공격",
+      "owner_card": "baekje-src-28",
+      "participants": [
+        "baekje",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "608-geolsapyo",
+      "year": 608,
+      "title": "걸사표",
+      "owner_card": "silla-src-33",
+      "participants": [
+        "goguryeo",
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "612-salsu-battle",
+      "year": 612,
+      "title": "살수대첩",
+      "owner_card": "goguryeo-src-11",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "624-laozi-lecture",
+      "year": 624,
+      "title": "노자 강론",
+      "owner_card": "goguryeo-src-34",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "631-cheolli-wall",
+      "year": 631,
+      "title": "천리장성 축조",
+      "owner_card": "goguryeo-src-21",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "634-bunhwangsa",
+      "year": 634,
+      "title": "분황사 창건",
+      "owner_card": "silla-src-10",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "634-gungnamji",
+      "year": 634,
+      "title": "궁궐 남쪽의 연못",
+      "owner_card": "baekje-src-29",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "639-mireuksa-reliquary",
+      "year": 639,
+      "title": "미륵사 사리 봉안",
+      "owner_card": "baekje-src-11",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "642-daeya-attack",
+      "year": 642,
+      "title": "대야성 공격",
+      "owner_card": "baekje-src-12",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "642-yeon-gaesomun-coup",
+      "year": 642,
+      "title": "연개소문의 정변",
+      "owner_card": "goguryeo-src-35",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "643-taoism-request",
+      "year": 643,
+      "title": "도교 진흥 요청",
+      "owner_card": "goguryeo-src-12",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "645-ansi-battle",
+      "year": 645,
+      "title": "안시성 전투",
+      "owner_card": "goguryeo-src-22",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "645-hwangnyongsa-pagoda",
+      "year": 645,
+      "title": "황룡사 9층 목탑",
+      "owner_card": "silla-src-22",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "651-jipsabu",
+      "year": 651,
+      "title": "집사부 설치",
+      "owner_card": "silla-src-11",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "660-baekje-conquest",
+      "year": 660,
+      "title": "백제 정벌",
+      "owner_card": "silla-src-12",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "660-hwangsanbeol-battle",
+      "year": 660,
+      "title": "황산벌 전투",
+      "owner_card": "baekje-src-23",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "663-baekgang-battle",
+      "year": 663,
+      "title": "백강 전투",
+      "owner_card": "baekje-src-24",
+      "participants": [
+        "baekje"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "666-yeon-namsaeng-defection",
+      "year": 666,
+      "title": "연남생의 당 투항",
+      "owner_card": "goguryeo-src-36",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "668-pyongyang-fall",
+      "year": 668,
+      "title": "평양성 함락",
+      "owner_card": "goguryeo-src-23",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "670-goguryeo-revival",
+      "year": 670,
+      "title": "고구려 부흥 운동",
+      "owner_card": "goguryeo-src-24",
+      "participants": [
+        "goguryeo"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "675-maeso-battle",
+      "year": 675,
+      "title": "매소성 전투",
+      "owner_card": "silla-src-23",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    },
+    {
+      "key": "676-gibeolpo-battle",
+      "year": 676,
+      "title": "기벌포 전투",
+      "owner_card": "silla-src-24",
+      "participants": [
+        "silla"
+      ],
+      "status": "owned",
+      "note": ""
+    }
+  ],
+  "distinct_pairs": [
+    {
+      "cards": [
+        "baekje-src-23",
+        "silla-src-12"
+      ],
+      "reason": "황산벌 전투(계백)와 나당 연합군의 사비 도성 공격·백제 항복은 다른 사건"
+    },
+    {
+      "cards": [
+        "baekje-src-29",
+        "silla-src-10"
+      ],
+      "reason": "백제 궁남지 조성과 신라 분황사 창건은 같은 해의 다른 사건"
+    }
+  ]
+}

@@ -1,0 +1,881 @@
+{
+  "schema": 2,
+  "cards": [
+    {
+      "id": "silla-src-13",
+      "kind": "source",
+      "nation": "silla",
+      "title": "우역 설치",
+      "year": 487,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "소지 마립간 9년",
+      "source_text": "왕이 처음으로 사방에 역을 두어 소식과 물자를 전하게 하고, 관리를 시켜 나라의 큰길을 고치게 하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-naemul"
+            },
+            {
+              "op": "before",
+              "ref": "silla-reign-jijeung"
+            }
+          ],
+          "text": "[내물 마립간]이 즉위한 뒤, [지증왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "소지 마립간 9년(487년). 우역, 관도."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-soji",
+        "before": "silla-reign-jijeung"
+      },
+      "explanation": "소지 마립간 9년(487년)의 일. 소지 마립간이 사방에 우역을 두고 관도를 정비한 일. 490년에는 도읍에 처음 시장을 열었다. 교통·유통망을 갖추어 중앙의 통제력을 넓힌 조치로 본다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 3,
+        "entry": "소지 마립간 9년 3월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "487년 우역 설치·관도 수리는 encykorea 요약으로 확인. 490년 시장 개설도 같은 자료로 확인. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "487-relay-stations"
+    },
+    {
+      "id": "silla-src-14",
+      "kind": "source",
+      "nation": "silla",
+      "title": "백제와의 혼인",
+      "year": 493,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "소지 마립간 15년",
+      "source_text": "서쪽 이웃 나라 왕이 사신을 보내 혼인을 청하자, 왕이 높은 관등을 가진 신하의 딸을 그에게 보냈다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-soji"
+            },
+            {
+              "op": "before",
+              "ref": "silla-reign-jinheung"
+            }
+          ],
+          "text": "[소지 마립간]이 즉위한 뒤, [진흥왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "소지 마립간 15년(493년). 백제 동성왕, 이찬 비지의 딸."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-soji",
+        "before": "silla-reign-jijeung"
+      },
+      "explanation": "소지 마립간 15년(493년)의 일. 백제 동성왕의 청혼에 소지 마립간이 이찬 비지의 딸을 보낸 결혼 동맹. 433년 나제 동맹을 굳혀 고구려의 남진에 함께 맞섰다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 3,
+        "entry": "소지 마립간 15년 3월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "493년 결혼 동맹과 이찬 비지의 딸은 백제 덱 조사(baekje.md)와 2차 자료로 확인. 백제본기 동성왕 15년조에도 같은 기사가 있다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "493-baekje-silla-marriage"
+    },
+    {
+      "id": "silla-src-15",
+      "kind": "source",
+      "nation": "silla",
+      "title": "순장 금지와 소갈이",
+      "year": 502,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "지증 마립간 3년",
+      "source_text": "왕이 명을 내려 임금이 죽었을 때 사람을 함께 묻던 풍습을 그만두게 하였다. 이어 각 고을을 맡은 관리에게 농사를 권하게 하고, 처음으로 소를 부려 밭을 갈게 하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-jijeung"
+            },
+            {
+              "op": "before",
+              "ref": "silla-reign-jinheung"
+            }
+          ],
+          "text": "[지증왕]이 즉위한 뒤, [진흥왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "지증왕 3년(502년). 순장 금지, 우경 장려."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-jijeung",
+        "before": "silla-reign-beopheung"
+      },
+      "explanation": "지증 마립간 3년(502년)의 일. 지증왕이 순장을 금하고 소갈이(우경)를 장려한 일. 노동력을 보호하고 농업 생산을 늘리려는 조치로 본다. 이듬해 국호를 '신라'로 정했다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 4,
+        "entry": "지증 마립간 3년 2월·3월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "502년 순장 금지(三年 春二月 下令禁殉葬)와 우경은 D145 조사(itwiki 지증왕·원문 인용)로 확인. 지증왕은 즉위 초 마립간 칭호를 썼으므로 reign_label은 마립간으로 둔다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "502-burial-ban-ox-plough"
+    },
+    {
+      "id": "silla-src-16",
+      "kind": "source",
+      "nation": "silla",
+      "title": "우산국 복속",
+      "year": 512,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "지증왕 13년",
+      "source_text": "동쪽 바다 섬나라 사람들이 험한 지세를 믿고 따르지 않자, 장군이 나무로 맹수 모양을 많이 만들어 배에 싣고 가서 항복하지 않으면 풀어 놓겠다고 을러 항복을 받았다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-soji"
+            },
+            {
+              "op": "before",
+              "ref": "silla-reign-beopheung"
+            }
+          ],
+          "text": "[소지 마립간]이 즉위한 뒤, [법흥왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "지증왕 13년(512년). 이사부, 우산국(울릉도), 나무 사자."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-jijeung",
+        "before": "silla-reign-beopheung"
+      },
+      "explanation": "지증왕 13년(512년)의 일. 이사부가 우산국을 복속시킨 일. 이후 우산국은 해마다 토산물을 바쳤다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기; 열전",
+        "volume": null,
+        "entry": "지증 마립간 13년 6월조; 이사부전",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "512년 6월 우산국 항복과 공물은 본기, 나무 사자 계략은 이사부 열전 기사(검색 요약으로 확인). 본문은 두 기사를 합쳐 풀었다. 권 번호는 원문 대조 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "512-usan-submission"
+    },
+    {
+      "id": "silla-src-17",
+      "kind": "source",
+      "nation": "silla",
+      "title": "상대등 설치",
+      "year": 531,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "법흥왕 18년",
+      "source_text": "왕이 높은 관등의 신하를 새 최고 관직에 앉혀 나라의 일을 총괄하게 하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-beopheung"
+            },
+            {
+              "op": "before",
+              "ref": "silla-reign-seondeok"
+            }
+          ],
+          "text": "[법흥왕]이 즉위한 뒤, [선덕여왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "법흥왕 18년(531년). 상대등, 이찬 철부."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-beopheung",
+        "before": "silla-reign-jinheung"
+      },
+      "explanation": "법흥왕 18년(531년)의 일. 법흥왕이 이찬 철부를 처음으로 상대등에 임명한 일. 상대등은 귀족 회의(화백)를 이끄는 최고 관직으로, 왕은 그 위에 서는 초월적 지위가 되었다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 4,
+        "entry": "법흥왕 18년 4월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "531년 4월 철부의 상대등 임명은 encykorea 상대등 항목과 위키문헌 번역본 요약으로 확인. 화백 회의 설명은 통설 서술. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "531-sangdaedeung"
+    },
+    {
+      "id": "silla-src-18",
+      "kind": "source",
+      "nation": "silla",
+      "title": "건원 연호",
+      "year": 536,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "법흥왕 23년",
+      "source_text": "처음으로 나라 스스로 해를 세는 이름을 정하여 쓰기 시작하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-jijeung"
+            },
+            {
+              "op": "before",
+              "ref": "silla-reign-jinpyeong"
+            }
+          ],
+          "text": "[지증왕]이 즉위한 뒤, [진평왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "법흥왕 23년(536년). 연호 '건원'."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-beopheung",
+        "before": "silla-reign-jinheung"
+      },
+      "explanation": "법흥왕 23년(536년)의 일. 법흥왕이 신라 최초의 독자 연호 '건원'을 쓴 일. 551년 진흥왕이 '개국'으로 바꿀 때까지 쓰였다. 중국과 대등함을 드러낸 것으로 해석한다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 4,
+        "entry": "법흥왕 23년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "536년 건원과 551년 개국 개원은 encykorea 건원 항목 요약으로 확인. 기출: 49회(검색 요약 기준, 문항 수준 미확인이라 추정 회차). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "536-geonwon-era"
+    },
+    {
+      "id": "silla-src-19",
+      "kind": "source",
+      "nation": "silla",
+      "title": "국사 편찬",
+      "year": 545,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "진흥왕 6년",
+      "source_text": "한 신하가 나라의 역사를 적어 두지 않으면 뒤 세대에 무엇을 보이겠느냐고 아뢰자, 왕이 학식 있는 신하들을 모아 역사를 엮게 하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-jinheung"
+            },
+            {
+              "op": "before",
+              "ref": "silla-reign-jindeok"
+            }
+          ],
+          "text": "[진흥왕]이 즉위한 뒤, [진덕여왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "진흥왕 6년(545년). 이사부의 건의, 거칠부의 『국사』."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-jinheung",
+        "before": "silla-reign-jinpyeong"
+      },
+      "explanation": "진흥왕 6년(545년)의 일. 이사부의 건의로 거칠부 등이 『국사』를 편찬한 일. 책은 전하지 않는다. 왕실의 권위를 드러내려는 뜻으로 본다.",
+      "exam_tags": [
+        "culture",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 4,
+        "entry": "진흥왕 6년 7월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "545년 이사부 건의·거칠부 편찬은 itwiki 진흥왕과 encykorea(국사·거칠부 항목) 요약으로 확인. 월은 원문 대조 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "545-guksa"
+    },
+    {
+      "id": "silla-src-20",
+      "kind": "source",
+      "nation": "silla",
+      "title": "대가야 정벌",
+      "year": 562,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "진흥왕 23년",
+      "source_text": "남쪽 가야의 한 나라가 등을 돌리자 왕이 장군을 보내 치게 하였다. 나이 어린 부장이 기병을 이끌고 먼저 성문으로 달려들어 깃발을 세우니 성안이 놀라 어찌할 줄 몰랐고, 뒤따른 본군이 성을 차지하였다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-jijeung"
+            },
+            {
+              "op": "before",
+              "ref": "silla-reign-jinpyeong"
+            }
+          ],
+          "text": "[지증왕]이 즉위한 뒤, [진평왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "진흥왕 23년(562년). 이사부, 사다함, 전단문."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-jinheung",
+        "before": "silla-reign-jinpyeong"
+      },
+      "explanation": "진흥왕 23년(562년)의 일. 이사부가 대가야를 정복한 일. 화랑 사다함이 선봉에 섰다. 이로써 가야 연맹이 모두 신라에 넘어갔다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 4,
+        "entry": "진흥왕 23년 9월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "562년 9월 이사부의 대가야 정벌, 사다함의 전단문 선봉은 encykorea(사다함 항목)와 itwiki 요약으로 확인. 기병 규모(5천)는 자료마다 달라 본문에 쓰지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2",
+        "가야"
+      ],
+      "event_key": "562-daegaya-conquest",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "actor",
+          "text": "왕의 명을 받은 장군이 등을 돌린 가야의 한 나라를 쳤다. 젊은 장수가 먼저 성문에 이르러 깃발을 세우자, 뒤따른 군대가 성을 함락하였다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "silla-src-21",
+      "kind": "source",
+      "nation": "silla",
+      "title": "위화부 설치",
+      "year": 581,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "진평왕 3년",
+      "source_text": "관리를 뽑고 등급을 매기는 일을 맡는 관청을 처음 두었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-beopheung"
+            },
+            {
+              "op": "before",
+              "ref": "silla-reign-seondeok"
+            }
+          ],
+          "text": "[법흥왕]이 즉위한 뒤, [선덕여왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "진평왕 3년(581년). 위화부."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-jinpyeong",
+        "before": "silla-reign-seondeok"
+      },
+      "explanation": "진평왕 3년(581년)의 일. 진평왕이 인사를 맡는 위화부를 둔 일. 이어 조부(584)·예부(586)·영객부(591) 등 관청을 잇달아 두어 관제를 정비했다.",
+      "exam_tags": [
+        "institution"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 4,
+        "entry": "진평왕 3년 정월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "581 위화부, 584 조부, 586 예부, 591 영객부는 encykorea·위키백과 진평왕 요약으로 확인. 중고기 위화부의 실제 권한은 제한적이었다는 연구가 있다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "581-wihwabu"
+    },
+    {
+      "id": "silla-src-22",
+      "kind": "source",
+      "nation": "silla",
+      "title": "황룡사 9층 목탑",
+      "year": 645,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "선덕여왕 14년",
+      "source_text": "당에서 돌아온 승려의 청에 따라 큰 절에 아홉 층의 탑을 세웠다. 이웃 나라들의 침략을 부처의 힘으로 막으려는 뜻이 담겼다고 전한다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-jinheung"
+            },
+            {
+              "op": "before",
+              "ref": "silla-reign-jindeok"
+            }
+          ],
+          "text": "[진흥왕]이 즉위한 뒤, [진덕여왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "선덕여왕 14년(645년). 자장, 백제 장인 아비지."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-seondeok",
+        "before": "silla-reign-jindeok"
+      },
+      "explanation": "선덕여왕 14년(645년)의 일. 자장의 건의로 황룡사 9층 목탑을 세운 일. 백제 장인 아비지가 기술을 맡았다고 전한다. 1238년 몽골 침입 때 불탔다.",
+      "exam_tags": [
+        "culture"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 5,
+        "entry": "선덕왕 14년 3월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "645년 자장 귀국·건의, 아비지(삼국유사)는 itwiki·encykorea 요약으로 확인. 착공을 643년으로 보는 자료가 있다. 9층 각각을 이웃 나라에 대응시키는 설명은 삼국유사 계열이라 본문에 쓰지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "645-hwangnyongsa-pagoda"
+    },
+    {
+      "id": "silla-src-23",
+      "kind": "source",
+      "nation": "silla",
+      "title": "매소성 전투",
+      "year": 675,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "문무왕 15년",
+      "source_text": "큰 나라 장수가 이끄는 대군이 북쪽 성에 머물자 우리 군사가 이를 쳐서 물리치고 말 삼만여 필과 많은 무기를 얻었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-jindeok"
+            }
+          ],
+          "text": "[진덕여왕]이 즉위한 뒤의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "문무왕 15년(675년). 매소성, 이근행, 나당 전쟁."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-munmu",
+        "before": null
+      },
+      "explanation": "문무왕 15년(675년)의 일. 나당 전쟁 중 신라가 매소성에서 당군을 물리친 일. 이 승리로 전세가 신라 쪽으로 기울었다. 이듬해 기벌포 전투로 전쟁이 끝났다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 7,
+        "entry": "문무왕 15년 9월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "675년 9월 매소성, 이근행, 말 3만여 필은 위키백과·itwiki 나당 전쟁 요약으로 확인. 당군 20만은 과장설이 있어 본문에 쓰지 않았다. 매소성 위치는 이견(양주·연천). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "675-maeso-battle"
+    },
+    {
+      "id": "silla-src-24",
+      "kind": "source",
+      "nation": "silla",
+      "title": "기벌포 전투",
+      "year": 676,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "문무왕 16년",
+      "source_text": "우리 수군이 강어귀에서 큰 나라 장수의 수군과 맞붙어 처음에는 졌으나, 다시 나아가 크고 작은 싸움 스물두 차례 끝에 이겼다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "silla-reign-muyeol"
+            }
+          ],
+          "text": "[태종 무열왕]이 즉위한 뒤의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "문무왕 16년(676년). 기벌포, 시득, 설인귀."
+        }
+      ],
+      "answer": {
+        "after": "silla-reign-munmu",
+        "before": null
+      },
+      "explanation": "문무왕 16년(676년)의 일. 사찬 시득의 신라 수군이 금강 하구 기벌포에서 설인귀의 당 수군을 물리친 일. 나당 전쟁의 마지막 큰 싸움으로, 이로써 신라의 삼국 통일이 이루어졌다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "신라본기",
+        "volume": 7,
+        "entry": "문무왕 16년 11월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "676년 11월 기벌포, 시득, 설인귀, 22차례 승리는 itwiki 나당 전쟁·한경 요약으로 확인. 첫 패배 뒤 22번 싸워 이겼다(又進大小二十二戰克之)는 신라 b2 대조로 반영(D150). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D146)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "tags": [
+        "신라",
+        "S-B2"
+      ],
+      "event_key": "676-gibeolpo-battle"
+    }
+  ]
+}

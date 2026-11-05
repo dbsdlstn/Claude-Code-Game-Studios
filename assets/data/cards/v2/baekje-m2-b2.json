@@ -70,7 +70,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "bc18-wirye-founding"
     },
     {
       "id": "baekje-src-14",
@@ -141,7 +142,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "bc5-hansan-capital"
     },
     {
       "id": "baekje-src-15",
@@ -193,7 +195,7 @@
         "url": null,
         "db_id": null,
         "exam_rounds": [],
-        "note": "260년 기사는 한국민족문화대백과 '좌평' 요약으로 확인. v0(D7)에서는 연대 이견으로 disputed였으나, v2는 수험 표기(고이왕)를 기준으로 판정 카드로 두고 이견을 해설·note에 적는다(D141). 사람이 확인할 때 disputed 여부를 다시 판단할 것. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차 확인 못 함(D83). 원문 대조 필요. 검증 전(D79·D141)."
+        "note": "260년 기사는 한국민족문화대백과 '좌평' 요약으로 확인. v0(D7)에서는 연대 이견으로 disputed였으나, v2는 수험 표기(고이왕)를 기준으로 판정 카드로 두고 이견을 해설·note에 적는다(D141). 사람이 확인할 때 disputed 여부를 다시 판단할 것. 고이왕 때 좌평은 1인이었다는 추정도 있다(한국민족문화대백과 좌평, 백제 b2 대조). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차 확인 못 함(D83). 원문 대조 필요. 검증 전(D79·D141)."
       },
       "disputed": false,
       "disputed_note": null,
@@ -212,7 +214,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "260-jwapyeong-ranks"
     },
     {
       "id": "baekje-src-16",
@@ -283,7 +286,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "262-official-corruption-law"
     },
     {
       "id": "baekje-src-17",
@@ -354,7 +358,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "372-envoy-to-eastern-jin"
     },
     {
       "id": "baekje-src-18",
@@ -430,6 +435,23 @@
       "tags": [
         "백제",
         "B-B2"
+      ],
+      "event_key": "433-naje-alliance",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "record",
+          "text": "왕이 동쪽 이웃 나라에 사신을 보내 화친을 맺었다. 이듬해 다시 사신이 말과 매를 가져가자 그 나라는 황금과 구슬로 답례하였다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -502,7 +524,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "523-muryeong-epitaph"
     },
     {
       "id": "baekje-src-20",
@@ -543,14 +566,14 @@
         "war"
       ],
       "source_ref": {
-        "work": "삼국사기",
-        "section": "백제본기",
-        "volume": 26,
-        "entry": "성왕 29년조",
+        "work": "일본서기; 삼국사기",
+        "section": "긴메이기; 신라본기",
+        "volume": null,
+        "entry": "긴메이 12년조; 진흥왕 12년조",
         "url": null,
         "db_id": null,
         "exam_rounds": [],
-        "note": "551년 9월 한강 하류 점령, 신라·가야 연합, 6군은 학술 논문 요약과 itwiki 성왕으로 확인. 동맹 시점을 550년으로 적는 기사도 있다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차 확인 못 함(D83). 원문 대조 필요. 검증 전(D79·D141)."
+        "note": "551년 9월 한강 하류 점령, 신라·가야 연합, 6군은 학술 논문 요약과 itwiki 성왕으로 확인. 동맹 시점을 550년으로 적는 기사도 있다. 출처는 백제본기 성왕 29년조 기사를 확인하기 전까지 일본서기 긴메이 12년과 삼국사기 신라본기 진흥왕 12년으로 적는다(백제 b2 대조). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차 확인 못 함(D83). 원문 대조 필요. 검증 전(D79·D141)."
       },
       "disputed": false,
       "disputed_note": null,
@@ -569,7 +592,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "551-han-river-recovery"
     },
     {
       "id": "baekje-src-21",
@@ -645,7 +669,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "552-buddhism-to-japan"
     },
     {
       "id": "baekje-src-22",
@@ -697,7 +722,7 @@
         "url": null,
         "db_id": null,
         "exam_rounds": [],
-        "note": "1995년 출토, 명문 '百濟昌王十三秊太歲在 / 丁亥妹□公主供養舍利', 567년, 국보 지정은 한국민족문화대백과 요약으로 확인. 공주 앞 글자 판독은 확정되지 않았다. 금동대향로 출토 연결은 원문 대조 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차 확인 못 함(D83). 원문 대조 필요. 검증 전(D79·D141)."
+        "note": "1995년 출토, 명문 '百濟昌王十三秊太歲在 / 丁亥妹□公主供養舍利', 567년, 국보 지정은 한국민족문화대백과 요약으로 확인. 공주 앞 글자 판독은 확정되지 않았다. 금동대향로 출토 연결은 원문 대조 필요. 삼국사기 기년으로는 위덕왕 13년이 566년이고 정해년(567)은 14년이다. 즉위년 칭원(유년칭원)과 즉위년 다음 해 칭원의 차이로 1년이 어긋난다(백제 b2 대조). 카드 연도는 명문의 정해년(567). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 기출 회차 확인 못 함(D83). 원문 대조 필요. 검증 전(D79·D141)."
       },
       "disputed": false,
       "disputed_note": null,
@@ -716,7 +741,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "567-changwang-reliquary"
     },
     {
       "id": "baekje-src-23",
@@ -784,7 +810,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "660-hwangsanbeol-battle"
     },
     {
       "id": "baekje-src-24",
@@ -851,7 +878,8 @@
       "tags": [
         "백제",
         "B-B2"
-      ]
+      ],
+      "event_key": "663-baekgang-battle"
     }
   ]
 }

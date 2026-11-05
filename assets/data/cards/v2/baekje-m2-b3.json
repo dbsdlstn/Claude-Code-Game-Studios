@@ -1,0 +1,363 @@
+{
+  "schema": 2,
+  "cards": [
+    {
+      "id": "baekje-src-25",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "왜에 보낸 태자",
+      "year": 397,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "아신왕 6년",
+      "source_text": "왕이 바다 건너 왜와 우호를 다지려고 태자를 그 나라에 볼모로 보냈다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-goi"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-gaero"
+            }
+          ],
+          "text": "[고이왕]이 즉위한 뒤, [개로왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "아신왕 6년(397년). 태자 전지, 왜."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-chimnyu",
+        "before": "baekje-reign-gaero"
+      },
+      "explanation": "아신왕 6년(397년)의 일. 아신왕이 고구려의 남진 압박에 맞서 왜와 우호를 다지려고 태자 전지를 볼모로 보낸 일. 앞서 396년 광개토왕의 공격으로 큰 타격을 입었다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 25,
+        "entry": "아신왕 6년 5월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "397년 전지 볼모 파견은 encykorea(전지왕 항목) 요약으로 확인. 일본서기 계열 해석은 연대를 396년으로 보기도 한다(블로그 소개라 year_alt로 두지 않음). 월은 원문 대조 필요. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D151)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "397-jeonji-hostage",
+      "tags": [
+        "백제",
+        "B-B3"
+      ]
+    },
+    {
+      "id": "baekje-src-26",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "해구의 반란",
+      "year": 478,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "삼근왕 2년",
+      "source_text": "군사를 맡은 높은 관리가 다른 귀족과 함께 성에 웅거하여 반란을 일으켰으나, 왕이 보낸 군사에게 토벌되어 죽고 함께한 자는 북쪽 나라로 달아났다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-munju"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-muryeong"
+            }
+          ],
+          "text": "[문주왕]이 즉위한 뒤, [무령왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "삼근왕 2년(478년). 병관좌평 해구, 은솔 연신, 대두성."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-munju",
+        "before": "baekje-reign-dongseong"
+      },
+      "explanation": "삼근왕 2년(478년)의 일. 병관좌평 해구가 은솔 연신과 대두성에서 일으킨 반란이 진압된 일. 해구는 앞서 477년 문주왕을 시해하고 실권을 쥐었다. 웅진 천도 직후 왕권이 흔들린 모습을 보여 준다.",
+      "exam_tags": [
+        "war",
+        "person"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "삼근왕 2년조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "478년 해구·연신의 대두성 반란과 토벌, 연신의 고구려 도주, 477년 문주왕 시해는 공주시 자료 요약으로 확인. 토벌 지휘관(진로·진남)은 자료마다 달라 본문에 쓰지 않았다. 문주왕 피살 연도는 477/478 이견이 있다(b3·b4 대조, D154). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D151)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "478-haegu-revolt",
+      "tags": [
+        "백제",
+        "B-B3"
+      ]
+    },
+    {
+      "id": "baekje-src-27",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "탐라 원정",
+      "year": 498,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "동성왕 20년",
+      "source_text": "남쪽 바다의 섬나라가 바칠 물건을 보내지 않자 왕이 몸소 군사를 이끌고 남쪽 고을까지 내려갔다. 섬나라가 이를 듣고 사신을 보내 용서를 빌었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-munju"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-muryeong"
+            }
+          ],
+          "text": "[문주왕]이 즉위한 뒤, [무령왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "동성왕 20년(498년). 탐라, 무진주."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-dongseong",
+        "before": "baekje-reign-muryeong"
+      },
+      "explanation": "동성왕 20년(498년)의 일. 동성왕이 공물을 끊은 탐라를 치려고 무진주(광주)까지 내려가자 탐라가 사죄한 일. 동성왕은 신라와 결혼 동맹(493)을 맺는 등 웅진 시기 왕권을 다졌다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 26,
+        "entry": "동성왕 20년 8월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "498년 탐라 공부 중단, 무진주 친정, 탐라 사죄는 itwiki 동성왕 요약과 학술 논문 초록으로 확인. 탐라 복속 시점(476 문주왕 2년설, 508설)은 논쟁이라 본문에 쓰지 않았다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D151)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "498-tamna-expedition",
+      "tags": [
+        "백제",
+        "B-B3"
+      ]
+    },
+    {
+      "id": "baekje-src-28",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "아막성 공격",
+      "year": 602,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "무왕 3년",
+      "source_text": "왕이 대군을 보내 동쪽 이웃 나라의 산성을 에워쌌으나, 그 나라 군사의 반격에 크게 졌다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-seong"
+            },
+            {
+              "op": "before",
+              "ref": "baekje-reign-uija"
+            }
+          ],
+          "text": "[성왕]이 즉위한 뒤, [의자왕]이 즉위하기 전의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "무왕 3년(602년). 아막성(모산성), 신라."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-mu",
+        "before": "baekje-reign-uija"
+      },
+      "explanation": "무왕 3년(602년)의 일. 무왕이 신라의 아막성을 공격했다가 크게 진 일. 무왕은 616년에도 아막성을 공격하는 등 신라와 계속 다투었다.",
+      "exam_tags": [
+        "war"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 27,
+        "entry": "무왕 3년 8월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "602년 8월 아막성(모산성) 공격과 패배, 616년 재공격은 encykorea·학술 논문 요약으로 확인. 병력(보기 4만)과 피해 규모는 자료마다 달라 본문에 쓰지 않았다. 위치는 남원 아영면 일대로 보는 견해가 많다. 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D151)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "602-amak-fortress",
+      "tags": [
+        "백제",
+        "B-B3"
+      ]
+    },
+    {
+      "id": "baekje-src-29",
+      "kind": "source",
+      "nation": "baekje",
+      "title": "궁궐 남쪽의 연못",
+      "year": 634,
+      "year_alt": [],
+      "year_basis": "chronicle",
+      "year_note": null,
+      "reign_label": "무왕 35년",
+      "source_text": "궁궐 남쪽에 못을 파고 스무 리 넘게 떨어진 곳에서 물을 끌어들였으며, 못 가운데에 신선이 산다는 산을 본뜬 섬을 만들었다.",
+      "text_basis": "own_paraphrase_from_original",
+      "clues": [
+        {
+          "level": 1,
+          "kind": "relation",
+          "relations": [
+            {
+              "op": "after",
+              "ref": "baekje-reign-mu"
+            }
+          ],
+          "text": "[무왕]이 즉위한 뒤의 일이다."
+        },
+        {
+          "level": 2,
+          "kind": "direct",
+          "text": "무왕 35년(634년). 사비, 궁남지."
+        }
+      ],
+      "answer": {
+        "after": "baekje-reign-mu",
+        "before": "baekje-reign-uija"
+      },
+      "explanation": "무왕 35년(634년)의 일. 무왕이 사비 궁궐 남쪽에 연못(궁남지)을 만든 일. 못 가운데 섬은 방장선산을 본떴다고 하여 신선 사상의 영향을 보여 준다.",
+      "exam_tags": [
+        "culture"
+      ],
+      "source_ref": {
+        "work": "삼국사기",
+        "section": "백제본기",
+        "volume": 27,
+        "entry": "무왕 35년 3월조",
+        "url": null,
+        "db_id": null,
+        "exam_rounds": [],
+        "note": "634년 3월 궁남 못, 20여 리 밖 물 끌기, 방장선산 섬은 삼국사기 기사 인용(지역 자료 요약)으로 확인. 1994년 3차 발굴로 지금의 연못이 기록 속 궁남지라는 결론이 났다는 보도가 있다(b3·b4 대조, D154). 문장은 원문 기사 내용을 근거로 새로 풀어 쓴 것이며 번역문과 기출 문항을 옮기지 않았다. 원문 대조 필요. 검증 전(D79·D151)."
+      },
+      "disputed": false,
+      "disputed_note": null,
+      "verification": {
+        "verified": false,
+        "verified_by": [],
+        "verified_at": null,
+        "original_checked": false,
+        "exam_notation_checked": false,
+        "content_hash": null
+      },
+      "image": null,
+      "image_source": null,
+      "image_license": null,
+      "v1_id": null,
+      "event_key": "634-gungnamji",
+      "tags": [
+        "백제",
+        "B-B3"
+      ]
+    }
+  ]
+}

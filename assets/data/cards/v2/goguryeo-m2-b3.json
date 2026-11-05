@@ -70,7 +70,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "3-gungnae-capital"
     },
     {
       "id": "goguryeo-src-26",
@@ -141,7 +142,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "22-buyeo-campaign"
     },
     {
       "id": "goguryeo-src-27",
@@ -213,7 +215,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "191-eulpaso"
     },
     {
       "id": "goguryeo-src-28",
@@ -284,7 +287,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "395-biryeo-campaign"
     },
     {
       "id": "goguryeo-src-29",
@@ -355,7 +359,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "396-baekje-58-fortresses"
     },
     {
       "id": "goguryeo-src-30",
@@ -426,7 +431,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "410-east-buyeo-campaign"
     },
     {
       "id": "goguryeo-src-31",
@@ -497,7 +503,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "415-hou-bowl"
     },
     {
       "id": "goguryeo-src-32",
@@ -568,7 +575,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "586-jangan-capital"
     },
     {
       "id": "goguryeo-src-33",
@@ -640,7 +648,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "590-ondal-death"
     },
     {
       "id": "goguryeo-src-34",
@@ -707,7 +716,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "624-laozi-lecture"
     },
     {
       "id": "goguryeo-src-35",
@@ -776,7 +786,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "642-yeon-gaesomun-coup"
     },
     {
       "id": "goguryeo-src-36",
@@ -844,7 +855,8 @@
       "tags": [
         "고구려",
         "M2-B3"
-      ]
+      ],
+      "event_key": "666-yeon-namsaeng-defection"
     }
   ]
 }

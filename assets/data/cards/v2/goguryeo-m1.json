@@ -554,6 +554,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "56-okjeo-conquest",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "result",
+          "text": "동쪽 바닷가의 작은 나라가 이 나라의 고을로 편입되었다. 그 결과 나라의 경계가 동쪽으로는 큰 바다에 닿았다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -625,6 +642,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "194-jindae-relief",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "result",
+          "text": "흉년에 굶주리는 백성을 위해, 봄부터 가을 사이에 관청 곡식을 식구 수에 맞추어 빌려주고 겨울에 돌려받게 하는 제도가 생겼다. 왕이 사냥길에 굶주린 백성을 만난 일이 계기였다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -696,6 +730,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "242-seoanpyeong-attack",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "actor",
+          "text": "이웃 큰 나라가 요동에 두고 있던 거점 한 곳을, 왕의 명을 받은 장수가 습격하여 깨뜨렸다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -767,6 +818,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "313-nangnang-expulsion",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "record",
+          "text": "왕의 군대가 오랫동안 중국 왕조가 다스려 온 남쪽 군을 쳐서 많은 남녀를 사로잡아 돌아왔다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -839,6 +907,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "371-pyongyang-fortress-battle",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "actor",
+          "text": "남쪽 이웃 나라의 왕이 대군을 이끌고 북쪽으로 올라와 평양성을 공격하였다. 성을 지키던 이 나라 왕은 싸움 중에 화살을 맞고 숨을 거두었다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -910,6 +995,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "372-goguryeo-buddhism",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "result",
+          "text": "북쪽 중국 왕조에서 온 승려가 불상과 경전을 전하여 이 나라에 새 종교가 들어왔다. 같은 해 나라에서 학교를 세워 자제들을 가르치기 시작했다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -981,6 +1083,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "373-goguryeo-yullyeong",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "record",
+          "text": "나라를 다스리는 데 쓸 법령을 처음으로 정하고, 이를 온 나라에 반포하였다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -1052,6 +1171,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "400-silla-relief",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "scene",
+          "text": "왜인이 이웃 나라의 성들 사이에 가득했으나 이 나라 대군이 이르자 달아났다. 군대는 그들을 뒤쫓아 가야 땅의 성까지 내려갔다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -1123,6 +1259,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "427-pyongyang-capital",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "result",
+          "text": "왕이 오래 머물던 도읍을 떠나 남쪽의 큰 성으로 나라의 도읍을 옮겼다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -1194,6 +1347,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "475-hanseong-fall",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "scene",
+          "text": "이 나라 왕이 몸소 대군을 이끌고 남쪽 이웃 나라의 도읍을 에워싸 함락하고, 그 나라 왕을 죽였다. 군대는 많은 사람을 사로잡아 돌아왔다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -1266,6 +1436,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "612-salsu-battle",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "actor",
+          "text": "적국의 대군이 도성 가까이 쳐들어오자, 이 나라 장수가 적장에게 시를 지어 보내 그만 돌아가라고 넌지시 권하였다. 적이 물러가며 강을 건너는 틈에 뒤를 치니 살아 돌아간 적은 얼마 되지 않았다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     },
     {
@@ -1333,6 +1520,23 @@
       "tags": [
         "고구려",
         "M1"
+      ],
+      "event_key": "643-taoism-request",
+      "variants": [
+        {
+          "id": "v2",
+          "angle": "result",
+          "text": "권력을 쥔 대신의 뜻에 따라 이웃 큰 나라에서 도사와 경전을 맞아들여 그 가르침을 크게 일으키려 하였다. 왕은 승려들의 절을 거두어 도사들을 머물게 하였다.",
+          "text_basis": "own_paraphrase_from_original",
+          "verification": {
+            "verified": false,
+            "verified_by": [],
+            "verified_at": null,
+            "original_checked": false,
+            "exam_notation_checked": false,
+            "content_hash": null
+          }
+        }
       ]
     }
   ]

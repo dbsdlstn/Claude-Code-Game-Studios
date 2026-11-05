@@ -14,18 +14,19 @@
       "label": "백제",
       "files": [
         "baekje-m2-b1.json",
-        "baekje-m2-b2.json"
+        "baekje-m2-b2.json",
+        "baekje-m2-b3.json"
       ]
     },
     {
       "id": "silla",
       "label": "신라",
-      "files": []
-    },
-    {
-      "id": "gaya",
-      "label": "가야",
-      "files": []
+      "files": [
+        "silla-m2-b1.json",
+        "silla-m2-b2.json",
+        "silla-m2-b3.json",
+        "silla-m2-b4.json"
+      ]
     }
   ]
 }
