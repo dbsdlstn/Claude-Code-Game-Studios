@@ -27,6 +27,14 @@
         "silla-m2-b3.json",
         "silla-m2-b4.json"
       ]
+    },
+    {
+      "id": "usilla",
+      "label": "통일신라",
+      "files": [
+        "usilla-m3-b1.json",
+        "usilla-m3-b2.json"
+      ]
     }
   ]
 }

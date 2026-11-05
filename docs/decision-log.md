@@ -1094,6 +1094,12 @@
 - **접근성(F9)**: `production/qa/a11y-m2.md` 점검표. e2e "접근성" 테스트(`tests/a11y.mjs`)가 타이틀·질문·오답 공개·결과·도감 4탭의 WCAG AA 대비 위반 0, 나라 목록 radiogroup 방향키(로빙 tabindex), 결과 dialog 포커스·progressbar·낭독 영역을 매번 확인. 실제 스크린리더·실기기는 M2-B 몫으로 미확인 표기.
 - **증거**: `production/qa/evidence/m2/` 390·1280 전 화면 61장 재촬영. 단위 90, e2e 61 통과.
 
+## 2026-11-05 D210. 통일신라 덱 manifest 등록 (콘텐츠 세션)
+- 웹 usilla 지원(53bce91) 뒤 `python3 tools/promote_staging.py usilla 통일신라 usilla-m3-b1.json usilla-m3-b2.json --apply`로 등록: staging 두 파일을 `assets/data/cards/v2/`로 옮기고 manifest에 usilla(통일신라) 추가, 사건 목록 planned 22건 → owned.
+- 검증: 기본 실행 PASS(파일 12, 앵커 47, 원문 120, 0/0). E·V 변형 테스트, mark_verified 테스트, validator parity 39/39, 웹 rules(59)·m2(11)·e2e-m2(25) 통과.
+- **웹 테스트 고정 목록 경로 수정**: `prototypes/m1-timeline/tests/fixtures/manifest-usilla.json`이 staging 경로를 가리켜 e2e-m2 1건이 실패했다(파일을 옮긴 결과). 경로만 `v2/`로 고쳐 통과시켰다(웹 소관 파일, 내용·단언 변경 없음).
+- 확인 안내서 재생성(191항목·17묶음), 덱 이름 표기를 "통일신라"로.
+
 ## 남은 문제
 - 카드 44장 전부 `verified: false`. 사람의 사실 확인 전에는 출시 빌드에 넣을 카드가 없다(`validate_cards.py --release` 실패가 정상).
 - 같은 사료(삼국사기 전승)에 기댄 건국기 카드가 많다. 플레이에서 건국기 칸이 단서 3단계 의존으로 쏠리는지 볼 것.
