@@ -107,6 +107,7 @@ jobs:
 
       - name: Import project (retry once)
         run: |
+          set +e
           set -uo pipefail
           # 4.7.1/4.7.2는 새 프로젝트 첫 import가 139로 끝날 수 있다(engine-reference 관찰). 한 번 더 시도한다.
           for attempt in 1 2; do
@@ -121,14 +122,17 @@ jobs:
       - name: Parse check each script
         id: parse
         run: |
+          # Actions의 기본 셸은 bash -e다. Godot가 오류로 끝나도 다음 파일을 계속 검사한다.
+          set +e
           set -uo pipefail
           : > parse-check.log
           bad=0
           while IFS= read -r f; do
             out="$("$GODOT" --headless --path . --check-only --script "res://$f" 2>&1)"
-            if echo "$out" | grep -qE "Parse Error|SCRIPT ERROR|Failed to load"; then
+            code=$?
+            if [ "$code" -ne 0 ] || echo "$out" | grep -qE "Parse Error|SCRIPT ERROR|Failed to load"; then
               bad=$((bad + 1))
-              { echo "=== $f"; echo "$out" | grep -E "Parse Error|SCRIPT ERROR|at: |Failed to load"; } >> parse-check.log
+              { echo "=== $f (exit $code)"; echo "$out" | grep -E "Parse Error|SCRIPT ERROR|at: |Failed to load|ERROR"; } >> parse-check.log
             fi
           done < <(git ls-files 'src/*.gd' 'tests/*.gd')
           echo "scripts with parse errors: $bad"
@@ -146,6 +150,7 @@ jobs:
         id: tests
         if: always()
         run: |
+          set +e
           set -uo pipefail
           "$GODOT" --headless --path . -s -d --remote-debug tcp://127.0.0.1:0 \
             res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a res://tests --ignoreHeadlessMode 2>&1 | tee gdunit.log
