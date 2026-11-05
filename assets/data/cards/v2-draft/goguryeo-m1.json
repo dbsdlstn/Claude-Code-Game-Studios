@@ -229,9 +229,10 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[고국천왕 즉위]보다 먼저.",
+          "text": "[동명성왕]이 즉위한 뒤, [동천왕]이 즉위하기 전의 일이다.",
           "refs": [
-            "goguryeo-anchor-gogukcheon"
+            "goguryeo-anchor-dongmyeong",
+            "goguryeo-anchor-dongcheon"
           ]
         },
         {
@@ -268,8 +269,9 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[동천왕 즉위]보다 먼저.",
+          "text": "[태조왕]이 즉위한 뒤, [동천왕]이 즉위하기 전의 일이다.",
           "refs": [
+            "goguryeo-anchor-taejo",
             "goguryeo-anchor-dongcheon"
           ]
         },
@@ -307,9 +309,10 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[미천왕 즉위]보다 먼저.",
+          "text": "[동천왕]이 즉위한 뒤, [광개토왕]이 즉위하기 전의 일이다.",
           "refs": [
-            "goguryeo-anchor-micheon"
+            "goguryeo-anchor-dongcheon",
+            "goguryeo-anchor-gwanggaeto"
           ]
         },
         {
@@ -346,8 +349,9 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[소수림왕 즉위]보다 먼저.",
+          "text": "[고국천왕]이 즉위한 뒤, [소수림왕]이 즉위하기 전의 일이다.",
           "refs": [
+            "goguryeo-anchor-gogukcheon",
             "goguryeo-anchor-sosurim"
           ]
         },
@@ -385,9 +389,10 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[소수림왕 즉위]보다 먼저.",
+          "text": "[미천왕]이 즉위한 뒤, [광개토왕]이 즉위하기 전의 일이다.",
           "refs": [
-            "goguryeo-anchor-sosurim"
+            "goguryeo-anchor-micheon",
+            "goguryeo-anchor-gwanggaeto"
           ]
         },
         {
@@ -424,9 +429,10 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[광개토왕 즉위]보다 먼저.",
+          "text": "[미천왕]이 즉위한 뒤, [장수왕]이 즉위하기 전의 일이다.",
           "refs": [
-            "goguryeo-anchor-gwanggaeto"
+            "goguryeo-anchor-micheon",
+            "goguryeo-anchor-jangsu"
           ]
         },
         {
@@ -463,9 +469,10 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[광개토왕 즉위]보다 먼저.",
+          "text": "[소수림왕]이 즉위한 뒤, [장수왕]이 즉위하기 전의 일이다.",
           "refs": [
-            "goguryeo-anchor-gwanggaeto"
+            "goguryeo-anchor-sosurim",
+            "goguryeo-anchor-jangsu"
           ]
         },
         {
@@ -502,9 +509,10 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[장수왕 즉위]보다 먼저.",
+          "text": "[소수림왕]이 즉위한 뒤, [영양왕]이 즉위하기 전의 일이다.",
           "refs": [
-            "goguryeo-anchor-jangsu"
+            "goguryeo-anchor-sosurim",
+            "goguryeo-anchor-yeongyang"
           ]
         },
         {
@@ -536,13 +544,14 @@
         "after": "goguryeo-anchor-jangsu",
         "before": "goguryeo-anchor-yeongyang"
       },
-      "front": "왕이 도읍을 평양으로 옮겼다.",
+      "front": "왕이 나라의 도읍을 옮겨 평양에 새로 자리 잡았다.",
       "clues": [
         {
           "level": 1,
           "kind": "relation",
-          "text": "[영양왕 즉위]보다 먼저.",
+          "text": "[광개토왕]이 즉위한 뒤, [영양왕]이 즉위하기 전의 일이다.",
           "refs": [
+            "goguryeo-anchor-gwanggaeto",
             "goguryeo-anchor-yeongyang"
           ]
         },
@@ -556,7 +565,7 @@
       "explanation": "장수왕이 국내성에서 평양으로 도읍을 옮겨 남진의 발판을 마련한 일.",
       "exam_note": "장수왕: 평양 천도(427) → 한성 함락(475) → 백제 웅진 천도 순서.",
       "source_ref": "삼국사기 권18 고구려본기 제6 장수왕 15년조",
-      "source_note": "지문이 짧고 '평양'이 들어 있어 쉬운 카드. 247년 동천왕의 '평양성' 천도와 헷갈리지 않게 해설에 적을 것. 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전",
+      "source_note": "지문이 짧고 '평양'이 들어 있어 쉬운 카드. 247년 동천왕의 '평양성' 천도와 헷갈리지 않게 해설에 적을 것. 원문 기사는 '도읍을 평양으로 옮겼다' 한 줄이라, 지문은 사실을 더하지 않고 길이만 늘렸다(D69). 문장은 원문 내용을 근거로 새로 풀어 쓴 것이며 번역문을 옮기지 않았다. 원문 대조 필요. 검증 전",
       "verified": false,
       "verified_by": null,
       "difficulty": 1
@@ -580,9 +589,10 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[영양왕 즉위]보다 먼저.",
+          "text": "[광개토왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다.",
           "refs": [
-            "goguryeo-anchor-yeongyang"
+            "goguryeo-anchor-gwanggaeto",
+            "goguryeo-anchor-bojang"
           ]
         },
         {
@@ -619,8 +629,9 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[보장왕 즉위]보다 먼저.",
+          "text": "[장수왕]이 즉위한 뒤, [보장왕]이 즉위하기 전의 일이다.",
           "refs": [
+            "goguryeo-anchor-jangsu",
             "goguryeo-anchor-bojang"
           ]
         },
@@ -658,9 +669,9 @@
         {
           "level": 1,
           "kind": "relation",
-          "text": "[보장왕 즉위]보다 나중.",
+          "text": "[장수왕]이 즉위한 뒤의 일이다.",
           "refs": [
-            "goguryeo-anchor-bojang"
+            "goguryeo-anchor-jangsu"
           ]
         },
         {
@@ -680,5 +691,5 @@
     }
   ],
   "_anchor_rule": "앵커 연도는 수험서·교과서에서 널리 쓰는 표기 하나로 정하고, 다른 기년은 year_alt에 병기한다(D60). 광개토왕(391, 비문)과 장수왕(413, 삼국사기)은 수험 표기 자체가 기년 기준이 다르다.",
-  "_clue_rule": "단서 순서: 앞면 사료 지문(무료) → 관계 단서(앞뒤 기준 카드 중 한쪽만) → 직접 단서(왕·연도). 관계 단서는 기본적으로 뒤쪽(다음 왕 즉위)을 말해, 자기 왕의 즉위를 바로 알려 주지 않는다(D62)."
+  "_clue_rule": "단서 순서: 앞면 사료 지문(무료) → 관계 단서(후보를 2~3칸으로 좁히는 구간, D68) → 직접 단서(왕·연도)."
 }

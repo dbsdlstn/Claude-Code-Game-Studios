@@ -2,14 +2,10 @@
 """Validate v2 card data against design/card-data-schema-v2.md.
 
 Usage:
-    python3 tools/validate_cards_v2.py [path ...] [--release] [--allow-two-relations]
+    python3 tools/validate_cards_v2.py [path ...] [--release]
 
     path       v2 card JSON file(s). Default: every assets/data/cards/v2/*.json
     --release  also apply the release gate (R1-R3 below).
-    --allow-two-relations
-               accept a level-1 relation clue with two relations (an interval).
-               Off by default: decision-log D62 makes the relation clue name one
-               side only. The schema allows 1-2; see D67.
 
 Exit code 0 = all checks passed, 1 = rule violations, 2 = file/JSON error.
 Standard library only. The v1 validator (tools/validate_cards.py) is separate
@@ -36,12 +32,16 @@ RULES (numbers follow the schema doc; a headless test should use the same):
       Length outside 20-200 characters is a warning.
   V9  text_basis == own_paraphrase_from_original.
   V10 clues: exactly two, levels 1 and 2, kinds relation and direct.
-      relations: 1 (2 only with --allow-two-relations, then one after and one
-      before, after's order < before's order); op in {before, after}; ref is an
+      relations: 1 or 2 (two = one after and one before, after's order <
+      before's order); op in {before, after}; ref is an
       anchor of the same nation; every relation is true (before: year <
       ref.start, after: year >= ref.start; the V6 same-year exception also
       makes `before` true for answer.before); the text contains "[ref title]"
       for every ref; the direct text is not empty.
+      V10a (D68): candidate gaps left by the relation clue (gaps between the
+      after anchor, or the first anchor, and the before anchor, or the end)
+      must be 2 or 3. 1 is an error (the clue gives the answer away); 4 or more
+      is a warning (the clue barely narrows).
   V11 exam_tags non-empty subset of {institution, person, war, culture}.
   V12 explanation non-empty and contains reign_label.
   V13 source_ref has work, section, entry.
@@ -114,7 +114,22 @@ def v1_ids():
     return ids
 
 
-def validate(cards, release=False, allow_two=False):
+def candidate_gaps(rels, items):
+    """Number of gaps left by relations over the ordered anchors `items`."""
+    idx = {a.get("id"): i for i, a in enumerate(items)}
+    lo, hi = 0, len(items)
+    for r in rels:
+        if not isinstance(r, dict) or r.get("ref") not in idx:
+            continue
+        i = idx[r["ref"]]
+        if r.get("op") == "after":
+            lo = max(lo, i)
+        elif r.get("op") == "before":
+            hi = min(hi, i)
+    return max(hi - lo, 0)
+
+
+def validate(cards, release=False):
     errors, warnings = [], []
 
     def err(cid, rule, msg):
@@ -262,10 +277,8 @@ def validate(cards, release=False, allow_two=False):
                 err(cid, "V10", "clues must be level 1 relation, level 2 direct")
             rel = clues[0]
             rels = rel.get("relations")
-            limit = 2 if allow_two else 1
-            if not (isinstance(rels, list) and 1 <= len(rels) <= limit):
-                err(cid, "V10", f"relations must have 1..{limit} entries"
-                    + ("" if allow_two else " (one side only, D62)"))
+            if not (isinstance(rels, list) and 1 <= len(rels) <= 2):
+                err(cid, "V10", "relations must have 1 or 2 entries")
                 rels = rels if isinstance(rels, list) else []
             rtext = rel.get("text") if nonempty(rel.get("text")) else ""
             if not rtext:
@@ -298,6 +311,12 @@ def validate(cards, release=False, allow_two=False):
                     err(cid, "V10", "two relations must be one after and one before")
                 elif not ops["after"].get("order", 0) < ops["before"].get("order", 0):
                     err(cid, "V10", "the after anchor must come before the before anchor")
+            items = sorted(order_index.get(nation, {}).values(), key=lambda a: a.get("order", 0))
+            n_gaps = candidate_gaps(rels, items)
+            if n_gaps == 1:
+                err(cid, "V10", "relation clue leaves 1 candidate gap; it must leave 2-3 (D68)")
+            elif n_gaps >= 4:
+                warnings.append(f"[V10] {cid}: relation clue leaves {n_gaps} candidate gaps (target 2-3, D68)")
             if not nonempty(clues[1].get("text")):
                 err(cid, "V10", "direct clue text is empty")
         # V11
@@ -380,23 +399,12 @@ def observations(anchors, sources):
             if c.get("nation") != nation:
                 continue
             rels = ((c.get("clues") or [{}])[0] or {}).get("relations") or []
-            lo, hi = 0, len(items)  # candidate gap indices [lo, hi)
-            idx = {a.get("id"): i for i, a in enumerate(items)}
-            for r in rels:
-                if not isinstance(r, dict) or r.get("ref") not in idx:
-                    continue
-                i = idx[r["ref"]]
-                if r.get("op") == "after":
-                    lo = max(lo, i)
-                elif r.get("op") == "before":
-                    hi = min(hi, i)
-            lines.append(f"  {c.get('id')}: {max(hi - lo, 0)} candidate gap(s) after the relation clue")
+            lines.append(f"  {c.get('id')}: {candidate_gaps(rels, items)} candidate gap(s) after the relation clue")
     return lines
 
 
 def main(argv):
     release = "--release" in argv
-    allow_two = "--allow-two-relations" in argv
     paths = [a for a in argv if not a.startswith("--")] or sorted(glob.glob(DEFAULT_GLOB))
     if not paths:
         print("ERROR: no v2 card files found")
@@ -412,7 +420,7 @@ def main(argv):
             print(f"ERROR {p}: top level must be {{\"schema\": 2, \"cards\": [...]}}")
             return 2
         cards.extend(data["cards"])
-    errors, warnings, anchors, sources = validate(cards, release, allow_two)
+    errors, warnings, anchors, sources = validate(cards, release)
     print(f"files: {len(paths)}, anchors: {len(anchors)}, source cards: {len(sources)}"
           + (" (release mode)" if release else ""))
     for line in observations(anchors, sources):
