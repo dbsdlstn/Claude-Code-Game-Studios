@@ -493,23 +493,35 @@ function skipSession() {
 }
 
 const KIND_TEXT = { clean: '깨끗한 정답', relation: '단서를 보고 맞힘', direct: '직접 단서를 보고 맞힘', wrong: '해설을 읽어 보세요' };
-const GRADE_LINE = ['', '동 등급이 되었어요', '은 등급', '금 등급'];
+const GRADE_LINE = ['', '동 등급', '은 등급', '금 등급'];
 
 /**
  * 세션 결과(한 화면, rewards-spec §6·session-result.md D128): A 결과 요약 → B 다음 복습 + [다음 세션] → C 이번 세션 XP →
  * D 바뀐 카드만 → E 하루 목표·연속 → F 레벨 → G 업적. 사건이 없는 블록은 빠진다. 블록은 data-stage.
  */
+/** 보너스 없는 상자 승급(1 → 2)만 있는 줄: D 블록에서 합계 한 줄로 묶는다(D168). */
+function plainUp(l) {
+  const from = l.boxFrom ?? 1;
+  return l.changed && l.kind !== 'wrong' && l.boxTo !== null && l.boxTo > from && !l.boxUp && !l.released && !l.grades.length && !l.newProbation;
+}
+
+/** 카드 한 장 = 한 줄(D168): "진대법 · 동 등급 · +35". 바뀐 것이 없으면 인출 방식을 적는다. */
 function settleLine(l, hintState) {
   const c = app.cardsById.get(l.id);
-  const subs = [];
   const from = l.boxFrom ?? 1;
-  if (l.boxTo !== null && l.boxTo !== from) subs.push(el('span', { class: 'settle-sub' }, `상자 ${from} → ${l.boxTo}${l.boxUp ? ` · +${l.boxXp}` : ''}`));
-  if (l.released) subs.push(el('span', { class: 'settle-sub settle-grade' }, `지난번 틀린 카드를 이겨 냈어요 · +${l.releaseXp}`));
-  for (const gr of l.grades) subs.push(el('span', { class: 'settle-sub settle-grade' }, `${GRADE_LINE[gr]} · +${R.xp.grade_up[gr]}`));
-  if (l.newProbation) subs.push(el('span', { class: 'settle-hint' }, '다음에 두 번 연속 맞히면 올라가요'));
-  if ((l.kind === 'relation' || l.kind === 'direct') && !hintState.shown) { hintState.shown = true; subs.push(el('span', { class: 'settle-hint', id: 'settle-clue-hint' }, `깨끗하게 맞히면 +${R.xp.clean}`)); }
-  return el('li', { class: 'settle', dataset: { id: l.id, kind: l.kind, xp: String(l.total), changed: l.changed ? '1' : '0' } },
-    el('span', { class: 'settle-main' }, `${c?.title ?? l.id} · ${KIND_TEXT[l.kind]}`), l.capped ? el('span') : el('b', { class: 'settle-xp' }, `+${l.xp}`), ...subs);
+  const parts = [c?.title ?? l.id];
+  const ev = [];
+  if (l.kind === 'wrong') ev.push('오답');
+  for (const gr of l.grades) ev.push(GRADE_LINE[gr]);
+  if (l.released) ev.push('지난번 틀린 카드를 이겨 냈어요');
+  if (l.boxTo !== null && l.boxTo !== from && !l.grades.length) ev.push(`상자 ${from} → ${l.boxTo}`);
+  if (l.newProbation) ev.push('두 번 연속 맞히면 올라가요');
+  parts.push(...(ev.length ? ev : [KIND_TEXT[l.kind]]));
+  const showXp = !(l.capped && !l.total);
+  const sub = (l.kind === 'relation' || l.kind === 'direct') && !hintState.shown
+    ? (hintState.shown = true, el('span', { class: 'settle-hint', id: 'settle-clue-hint' }, `깨끗하게 맞히면 +${R.xp.clean}`)) : null;
+  return el('li', { class: `settle${l.grades.length || l.released ? ' settle-grade' : ''}`, dataset: { id: l.id, kind: l.kind, xp: String(l.total), changed: l.changed ? '1' : '0' } },
+    el('span', { class: 'settle-main' }, parts.join(' · ')), showXp ? el('b', { class: 'settle-xp' }, `+${l.total}`) : el('span'), sub);
 }
 
 function rewardBlocks() {
@@ -526,14 +538,18 @@ function rewardBlocks() {
         g.capped ? el('small', { class: 'settle-hint', id: 'summary-cap' }, ` · 그날 ${R.xp_cards_per_day}장을 넘긴 카드부터는 경험치가 없어요`) : null)));
   // D 바뀐 카드만
   const hint = { shown: false };
-  const changed = g.lines.filter((l) => l.changed);
+  const ups = g.lines.filter(plainUp);
+  const changed = g.lines.filter((l) => l.changed && !plainUp(l));
   const same = g.lines.filter((l) => !l.changed);
+  const upTo = new Set(ups.map((l) => l.boxTo));
+  const upLine = ups.length ? el('p', { class: 'settle-up', id: 'settle-up' }, upTo.size === 1 ? `상자 ${ups[0].boxTo}로 오른 카드 ${ups.length}장` : `상자가 오른 카드 ${ups.length}장`) : null;
   const list = el('ul', { class: 'settle-list', id: 'settle-list' }, changed.slice(0, changed.length > 6 ? 5 : 6).map((l) => settleLine(l, hint)));
   const moreChanged = changed.length > 6 ? changed.slice(5) : [];
   const full = el('ul', { class: 'settle-list', id: 'settle-full', hidden: true }, g.lines.map((l) => settleLine(l, { shown: true })));
   blocks.push(el('section', { class: 'stage', dataset: { stage: 'cards' }, id: 'stage-cards', 'aria-label': '바뀐 카드' },
-    el('h3', {}, changed.length ? '바뀐 카드' : '이번 세션의 카드'),
+    el('h3', {}, changed.length || ups.length ? '바뀐 카드' : '이번 세션의 카드'),
     changed.length ? list : null,
+    upLine,
     moreChanged.length ? el('button', { type: 'button', class: 'btn btn-small btn-quiet', id: 'settle-more', onclick: (e) => { list.append(...moreChanged.map((l) => settleLine(l, hint))); e.target.remove(); } }, `더 보기 (${moreChanged.length}장)`) : null,
     same.length ? el('p', { class: 'source-note', id: 'settle-same' }, `그 밖에 ${same.length}장은 변화 없어요 `,
       el('button', { type: 'button', class: 'btn btn-small btn-quiet', id: 'settle-all', 'aria-expanded': 'false', onclick: (e) => { full.hidden = !full.hidden; e.target.setAttribute('aria-expanded', full.hidden ? 'false' : 'true'); e.target.textContent = full.hidden ? '전체 보기' : '접기'; } }, '전체 보기')) : null,

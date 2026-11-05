@@ -112,15 +112,12 @@ test('결과 한 화면(D128): A 요약 → B 다음 복습·[다음 세션] →
   assert.equal(await page.locator('#stage-next #summary-next').count(), 1, '[다음 세션]은 B 블록 안');
   assert.equal(await page.isVisible('#summary-skip'), false);
   assert.equal(await page.isVisible('#summary-step'), false);
-  // D: 바뀐 카드만(새 카드 첫 정답은 상자 1 → 2, 보너스 없음; 오답은 재학습 표시가 새로 붙음)
+  // D: 바뀐 카드만(D168). 새 카드 첫 정답은 상자 1 → 2(보너스 없음)라 합계 한 줄, 오답만 카드별 한 줄
   const lines = await page.locator('#settle-list .settle').evaluateAll((n) => n.map((x) => [x.dataset.kind, x.innerText]));
-  assert.equal(lines.length, FIRST, '이번 세션은 모두 바뀜(새 카드)');
-  const wrong = lines.find(([k]) => k === 'wrong');
-  assert.match(wrong[1], /해설을 읽어 보세요\s*\+0[\s\S]*다음에 두 번 연속 맞히면 올라가요/);
-  for (const [, t] of lines.filter(([k]) => k === 'clean')) {
-    assert.match(t, /깨끗한 정답\s*\+10[\s\S]*상자 1 → 2/);
-    assert.doesNotMatch(t, /상자 1 → 2 · \+5/, '상자 1 → 2에는 승급 보너스가 없다(D164)');
-  }
+  assert.equal(lines.length, 1, '카드별 줄은 오답 1장뿐');
+  assert.match(lines[0][1], /^.+ · 오답 · 두 번 연속 맞히면 올라가요\s*\+0$/, '카드 한 장 = 한 줄');
+  assert.equal(await page.innerText('#settle-up'), `상자 2로 오른 카드 ${FIRST - 1}장`);
+  assert.doesNotMatch(await page.innerText('#stage-cards'), /상자 1 → 2 · \+/, '상자 1 → 2에는 승급 보너스가 없다(D164)');
   assert.doesNotMatch(await page.innerText('#summary-body'), /직접 힌트/);
   const xp = (FIRST - 1) * X.clean + X.daily_goal;
   assert.equal(await page.getAttribute('#summary-xp', 'data-xp'), String(xp));
@@ -646,4 +643,56 @@ test('통일신라(usilla, staging 고정 목록): 나라 버튼과 연표 제�
   assert.equal(await page.locator('#timeline .row-anchor').count(), 12);
   assert.ok(await page.getAttribute('#card', 'data-card-id'));
   assert.ok(await noOverflow(page));
+}));
+
+// D111: 나라 4개(실제 3 + 통일신라)도 390px 세로 목록에 모두 보이고 행마다 인장이 있다
+test('390px 나라 4개(통일신라 포함): 세로 목록 4행(56px 이상, 인장 고·백·신·통), 가로 스크롤 없음', { skip: !nationDeck('silla') && '신라 없음' }, () => withPage(VIEWPORTS.mobile, async (page) => {
+  await openProto(page, server.base, { data: null, title: null, manifest: USILLA });
+  await page.waitForSelector('#title:not([hidden])');
+  const rows = page.locator('#title-nations .nation-row');
+  assert.equal(await rows.count(), 4);
+  const info = await rows.evaluateAll((r) => r.map((x) => { const b = x.getBoundingClientRect(); return [x.dataset.nation, x.querySelector('.seal')?.textContent, b.height, b.left]; }));
+  assert.deepEqual(info.map((x) => x[0]), ['goguryeo', 'baekje', 'silla', 'usilla']);
+  assert.deepEqual(info.map((x) => x[1]), ['고', '백', '신', '통']);
+  assert.ok(info.every((x) => x[2] >= 56), String(info.map((x) => x[2])));
+  assert.equal(new Set(info.map((x) => Math.round(x[3]))).size, 1, '한 줄에 하나씩(세로)');
+  assert.ok(await noOverflow(page));
+}));
+
+// D111: 키보드만으로 타이틀 → 세션 → 결과 → 도감(Tab·Enter·방향키, 마우스 없음)
+async function tabTo(page, pred, max = 80, arg = null) {
+  for (let i = 0; i < max; i++) {
+    await page.keyboard.press('Tab');
+    if (await page.evaluate(pred, arg)) return true;
+  }
+  return false;
+}
+test('키보드만: 타이틀 → 학습 세션(칸 Tab+Enter) → 결과 → 도감 탭 방향키', { skip: !FULL && '실제 데이터 없음' }, () => withPage(VIEWPORTS.desktop, async (page) => {
+  await openProto(page, server.base, { data: null, title: null });
+  await page.waitForSelector('#title:not([hidden])');
+  assert.ok(await tabTo(page, () => document.activeElement?.id === 'title-play'), '[시작] Tab으로 닿음');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('#card[data-card-id]');
+  let n = 0;
+  while (await page.getAttribute('#card', 'data-card-id')) {
+    const c = await currentCard(page, FULL_BY_ID);
+    const { right } = await gapsFor(page, c);
+    assert.ok(await tabTo(page, (k) => document.activeElement?.matches?.(`#timeline .gap[data-gap="${k}"]`), 200, right), '칸 Tab으로 닿음');
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('#result');
+    assert.ok(await tabTo(page, () => document.activeElement?.id === 'btn-next'), '[다음] Tab으로 닿음');
+    await page.keyboard.press('Enter');
+    if (++n > 20) break;
+  }
+  await page.waitForSelector('#summary:not([hidden])');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'summary-next');
+  assert.ok(await tabTo(page, () => document.activeElement?.id === 'summary-dogam'), '결과 → [도감] Tab으로 닿음');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('#dogam:not([hidden])');
+  assert.ok(await tabTo(page, () => document.activeElement?.getAttribute('role') === 'tab'), '도감 탭 Tab으로 닿음');
+  const before = await page.evaluate(() => document.activeElement.id);
+  await page.keyboard.press('ArrowRight');
+  const after = await page.evaluate(() => [document.activeElement.id, document.activeElement.getAttribute('aria-selected')]);
+  assert.notEqual(after[0], before);
+  assert.equal(after[1], 'true', '방향키로 탭이 바뀜');
 }));

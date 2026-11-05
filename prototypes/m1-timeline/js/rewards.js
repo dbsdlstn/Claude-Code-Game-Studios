@@ -140,7 +140,7 @@ export function achievementDefs(nation = null, nationLabel = '') {
     { id: 'first-bronze', name: '첫 동', desc: '카드 하나가 동 등급이 되었어요', test: (s) => s.bronzePlus >= 1, progress: null },
     { id: 'first-silver', name: '첫 은', desc: '카드 하나가 은 등급이 되었어요', test: (s) => s.silverPlus >= 1, progress: null },
     { id: 'first-gold', name: '첫 금', desc: '카드 하나를 금 등급까지 올렸어요', test: (s) => s.gold >= 1, progress: null },
-    { id: 'clean-session', name: '깨끗한 한 판', desc: '한 세션에서 5장을 모두 힌트 없이 맞혔어요', test: (s) => s.sessionCards >= 5 && s.sessionClean === s.sessionCards, progress: null },
+    { id: 'clean-session', name: '깨끗한 한 판', desc: '한 세션에서 5장을 모두 단서 없이 맞혔어요', test: (s) => s.sessionCards >= 5 && s.sessionClean === s.sessionCards, progress: null },
     { id: 'wrong-note-clear', name: '오답 노트 비우기', desc: '틀렸던 카드를 모두 다시 익혔어요', test: (s) => s.lapsed >= 3 && s.lapsedRecovered === s.lapsed, progress: (s) => (s.lapsed >= 3 ? [s.lapsedRecovered, s.lapsed] : null) },
     { id: 'streak-3', name: '사흘 연속', desc: '3일 이어서 공부했어요', test: (s) => s.bestStreak >= 3, progress: (s) => [Math.min(3, s.streak), 3] },
     { id: 'streak-7', name: '일주일 연속', desc: '7일 이어서 공부했어요', test: (s) => s.bestStreak >= 7, progress: (s) => [Math.min(7, s.streak), 7] },
