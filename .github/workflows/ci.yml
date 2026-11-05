@@ -53,6 +53,9 @@ jobs:
       - name: Passage variant rules (V16-V21 mutation tests)
         run: python3 tools/test_validate_variants.py
 
+      - name: Review recorder tests (mark_verified.py)
+        run: python3 tools/test_mark_verified.py
+
       - name: Validator parity (Python)
         run: python3 tools/validator_parity.py
 
